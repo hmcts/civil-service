@@ -113,6 +113,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -238,6 +239,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(YES);
         } else {
             updatedData.showCarmFields(NO);
+        }
+
+        // After respond to claim, when spec and claim is less/equal 1000 we update CML to default location (192280),
+        // After SDO claim should be pointed towards local court, so use non-legal advisor route logic and update based on
+        // DQs for preferred location
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+        && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0) {
+            log.info("Update CML to DQ preferred location, legal advisor SDO");
+            updateCaseManagementLocationForSdo(callbackParams, updatedData);
         }
 
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, true);
@@ -1299,10 +1309,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
             }
             dataBuilder.sdoR2Trial(sdoR2Trial);
-        }
-
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            updateCaseManagementLocationForSdo(callbackParams, dataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

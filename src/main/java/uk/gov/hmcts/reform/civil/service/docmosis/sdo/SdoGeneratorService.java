@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAlloca
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SdoGeneratorService {
 
     private final DocumentGeneratorService documentGeneratorService;
@@ -48,12 +50,7 @@ public class SdoGeneratorService {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
 
-        boolean isJudge = false;
-
-        if (userDetails.getRoles() != null) {
-            isJudge = userDetails.getRoles().stream()
-                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-        }
+        boolean isJudge = true;
 
         if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
@@ -72,6 +69,9 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
+
+        log.info("docmosis template is " + docmosisTemplate);
+        log.info("CML is " + caseData.getCaseManagementLocation());
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
