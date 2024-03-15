@@ -283,7 +283,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         handler.handle(callbackParams);
 
         verify(dashboardApiClient, times(1)).recordScenario(
-        caseData.getCcdCaseReference().toString(),
+            caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
                 .getScenario(),
             "BEARER_TOKEN",
