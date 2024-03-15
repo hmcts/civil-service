@@ -19,8 +19,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 @RunWith(SpringRunner.class)
-@EnableFeignClients(defaultConfiguration = DasbhboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
-public class DasbhboardBaseIntegrationTest extends BaseIntegrationTest {
+@EnableFeignClients(defaultConfiguration = DashboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
+public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     public static class MockMvcFeignConfiguration {
         @Bean
