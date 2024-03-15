@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.FeatureNotActiveException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -80,6 +81,10 @@ public class HearingValuesService {
     private final FeatureToggleService featureToggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
+        if (!featureToggleService.isHmcEnabled()) {
+            throw new FeatureNotActiveException("HMC");
+        }
+
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
         isEarlyAdopter(caseData);
@@ -90,7 +95,7 @@ public class HearingValuesService {
         return ServiceHearingValuesModel.builder()
             .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
+            .publicCaseName(getPublicCaseName(caseData))
             .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
             .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
@@ -106,7 +111,7 @@ public class HearingValuesService {
             .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
             .hearingInWelshFlag(getHearingInWelshFlag(caseData))
             .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData)) // todo civ-6888
+            .facilitiesRequired(getFacilitiesRequired(caseData))
             .listingComments(getListingComments(caseData))
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
@@ -115,11 +120,11 @@ public class HearingValuesService {
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
             .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
+            .caseFlags(getCaseFlags(caseData))
             .build();
     }
 

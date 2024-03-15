@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
@@ -45,36 +44,28 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDate() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-09-15");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-02");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
         }
 
         @Test
         void shouldPopulateJudgementStatusAsSatisfied() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-09-15");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-02");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("judgmentStatusTypes").isEqualTo(
                 JudgmentStatusType.SATISFIED.name());
@@ -86,18 +77,14 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsCancelled() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-09-15");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-01");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("judgmentStatusTypes").isEqualTo(
                 JudgmentStatusType.CANCELLED.name());
@@ -111,7 +98,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentMadeDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
@@ -125,7 +112,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED)
