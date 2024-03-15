@@ -27,7 +27,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION("Scenario.AAA7.ClaimIssue.HWF.PartRemission"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_NO_REMISSION("Scenario.AAA7.ClaimIssue.HWF.Rejected"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant"),
-    SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant");
+    SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant"),
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission");
 
     private final String scenario;
 
