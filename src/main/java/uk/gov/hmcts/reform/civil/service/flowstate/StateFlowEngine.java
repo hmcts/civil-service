@@ -523,7 +523,8 @@ public class StateFlowEngine {
                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.or(isDefendantNotPaidFullDefenceClaim).and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()))
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.or(isDefendantNotPaidFullDefenceClaim)
+                                                           .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                     flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
