@@ -73,6 +73,12 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
         }  else if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
+            if ((caseData.hasDefendantNotPaid()
+                || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && (caseData.isFullDefenceNotPaid() || caseData.isClaimantIntentionNotSettlePartAdmit()))
+                && caseData.isMediationRejectedOrFastTrack())) {
+                return SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario();
+            }
             if (caseData.isRespondentResponseFullDefence()
                 && (isNull(caseData.getResponseClaimMediationSpecRequired())
                 || caseData.hasDefendantNotAgreedToFreeMediation())) {
@@ -85,12 +91,6 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
                     || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario();
             }
-        }
-        if ((caseData.hasDefendantNotPaid()
-            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && (caseData.isFullDefenceNotPaid() || caseData.isClaimantIntentionNotSettlePartAdmit()))
-            && caseData.isMediationRejectedOrFastTrack())) {
-            return SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario();
         }
         return null;
     }
