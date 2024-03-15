@@ -96,6 +96,9 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setJoSetAsideOrderDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
+        caseData.setJoSetAsideOrderType(null);
+        caseData.setJoSetAsideReason(null);
+        caseData.setJoSetAsideJudgmentErrorText(null);
         caseData.setJoJudgmentPaidInFull(null);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
