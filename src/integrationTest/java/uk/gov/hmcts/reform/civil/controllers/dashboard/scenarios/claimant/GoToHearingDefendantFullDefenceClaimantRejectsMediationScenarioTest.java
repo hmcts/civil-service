@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class GoToHearingDefendantFullDefenceScenarioTest extends BaseIntegrationTest {
+public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest extends BaseIntegrationTest {
 
     @Test
     void should_create_go_to_hearing_scenario() throws Exception {
@@ -24,7 +24,7 @@ public class GoToHearingDefendantFullDefenceScenarioTest extends BaseIntegration
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimant1PartyName", "John Doe"))
+                   .params(Map.of("applicant1PartyName", "John Doe"))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario(), caseId
         )
@@ -41,8 +41,8 @@ public class GoToHearingDefendantFullDefenceScenarioTest extends BaseIntegration
                                + " <p class=\"govuk-body\">They rejected your response.</p> <p class=\"govuk-body\">They"
                                + " said no to mediation.</p> <p class=\"govuk-body\">If the case goes to a hearing we will"
                                + " contact you with further details.</p> <p class=\"govuk-body\"><a"
-                               + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a></p>"
-                               + " <p class=\"govuk-body\"><a href={VIEW_CLAIMANT_HEARING_REQUIREMENTS}"
+                               + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a><br>"
+                               + "<a href={VIEW_CLAIMANT_HEARING_REQS}"
                                + " class=\"govuk-link\">View the claimant's hearing requirements</a></p>"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionCy")
@@ -50,8 +50,8 @@ public class GoToHearingDefendantFullDefenceScenarioTest extends BaseIntegration
                                + " <p class=\"govuk-body\">They rejected your response.</p> <p class=\"govuk-body\">They"
                                + " said no to mediation.</p> <p class=\"govuk-body\">If the case goes to a hearing we will"
                                + " contact you with further details.</p> <p class=\"govuk-body\"><a"
-                               + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a></p>"
-                               + " <p class=\"govuk-body\"><a href={VIEW_CLAIMANT_HEARING_REQUIREMENTS}"
+                               + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a><br>"
+                               + "<a href={VIEW_CLAIMANT_HEARING_REQS}"
                                + " class=\"govuk-link\">View the claimant's hearing requirements</a></p>")
             );
     }
