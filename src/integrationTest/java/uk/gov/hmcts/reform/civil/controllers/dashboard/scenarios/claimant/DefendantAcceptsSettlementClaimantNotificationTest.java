@@ -7,7 +7,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +35,6 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends BaseInte
             SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_DEFENDANT_RESPONSE_ACCEPTS_CLAIMANT.getScenario(),
             caseId
         ).andExpect(status().isOk());
-
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
