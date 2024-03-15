@@ -2680,7 +2680,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
         }
 
-        
         @Test
         void smallClaimsSdoR2FlagSetToYesPathOne() {
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
