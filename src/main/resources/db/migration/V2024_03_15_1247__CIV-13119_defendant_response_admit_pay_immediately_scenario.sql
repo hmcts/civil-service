@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant', '{
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. The payment must clear the account by then, if not the claimant can request a county court judgment.</p><br><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.',
-        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}. The payment must clear the account by then, if not the claimant can request a county court judgment.</p><br><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.',
+        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. The payment must clear the account by then, if not the claimant can request a county court judgment.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.',
+        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}. The payment must clear the account by then, if not the claimant can request a county court judgment.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.',
         'DEFENDANT');
 
 /**
@@ -22,4 +22,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
         'The response',
         '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
-        'The response', 'Response.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 3);
+        'The response', 'Response.View', 'Scenario.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant', '{3, 3}', 'DEFENDANT', 3);

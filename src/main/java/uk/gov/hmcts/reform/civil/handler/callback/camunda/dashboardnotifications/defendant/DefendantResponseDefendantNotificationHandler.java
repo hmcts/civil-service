@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -52,12 +53,8 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
 
     private String getScenario(CaseData caseData) {
 
-        if ((caseData.getRespondentClaimResponseTypeForSpecGeneric()
-                .equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-            || caseData.getRespondentClaimResponseTypeForSpecGeneric()
-                .equals(RespondentResponseTypeSpec.PART_ADMISSION))
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                .equals(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)) {
+        if (caseData.isFullAdmitPayImmediatelyClaimSpec()
+            || caseData.isPartAdmitPayImmediatelyClaimSpec()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario();
         }
 
