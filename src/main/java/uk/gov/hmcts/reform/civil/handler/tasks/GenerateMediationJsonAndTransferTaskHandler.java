@@ -53,7 +53,7 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
         } else {
-            claimMovedDate = LocalDate.now();
+            claimMovedDate = LocalDate.now().minusDays(1);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
         inMediationCases = cases.stream()
