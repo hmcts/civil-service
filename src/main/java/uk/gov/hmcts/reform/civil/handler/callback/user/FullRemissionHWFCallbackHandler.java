@@ -50,7 +50,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
