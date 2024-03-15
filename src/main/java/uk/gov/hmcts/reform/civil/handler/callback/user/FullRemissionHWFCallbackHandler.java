@@ -51,7 +51,8 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
@@ -84,7 +85,6 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     )
                 );
         }
-        updatedData.businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
