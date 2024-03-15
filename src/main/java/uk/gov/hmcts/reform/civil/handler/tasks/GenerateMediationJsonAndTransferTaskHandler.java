@@ -45,6 +45,7 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     @Override
     public void handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isFeatureEnabled("carm")) {
+            log.info("Carm not enabled - not sending MMT JSON");
             return;
         }
         List<CaseData> inMediationCases;
@@ -52,7 +53,7 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
         } else {
-            claimMovedDate = LocalDate.now().minusDays(1);
+            claimMovedDate = LocalDate.now();
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
         inMediationCases = cases.stream()
