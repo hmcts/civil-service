@@ -245,7 +245,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // After SDO claim should be pointed towards local court, so use non-legal advisor route logic and update based on
         // DQs for preferred location
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-        && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0) {
+            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0) {
             log.info("Update CML to DQ preferred location, legal advisor SDO");
             updateCaseManagementLocationForSdo(callbackParams, updatedData);
         }
