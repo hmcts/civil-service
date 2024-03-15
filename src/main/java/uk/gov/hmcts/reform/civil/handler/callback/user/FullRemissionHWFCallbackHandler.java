@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
@@ -21,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +51,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
@@ -81,6 +84,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     )
                 );
         }
+        updatedData.businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
