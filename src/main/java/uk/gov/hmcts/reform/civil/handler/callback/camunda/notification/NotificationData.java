@@ -17,6 +17,7 @@ public interface NotificationData {
     String NOTIFICATION_DEADLINE = "notificationDeadline";
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
     String REASON = "reason";
+    String REASON_FROM_CASEWORKER = "reason from caseworker";
     String PARTY_REFERENCES = "partyReferences";
     String ALLOCATED_TRACK = "allocatedTrack";
     String RECIPIENT_PARTY_NAME = "recipientPartyName";
@@ -74,6 +75,7 @@ public interface NotificationData {
     String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
     String COURT_LOCATION = "courtlocation";
     String LEGAL_ORG_NAME = "LegalOrgName";
+    String LEGAL_ORG = "legal Org";
     String PARTY_NAME = "name";
 
     //NoC
