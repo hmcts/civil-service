@@ -81,7 +81,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             scenarioParams.put("typeOfFee", "claim");
             scenarioParams.put("claimIssueRemissionAmount", "£1000");
             scenarioParams.put("claimIssueOutStandingAmount", "£25");
-            scenarioParams.put("claimFee", 455);
+            scenarioParams.put("claimFee", "£455");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
