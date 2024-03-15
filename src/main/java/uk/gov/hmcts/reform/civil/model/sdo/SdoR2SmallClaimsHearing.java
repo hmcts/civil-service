@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 @Data
@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 @AllArgsConstructor
 public class SdoR2SmallClaimsHearing {
 
-    private TrialOnRadioOptions trialOnOptions;
+    private HearingOnRadioOptions trialOnOptions;
     private SdoR2SmallClaimsHearingFirstOpenDateAfter sdoR2SmallClaimsHearingFirstOpenDateAfter;
     private SdoR2SmallClaimsHearingWindow sdoR2SmallClaimsHearingWindow;
     private SmallClaimsSdoR2TimeEstimate lengthList;

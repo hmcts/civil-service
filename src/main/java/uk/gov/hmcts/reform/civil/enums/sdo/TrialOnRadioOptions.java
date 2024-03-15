@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum TrialOnRadioOptions {
     OPEN_DATE("First open date after"),
-    HEARING_WINDOW("Hearing window");
+    TRIAL_WINDOW("Trial window");
 
     private final String label;
 

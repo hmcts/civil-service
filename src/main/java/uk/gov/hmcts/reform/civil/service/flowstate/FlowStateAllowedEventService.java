@@ -68,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -83,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -602,12 +604,14 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
                 CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1226,6 +1230,7 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
@@ -1234,7 +1239,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
