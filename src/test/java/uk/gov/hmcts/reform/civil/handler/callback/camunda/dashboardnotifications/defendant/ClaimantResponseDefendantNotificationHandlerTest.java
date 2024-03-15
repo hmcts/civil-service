@@ -173,7 +173,6 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .ccdState(CaseState.CASE_SETTLED)
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .claimantCourtDecision(RepaymentDecisionType
