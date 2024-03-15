@@ -25,10 +25,10 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
 
     @Autowired
     HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
-    public static final String caseId  = "000MC001";
 
     @Test
     void should_create_claim_issue_hwf_full_remission_scenario() throws Exception {
+        String caseId = "1234";
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
