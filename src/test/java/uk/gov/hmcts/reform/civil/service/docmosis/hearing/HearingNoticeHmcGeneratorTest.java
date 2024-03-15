@@ -98,9 +98,9 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getCourtLocationsForDefaultJudgments(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
+                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
-                                                                                             .siteName("SiteName")
+                                                                                             .venueName("VenueName")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
                                                                                              .postcode("Postcode")
@@ -169,7 +169,7 @@ class HearingNoticeHmcGeneratorTest {
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -223,7 +223,7 @@ class HearingNoticeHmcGeneratorTest {
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount("£1")
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -279,7 +279,7 @@ class HearingNoticeHmcGeneratorTest {
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .defendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -337,7 +337,7 @@ class HearingNoticeHmcGeneratorTest {
             .claimant2Reference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
