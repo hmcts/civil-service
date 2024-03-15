@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers;
+package uk.gov.hmcts.reform.civil.config;
 
 import feign.Client;
 import feign.Request;
@@ -17,9 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MockMvcFeignClient implements Client {
+
     @Autowired
     private MockMvc mockMvc;
-
 
     @SneakyThrows
     @Override
