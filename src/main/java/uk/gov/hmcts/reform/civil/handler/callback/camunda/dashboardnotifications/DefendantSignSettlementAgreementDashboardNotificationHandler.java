@@ -76,9 +76,9 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
                 SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
             };
         }
-            return new String[] {
-                SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_DEFENDANT_RESPONSE_ACCEPTS_CLAIMANT.getScenario()
-            };
+        return new String[] {
+            SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_DEFENDANT_RESPONSE_ACCEPTS_CLAIMANT.getScenario()
+        };
 
     }
 }
