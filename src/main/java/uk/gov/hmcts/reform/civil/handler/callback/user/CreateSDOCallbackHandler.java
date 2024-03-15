@@ -234,10 +234,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            updateCaseManagementLocationForSdo(callbackParams, updatedData);
-        }
-
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.showCarmFields(YES);
         } else {
@@ -1305,6 +1301,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             dataBuilder.sdoR2Trial(sdoR2Trial);
         }
 
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            updateCaseManagementLocationForSdo(callbackParams, dataBuilder);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
@@ -1501,7 +1501,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private void updateCaseManagementLocationForSdo(CallbackParams callbackParams, CaseData.CaseDataBuilder updatedData) {
         CaseData caseData = callbackParams.getCaseData();
-
+        log.info("Update case management location back to DQ preferred location");
         locationHelper.getCaseManagementLocation(caseData, true)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 updatedData,
@@ -1509,9 +1509,5 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
-        if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " updated to, during SDO " + updatedData.build().getCaseManagementLocation());
-        }
     }
 }
