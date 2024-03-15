@@ -76,7 +76,6 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
 
         String caseId = "1234";
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
-        String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
