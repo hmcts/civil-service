@@ -6,10 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.ZoneId;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,91 +14,89 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
+        if (feature.equals("isSdoR2Enabled") || feature.equals("bulk_claim_enabled")
+            || feature.equals("hmc") || feature.equals("ahn") || feature.equals("update-contact-details")
+            || feature.equals("cuiReleaseTwoEnabled")
+            || feature.equals("cui-case-progression")
+            || feature.equals("carm")
+            || feature.equals("cam-enabled-for-case")) {
+            return false;
+        }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
+        return true;
     }
 
     public boolean isBulkClaimEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
+        return false;
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return true;
     }
 
     public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return true;
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return true;
     }
 
     public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+        return true;
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isCaseFileViewEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-file-view");
+        return true;
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
+        return false;
     }
 
     public boolean isFastTrackUpliftsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
+        return true;
     }
 
     public boolean isUpdateContactDetailsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+        return false;
     }
 
     public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return false;
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
             locationEpimms != null
-                && featureToggleApi
-                .isFeatureEnabledForLocation(
-                    "case-progression-location-whitelist",
-                    locationEpimms,
-                    true
-                );
+                && true;
     }
 
     public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+        return true;
     }
 
     public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+        return false;
     }
 
     public boolean isEarlyAdoptersEnabled() {
-        return featureToggleApi.isFeatureEnabled("early-adopters");
+        return true;
     }
 
     public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+        return false;
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
-            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false);
+        return false;
     }
 }
