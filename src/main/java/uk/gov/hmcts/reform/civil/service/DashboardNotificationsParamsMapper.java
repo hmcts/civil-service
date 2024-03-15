@@ -15,12 +15,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 public class DashboardNotificationsParamsMapper {
+
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -30,15 +33,18 @@ public class DashboardNotificationsParamsMapper {
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
         params.put("claimantName", getPartyNameBasedOnType(caseData.getApplicant1()));
+        params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount",
-                       this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
+            params.put(
+                "defendantAdmittedAmount",
+                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+            );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
-            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("respondent1AdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
         if (nonNull(caseData.getClaimFee())) {
             params.put(
@@ -51,8 +57,10 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
+
         if (caseData.getClaimIssueRemissionAmount() != null) {
-            params.put("claimIssueRemissionAmount",
+            params.put(
+                "claimIssueRemissionAmount",
                 "£" + this.removeDoubleZeros(MonetaryConversions
                                                  .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
@@ -79,7 +87,7 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).map(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", date);
             params.put("respondent1SettlementAgreementDeadlineCy", date);
-            params.put("claimantSettlementAgreement", "accepted");
+            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
             return Optional.of(date);
         });
 
@@ -121,5 +129,12 @@ public class DashboardNotificationsParamsMapper {
         return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
             .map(LocalDateTime::toLocalDate)
             .map(DateUtils::formatDate);
+    }
+
+    private String getClaimantRepaymentPlanDecision(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
     }
 }
