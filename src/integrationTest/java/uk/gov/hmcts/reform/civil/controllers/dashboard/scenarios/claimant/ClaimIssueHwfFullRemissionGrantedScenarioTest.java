@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -19,16 +17,14 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
+    private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
 
     @Test
     void should_create_claim_issue_hwf_full_remission_scenario() throws Exception {
-        String caseId = "1234";
+        String caseId = "12345";
 
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
@@ -49,11 +45,11 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "The full claim fee of £455 will be covered. You do not need to make a payment."),
+                "The full claim fee of £4550 will be covered. You do not need to make a payment."),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "The full claim fee of £455 will be covered. You do not need to make a payment.")
+                "The full claim fee of £4550 will be covered. You do not need to make a payment.")
         );
     }
 }
