@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 @RequiredArgsConstructor
-public class DefendantResponseDefendantNotificationHandler extends CallbackHandler{
+public class DefendantResponseDefendantNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationDefendantResponse";
