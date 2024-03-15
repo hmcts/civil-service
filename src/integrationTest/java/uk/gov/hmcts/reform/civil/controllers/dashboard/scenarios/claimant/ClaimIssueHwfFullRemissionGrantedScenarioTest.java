@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
@@ -27,6 +26,7 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
     @Autowired
     HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
     public static final String caseId  = "000MC001";
+
     @Test
     void should_create_claim_issue_hwf_full_remission_scenario() throws Exception {
 
