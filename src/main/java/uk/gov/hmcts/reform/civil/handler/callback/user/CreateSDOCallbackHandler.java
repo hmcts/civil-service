@@ -244,7 +244,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // DQs for preferred location
         updateCaseManagementLocationForSdo(callbackParams, updatedData);
 
-
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, true);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
