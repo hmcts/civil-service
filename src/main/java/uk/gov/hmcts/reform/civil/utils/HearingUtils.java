@@ -117,6 +117,10 @@ public class HearingUtils {
             return formatHearingNote(caseData.getSdoHearingNotes().getInput());
         } else if (caseData.getTrialHearingHearingNotesDJ() != null) {
             return formatHearingNote(caseData.getTrialHearingHearingNotesDJ().getInput());
+        } else if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getHearingNotesTxt() != null) {
+            return formatHearingNote(caseData.getSdoR2Trial().getHearingNotesTxt());
+        } else if (caseData.getSdoR2SmallClaimsHearing() != null && caseData.getSdoR2SmallClaimsHearing().getHearingNotesTxt() != null) {
+            return formatHearingNote(caseData.getSdoR2SmallClaimsHearing().getHearingNotesTxt());
         } else {
             return null;
         }

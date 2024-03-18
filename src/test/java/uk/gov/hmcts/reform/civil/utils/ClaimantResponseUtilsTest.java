@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.utils;
+package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,10 +18,10 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getClaimantFinalRepaymentDate;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getClaimantRepaymentType;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantFinalRepaymentDate;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getClaimantFinalRepaymentDate;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getClaimantRepaymentType;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantFinalRepaymentDate;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
 
 public class ClaimantResponseUtilsTest {
 

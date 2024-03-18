@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class ClaimISettledCourtDecisionInFavorOfDefendantScenarioTest extends BaseIntegrationTest {
+public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends BaseIntegrationTest {
 
     @MockBean
     private OffsetDateTime time;
@@ -32,7 +32,7 @@ public class ClaimISettledCourtDecisionInFavorOfDefendantScenarioTest extends Ba
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of(
-                       "respondSettlementAgreementDeadline", responseDeadline
+                       "respondent1SettlementAgreementDeadlineEn", responseDeadline
                    ))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,

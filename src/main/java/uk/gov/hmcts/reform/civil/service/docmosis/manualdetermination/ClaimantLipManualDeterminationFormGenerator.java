@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.manualdetermination.ClaimantLipM
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
 import java.time.LocalDate;
 
