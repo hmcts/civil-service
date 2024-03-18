@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimantIntent.SettlementAgreement.DefendantAccepted.Defendant', '{"Notice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant","Notice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant","otice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithDefendant.Defendant"}',
+VALUES ('Scenario.AAA7.ClaimantIntent.SettlementAgreement.DefendantAccepted.Defendant', '{"Notice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant","Notice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant","Notice.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithDefendant.Defendant"}',
         '{"Notice.AAA7.ClaimantIntent.SettlementAgreement.DefendantAccepted.Defendant" : [""]}');
 
 /**

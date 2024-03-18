@@ -29,7 +29,7 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
         }
     }
 
-    protected static CallbackParams callbackParams(CaseData caseData) {
+    public static CallbackParams callbackParams(CaseData caseData) {
         return CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
