@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -17,6 +19,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class CCJRequestedScenarioTest extends BaseIntegrationTest {
+
+    @Autowired
+    private CCJRequestedDashboardNotificationHandler handler;
 
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
