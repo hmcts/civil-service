@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -22,11 +20,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
-public class DefendantResponseDefendantNotificationHandler extends CallbackHandler{
+public class DefendantResponseDefendantNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationDefendantResponse";
@@ -52,12 +50,8 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
 
     private String getScenario(CaseData caseData) {
 
-        if ((caseData.getRespondentClaimResponseTypeForSpecGeneric()
-                .equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-            || caseData.getRespondentClaimResponseTypeForSpecGeneric()
-                .equals(RespondentResponseTypeSpec.PART_ADMISSION))
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                .equals(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)) {
+        if (caseData.isFullAdmitPayImmediatelyClaimSpec()
+            || caseData.isPartAdmitPayImmediatelyClaimSpec()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario();
         }
 
