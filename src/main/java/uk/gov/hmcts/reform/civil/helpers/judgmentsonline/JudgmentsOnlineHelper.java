@@ -39,11 +39,8 @@ public class JudgmentsOnlineHelper {
         return false;
     }
 
-    public static boolean checkIfDateDifferenceIsGreaterThan30Days(LocalDate firstDate, LocalDate secondDate) {
-        if (ChronoUnit.DAYS.between(firstDate, secondDate) > 30) {
-            return true;
-        }
-        return false;
+    public static boolean checkIfDateDifferenceIsGreaterThan31Days(LocalDate firstDate, LocalDate secondDate) {
+        return ChronoUnit.DAYS.between(firstDate, secondDate) > 31;
     }
 
     public static List<String> validateMidCallbackData(CaseData caseData) {
