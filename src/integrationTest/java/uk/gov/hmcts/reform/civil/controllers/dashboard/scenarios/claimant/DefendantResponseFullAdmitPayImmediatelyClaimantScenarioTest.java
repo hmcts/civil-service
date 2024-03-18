@@ -29,7 +29,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
     void should_create_full_admit_pay_immediately_claimant_scenario() throws Exception {
 
         String caseId = "1234";
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
