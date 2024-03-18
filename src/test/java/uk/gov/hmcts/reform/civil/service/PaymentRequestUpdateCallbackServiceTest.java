@@ -67,6 +67,8 @@ class PaymentRequestUpdateCallbackServiceTest {
     FeatureToggleService featureToggleService;
     @MockBean
     CaseDetailsConverter caseDetailsConverter;
+    @MockBean
+    UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     public void setup() {
@@ -191,7 +193,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldStartAndSubmitEventWithCaseDetailsInLipClaim_Hearing() {
+    public void shouldCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNull() {
 
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -202,6 +204,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                  .build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
+            .hearingFeePaymentDetails(null)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -214,8 +217,68 @@ class PaymentRequestUpdateCallbackServiceTest {
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+        verify(coreCaseDataService, never()).startUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+    }
+
+    @Test
+    public void shouldNotCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNotNull() {
+
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData = caseData.toBuilder()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(BusinessProcess.builder()
+                                 .status(BusinessProcessStatus.READY)
+                                 .camundaEvent(BUSINESS_PROCESS)
+                                 .build())
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .hearingFeePaymentDetails(new PaymentDetails())
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
+
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, never()).startUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), any(), any());
+    }
+
+    @Test
+    public void shouldNotCallUpdatePaymentServiceWhenLRvLR() {
+
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData = caseData.toBuilder()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(BusinessProcess.builder()
+                                 .status(BusinessProcessStatus.READY)
+                                 .camundaEvent(BUSINESS_PROCESS)
+                                 .build())
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
+
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService).startUpdate(any(), any());
+        verify(coreCaseDataService).submitUpdate(any(), any());
+        verify(updatePaymentStatusService, never()).updatePaymentStatus(any(), any(), any());
     }
 
     @Test

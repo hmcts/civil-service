@@ -2,7 +2,13 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -16,10 +22,19 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -27,15 +42,27 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,6 +147,184 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.isFastTrack(caseData)).isFalse();
+        }
+    }
+
+    @Nested
+    class IsNihlTests {
+        @Test
+        void shouldReturnTrue_whenNihlFastTrack1() {
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimBuildingDispute);
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .orderType(OrderType.DECIDE_DAMAGES)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .trialAdditionalDirectionsForFastTrack(fastTrackList)
+                .build();
+
+            assertThat(SdoHelper.isNihlFastTrack(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenNihlFastTrackPath2() {
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(fastTrackList)
+                .build();
+
+            assertThat(SdoHelper.isNihlFastTrack(caseData)).isTrue();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturnLocationForNIHL(boolean isAltLoc) {
+            DynamicList options = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .build();
+            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+            DynamicListElement selectedCourt = DynamicListElement.builder()
+                .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .hearingCourtLocationList(isAltLoc ? null : (options.toBuilder().value(selectedCourt).build()))
+                                .altHearingCourtLocationList(isAltLoc ? (options.toBuilder().value(selectedCourt).build()) : null)
+                                .build())
+                .build();
+            assertThat(SdoHelper.getHearingLocationNihl(caseData)).isNotNull();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldreturn_physicalbundletext(boolean isParty) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .physicalBundlePartyTxt("Test")
+                                .physicalBundleOptions(isParty ? PhysicalTrialBundleOptions.PARTY : PhysicalTrialBundleOptions.NONE).build())
+                .build();
+            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_restricPages(boolean isPages) {
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
+                                          .sdoRestrictPages(SdoR2RestrictPages.builder()
+                                                                .isRestrictPages(isPages ? YES : NO).build())
+                                          .build())
+                .build();
+            assertThat(SdoHelper.isRestrictPagesNihl(caseData)).isEqualTo(isPages);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_restricWitness(boolean isWitness) {
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
+                                          .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                                                    .isRestrictWitness(isWitness ? YES : NO).build())
+                                          .build())
+                .build();
+            assertThat(SdoHelper.isRestrictWitnessNihl(caseData)).isEqualTo(isWitness);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_isApplicationToRelyOnFurtherNihl(boolean toRely) {
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
+                                                  .sdoApplicationToRelyOnFurther(
+                                                      SdoR2ApplicationToRelyOnFurther.builder()
+                                                          .doRequireApplicationToRely(toRely ? YES : NO)
+                                                          .build())
+                                                  .build())
+                .build();
+            assertThat(SdoHelper.isApplicationToRelyOnFurtherNihl(caseData)).isEqualTo(toRely ? "Yes" : "No");
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_isClaimForPecuniaryLossNihl(boolean isClaim) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantText(
+                        SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
+                                         .isClaimForPecuniaryLoss(isClaim ? YES : NO)
+                                         .build())
+                .build();
+            assertThat(SdoHelper.isClaimForPecuniaryLossNihl(caseData)).isEqualTo(isClaim);
+        }
+
+        @Test
+        void shouldReturn_method_of_hearing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson).build())
+                .build();
+            assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_getSdoTrialHearingTimeAllocated(boolean isOther) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .lengthList(isOther ? FastTrackHearingTimeEstimate.OTHER : FastTrackHearingTimeEstimate.FOUR_HOURS)
+                                .lengthListOther(isOther ? SdoR2TrialHearingLengthOther.builder().trialLengthDays(4).trialLengthHours(4).trialLengthMinutes(4).build() : null)
+                                .build())
+                .build();
+            assertThat(SdoHelper.getSdoTrialHearingTimeAllocated(caseData)).isEqualTo(isOther ? "4 days, 4 hours and 4 minutes" : "4 hours");
         }
     }
 
@@ -1637,4 +1842,142 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasDisposalVariable(caseData, "invalid input")).isFalse();
         }
     }
+
+    @Nested
+    class SmallClaimsDrhTests {
+        @Test
+        void shouldReturnTrue_whenSmallClaimsDrhCase_Path1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenSmallClaimsDrhCase_Path2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaimsAdditionalDirections(
+                    List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"hearing_location", "OTHER_LOCATION"})
+        void shouldReturnHearingLocationsForDrh(String location) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(DynamicList.builder().value(
+                    DynamicListElement.builder().code(location).build()
+                    ).build()).altHearingCourtLocationList(DynamicList.builder().value(
+                    DynamicListElement.builder().code("alt_location").build()
+                ).build()).build())
+                .build();
+            if (location.equals("hearing_location")) {
+                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo(location);
+            } else {
+                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo("alt_location");
+            }
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldCheckForSdoR2HearingTrialWindow(Boolean window) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(window ? HearingOnRadioOptions.HEARING_WINDOW :
+                                                                                              HearingOnRadioOptions.OPEN_DATE).build())
+                .build();
+
+            assertThat(SdoHelper.hasSdoR2HearingTrialWindow(caseData)).isEqualTo(window);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2TimeEstimate.class)
+        void shouldReturnHearingTime(SmallClaimsSdoR2TimeEstimate selection) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().lengthList(selection).lengthListOther(
+                    SdoR2SmallClaimsHearingLengthOther.builder()
+                        .trialLengthDays(1).trialLengthHours(2).trialLengthMinutes(3).build()).build())
+                .build();
+
+            if (selection.getLabel() != SmallClaimsSdoR2TimeEstimate.OTHER.getLabel()) {
+                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo(selection.getLabel());
+            } else {
+                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo("1 days, 2 hours, 3 minutes");
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2HearingMethod.class)
+        void shouldReturnHearingMethodsForDrh(SmallClaimsSdoR2HearingMethod method) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().methodOfHearing(method).build())
+                .build();
+
+            if (method == SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
+            } else if (method == SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
+            } else if (method == SmallClaimsSdoR2HearingMethod.IN_PERSON) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2PhysicalTrialBundleOptions.class)
+        void shouldReturnPhysicalTrialBundleTxt(SmallClaimsSdoR2PhysicalTrialBundleOptions option) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().physicalBundleOptions(option).sdoR2SmallClaimsBundleOfDocs(
+                    SdoR2SmallClaimsBundleOfDocs.builder().physicalBundlePartyTxt("test_text").build()).build())
+                .build();
+
+            if (option == SmallClaimsSdoR2PhysicalTrialBundleOptions.NO) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("None");
+            } else {
+                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
+            }
+        }
+    }
+
 }

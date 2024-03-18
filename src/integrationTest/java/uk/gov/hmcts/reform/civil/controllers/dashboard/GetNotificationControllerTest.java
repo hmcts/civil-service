@@ -38,7 +38,8 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
                                  .titleEn("title_en")
                                  .titleCy("title_cy")
                                  .descriptionEn("description_en")
-                                 .descriptionCy("description_cy").build());
+                                 .descriptionCy("description_cy")
+                                 .timeToLive("Click").build());
 
         return notificationList;
     }
