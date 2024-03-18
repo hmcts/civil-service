@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediationLitigant {
 
     private String partyID; //party.getPartyid()

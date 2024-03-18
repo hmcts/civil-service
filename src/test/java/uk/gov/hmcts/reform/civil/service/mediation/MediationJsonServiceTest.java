@@ -545,9 +545,7 @@ public class MediationJsonServiceTest {
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(buildClaimant1(NO));
-            expected.add(null);
             expected.add(buildRespondent1(NO));
-            expected.add(null);
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -565,9 +563,7 @@ public class MediationJsonServiceTest {
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(buildClaimant1(YES));
-            expected.add(null);
             expected.add(buildRespondent1(YES));
-            expected.add(null);
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -589,7 +585,6 @@ public class MediationJsonServiceTest {
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(buildClaimant1(YES));
-            expected.add(null);
             expected.add(buildRespondent1(NO));
             expected.add(buildRespondent2(NO));
 
@@ -611,7 +606,6 @@ public class MediationJsonServiceTest {
 
             List<MediationLitigant> expected = new ArrayList<>();
             expected.add(buildClaimant1(YES));
-            expected.add(null);
             expected.add(buildRespondent1(YES));
             expected.add(buildRespondent2(YES));
 
@@ -635,7 +629,6 @@ public class MediationJsonServiceTest {
             expected.add(buildClaimant1(YES));
             expected.add(buildClaimant2());
             expected.add(buildRespondent1(YES));
-            expected.add(null);
 
             MediationCase actual = service.generateJsonContent(caseData);
 

@@ -134,9 +134,13 @@ public class MediationJsonService {
 
     private void buildLitigantFields(CaseData caseData, List<MediationLitigant> litigantList) {
         litigantList.add(buildApplicant1Fields(caseData));
-        litigantList.add(buildApplicant2Fields(caseData));
+        if (caseData.getApplicant2() != null) {
+            litigantList.add(buildApplicant2Fields(caseData));
+        }
         litigantList.add(buildRespondent1Fields(caseData));
-        litigantList.add(buildRespondent2Fields(caseData));
+        if (caseData.getRespondent2() != null) {
+            litigantList.add(buildRespondent2Fields(caseData));
+        }
     }
 
     private MediationLitigant buildApplicant1Fields(CaseData caseData) {
@@ -149,13 +153,10 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildApplicant2Fields(CaseData caseData) {
-        if (caseData.getApplicant2() != null) {
-            return buildRepresentedLitigant(caseData.getApplicant2(), caseData.getApplicant2OrganisationPolicy() != null
-                                                ? caseData.getApplicant2OrganisationPolicy()
-                                                : caseData.getApplicant1OrganisationPolicy(),
-                                            caseData.getApplicantSolicitor1UserDetails().getEmail());
-        }
-        return null;
+        return buildRepresentedLitigant(caseData.getApplicant2(), caseData.getApplicant2OrganisationPolicy() != null
+                                            ? caseData.getApplicant2OrganisationPolicy()
+                                            : caseData.getApplicant1OrganisationPolicy(),
+                                        caseData.getApplicantSolicitor1UserDetails().getEmail());
     }
 
     private MediationLitigant buildRespondent1Fields(CaseData caseData) {
@@ -168,15 +169,12 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildRespondent2Fields(CaseData caseData) {
-        if (caseData.getRespondent2() != null) {
-            if (NO.equals(caseData.getRespondent2Represented())) {
-                return buildUnrepresentedLitigant(caseData.getRespondent2());
-            } else {
-                return buildRepresentedLitigant(caseData.getRespondent2(), caseData.getRespondent2OrganisationPolicy(),
-                                                caseData.getRespondentSolicitor2EmailAddress());
-            }
+        if (NO.equals(caseData.getRespondent2Represented())) {
+            return buildUnrepresentedLitigant(caseData.getRespondent2());
+        } else {
+            return buildRepresentedLitigant(caseData.getRespondent2(), caseData.getRespondent2OrganisationPolicy(),
+                                            caseData.getRespondentSolicitor2EmailAddress());
         }
-        return null;
     }
 
     private MediationLitigant buildRepresentedLitigant(Party party, OrganisationPolicy organisationPolicy, String solicitorEmail) {
