@@ -72,8 +72,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        String paidAmount = getAlreadyPaidAmount(caseData);
-        params.put("admissionPaidAmount", paidAmount);
+        getAlreadyPaidAmount(caseData).map(amount -> params.put("admissionPaidAmount", amount));
 
         getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
 
@@ -130,11 +129,13 @@ public class DashboardNotificationsParamsMapper {
             .map(DateUtils::formatDate);
     }
 
-    private String getAlreadyPaidAmount(CaseData caseData) {
+    private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
             MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
-            null);
+            BigDecimal::stripTrailingZeros)
+            .map(amount -> amount.setScale(2))
+            .map(BigDecimal::toPlainString)
+            .map(amount -> "£" + amount);
     }
 
     private String getClaimantRepaymentPlanDecision(CaseData caseData) {
