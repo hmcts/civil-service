@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantName
 @RequiredArgsConstructor
 public class ClaimSetAsideJudgementDefendantNotificationHandler extends CallbackHandler
     implements NotificationData {
+
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_DEFENDANT);
     public static final String TASK_ID = "NotifyDefendantSetAsideJudgement";
     private static final String REFERENCE_TEMPLATE =
@@ -86,11 +87,9 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
                                                     .getOrganisation()
                                                     .getOrganisationID(), caseData),
             DEFENDANT_NAME_INTERIM, getDefendantName(caseData),
-            REASON_FROM_CASEWORKER, "test_reason" //caseData.getJoJudgmentRecordReason().name()
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText() //caseData.getJoJudgmentRecordReason().name()
         );
     }
-
-
 
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return Map.of(
@@ -99,7 +98,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
             LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
                                                          .getOrganisationID(), caseData),
-            REASON_FROM_CASEWORKER, "test_reason", //caseData.getJoJudgmentRecordReason().name(),
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(), //caseData.getJoJudgmentRecordReason().name(),
             DEFENDANT_NAME_INTERIM, getDefendantName(caseData)
         );
     }

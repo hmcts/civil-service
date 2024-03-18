@@ -78,7 +78,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
             LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
                                                          .getOrganisationID(), caseData),
-            REASON_FROM_CASEWORKER, "test_reason", //caseData.getJoJudgmentRecordReason().name()
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(), //caseData.getJoJudgmentRecordReason().name()
             DEFENDANT_NAME_INTERIM, getDefendantName(caseData)
         );
     }

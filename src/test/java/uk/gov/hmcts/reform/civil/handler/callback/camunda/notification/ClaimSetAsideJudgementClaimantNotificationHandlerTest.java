@@ -22,10 +22,15 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
 
 @SpringBootTest(classes = {
     ClaimSetAsideJudgementClaimantNotificationHandler.class,
@@ -33,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant
     JacksonAutoConfiguration.class
 })
 public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     public static final String TEMPLATE_ID = "template-id";
 
     @MockBean

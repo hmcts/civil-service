@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
@@ -78,12 +79,16 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .judgmentStatusTypes(JudgmentStatusType.SET_ASIDE)
             .lastUpdatedDate(LocalDateTime.now()).build();
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SET_ASIDE));
+            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(
+                JudgmentStatusType.SET_ASIDE));
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+
+        if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
