@@ -64,7 +64,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
+    public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediatelyClaimant() {
 
         Map<String, Object> params = new HashMap<>();
 
@@ -75,7 +75,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(1234L))
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(admitPaymentDeadline)
