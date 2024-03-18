@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -99,12 +101,12 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
     }
 
-    public boolean isCarmEnabledForCase(LocalDateTime submittedDate) {
+    public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
-        long epoch = submittedDate.atZone(zoneId).toEpochSecond();
-        return featureToggleApi.isFeatureEnabled("carm")
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false
-        );
+                                                        epoch, false);
     }
 }

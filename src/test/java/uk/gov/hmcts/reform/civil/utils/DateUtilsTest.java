@@ -11,7 +11,7 @@ public class DateUtilsTest {
 
     @Test
     public void testFormatDate() {
-        LocalDateTime date = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
+        LocalDate date = LocalDate.of(2022, 7, 28);
         String dateFormatted = DateUtils.formatDate(date);
 
         Assertions.assertEquals("28 July 2022", dateFormatted);
@@ -66,5 +66,20 @@ public class DateUtilsTest {
         LocalDate result = DateUtils.addDaysSkippingWeekends(initialDate, daysToAdd);
 
         assertEquals(initialDate, result);
+    }
+
+    @Test
+    public void testFormatOrdinalDate() {
+        String date = DateUtils.formatOrdinalDate(LocalDate.of(2024, 2, 1));
+        String date2 = DateUtils.formatOrdinalDate(LocalDate.of(2024, 2, 2));
+        String date3 = DateUtils.formatOrdinalDate(LocalDate.of(2024, 2, 3));
+        String date4 = DateUtils.formatOrdinalDate(LocalDate.of(2024, 2, 4));
+        String date5 = DateUtils.formatOrdinalDate(LocalDate.of(2024, 2, 11));
+
+        Assertions.assertEquals("1st February 2024", date);
+        Assertions.assertEquals("2nd February 2024", date2);
+        Assertions.assertEquals("3rd February 2024", date3);
+        Assertions.assertEquals("4th February 2024", date4);
+        Assertions.assertEquals("11th February 2024", date5);
     }
 }

@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class DateUtils {
 
@@ -15,6 +16,11 @@ public class DateUtils {
     }
 
     public static String formatDate(LocalDateTime date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+        return date.format(formatter);
+    }
+
+    public static String formatDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
         return date.format(formatter);
     }
@@ -45,5 +51,22 @@ public class DateUtils {
     public static LocalDate getRequiredDateBeforeFourPm(LocalDateTime localDateTime) {
         return isAfterFourPM(localDateTime)
             ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate();
+    }
+
+    public static String formatOrdinalDate(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM' 'yyyy", Locale.ENGLISH);
+        return getDayOfMonthSuffix(date.getDayOfMonth()) + date.format(formatter);
+    }
+
+    private static String getDayOfMonthSuffix(int n) {
+        if (n >= 11 && n <= 13) {
+            return n + "th ";
+        }
+        return switch (n % 10) {
+            case 1 -> n + "st ";
+            case 2 -> n + "nd ";
+            case 3 -> n + "rd ";
+            default -> n + "th ";
+        };
     }
 }
