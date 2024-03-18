@@ -136,7 +136,8 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getRespondent1().getPartyName(),
             LEGAL_ORG, "Test Org Name",
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
+            REASON_FROM_CASEWORKER, "test_reason",
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo"
         );
     }
 
@@ -146,7 +147,8 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getRespondent2().getPartyName(),
             LEGAL_ORG, "Test Org Name",
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName()
+            REASON_FROM_CASEWORKER, "test_reason",
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo"
         );
     }
 

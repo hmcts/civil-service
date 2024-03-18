@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantName;
 
 @Service
 @RequiredArgsConstructor
@@ -76,12 +77,12 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
-                                                         .getOrganisationID(), caseData)
-            //REASON_FROM_CASEWORKER, caseData.getJoJudgmentRecordReason().name() //TODO: Confirm on Reason field
+                                                         .getOrganisationID(), caseData),
+            REASON_FROM_CASEWORKER, "test_reason", //caseData.getJoJudgmentRecordReason().name()
+            DEFENDANT_NAME_INTERIM, getDefendantName(caseData)
         );
     }
 
-    //TODO: Change to notifySetAsideJudgementTemplate property in civil-commons
     private String getTemplate() {
         return notificationsProperties.getNotifySetAsideJudgementTemplate();
     }

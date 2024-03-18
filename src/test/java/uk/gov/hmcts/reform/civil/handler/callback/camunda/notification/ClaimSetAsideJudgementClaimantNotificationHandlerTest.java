@@ -87,8 +87,8 @@ public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseC
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            LEGAL_ORG, "Test Org Name"
-            //REASON_FROM_CASEWORKER, caseData.getJoJudgmentRecordReason().name() //TODO: Confirm on Reason field
+            LEGAL_ORG, "Test Org Name",
+            REASON_FROM_CASEWORKER, "test_reason" //caseData.getJoJudgmentRecordReason().name()
         );
     }
 }
