@@ -45,7 +45,6 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     @Override
     public void handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isFeatureEnabled("carm")) {
-            log.info("Carm not enabled - not sending MMT JSON");
             return;
         }
         List<CaseData> inMediationCases;

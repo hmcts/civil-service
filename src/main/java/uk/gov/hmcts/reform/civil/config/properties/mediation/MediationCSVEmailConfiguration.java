@@ -11,4 +11,5 @@ public class MediationCSVEmailConfiguration {
 
     private String sender;
     private String recipient;
+    private String jsonRecipient;
 }

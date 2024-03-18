@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude
+@Builder(toBuilder = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Builder
 public class MediationCase {
 
     private Long ccdCaseNumber;

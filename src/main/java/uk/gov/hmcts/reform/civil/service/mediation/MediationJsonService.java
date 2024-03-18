@@ -183,6 +183,12 @@ public class MediationJsonService {
         String orgId = organisationPolicy.getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
         Organisation solicitorOrgDetails = organisation.orElse(null);
+        if (solicitorOrgDetails != null) {
+            log.info("solicitor details: {} {} {} {} ", solicitorOrgDetails.getName(),
+                    solicitorOrgDetails.getCompanyNumber(),
+                    solicitorOrgDetails.getCompanyUrl(),
+                    solicitorOrgDetails.getContactInformation());
+        }
         String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
         return MediationLitigant.builder()
             .partyID(party.getPartyID())
