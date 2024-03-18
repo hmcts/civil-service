@@ -34,7 +34,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -53,9 +53,9 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has offered to pay £1000 by " +
-                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
-                        "The payment must clear the account by then, if not you can request a county court judgment.</p>" +
-                        "<a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a>."
+                        DateUtils.formatDate(admitPaymentDeadline) + ".</p>" +
+                        "<p class=\"govuk-body\">The payment must clear the account by then, if not you can request a county court judgment.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"
                 )
             );
 
