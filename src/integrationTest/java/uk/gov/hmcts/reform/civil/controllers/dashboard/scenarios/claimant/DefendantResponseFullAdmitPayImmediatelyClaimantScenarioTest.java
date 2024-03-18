@@ -28,7 +28,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
     @Test
     void should_create_full_admit_pay_immediately_claimant_scenario() throws Exception {
 
-        String caseId = "1234";
+        String caseId = "12348";
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate().plusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
