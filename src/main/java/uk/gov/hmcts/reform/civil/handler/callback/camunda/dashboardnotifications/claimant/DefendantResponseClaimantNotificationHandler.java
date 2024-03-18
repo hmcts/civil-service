@@ -51,10 +51,8 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
-        if (caseData.getRespondentClaimResponseTypeForSpecGeneric()
-            .equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            .equals(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)) {
+        if (caseData.isFullAdmitClaimSpec()
+            && caseData.isPayImmediately()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
         }
         return null;
