@@ -152,6 +152,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -167,7 +168,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
-
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -347,6 +353,7 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
+    //SDOR2
     private YesOrNo isSdoR2NewScreen;
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
@@ -379,6 +386,18 @@ public class CaseDataParent implements MappableObject {
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
     private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
     private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
+    private SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsPPIToggle;
+    private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
+    private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
+    private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
+    private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
