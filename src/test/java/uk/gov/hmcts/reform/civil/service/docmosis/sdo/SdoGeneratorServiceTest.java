@@ -93,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -106,6 +107,7 @@ public class SdoGeneratorServiceTest {
     private static String fileNameSmall = null;
     private static String fileNameFast = null;
     private static String fileNameDisposal = null;
+    private static String fileNameSmallDrh = null;
     private static final CaseDocument CASE_DOCUMENT_SMALL = CaseDocumentBuilder.builder()
         .documentName(fileNameSmall)
         .documentType(SDO_ORDER)
@@ -116,6 +118,11 @@ public class SdoGeneratorServiceTest {
         .build();
     private static final CaseDocument CASE_DOCUMENT_DISPOSAL = CaseDocumentBuilder.builder()
         .documentName(fileNameDisposal)
+        .documentType(SDO_ORDER)
+        .build();
+
+    private static final CaseDocument CASE_DOCUMENT_SMALL_DRH = CaseDocumentBuilder.builder()
+        .documentName(fileNameSmallDrh)
         .documentType(SDO_ORDER)
         .build();
 
@@ -142,6 +149,7 @@ public class SdoGeneratorServiceTest {
         fileNameDisposal = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameFast = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameSmall = LocalDate.now() + "_Judgey McJudge" + ".pdf";
+        fileNameSmallDrh = LocalDate.now() + "_Judgey McJudge" + ".pdf";
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
@@ -660,5 +668,30 @@ public class SdoGeneratorServiceTest {
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
 
         return updatedData.build();
+    }
+
+    @Test
+    public void shouldGenerateSdoSmallDrhDocument() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL_DRH);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
     }
 }
