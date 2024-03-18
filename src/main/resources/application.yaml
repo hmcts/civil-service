@@ -132,6 +132,7 @@ payments:
     spec_service: SPEC
     url: http://localhost:8765
 
+
 idam:
   s2s-auth:
     microservice: civil_service
