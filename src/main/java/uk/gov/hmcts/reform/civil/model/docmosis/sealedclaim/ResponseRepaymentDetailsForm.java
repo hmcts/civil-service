@@ -110,7 +110,7 @@ public class ResponseRepaymentDetailsForm {
                                       .build())
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-            builder.amountToPay = (totalClaimAmount + "");
+            builder.amountToPay(totalClaimAmount + "");
         }
     }
 
@@ -148,19 +148,15 @@ public class ResponseRepaymentDetailsForm {
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
         } else {
-            if (useRespondent2(caseData)) {
-                addRepaymentMethod(
-                    caseData,
-                    builder,
-                    MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount2())
-                );
-            } else {
-                addRepaymentMethod(
-                    caseData,
-                    builder,
-                    MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount())
-                );
-            }
+             BigDecimal amountInPennies =
+                useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
+                    caseData.getRespondToAdmittedClaimOwingAmount();
+
+            addRepaymentMethod(
+                caseData,
+                builder,
+                MonetaryConversions.penniesToPounds(amountInPennies)
+            );
         }
     }
 
