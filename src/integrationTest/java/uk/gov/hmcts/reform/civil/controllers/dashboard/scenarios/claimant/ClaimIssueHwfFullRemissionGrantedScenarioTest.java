@@ -31,7 +31,7 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(455000)).build())
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
@@ -45,11 +45,11 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "The full claim fee of £4550 will be covered. You do not need to make a payment."),
+                "<p class=\"govuk-body\">The full claim fee of £455 will be covered. You do not need to make a payment.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "The full claim fee of £4550 will be covered. You do not need to make a payment.")
+                "<p class=\"govuk-body\">The full claim fee of £455 will be covered. You do not need to make a payment.</p>")
         );
     }
 }
