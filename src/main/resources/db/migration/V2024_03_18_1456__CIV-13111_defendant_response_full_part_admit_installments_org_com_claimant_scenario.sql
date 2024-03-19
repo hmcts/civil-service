@@ -14,6 +14,6 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
 VALUES ('Notice.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant',
         'Response to the claim', 'Response to the claim',
         '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} every ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDate}.</p><p class="govuk-body">The defendant needs to send you their financial details. <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
-        '',
+        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} every ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDate}.</p><p class="govuk-body">The defendant needs to send you their financial details. <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
