@@ -4,16 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimSettledDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +30,7 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ClaimSettledDate(LocalDate.of(2024, 03,19))
+                                                        .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19))
                                                         .build()).build())
             .build();
 

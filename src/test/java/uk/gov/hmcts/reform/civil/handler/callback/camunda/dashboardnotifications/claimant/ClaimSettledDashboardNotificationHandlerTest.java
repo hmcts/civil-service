@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
@@ -24,20 +22,16 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerTest
-{
+public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerTest {
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
@@ -72,15 +66,16 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ClaimSettledDate(
                                      LocalDate.of(2014, 3, 19)).build()).build()).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
-            ).build();
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
+            ).build();
 
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
