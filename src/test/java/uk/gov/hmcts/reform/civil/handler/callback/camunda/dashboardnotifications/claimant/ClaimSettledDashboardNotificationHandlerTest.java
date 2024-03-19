@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerTest {
+
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock

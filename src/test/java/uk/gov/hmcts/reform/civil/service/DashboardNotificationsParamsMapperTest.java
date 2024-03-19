@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -47,6 +49,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ClaimSettledDate(LocalDate.now()).build()).build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -80,6 +83,11 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
+        assertThat(result).extracting("applicant1ClaimSettledDateEn")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+
+        assertThat(result).extracting("applicant1ClaimSettledDateCy")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
     }
 
     @Test
@@ -163,6 +171,20 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("£25");
         assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("£100");
+    }
+
+    @Test
+    public void shouldMapParameters_whenClaimantSubmitSettlmentEvent() {
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19)).build()).build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("applicant1ClaimSettledDateEn").isEqualTo("19 March 2024");
+        assertThat(result).extracting("applicant1ClaimSettledDateCy").isEqualTo("19 March 2024");
     }
 }
 
