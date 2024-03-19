@@ -49,7 +49,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
-        if (caseData.isFullAdmitClaimSpec() && caseData.isPayImmediately()) {
+        if (caseData.isFullAdmitPayImmediatelyClaimSpec()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
         }
         return null;
