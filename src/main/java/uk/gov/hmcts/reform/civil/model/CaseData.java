@@ -1398,6 +1398,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
     }
 
+    public boolean hasApplicant1CourtDecisionInFavourOfDefendant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfDefendant).isPresent();
+    }
+
     @JsonIgnore
     public boolean claimIssueFeePaymentDoneWithHWF() {
         return Objects.nonNull(getHelpWithFeesReferenceNumber())
