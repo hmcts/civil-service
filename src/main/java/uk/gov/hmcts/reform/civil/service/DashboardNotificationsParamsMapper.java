@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -89,6 +91,12 @@ public class DashboardNotificationsParamsMapper {
             return Optional.of(date);
         });
 
+        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
+            params.put("instalmentAmount", getInstalmentAmount(caseData));
+            params.put("instalmentTimePeriod", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+            params.put("instalmentStartDate", getInstalmentStartDate(caseData));
+        }
+
         return params;
     }
 
@@ -143,5 +151,31 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
+    }
+
+    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "week";
+            case ONCE_TWO_WEEKS -> "2 weeks";
+            case ONCE_THREE_WEEKS -> "3 weeks";
+            case ONCE_FOUR_WEEKS -> "4 weeks";
+            case ONCE_ONE_MONTH -> "month";
+            default -> null;
+        };
+    }
+
+    private Optional<String> getInstalmentStartDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
+            .map(DateUtils::formatDate);
+    }
+
+    private Optional<String> getInstalmentAmount(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getPaymentAmount).map(
+                MonetaryConversions::penniesToPounds).map(
+                BigDecimal::stripTrailingZeros)
+            .map(amount -> amount.setScale(2))
+            .map(BigDecimal::toPlainString)
+            .map(amount -> "£" + amount);
     }
 }
