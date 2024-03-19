@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,10 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     private String getScenario(CaseData caseData) {
         if (caseData.isFullAdmitClaimSpec() && caseData.isPayImmediately()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
+        } else if ((caseData.isPartAdmitPayImmediatelyClaimSpec() || caseData.isFullAdmitClaimSpec())
+            && caseData.getRespondent1().isCompanyOROrganisation()
+            && caseData.isPayByInstallment()) {
+            return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario();
         }
         return null;
     }
