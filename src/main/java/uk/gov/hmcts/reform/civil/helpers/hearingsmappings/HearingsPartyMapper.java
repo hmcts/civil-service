@@ -332,6 +332,7 @@ public class HearingsPartyMapper {
             null);
     }
 
+    @SuppressWarnings("java:S107")
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
                                                                String partyName, String partyRole,
                                                                String email, String phone,
