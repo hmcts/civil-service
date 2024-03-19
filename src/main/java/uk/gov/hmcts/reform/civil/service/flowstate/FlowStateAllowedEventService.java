@@ -17,6 +17,8 @@ import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -66,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -81,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -166,6 +170,14 @@ public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    private static final List<CaseEvent> EVENT_WHITELIST = List.of(
+        migrateCase,
+        NOTIFY_HEARING_PARTIES,
+        MANAGE_CONTACT_INFORMATION,
+        CASE_PROCEEDS_IN_CASEMAN,
+        UpdateNextHearingInfo
+    );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
@@ -592,12 +604,14 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
                 CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1216,6 +1230,7 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
@@ -1224,7 +1239,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1384,6 +1400,7 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
                 FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
@@ -1570,7 +1587,8 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
         entry(
@@ -1590,7 +1608,8 @@ public class FlowStateAllowedEventService {
                 FEE_PAYMENT_OUTCOME,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                NO_REMISSION_HWF
             )
         ),
         entry(
@@ -1631,19 +1650,7 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        if (caseEvent.equals(migrateCase)) {
-            return true;
-        }
-
-        if (caseEvent.equals(NOTIFY_HEARING_PARTIES)) {
-            return true;
-        }
-
-        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
-            return true;
-        }
-
-        if (caseEvent.equals(CASE_PROCEEDS_IN_CASEMAN)) {
+        if (EVENT_WHITELIST.contains(caseEvent)) {
             return true;
         }
 

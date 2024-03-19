@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -44,6 +45,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final HelpWithFeesForTabService helpWithFeesForTabService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -83,6 +85,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(null).build());
             caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
         }
+        setUpHelpWithFees(caseDataBuilder);
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -102,4 +105,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
     }
 
+    private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
+    }
 }
