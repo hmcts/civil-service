@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -108,6 +110,7 @@ public class ResponseRepaymentDetailsForm {
                                       .build())
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            builder.amountToPay(totalClaimAmount + "");
         }
     }
 
@@ -145,11 +148,22 @@ public class ResponseRepaymentDetailsForm {
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
         } else {
+            BigDecimal amountInPennies =
+                useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
+                    caseData.getRespondToAdmittedClaimOwingAmount();
+
             addRepaymentMethod(
                 caseData,
                 builder,
-                MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount())
+                MonetaryConversions.penniesToPounds(amountInPennies)
             );
         }
+    }
+
+    private static boolean useRespondent2(CaseData caseData) {
+        return MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
+            && caseData.getRespondent1ResponseDate() == null
+            || (caseData.getRespondent2ResponseDate() != null
+            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
 }
