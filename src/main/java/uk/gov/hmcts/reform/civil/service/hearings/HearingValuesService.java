@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.FeatureNotActiveException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -81,10 +80,6 @@ public class HearingValuesService {
     private final FeatureToggleService featureToggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
-        if (!featureToggleService.isHmcEnabled()) {
-            throw new FeatureNotActiveException("HMC");
-        }
-
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
         isEarlyAdopter(caseData);

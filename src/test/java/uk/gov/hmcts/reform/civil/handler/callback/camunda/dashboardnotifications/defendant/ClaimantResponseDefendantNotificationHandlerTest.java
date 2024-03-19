@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -30,10 +32,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
@@ -196,6 +201,39 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
+    public void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
+
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .claimantCourtDecision(RepaymentDecisionType
+                                                                                   .IN_FAVOUR_OF_DEFENDANT).build())
+                             .build())
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
     public void configureDashboardNotificationsForDefendantPartAdmitHearing() {
 
         Map<String, Object> params = new HashMap<>();
@@ -251,6 +289,74 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
+
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
+                .getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
+
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
+                        .getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
         );
     }
 
