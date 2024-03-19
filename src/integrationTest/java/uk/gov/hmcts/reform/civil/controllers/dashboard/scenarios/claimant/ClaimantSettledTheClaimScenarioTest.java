@@ -21,7 +21,7 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
     private ClaimSettledDashboardNotificationHandler handler;
 
     @Test
-    void should_create_ccj_requested_scenario() throws Exception {
+    void should_create_claimant_settled_claim_scenario() throws Exception {
 
         String caseId = "55551111";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
