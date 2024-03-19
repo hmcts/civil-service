@@ -42,7 +42,7 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
                                + " said no to mediation.</p> <p class=\"govuk-body\">If the case goes to a hearing we will"
                                + " contact you with further details.</p> <p class=\"govuk-body\"><a"
                                + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a><br>"
-                               + "<a href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\""
+                               + "<a target=\"_blank\" href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\""
                                + " class=\"govuk-link\">View the claimant's hearing requirements</a></p>"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionCy")
@@ -50,8 +50,8 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
                                + " <p class=\"govuk-body\">They rejected your response.</p> <p class=\"govuk-body\">They"
                                + " said no to mediation.</p> <p class=\"govuk-body\">If the case goes to a hearing we will"
                                + " contact you with further details.</p> <p class=\"govuk-body\"><a"
-                               + " href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a><br>"
-                               + "<a href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\""
+                               + "target=\"_blank\" href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a><br>"
+                               + "<a target=\"_blank\" href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\""
                                + " class=\"govuk-link\">View the claimant's hearing requirements</a></p>")
             );
     }
