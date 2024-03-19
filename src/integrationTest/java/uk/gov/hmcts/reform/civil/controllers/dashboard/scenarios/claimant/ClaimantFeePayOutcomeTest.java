@@ -38,8 +38,8 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("The claim fee has been paid"),
-                jsonPath("$[0].descriptionEn").value(
+                jsonPath("$[1].titleEn").value("The claim fee has been paid"),
+                jsonPath("$[1].descriptionEn").value(
                     "<p class=\"govuk-body\">The claim fee has been paid in full.</p>")
             );
     }
