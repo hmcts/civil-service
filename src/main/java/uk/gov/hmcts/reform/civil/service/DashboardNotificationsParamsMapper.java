@@ -68,10 +68,11 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
             );
         }
-
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
+
+        getAlreadyPaidAmount(caseData).map(amount -> params.put("admissionPaidAmount", amount));
 
         getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
 
@@ -126,6 +127,15 @@ public class DashboardNotificationsParamsMapper {
         return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
             .map(LocalDateTime::toLocalDate)
             .map(DateUtils::formatDate);
+    }
+
+    private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
+            MonetaryConversions::penniesToPounds).map(
+            BigDecimal::stripTrailingZeros)
+            .map(amount -> amount.setScale(2))
+            .map(BigDecimal::toPlainString)
+            .map(amount -> "£" + amount);
     }
 
     private String getClaimantRepaymentPlanDecision(CaseData caseData) {
