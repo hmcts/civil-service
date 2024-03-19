@@ -27,7 +27,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
     private DefendantResponseClaimantNotificationHandler handler;
 
     @Test
-    void should_create_full_admit_pay_immediately_claimant_scenario() throws Exception {
+    void should_create_full_part_admit_installments_org_com_claimant_scenario() throws Exception {
 
         String caseId = "12348";
         LocalDate firstPaymentDate = LocalDate.now();
