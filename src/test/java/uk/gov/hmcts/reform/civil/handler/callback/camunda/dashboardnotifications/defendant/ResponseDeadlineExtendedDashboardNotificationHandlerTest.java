@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT;
 
 import java.util.HashMap;
@@ -52,7 +51,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name())
+                             .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
