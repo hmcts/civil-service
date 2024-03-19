@@ -74,7 +74,6 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getApplicant1().getPartyName(),
             LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
                                                          .getOrganisationID(), caseData),
