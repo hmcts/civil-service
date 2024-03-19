@@ -1066,7 +1066,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRejectWithNoMediation() {
         return isClaimantNotSettlePartAdmitClaim()
-            && ((hasClaimantNotAgreedToFreeMediation()
+            && isMediationRejectedOrFastTrack();
+    }
+
+    @JsonIgnore
+    public boolean isMediationRejectedOrFastTrack() {
+        return ((hasClaimantNotAgreedToFreeMediation()
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
     }
