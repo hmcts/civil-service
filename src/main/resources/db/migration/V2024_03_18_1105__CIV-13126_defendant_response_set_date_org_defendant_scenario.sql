@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant',
         '{"Notice.AAA7.ClaimIssue.Response.Required", "Notice.AAA7.DefResponse.MoretimeRequested.Defendant", "Notice.AAA7.DefResponse.ResponseTimeElapsed.Defendant"}',
-        '{"Notice.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant" : []}');
+        '{"Notice.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant" : ["defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
 
 /**
  * Add notification template
@@ -13,7 +13,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant', 'Response to the claim', 'Response to the claim',
         '<p class="govuk-body">You’ve offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. You need to send the claimant your financial details. The court will contact you when they respond.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response.</a>.',
-        '<p class="govuk-body">You’ve offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCY}. You need to send the claimant your financial details. The court will contact you when they respond.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response.</a>.',
+        '<p class="govuk-body">You’ve offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}. You need to send the claimant your financial details. The court will contact you when they respond.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response.</a>.',
         'DEFENDANT');
 
 /**

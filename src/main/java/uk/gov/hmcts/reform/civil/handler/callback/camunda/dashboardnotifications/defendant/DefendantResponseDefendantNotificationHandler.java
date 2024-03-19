@@ -52,8 +52,7 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
 
     private String getScenario(CaseData caseData) {
 
-        // TODO: Part/Full Admit , Pay by set date (Org/Company)
-        if (caseData.getNeitherCompanyNorOrganisation() == YesOrNo.NO
+        if (caseData.getRespondent1().isCompanyOROrganisation()
             && caseData.isPayBySetDate()) {
             return SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario();
         }
