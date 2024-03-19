@@ -32,6 +32,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandler extends Cal
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
