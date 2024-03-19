@@ -30,7 +30,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant"),
-    SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT("Scenario.AAA7.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant");
+    SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT("Scenario.AAA7.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT("Scenario.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant");
 
     private final String scenario;
 
