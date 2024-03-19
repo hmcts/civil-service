@@ -19,12 +19,12 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimantIntent.Mediation.Defendant',
         '${applicant1PartyName} rejected your response', '${applicant1PartyName} rejected your response',
-        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.'
-        '<a href="{MEDIATION}" rel="noopener noreferrer" class="govuk-link" target="_blank">Find out more about how mediation works (opens in a new tab).</a><p/>'
-        '<p class="govuk-body">They''ve also sent us their hearing requirements. You can ' ||
+        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p>'
+        '<p class="govuk-body"><a href="{MEDIATION}" rel="noopener noreferrer" class="govuk-link" target="_blank">Find out more about how mediation works (opens in a new tab).</a><p/>'
+        '<p class="govuk-body">They''ve also sent us their hearing requirements. You can '
         '<a href="{VIEW_CLAIMANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">view their hearing requirements (PDF, {VIEW_CLAIMANT_HEARING_REQS_SIZE}).</a></p>',
-        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.'
-        '<a href="{MEDIATION}" rel="noopener noreferrer" class="govuk-link" target="_blank">Find out more about how mediation works (opens in a new tab).</a><p/>'
-        '<p class="govuk-body">They''ve also sent us their hearing requirements. You can ' ||
-        '<a href="{VIEW_CLAIMANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">view their hearing requirements (PDF, {VIEW_CLAIMANT_HEARING_REQS_SIZE}).</a></p>',
+        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p>'
+          '<p class="govuk-body"><a href="{MEDIATION}" rel="noopener noreferrer" class="govuk-link" target="_blank">Find out more about how mediation works (opens in a new tab).</a><p/>'
+          '<p class="govuk-body">They''ve also sent us their hearing requirements. You can '
+          '<a href="{VIEW_CLAIMANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">view their hearing requirements (PDF, {VIEW_CLAIMANT_HEARING_REQS_SIZE}).</a></p>',
         'DEFENDANT');
