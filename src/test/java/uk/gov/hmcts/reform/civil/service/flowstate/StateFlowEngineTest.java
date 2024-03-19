@@ -4674,7 +4674,7 @@ class StateFlowEngineTest {
         void shouldContinueOnline_1v1Spec_HwF_whenDefendantIsUnrepresented() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmittedSpec()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
                     .applicant1Represented(NO)
                     .respondent1Represented(NO)
                     .build().toBuilder()
@@ -4778,6 +4778,45 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).contains(
                 entry(FlowFlag.LIP_CASE.name(), true),
                 entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
+            );
+        }
+
+        @Test
+        void shouldReturnProceedsInHeritageSystem_whenFullDefenceDefendantNotPaid() {
+            // Given
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
+                .accessCode("TEST")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseAccessCategory(SPEC_CLAIM)
+                .claimNotificationDeadline(LocalDateTime.now())
+                .claimNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO)
+                .build();
+
+            // When
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(FULL_DEFENCE_PROCEED.fullName());
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.AGREED_TO_MEDIATION.name(), false),
+                entry(FlowFlag.SETTLE_THE_CLAIM.name(), false)
             );
         }
     }

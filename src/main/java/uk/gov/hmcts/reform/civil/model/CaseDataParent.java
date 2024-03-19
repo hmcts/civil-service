@@ -152,6 +152,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -167,7 +168,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
-
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -347,6 +353,7 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
+    //SDOR2
     private YesOrNo isSdoR2NewScreen;
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
@@ -379,6 +386,18 @@ public class CaseDataParent implements MappableObject {
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
     private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
     private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
+    private SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsPPIToggle;
+    private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
+    private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
+    private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
+    private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
@@ -607,6 +626,8 @@ public class CaseDataParent implements MappableObject {
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+
+    //Top level structure objects used for Hearings + Case Flags
     private final Flags caseFlags;
     private final List<Element<PartyFlagStructure>> applicantExperts;
     private final List<Element<PartyFlagStructure>> respondent1Experts;
@@ -614,13 +635,15 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+    //Individuals attending from parties that are Org/Company
     private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
     private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+    //Individuals attending from Legal Representative Firms
+    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -703,7 +726,6 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     /* Final Orders */
-
     private YesOrNo finalOrderMadeSelection;
     private OrderMade finalOrderDateHeardComplex;
     private List<FinalOrdersJudgePapers> finalOrderJudgePapers;
@@ -792,7 +814,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
 
-    // TOC
+    // Transfer a Case Online
     private String reasonForTransfer;
     private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
