@@ -19,13 +19,5 @@ VALUES ('Notice.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', 'Response t
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">View the claim</a>', 'The claim','<a href={VIEW_CLAIM_URL}>View the claim</a>',
-        'The claim', 'Claim.View', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 1),
-       ('<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">View information about the claimant</a>', 'The claim','<a href={VIEW_INFO_ABOUT_CLAIMANT_URL}>View information about the claimant</a>',
-        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 2),
-       ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response','<a href={VIEW_RESPONSE_TO_CLAIM}>View the response to the claim</a>',
-        'The response', 'Response.View', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 3),
-       ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}>View information about the defendant</a>',
-        'The response', 'Response.Defendant.Info', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 4),
-       ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES_URL}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 10);
+values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response','<a href={VIEW_RESPONSE_TO_CLAIM}>View the response to the claim</a>',
+        'The response', 'Response.View', 'Scenario.AAA7.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 3);
