@@ -11,9 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,8 +22,6 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
     @Test
     void should_create_fee_payment_outcome_scenario() throws Exception {
         String caseId = "1234";
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
-        String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -34,7 +29,6 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
             .hwfFeeType(FeeType.CLAIMISSUED)
             .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
                                           .hwfFullRemissionGrantedForClaimIssue(YesOrNo.NO).build())
-            .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
             .build();
 
         handler.handle(callbackParams(caseData));
