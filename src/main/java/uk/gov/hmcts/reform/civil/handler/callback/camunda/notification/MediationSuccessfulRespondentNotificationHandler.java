@@ -45,7 +45,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
             notificationService.sendMail(
-                "leonardo.palmeiro@hmcts.net",//caseData.getRespondent1().getPartyEmail(),
+                caseData.getRespondent1().getPartyEmail(),
                 addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));

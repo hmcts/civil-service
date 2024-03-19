@@ -30,7 +30,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Defendant");
 
-
     private final String scenario;
 
     DashboardScenarios(String scenario) {

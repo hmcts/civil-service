@@ -46,7 +46,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",//caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
