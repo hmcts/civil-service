@@ -29,7 +29,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
     @Test
     void should_create_full_part_admit_installments_org_com_claimant_scenario() throws Exception {
 
-        String caseId = "12348";
+        String caseId = "10002348";
         LocalDate firstPaymentDate = LocalDate.now();
         PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_FOUR_WEEKS;
         BigDecimal installmentAmount = new BigDecimal("100");
