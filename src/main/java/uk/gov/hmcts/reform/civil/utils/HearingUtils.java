@@ -147,8 +147,8 @@ public class HearingUtils {
     }
 
     public static boolean hearingFeeRequired(String hearingType) {
-        List<String> HEARING_TYPES_EXCLUDED_FROM_FEE = List.of("DIS", "DRH");
-        return HEARING_TYPES_EXCLUDED_FROM_FEE.stream().filter(
+        List<String> hearingTypesExcludedFromFee = List.of("DIS", "DRH");
+        return hearingTypesExcludedFromFee.stream().filter(
             type -> parseHearingType(hearingType).equals(type)).count() < 1;
     }
 }
