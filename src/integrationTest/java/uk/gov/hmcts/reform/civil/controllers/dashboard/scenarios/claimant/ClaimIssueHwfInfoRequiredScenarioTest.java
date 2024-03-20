@@ -1,34 +1,36 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-import java.util.Map;
-import java.util.UUID;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class ClaimIssueHwfInfoRequiredScenarioTest extends BaseIntegrationTest {
+public class ClaimIssueHwfInfoRequiredScenarioTest extends DashboardBaseIntegrationTest {
+
+    private HwFDashboardNotificationsHandler handler;
 
     @Test
     void should_create_claim_issue_hwf_info_required_scenario() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(Map.of("typeOfFee", "claim")).build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario(),
-            caseId
-        ).andExpect(status().isOk());
+        String caseId = "12346780";
+
+        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData()
+            .toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                       .hwfCaseEvent(MORE_INFORMATION_HWF)
+                                       .build())
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
