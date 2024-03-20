@@ -45,7 +45,15 @@ public class MoreTimeRequestedScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("More time requested"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The response deadline for you is now ${time} on {deadline} ({days} days remaining).<a href=\" \" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
+                    "<p class=\"govuk-body\">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineEn} ({daysLeftToRespond} days remaining).<a href=\" \" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
+
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+                .andExpect(status().isOk())
+            .andExpectAll(
+            status().is(HttpStatus.OK.value()),
+        jsonPath("$[0].titleCy").value("More time requested"),
+        jsonPath("$[0].descriptionCy").value(
+                        "<p class=\"govuk-body\">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineCy} ({daysLeftToRespond} days remaining)..<a href=\" \" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
 
     }
 
