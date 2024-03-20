@@ -65,7 +65,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
     @Test
     public void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
-
+        //given
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -87,9 +87,9 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .build();
-
+        //when
         handler.handle(callbackParams);
-
+        //then
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
@@ -100,7 +100,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
     @Test
     public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
-
+        //given
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -122,9 +122,9 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .build();
-
+        //when
         handler.handle(callbackParams);
-
+        //then
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
