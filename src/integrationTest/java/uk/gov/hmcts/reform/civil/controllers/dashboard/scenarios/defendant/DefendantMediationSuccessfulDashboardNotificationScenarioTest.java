@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantMediationSuccessfulDashboardNotificationHandler;
@@ -20,13 +20,14 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
     @Autowired
     private DefendantMediationSuccessfulDashboardNotificationHandler handler;
 
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
     @Test
     void should_create_mediation_scenario() throws Exception {
 
-        String caseId = "123456";
+        String caseId = String.valueOf(System.currentTimeMillis());
+        System.out.println(caseId);
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
