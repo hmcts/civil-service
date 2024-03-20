@@ -375,6 +375,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
     private final YesOrNo specDefenceAdmittedRequired;
 
+    private final MediationContactInformation app1MediationContactInfo;
+    private final MediationAvailability app1MediationAvailability;
     private final MediationContactInformation resp1MediationContactInfo;
     private final MediationContactInformation resp2MediationContactInfo;
     private final MediationAvailability resp1MediationAvailability;
