@@ -24,6 +24,6 @@ VALUES ('Scenario.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant', 'The claim is settled' , 'The claim is settled',
-        '<p class="govuk-body">You have confirmed that the defendant paid you on ${applicant1ClaimSettledDateEn}.</P>',
-        '<p class="govuk-body">You have confirmed that the defendant paid you on ${applicant1ClaimSettledDateCy}.</P>',
+        '<p class="govuk-body">You have confirmed that the defendant paid you on ${applicant1ClaimSettledDateEn}.</p>',
+        '<p class="govuk-body">You have confirmed that the defendant paid you on ${applicant1ClaimSettledDateCy}.</p>',
         'CLAIMANT')
