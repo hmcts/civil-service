@@ -1,42 +1,34 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.MoreTimeRequestedDashboardNotificationDefendantHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest{
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class MoreTimeRequestedScenarioTest extends BaseIntegrationTest {
-
+    @Autowired
+    private MoreTimeRequestedDashboardNotificationDefendantHandler handler;
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
-        String claimantName = "Dave Indent";
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(
-                       Map.of(
-                           "applicant1PartyName", claimantName
-                       )
-                   )
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT.getScenario(), caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "123491";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+            .toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.of(2024, 4, 1, 12, 0))
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -45,15 +37,10 @@ public class MoreTimeRequestedScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("More time requested"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineEn} ({daysLeftToRespond} days remaining).<a href=\" \" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
-
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
-                .andExpect(status().isOk())
-            .andExpectAll(
-            status().is(HttpStatus.OK.value()),
-        jsonPath("$[0].titleCy").value("More time requested"),
-        jsonPath("$[0].descriptionCy").value(
-                        "<p class=\"govuk-body\">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineCy} ({daysLeftToRespond} days remaining)..<a href=\" \" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
+                    "<p class=\"govuk-body\">The response deadline for you is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"),
+                jsonPath("$[0].titleCy").value("More time requested"),
+                jsonPath("$[0].descriptionCy").value(
+                                "<p class=\"govuk-body\">The response deadline for you is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
 
     }
 

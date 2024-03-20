@@ -12,7 +12,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA7.DefResponse.MoreTimeRequested.Defendant', 'More time requested', 'More time requested',
         '<p class="govuk-body">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineEn} ({daysLeftToRespond} days remaining).' ||
-        '<a href=" " rel="noopener noreferrer" class="govuk-link"> Respond to claim</a></p>',
+        '<a href="{RESPONSE_TASK_LIST_URL}" rel="noopener noreferrer" class="govuk-link"> Respond to claim</a></p>',
         '<p class="govuk-body">The response deadline for you is now ${defaultRespondTime} on ${respondent1ResponseDeadlineCy} ({daysLeftToRespond} days remaining).' ||
-        '<a href=" " rel="noopener noreferrer" class="govuk-link"> Respond to claim</a></p>',
+        '<a href="{RESPONSE_TASK_LIST_URL}" rel="noopener noreferrer" class="govuk-link"> Respond to claim</a></p>',
 'DEFENDANT');
