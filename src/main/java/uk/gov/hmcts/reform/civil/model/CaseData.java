@@ -1430,14 +1430,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && (claimIssueFeePaymentDoneWithHWF()
             || getChangeOfRepresentation() != null));
     }
-
-    @JsonIgnore
-    public boolean isFullAdmitPayBySetDateClaimSpec() {
-        return isFullAdmitClaimSpec() && isPayBySetDate();
-    }
-
-    @JsonIgnore
-    public boolean isPartAdmitPayBySetDateClaimSpec() {
-        return isPartAdmitClaimSpec() && isPayBySetDate();
-    }
 }
