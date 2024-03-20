@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -29,6 +30,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -67,6 +70,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -120,6 +124,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
 
+    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
+    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
+    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
+    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
+
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
@@ -133,6 +144,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
             .put(callbackKey(V_1, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
             .put(callbackKey(V_2, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
             .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
@@ -190,6 +202,47 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             caseDataBuilder.applicant1ProceedWithClaim(YES);
+        }
+    }
+
+    private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if ((caseData.getApp1MediationAvailability() != null
+            && YES.equals(caseData.getApp1MediationAvailability().getIsMediationUnavailablityExists()))) {
+            checkUnavailable(errors, caseData.getApp1MediationAvailability().getUnavailableDatesForMediation());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private void checkUnavailable(List<String> errors,
+                                  List<Element<UnavailableDate>> datesUnavailableList) {
+        if (isEmpty(datesUnavailableList)) {
+            errors.add(UNAVAILABLE_DATE_RANGE_MISSING);
+        } else {
+            for (Element<UnavailableDate> dateRange : datesUnavailableList) {
+                var unavailableDateType = dateRange.getValue().getUnavailableDateType();
+                LocalDate dateFrom = dateRange.getValue().getFromDate();
+                LocalDate dateTo = dateRange.getValue().getToDate();
+                if (unavailableDateType.equals(UnavailableDateType.SINGLE_DATE)) {
+                    if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+                    } else if (dateRange.getValue().getDate().isAfter(LocalDate.now().plusYears(1))) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+                    }
+                } else if (unavailableDateType.equals(UnavailableDateType.DATE_RANGE)) {
+                    if (dateTo != null && dateTo.isBefore(dateFrom)) {
+                        errors.add(INVALID_UNAVAILABILITY_RANGE);
+                    } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+                    } else if (dateTo != null && dateTo.isAfter(LocalDate.now().plusYears(1))) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+                    }
+                }
+            }
         }
     }
 
@@ -489,6 +542,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedCaseData.showCarmFields(YES);
+        } else {
+            updatedCaseData.showCarmFields(NO);
+        }
 
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         updatedCaseData.applicant1DQ(
