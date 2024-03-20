@@ -63,7 +63,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
         }
 
         @Test
-        void shouldNotifyApplicantOnlyOneSolicitor_whenInvoked() {
+        void shouldNotifyClaimantJudgmentVariedDeterminationOfMeans_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged_1v2_BothDefendants()
                 .multiPartyClaimTwoDefendantSolicitorsSpec().build();
@@ -82,7 +82,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "claimant-judgement-varied-determination-of-means-000DC001"
+                "claimant-judgment-varied-determination-of-means-000DC001"
             );
         }
     }

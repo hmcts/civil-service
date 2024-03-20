@@ -60,7 +60,7 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
         }
 
         @Test
-        void shouldNotifyApplicantOnlyOneSolicitor_whenInvoked() {
+        void shouldNotifyDefendantJudgmentVariedDeterminationOfMeans_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged_1v2_BothDefendants()
                 .multiPartyClaimTwoDefendantSolicitorsSpec().build();
