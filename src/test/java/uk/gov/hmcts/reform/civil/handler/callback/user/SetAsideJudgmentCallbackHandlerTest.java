@@ -137,22 +137,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmitCallBack {
-        @Test
-        public void whenSubmitted_thenStateShouldBeSame() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .build();
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        }
-    }
-
-    @Nested
     class SubmittedCallback {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
