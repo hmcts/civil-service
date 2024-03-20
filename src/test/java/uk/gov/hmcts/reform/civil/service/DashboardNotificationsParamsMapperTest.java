@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -49,7 +48,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ClaimSettledDate(LocalDate.now()).build()).build())
+            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -176,9 +175,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_whenClaimantSubmitSettlmentEvent() {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19)).build()).build())
+            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);

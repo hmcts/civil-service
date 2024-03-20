@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -65,8 +64,8 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ClaimSettledDate(
-                                     LocalDate.of(2014, 3, 19)).build()).build()).build();
+                                 .applicant1ClaimSettledDate(
+                                     LocalDate.now()).build()).build();
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());

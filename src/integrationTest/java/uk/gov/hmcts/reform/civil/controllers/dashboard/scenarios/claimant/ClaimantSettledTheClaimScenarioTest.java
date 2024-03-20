@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimSettledDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -29,9 +28,8 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19))
-                                                        .build()).build())
+                             .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19))
+                                                        .build())
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -43,10 +41,10 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have confirmed that the defendant paid you on 19 March 2024.</P>"),
+                    "<p class=\"govuk-body\">You have confirmed that the defendant paid you on 19 March 2024.</p>"),
                 jsonPath("$[0].titleCy").value("The claim is settled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have confirmed that the defendant paid you on 19 March 2024.</P>")
+                    "<p class=\"govuk-body\">You have confirmed that the defendant paid you on 19 March 2024.</p>")
             );
     }
 }
