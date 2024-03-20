@@ -92,11 +92,11 @@ public class DashboardNotificationsParamsMapper {
         });
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("instalmentAmount", getInstalmentAmount(caseData));
+            getInstalmentAmount(caseData).map(amount -> params.put("instalmentAmount", amount));
+            getInstalmentStartDate(caseData).map(dateEn -> params.put("instalmentStartDateEn", dateEn));
+            getInstalmentStartDate(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
             params.put("instalmentTimePeriodEn", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
             params.put("instalmentTimePeriodCy", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
-            params.put("instalmentStartDateEn", getInstalmentStartDate(caseData));
-            params.put("instalmentStartDateCy", getInstalmentStartDate(caseData));
         }
 
         return params;
@@ -173,9 +173,8 @@ public class DashboardNotificationsParamsMapper {
 
     private Optional<String> getInstalmentAmount(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
-            .map(RepaymentPlanLRspec::getPaymentAmount).map(
-                MonetaryConversions::penniesToPounds).map(
-                BigDecimal::stripTrailingZeros)
+            .map(RepaymentPlanLRspec::getPaymentAmount)
+            .map(MonetaryConversions::penniesToPounds)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
             .map(this::removeDoubleZeros)
