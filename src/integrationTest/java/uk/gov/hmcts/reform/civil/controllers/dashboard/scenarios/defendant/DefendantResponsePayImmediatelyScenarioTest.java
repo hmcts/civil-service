@@ -59,7 +59,6 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
                 )
             );
-
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
@@ -104,7 +103,6 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
                 )
             );
-
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
