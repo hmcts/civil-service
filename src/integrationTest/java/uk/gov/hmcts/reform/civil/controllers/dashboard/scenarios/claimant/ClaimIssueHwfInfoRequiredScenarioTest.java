@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -15,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 
 public class ClaimIssueHwfInfoRequiredScenarioTest extends DashboardBaseIntegrationTest {
 
+    @Autowired
     private HwFDashboardNotificationsHandler handler;
 
     @Test
@@ -22,12 +24,11 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends DashboardBaseIntegrat
 
         String caseId = "12346780";
 
-        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                       .hwfCaseEvent(MORE_INFORMATION_HWF)
-                                       .build())
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(MORE_INFORMATION_HWF).build())
+            .ccdCaseReference(Long.valueOf(caseId))
             .build();
 
         handler.handle(callbackParams(caseData));

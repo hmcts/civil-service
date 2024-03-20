@@ -12,6 +12,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.HWF.Rejected', 'Your help with fees application has been rejected',
         'Your help with fees application has been rejected',
-        '<p class="govuk-body">We''ve rejected your application for help with the claim fee. See the email for further details.</p><p class="govuk-body">You''ll need to pay the full fee of ${claimFee} . You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
-        '<p class="govuk-body">We''ve rejected your application for help with the claim fee. See the email for further details.</p><p class="govuk-body">You''ll need to pay the full fee of ${claimFee} . You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">We''ve rejected your application for help with the claim fee. See the email for further details.</p><p class="govuk-body">You''ll need to pay the full fee of ${claimFee}. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">We''ve rejected your application for help with the claim fee. See the email for further details.</p><p class="govuk-body">You''ll need to pay the full fee of ${claimFee}. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
         'CLAIMANT');
