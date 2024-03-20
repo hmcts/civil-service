@@ -81,7 +81,8 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
 
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+            caseData.setJoSetAsideJudgmentErrorText("test error");
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -104,6 +105,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
         @Test
         void shouldNotifyDefendantBothSolicitors_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+            caseData.setJoSetAsideJudgmentErrorText("test error");
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -140,9 +142,8 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName(),
             LEGAL_ORG, "Test Org Name",
-            REASON_FROM_CASEWORKER, "test_reason",
+            REASON_FROM_CASEWORKER, "test error",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo"
         );
     }
@@ -153,7 +154,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getRespondent2().getPartyName(),
             LEGAL_ORG, "Test Org Name",
-            REASON_FROM_CASEWORKER, "test_reason",
+            REASON_FROM_CASEWORKER, "test error",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo"
         );
     }
