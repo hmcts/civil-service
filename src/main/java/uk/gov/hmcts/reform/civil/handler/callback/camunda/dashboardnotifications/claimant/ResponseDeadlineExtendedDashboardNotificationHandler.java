@@ -52,7 +52,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandler extends Callba
         if (caseData.isRespondent1NotRepresented()) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario(),
+                getScenario(caseData),
                 authToken,
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build()
@@ -60,5 +60,9 @@ public class ResponseDeadlineExtendedDashboardNotificationHandler extends Callba
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getScenario(CaseData caseData) {
+        return SCENARIO_AAA7_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT.getScenario();
     }
 }
