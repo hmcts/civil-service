@@ -30,6 +30,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
             .build();
 
         handler.handle(callbackParams(caseData));
