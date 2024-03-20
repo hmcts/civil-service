@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
@@ -137,6 +138,22 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class AboutToSubmitCallBack {
+        @Test
+        public void whenSubmitted_thenStateShouldBeSame() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .build();
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+    }
+
+    @Nested
     class SubmittedCallback {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
@@ -151,5 +168,4 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertTrue(response.getConfirmationBody().contains("The judgment has been set aside"));
         }
     }
-
 }
