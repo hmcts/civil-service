@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
 
 @SpringBootTest(classes = {
@@ -93,8 +93,8 @@ public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseC
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG, "Test Org Name",
-            REASON_FROM_CASEWORKER, "test error", //caseData.getJoJudgmentRecordReason().name()
+            LEGAL_ORG_NAME, "Test Org Name",
+            REASON_FROM_CASEWORKER, "test error",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader"
         );
     }

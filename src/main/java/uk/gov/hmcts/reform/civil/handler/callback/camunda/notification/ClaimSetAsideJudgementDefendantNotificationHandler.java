@@ -11,16 +11,19 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -82,22 +85,17 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                    .getOrganisation()
-                                                    .getOrganisationID(), caseData),
-            DEFENDANT_NAME_INTERIM, getDefendantName(caseData),
-            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText() //caseData.getJoJudgmentRecordReason().name()
+            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
+            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
         );
     }
 
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent2().getPartyName(),
-            LEGAL_ORG, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                         .getOrganisation()
-                                                         .getOrganisationID(), caseData),
-            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(), //caseData.getJoJudgmentRecordReason().name(),
+            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
             DEFENDANT_NAME_INTERIM, getDefendantName(caseData)
         );
     }
@@ -111,11 +109,15 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getLegalOrganizationName(String id, CaseData caseData) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+    private String getDefendantNameBasedOnCaseType(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            return getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
         }
-        return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
+
 }
