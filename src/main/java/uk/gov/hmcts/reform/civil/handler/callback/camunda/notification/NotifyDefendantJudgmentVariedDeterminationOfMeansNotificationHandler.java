@@ -95,7 +95,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
         String defendantsName = caseData.getRespondent1().getPartyName();
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            defendantsName += "&" + caseData.getRespondent2().getPartyName();
+            defendantsName += "& " + caseData.getRespondent2().getPartyName();
         }
 
         return defendantsName;

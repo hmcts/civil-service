@@ -79,7 +79,7 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
                 "respondentsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "defendant-judgement-varied-determination-of-means-000DC001"
+                "defendant-judgment-varied-determination-of-means-000DC001"
             );
         }
     }
@@ -103,7 +103,7 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
         String defendantsName = caseData.getRespondent1().getPartyName();
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            defendantsName += "&" + caseData.getRespondent2().getPartyName();
+            defendantsName += "& " + caseData.getRespondent2().getPartyName();
         }
 
         return defendantsName;
