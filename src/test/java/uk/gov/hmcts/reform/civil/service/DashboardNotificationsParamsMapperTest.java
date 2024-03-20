@@ -175,7 +175,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_whenClaimantSubmitSettlmentEvent() {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
-            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
+            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19)).build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
