@@ -59,14 +59,14 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
                       +  DateUtils.formatDate(responseDeadline) + ".</p><p class=\"govuk-body\">"
-                      +  "The defendant needs to send you their financial details.<br>"
-                      +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and response</a>.</p>"),
+                      +  "The defendant needs to send you their financial details."
+                      +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
                      +   DateUtils.formatDate(responseDeadline) + ".</p><p class=\"govuk-body\">"
-                     +   "The defendant needs to send you their financial details.<br>"
-                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and response</a>.</p>")
+                     +   "The defendant needs to send you their financial details."
+                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
         //Verify task Item is created
@@ -114,14 +114,14 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
                      +   DateUtils.formatDate(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
-                     +   "The defendant needs to send you their financial details.<br>"
-                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and response</a>.</p>"),
+                     +   "The defendant needs to send you their financial details."
+                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                jsonPath("$[0].titleCy").value("Response to the claim"),
                jsonPath("$[0].descriptionCy").value(
                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
                     +   DateUtils.formatDate(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
-                    +   "The defendant needs to send you their financial details.<br>"
-                    +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and response</a>.</p>")
+                    +   "The defendant needs to send you their financial details."
+                    +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
         //Verify task Item is created
