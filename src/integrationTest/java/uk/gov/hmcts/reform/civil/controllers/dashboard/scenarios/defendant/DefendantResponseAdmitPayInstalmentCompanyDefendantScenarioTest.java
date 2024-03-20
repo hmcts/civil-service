@@ -30,7 +30,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     @Test
     void should_create_part_admit_pay_instalment_scenario() throws Exception {
 
-        String caseId = "12345677";
+        String caseId = "12345671";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -41,7 +41,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             .respondent1Represented(YesOrNo.NO)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                           .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal(10))
+                                          .paymentAmount(new BigDecimal(1000))
                                           .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -57,7 +57,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week." +
+                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
                         "You've offered to do this starting from " +
                         DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
@@ -76,48 +76,52 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             );
     }
 
-//    @Test
-//    void should_create_full_admit_pay_immediately_scenario() throws Exception {
-//
-//        String caseId = "1234";
-//        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
-//        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-//            .toBuilder()
-//            .legacyCaseReference("reference")
-//            .ccdCaseReference(Long.valueOf(caseId))
-//            .respondent1Represented(YesOrNo.NO)
-//            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-//                                               .builder()
-//                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-//                                               .build())
-//            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-//            .totalClaimAmount(new BigDecimal(1000))
-//            .build();
-//
-//        handler.handle(callbackParams(caseData));
-//
-//        //Verify Notification is created
-//        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
-//            .andExpect(status().isOk())
-//            .andExpectAll(
-//                status().is(HttpStatus.OK.value()),
-//                jsonPath("$[0].titleEn").value("Response to the claim"),
-//                jsonPath("$[0].descriptionEn").value(
-//                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
-//                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
-//                        "The payment must clear the account by then, if not the claimant can request a county court judgment.</p>" +
-//                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
-//                )
-//            );
-//
-//        //Verify task Item is created
-//        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-//            .andExpectAll(
-//                status().is(HttpStatus.OK.value()),
-//                jsonPath("$[0].reference").value(caseId.toString()),
-//                jsonPath("$[0].taskNameEn").value(
-//                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-//                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
-//            );
-//    }
+    @Test
+    void should_create_fulladmit_pay_instalment_scenario() throws Exception {
+
+        String caseId = "12345672";
+        LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .firstRepaymentDate(firstRepaymentDate)
+                                          .paymentAmount(new BigDecimal(1000))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .build())
+            .totalClaimAmount(new BigDecimal(1000))
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .build();
+
+        handler.handle(callbackParams(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("Response to the claim"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
+                        "You've offered to do this starting from " +
+                        DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
+                        "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>"
+                )
+            );
+
+        //Verify task Item is created
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
+            );
+    }
 }
