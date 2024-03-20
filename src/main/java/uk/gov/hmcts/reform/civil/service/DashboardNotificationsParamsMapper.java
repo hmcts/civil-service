@@ -93,8 +93,10 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
             params.put("instalmentAmount", getInstalmentAmount(caseData));
-            params.put("instalmentTimePeriod", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
-            params.put("instalmentStartDate", getInstalmentStartDate(caseData));
+            params.put("instalmentTimePeriodEn", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+            params.put("instalmentTimePeriodCy", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+            params.put("instalmentStartDateEn", getInstalmentStartDate(caseData));
+            params.put("instalmentStartDateCy", getInstalmentStartDate(caseData));
         }
 
         return params;
@@ -176,6 +178,7 @@ public class DashboardNotificationsParamsMapper {
                 BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
     }
 }
