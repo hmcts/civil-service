@@ -51,7 +51,8 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_RESPONDENT);
+        assertThat(handler.handledEvents()).contains(
+            CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_RESPONDENT);
     }
 
     @Test
@@ -108,7 +109,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient, times(0)).recordScenario(any(),any(),any(),any());
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
     }
 
 }
