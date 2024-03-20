@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 
 @Service
 @RequiredArgsConstructor
@@ -93,8 +94,8 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS){ //ToDo: Check if this is necessary
-            caseDataBuilder.businessProcess(BusinessProcess.ready(EDIT_JUDGMENT));
+        if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

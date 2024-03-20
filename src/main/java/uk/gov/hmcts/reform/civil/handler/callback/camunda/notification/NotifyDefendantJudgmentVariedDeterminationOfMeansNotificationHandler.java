@@ -18,19 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 
 @Service
 @RequiredArgsConstructor
-public class NotifyDefendantJudgementVariedDeterminationOfMeansNotificationHandler extends CallbackHandler
+public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_JUDGEMENT_VARIED_DETERMINATION_OF_MEANS);
-    public static final String TASK_ID = "NotifyDefendantJudgementVariedDeterminationOfMeans";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+    public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
-        "defendant-judgement-varied-determination-of-means-%s";
+        "defendant-judgment-varied-determination-of-means-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -40,7 +40,7 @@ public class NotifyDefendantJudgementVariedDeterminationOfMeansNotificationHandl
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyDefendantJudgementVariedDeterminationOfMeans
+            this::notifyDefendantJudgmentVariedDeterminationOfMeans
         );
     }
 
@@ -54,7 +54,7 @@ public class NotifyDefendantJudgementVariedDeterminationOfMeansNotificationHandl
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantJudgementVariedDeterminationOfMeans(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
             notificationService.sendMail(
@@ -73,12 +73,11 @@ public class NotifyDefendantJudgementVariedDeterminationOfMeansNotificationHandl
         return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData)
-                //PARTY_NAME, caseData.getRespondent1().getPartyName() //ToDo: Review the EXUI URL
             );
     }
 
     private String getTemplate() {
-        return notificationsProperties.getNotifyUpdateTemplate();
+        return notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -88,8 +87,18 @@ public class NotifyDefendantJudgementVariedDeterminationOfMeansNotificationHandl
     private String getLegalOrganisationName(CaseData caseData) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(
             caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+
+        if (organisation.isPresent()) {
+            return organisation.get().getName();
+        }
+
+        String defendantsName = caseData.getRespondent1().getPartyName();
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            defendantsName += "&" + caseData.getRespondent2().getPartyName();
+        }
+
+        return defendantsName;
     }
 
 }

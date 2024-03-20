@@ -19,19 +19,21 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_JUDGEMENT_VARIED_DETERMINATION_OF_MEANS;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
-public class NotifyClaimantJudgementVariedDeterminationOfMeansNotificationHandler extends CallbackHandler
+public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_JUDGEMENT_VARIED_DETERMINATION_OF_MEANS);
-    public static final String TASK_ID = "NotifyClaimantJudgementVariedDeterminationOfMeans";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+    public static final String TASK_ID = "NotifyClaimantJudgmentVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
-        "claimant-judgement-varied-determination-of-means-%s";
+        "claimant-judgment-varied-determination-of-means-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -41,7 +43,7 @@ public class NotifyClaimantJudgementVariedDeterminationOfMeansNotificationHandle
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimantJudgementVariedDeterminationOfMeans
+            this::notifyClaimantJudgmentVariedDeterminationOfMeans
         );
     }
 
@@ -55,7 +57,7 @@ public class NotifyClaimantJudgementVariedDeterminationOfMeansNotificationHandle
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantJudgementVariedDeterminationOfMeans(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
             notificationService.sendMail(
@@ -71,28 +73,34 @@ public class NotifyClaimantJudgementVariedDeterminationOfMeansNotificationHandle
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        String defendantName = "";
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            defendantName = getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            defendantName = getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
         return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                LEGAL_ORG_NAME, getLegalOrganizationName(caseData), //ToDo: Check the legal organization name
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData),
+                DEFENDANT_NAME,  defendantName
             );
     }
 
     private String getTemplate() {
-        return notificationsProperties.getNotifyUpdateTemplate();
+        return notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getLegalOrganizationName(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
-        }
-        return caseData.getApplicant1().getPartyName();
+    public String getApplicantLegalOrganizationName(CaseData caseData) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
