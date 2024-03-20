@@ -26,7 +26,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
     @Test
     void should_create_mediation_scenario() throws Exception {
 
-        String caseId = "1234";
+        String caseId = "123456";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
