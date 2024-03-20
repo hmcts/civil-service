@@ -28,7 +28,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     private DefendantResponseDefendantNotificationHandler handler;
 
     @Test
-    void should_create_part_admit_pay_instalment_scenario() throws Exception {
+    void should_create_part_admit_pay_instalment_company_organisation_scenario() throws Exception {
 
         String caseId = "12345671";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
@@ -77,7 +77,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     }
 
     @Test
-    void should_create_fulladmit_pay_instalment_scenario() throws Exception {
+    void should_create_full_admit_pay_instalment_company_organisation_scenario() throws Exception {
 
         String caseId = "12345672";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
