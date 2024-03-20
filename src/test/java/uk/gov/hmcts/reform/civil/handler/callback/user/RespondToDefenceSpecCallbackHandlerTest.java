@@ -33,15 +33,18 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -85,6 +88,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -98,6 +102,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -194,6 +199,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+
+    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
+    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
+    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability Date must not be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
+    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
 
     @Nested
     class AboutToStart {
@@ -2277,5 +2289,245 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             String paymentDate = getCaseData(response).getCurrentDateboxDefendantSpec();
             assertThat(paymentDate).isEqualTo(formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE));
         }
+    }
+
+    @Nested
+    class MidValidateMediationUnavailabiltyDates {
+
+        @Test
+        public void testValidateApplicantUnavailableDateWhenAvailabilityIsNo() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateApp1UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateErrored() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().minusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+        }
+
+        @Test
+        public void testApp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusYears(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+        }
+
+        @Test
+        public void testApp1UnavailableDateWhenDateToIsBeforeDateFrom() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().plusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+        }
+
+        @Test
+        public void testApp1UnavailableDateWhenDateFromIsBeforeToday() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().minusDays(6))
+                    .toDate(LocalDate.now().plusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+        }
+
+        @Test
+        public void testApp1UnavailableDateWhenDateToIsBeforeToday() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().minusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+        }
+
+        @Test
+        public void testApp1UnavailableDateWhenDateToIsBeyondOneYear() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().plusYears(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+        }
+
     }
 }
