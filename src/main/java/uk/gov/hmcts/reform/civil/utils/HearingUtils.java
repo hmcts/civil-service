@@ -141,7 +141,14 @@ public class HearingUtils {
         };
     }
 
-    public static boolean isDisposalHearing(String hearingType) {
-        return hearingType.contains("DIS");
+    public static String parseHearingType(String hearingType) {
+        String[] parts = hearingType.split("-");
+        return parts.length == 2 ? parts[1] : hearingType;
+    }
+
+    public static boolean hearingFeeRequired(String hearingType) {
+        List<String> HEARING_TYPES_EXCLUDED_FROM_FEE = List.of("DIS", "DRH");
+        return HEARING_TYPES_EXCLUDED_FROM_FEE.stream().filter(
+            type -> parseHearingType(hearingType).equals(type)).count() < 1;
     }
 }
