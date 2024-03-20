@@ -49,6 +49,6 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
                             + "<p class=\"govuk-body\">This case is now settled and no further action is needed.</p> "
                             + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
-                );
+            );
     }
 }
