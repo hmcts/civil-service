@@ -18,6 +18,14 @@ public class DateUtilsTest {
     }
 
     @Test
+    public void testFormatDateInWelsh() {
+        LocalDate date = LocalDate.of(2022, 7, 28);
+        String dateFormatted = DateUtils.formatDateInWelsh(date);
+
+        Assertions.assertEquals("28 Gorffennaf 2022", dateFormatted);
+    }
+
+    @Test
     public void testConvertFromUTC_withBSTDate() {
         LocalDateTime utcDate = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
         LocalDateTime ukDate = DateUtils.convertFromUTC(utcDate);
