@@ -75,7 +75,6 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
         if (isNotAgreed) {
             return new String[] {
                 SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
-
                 SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT.getScenario()
             };
         }
@@ -84,4 +83,3 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
         };
     }
 }
-
