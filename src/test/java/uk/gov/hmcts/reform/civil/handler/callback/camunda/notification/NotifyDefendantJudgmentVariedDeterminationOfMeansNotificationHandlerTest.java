@@ -22,13 +22,14 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @SpringBootTest(classes = {
     NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandler.class,
@@ -56,7 +57,10 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
 
         @BeforeEach
         void setup() {
+
             when(notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(
+                anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
         }
 
         @Test
@@ -69,7 +73,31 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                             .eventId(CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "respondentsolicitor@example.com",
+                TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "defendant-judgment-varied-determination-of-means-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyDefendant2JudgmentVariedDeterminationOfMeans_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged_1v2_BothDefendants()
+                .multiPartyClaimTwoDefendantSolicitorsSpec().build();
+
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
                              .build())
                 .build();
 
@@ -88,24 +116,8 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData)
+            DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
         );
     }
 
-    private String getLegalOrganisationName(CaseData caseData) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(
-            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
-
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
-        }
-
-        String defendantsName = caseData.getRespondent1().getPartyName();
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            defendantsName += "& " + caseData.getRespondent2().getPartyName();
-        }
-
-        return defendantsName;
-    }
 }

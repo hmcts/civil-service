@@ -11,23 +11,24 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
 public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
+                                                           NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
     public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-varied-determination-of-means-%s";
@@ -56,11 +57,17 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private CallbackResponse notifyDefendantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
+        String recipient = (callbackParams.getRequest().getEventId()
+                .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()))
+            ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (nonNull(recipient)) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 getTemplate(),
-                addProperties(caseData),
+                callbackParams.getRequest().getEventId()
+                        .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                    ? addProperties(caseData) : addRespondent2Properties(caseData),
                 getReferenceTemplate(caseData)
             );
         }
@@ -71,9 +78,16 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
             );
+    }
+
+    public Map<String, String> addRespondent2Properties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
+        );
     }
 
     private String getTemplate() {
@@ -82,23 +96,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
-    }
-
-    private String getLegalOrganisationName(CaseData caseData) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(
-            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
-
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
-        }
-
-        String defendantsName = caseData.getRespondent1().getPartyName();
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            defendantsName += "& " + caseData.getRespondent2().getPartyName();
-        }
-
-        return defendantsName;
     }
 
 }
