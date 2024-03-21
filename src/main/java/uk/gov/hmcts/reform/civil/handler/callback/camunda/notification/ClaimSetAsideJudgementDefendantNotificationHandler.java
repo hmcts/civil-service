@@ -33,7 +33,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_DEFENDANT);
     public static final String TASK_ID = "NotifyDefendantSetAsideJudgement";
     private static final String REFERENCE_TEMPLATE =
-        "set-aside-judgement-applicant-notification-%s";
+        "set-aside-judgement-defendant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
