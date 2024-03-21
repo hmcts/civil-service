@@ -13,10 +13,12 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.MoreTimeRequestedDashboardNotificationDefendantHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest{
+
+public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private MoreTimeRequestedDashboardNotificationDefendantHandler handler;
+
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
 
