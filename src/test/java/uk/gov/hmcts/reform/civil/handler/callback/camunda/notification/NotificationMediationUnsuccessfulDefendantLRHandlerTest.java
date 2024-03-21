@@ -37,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSU
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_TWO;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
@@ -75,6 +77,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     private static final String APPLICANT_PARTY_NAME = "Alice";
     private static final String APPLICANT_2_PARTY_NAME = "Portia";
     private static final String DEFENDANT_1_PARTY_NAME = "Lycia";
+    private static final String DEFENDANT_2_PARTY_NAME = "Alicia";
     private static final Long CCD_REFERENCE_NUMBER = 123456789L;
     private static final String CLAIMANT_EMAIL_ADDRESS = "applicantemail@hmcts.net";
     private static final String DEFENDANT_1_EMAIL_ADDRESS = "defendant1email@hmcts.net";
@@ -91,6 +94,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
                                                                         CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
     private static final Map<String, String> CARM_D1_NO_ATTENDANCE_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1,
                                                                         CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+    private static final Map<String, String> CARM_D2_NO_ATTENDANCE_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2,
+                                                                        CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
     @BeforeEach
     void setUp() {
@@ -98,13 +103,14 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
     }
 
     @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE"})
+    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
     void shouldSendNotificationToDefendant1LR(MediationUnsuccessfulReason reason) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
@@ -132,10 +138,9 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE"})
+    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
     void shouldSendNotificationToDefendant2LR(MediationUnsuccessfulReason reason) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
@@ -162,10 +167,9 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE"})
+    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
     void shouldSendNotificationToDefendantLR_2v1(MediationUnsuccessfulReason reason) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicant2(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_2_PARTY_NAME).build())
@@ -195,8 +199,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @ParameterizedTest
     @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_ONE"})
     void shouldSendNotificationToDefendant1LRNoAttendance(MediationUnsuccessfulReason reason) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
@@ -221,13 +223,39 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
         assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_D1_NO_ATTENDANCE_PROPERTY_MAP);
+    }
 
+    @ParameterizedTest
+    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_TWO"})
+    void shouldSendNotificationToDefendant2LRNoAttendance(MediationUnsuccessfulReason reason) {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName("Lea").build())
+            .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
+        //When
+        notificationHandler.handle(params);
+        //Then
+        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                       emailTemplate.capture(),
+                                                       notificationDataMap.capture(), reference.capture()
+        );
+        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
+        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_D2_NO_ATTENDANCE_PROPERTY_MAP);
     }
 
     @Test
     void shouldSendNotificationToDefendant1LRNoAttendance_whenMoreThan1Reason() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
@@ -251,23 +279,20 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
         assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_D1_NO_ATTENDANCE_PROPERTY_MAP);
-
     }
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_CLAIMANT_TWO", "NOT_CONTACTABLE_DEFENDANT_TWO"})
-    void shouldNotSendNotification(MediationUnsuccessfulReason reason) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
+    @Test
+    void shouldSendNotificationToDefendant2LRNoAttendance_whenMoreThan1Reason() {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName("Lea").build())
             .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
             .ccdCaseReference(CCD_REFERENCE_NUMBER)
             .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
             .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS, NOT_CONTACTABLE_DEFENDANT_ONE, NOT_CONTACTABLE_DEFENDANT_TWO)).build())
             .build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
@@ -275,8 +300,12 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         //When
         notificationHandler.handle(params);
         //Then
-        verify(notificationService, times(0)).sendMail(targetEmail.capture(),
+        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
                                                        emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture());
+                                                       notificationDataMap.capture(), reference.capture()
+        );
+        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
+        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_D2_NO_ATTENDANCE_PROPERTY_MAP);
     }
 }
