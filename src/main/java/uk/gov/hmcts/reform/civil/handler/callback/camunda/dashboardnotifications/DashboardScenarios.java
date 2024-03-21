@@ -40,6 +40,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT("Scenario.AAA7.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant"),
     SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT("Scenario.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT(
+        "Scenario.AAA7.ClaimantIntent.ClaimSettleEvent.Defendant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission");
 
     private final String scenario;
