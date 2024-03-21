@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
