@@ -23,7 +23,7 @@ public class GoToHearingScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of())
+                   .params(Map.of("respondent1PartyName", "Mr Def Defendant"))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario(), caseId
         )
@@ -36,16 +36,16 @@ public class GoToHearingScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("You have rejected ${defendantName}'s response and want to proceed to court." +
-                               " If the case goes to a hearing we will contact you with further details.<br><br>" +
-                               "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +
-                               "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>."),
+                    .value("<p class=\"govuk-body\">You have rejected Mr Def Defendant's response and want to proceed to court."
+                               + " If the case goes to a hearing we will contact you with further details.</p><p class=\"govuk-body\">"
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  "
+                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionCy")
-                    .value("You have rejected ${defendantName}'s response and want to proceed to court." +
-                               " If the case goes to a hearing we will contact you with further details.<br><br>" +
-                               "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +
-                               "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.")
+                    .value("<p class=\"govuk-body\">You have rejected Mr Def Defendant's response and want to proceed to court."
+                               + " If the case goes to a hearing we will contact you with further details.</p><p class=\"govuk-body\">"
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  "
+                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>")
             );
     }
 }
