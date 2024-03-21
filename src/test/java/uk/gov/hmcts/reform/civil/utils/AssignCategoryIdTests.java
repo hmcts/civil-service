@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,28 @@ public class AssignCategoryIdTests {
         .documentBinaryUrl("testBinUrl")
         .documentFileName("testFileName")
         .documentHash("testDocumentHash")
+        .build();
+
+    private MediationNonAttendanceStatement testMediationNonAttDocument = MediationNonAttendanceStatement.builder()
+        .yourName("Joe Bloggs")
+        .documentDate(LocalDate.of(2023, 10, 7))
+        .documentUploadedDatetime(LocalDateTime.of(2024, 01, 10, 12, 13, 12))
+        .document(Document.builder()
+                      .documentUrl("fake-url")
+                      .documentFileName("file-name")
+                      .documentBinaryUrl("binary-url")
+                      .build())
+        .build();
+
+    private MediationDocumentsReferredInStatement testMediationDocRefDocument = MediationDocumentsReferredInStatement.builder()
+        .documentType("doc-type")
+        .documentDate(LocalDate.of(2023, 10, 7))
+        .documentUploadedDatetime(LocalDateTime.of(2024, 01, 10, 12, 13, 12))
+        .document(Document.builder()
+                      .documentUrl("fake-url")
+                      .documentFileName("file-name")
+                      .documentBinaryUrl("binary-url")
+                      .build())
         .build();
 
     @BeforeEach
@@ -120,6 +145,50 @@ public class AssignCategoryIdTests {
 
         assertThat(copyList).isNull();
         assertThat(copy).isNull();
+    }
+
+    @Test
+    void shouldCopyDocumentsWithCategoryIdMediationNonAtt_whenInvoked() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<Element<MediationNonAttendanceStatement>> documentList = new ArrayList<>();
+        documentList.add(element(testMediationNonAttDocument));
+        List<Element<MediationNonAttendanceStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(documentList,
+                                                                                                   "testDocumentCollectionID");
+
+        assertThat(copyList.get(0).getValue().getDocument().getCategoryID()).isEqualTo("testDocumentCollectionID");
+    }
+
+    @Test
+    void shouldNotCopyCaseDocumentListWithCategoryIdMediationNonAtt_whenInvokedAndToggleFalse() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
+        List<Element<MediationNonAttendanceStatement>> documentList = new ArrayList<>();
+        documentList.add(element(testMediationNonAttDocument));
+        List<Element<MediationNonAttendanceStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(documentList,
+                                                                                                   "testDocumentCollectionID");
+
+        assertThat(copyList).isNull();
+    }
+
+    @Test
+    void shouldCopyCaseDocumentListWithCategoryIdMediationDocRef_whenInvoked() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<Element<MediationDocumentsReferredInStatement>> documentList = new ArrayList<>();
+        documentList.add(element(testMediationDocRefDocument));
+        List<Element<MediationDocumentsReferredInStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(documentList,
+                                                                                                                                     "testDocumentCollectionID");
+
+        assertThat(copyList.get(0).getValue().getDocument().getCategoryID()).isEqualTo("testDocumentCollectionID");
+    }
+
+    @Test
+    void shouldNotCopyCaseDocumentListWithCategoryIdMediationDocRef_whenInvokedAndToggleFalse() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
+        List<Element<MediationDocumentsReferredInStatement>> documentList = new ArrayList<>();
+        documentList.add(element(testMediationDocRefDocument));
+        List<Element<MediationDocumentsReferredInStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(documentList,
+                                                                                                                                     "testDocumentCollectionID");
+
+        assertThat(copyList).isNull();
     }
 
 }

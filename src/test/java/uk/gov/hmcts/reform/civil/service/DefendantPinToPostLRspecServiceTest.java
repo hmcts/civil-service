@@ -1,11 +1,19 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import feign.Request;
+import feign.Response;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,18 +27,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.pininpost.CUIIdamClientService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
     DefendantPinToPostLRspecService.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
 })
 class DefendantPinToPostLRspecServiceTest {
 
@@ -40,10 +50,15 @@ class DefendantPinToPostLRspecServiceTest {
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @MockBean
+    private CUIIdamClientService cuiIdamClientService;
+
+    @MockBean
     private CoreCaseDataService coreCaseDataService;
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    Request request;
 
     @Nested
     class BuildDefendantPinToPost {
@@ -87,7 +102,7 @@ class DefendantPinToPostLRspecServiceTest {
             CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
+                                                   .accessCode("TEST12341")
                                                    .expiryDate(LocalDate.now().plusDays(180))
                                                    .build())
                 .build();
@@ -98,7 +113,7 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST0000"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
         }
 
         @Test
@@ -116,7 +131,7 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST0000"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
         }
 
         @Test
@@ -131,7 +146,7 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12342"));
         }
 
         @Test
@@ -139,7 +154,7 @@ class DefendantPinToPostLRspecServiceTest {
             CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
+                                                   .accessCode("TEST12341")
                                                    .expiryDate(LocalDate.now().minusDays(1))
                                                    .build())
                 .build();
@@ -150,7 +165,43 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12341"));
+        }
+
+        @Test
+        void shouldCheckPinNotValidForCMC_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(Response.builder().request(request).status(
+                HttpStatus.SC_OK).build());
+
+            assertThrows(
+                PinNotMatchException.class,
+                () ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
+        }
+
+        @Test
+        void shouldCheckPinIsValidForCMC_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            Map<String, Collection<String>> headers = new HashMap<>();
+            List<String> header = Arrays.asList("Location");
+            headers.put("Location", header);
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(Response.builder().request(request).status(
+                HttpStatus.SC_MOVED_TEMPORARILY).headers(headers).build());
+
+            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
     }
 

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -145,7 +146,6 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference()
             );
         }
-        log.info(String.format("Subject-------- %s", subject));
         return subject;
     }
 
@@ -153,7 +153,8 @@ public class RoboticsNotificationService {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-                if (nonNull(caseData.getPaymentTypeSelection())) {
+                if (nonNull(caseData.getPaymentTypeSelection())
+                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()
@@ -204,13 +205,11 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
-            log.info(String.format("EMAIl:--------- %s", roboticsEmailConfiguration.getSpecRecipient()));
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
-        log.info(String.format("EMAIl:--------- %s", recipient));
         return recipient;
     }
 
@@ -261,7 +260,9 @@ public class RoboticsNotificationService {
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
             eventHistory.getBreathingSpaceMentalHealthLifted(),
-            eventHistory.getJudgmentByAdmission()
+            eventHistory.getJudgmentByAdmission(),
+            eventHistory.getGeneralFormOfApplication(),
+            eventHistory.getDefenceStruckOut()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -288,7 +289,8 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getJudgmentByAdmission(), triggerReason);
-
+        triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceStruckOut(), triggerReason);
         return triggerReason;
     }
 

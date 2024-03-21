@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -34,6 +35,7 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,11 +58,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? notificationsProperties.getSdoOrderedSpec()
-                : notificationsProperties.getSdoOrdered(),
-            addProperties(caseData),
+            getRecipientEmail(caseData),
+            getNotificationTemplate(caseData),
+            getEmailProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
@@ -76,9 +76,45 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
         );
     }
 
+    public Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+        );
+    }
+
     public String getApplicantsLegalOrganizationName(String id, CaseData caseData) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private String getNotificationTemplate(CaseData caseData) {
+
+        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
+
+        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+
+        if (caseData.isApplicantLiP()) {
+            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        } else {
+            if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+                return specTemplate;
+            } else {
+                return unspecTemplate;
+            }
+        }
+    }
+
+    private String getRecipientEmail(CaseData caseData) {
+        return caseData.isApplicantLiP() ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+    }
+
+    private Map<String, String> getEmailProperties(CaseData caseData) {
+        return caseData.isApplicantLiP() ? addPropertiesLip(caseData)
+            : addProperties(caseData);
     }
 }

@@ -351,7 +351,7 @@ public class PartyUtils {
                           ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
-    private static String createPartyId() {
+    public static String createPartyId() {
         return UUID.randomUUID().toString().substring(0, 16);
     }
 
@@ -464,5 +464,18 @@ public class PartyUtils {
             .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
             .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
             .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void populatePartyIndividuals(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
+            .applicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()))
+            .respondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()))
+            .respondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()))
+            .applicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()))
+            .applicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()))
+            .respondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()))
+            .respondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
     }
 }

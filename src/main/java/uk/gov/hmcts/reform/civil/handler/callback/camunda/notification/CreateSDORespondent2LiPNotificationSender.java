@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 /**
  * When an SDO is created it is notified to applicants and defendants.
@@ -16,8 +17,9 @@ public class CreateSDORespondent2LiPNotificationSender extends AbstractCreateSDO
 
     public CreateSDORespondent2LiPNotificationSender(
         NotificationService notificationService,
-        NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+        NotificationsProperties notificationsProperties,
+        FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, featureToggleService);
     }
 
     @Override

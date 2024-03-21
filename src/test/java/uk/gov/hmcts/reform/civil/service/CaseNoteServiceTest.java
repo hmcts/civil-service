@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -95,6 +98,34 @@ class CaseNoteServiceTest {
 
             assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(newNote, oldNote));
         }
+
+        @Test
+        void shouldBuildJudgeNote_whenInvokedAndDocumentAndNote() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").build();
+            when(idamClient.getUserDetails(BEARER_TOKEN)).thenReturn(USER_DETAILS);
+
+            var builtDoc = caseNoteService.buildJudgeCaseNoteAndDocument(testDocument, BEARER_TOKEN);
+
+            assertThat(builtDoc.get(0).getValue().getDocumentName()).isEqualTo("testDocument");;
+            assertThat(builtDoc.get(0).getValue().getDocument()).isEqualTo(document);
+            assertThat(builtDoc.get(0).getValue().getDocumentNote()).isEqualTo("Note");
+            assertThat(builtDoc.get(0).getValue().getCreatedBy()).isEqualTo("John Smith");;
+        }
+
+        @Test
+        void shouldBuildJudgeNote_whenInvokedAndDocumentAndName() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).build();
+            when(idamClient.getUserDetails(BEARER_TOKEN)).thenReturn(USER_DETAILS);
+
+            var builtDoc = caseNoteService.buildJudgeCaseNoteDocumentAndName(testDocument, BEARER_TOKEN);
+
+            assertThat(builtDoc.get(0).getValue().getDocumentName()).isEqualTo("testDocument");;
+            assertThat(builtDoc.get(0).getValue().getDocument()).isEqualTo(document);
+            assertThat(builtDoc.get(0).getValue().getCreatedBy()).isEqualTo("John Smith");;
+        }
+
     }
 
     private CaseNote caseNoteForToday(String note) {

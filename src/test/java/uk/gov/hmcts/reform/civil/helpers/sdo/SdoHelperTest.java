@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHeari
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -130,6 +131,10 @@ public class SdoHelperTest {
                 .isEqualTo(SmallTrack.smallClaimCreditHire);
             assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimRoadTrafficAccident"))
                 .isEqualTo(SmallTrack.smallClaimRoadTrafficAccident);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimDisputeResolutionHearing"))
+                .isEqualTo(SmallTrack.smallClaimDisputeResolutionHearing);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimFlightDelay"))
+                .isEqualTo(SmallTrack.smallClaimFlightDelay);
         }
 
         @Test
@@ -173,6 +178,22 @@ public class SdoHelperTest {
         }
 
         @Test
+        void shouldReturnTrue_ifHasDisputeResolutionHearing() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimDisputeResolutionHearing);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimDisputeResolutionHearing"))
+                .isTrue();
+        }
+
+        @Test
         void shouldReturnFalse_ifHasNoAdditionalDirections() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -184,6 +205,22 @@ public class SdoHelperTest {
 
             assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
                 .isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_ifHasFlightDelay() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimFlightDelay);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay"))
+                .isTrue();
         }
     }
 
@@ -479,6 +516,86 @@ public class SdoHelperTest {
     }
 
     @Nested
+    class CarmMediationSectionTest {
+
+        @Test
+        void shouldReturnTrue_whenCarmEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .smallClaimsMediationSectionStatement(
+                    SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSection(caseData, true)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .smallClaimsMediationSectionStatement(
+                    SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSection(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmEnabledAndStatementNotExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .smallClaimsMediationSectionStatement(
+                    SmallClaimsMediation.builder().build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSection(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnText_whenStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .smallClaimsMediationSectionStatement(
+                    SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isEqualTo("small claims mediation text");
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementExistsTextIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .smallClaimsMediationSectionStatement(
+                    SmallClaimsMediation.builder()
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isNull();
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isNull();
+        }
+    }
+
+    @Nested
     class HasSharedVariableTest {
         @Test
         void shouldReturnTrue_whenApplicant2IsNotNull() {
@@ -523,12 +640,15 @@ public class SdoHelperTest {
                 .smallClaimsMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
+                .isTrue();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
                 .isTrue();
         }
 
@@ -560,7 +680,6 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isFalse();
@@ -823,7 +942,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isFalse();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
@@ -1509,7 +1627,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasDisposalVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
                 .isFalse();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -40,6 +42,8 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -66,6 +70,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -99,6 +106,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
+    private String ext = "";
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -128,7 +137,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder
             .freeFormRecordedTextArea(null)
             .freeFormOrderedTextArea(null)
-            .orderOnCourtsList(null);
+            .orderOnCourtsList(null)
+            .freeFormHearingNotes(null);
         // Assisted orders
         caseDataBuilder
             .finalOrderMadeSelection(null).finalOrderDateHeardComplex(null)
@@ -155,7 +165,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
             List<LocationRefData> locations = (locationRefDataService
-                .getCourtLocationsForDefaultJudgments(authToken));
+                .getHearingCourtLocations(authToken));
             caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
         } else {
             caseDataBuilder = populateFreeFormFields(caseDataBuilder);
@@ -178,7 +188,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+        caseDataBuilder.finalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -288,6 +298,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .assistedOrderCostsFirstDropdownDate(advancedDate)
                                                   .assistedOrderAssessmentThirdDropdownDate(advancedDate)
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .makeAnOrderForCostsList(CLAIMANT)
+                                                  .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
+                                                  .assistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS)
+                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
@@ -367,6 +381,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
                      "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
 
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())) {
+            if (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
+                    && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
+                    .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
+            }
+        }
+
         validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
                          .map(AssistedOrderCostDetails::getAssistedOrderCostsFirstDropdownDate).orElse(null),
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
@@ -403,16 +425,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = caseData.getFinalOrderDocument();
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
+
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
-        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("finalOrders"));
+
+        String judgeName = userDetails.getFullName();
+        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("caseManagementOrders"));
+        finalCaseDocuments.forEach(document -> {
+            StringBuilder updatedFileName = new StringBuilder();
+            ext = FilenameUtils.getExtension(document.getValue().getDocumentLink().getDocumentFileName());
+            document.getValue().getDocumentLink().setDocumentFileName(updatedFileName
+                                                                          .append(document.getValue().getCreatedDatetime().toLocalDate().toString())
+                                                                          .append("_").append(judgeName).append(".").append(ext).toString());
+        });
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
@@ -426,12 +457,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             state = CASE_PROGRESSION;
         }
 
-        if (caseData.getFinalOrderFurtherHearingComplex() != null
-            && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
-            caseDataBuilder.hearingNotes(HearingNotes.builder()
-                                             .date(LocalDate.now())
-                                             .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-                                             .build());
+        // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
+        if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
+            if (caseData.getFinalOrderFurtherHearingComplex() != null
+                && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
+                                                 .build());
+            }
+        } else {
+            if (nonNull(caseData.getFreeFormHearingNotes())) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFreeFormHearingNotes())
+                                                 .build());
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

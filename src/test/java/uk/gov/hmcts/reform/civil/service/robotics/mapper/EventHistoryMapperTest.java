@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDIC
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
@@ -133,93 +134,7 @@ class EventHistoryMapperTest {
     }
 
     @Nested
-    class UnrepresentedDefendant {
-
-        @Test
-        void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnrepresentedDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
-            Event expectedEvent = Event.builder()
-                .eventSequence(1)
-                .eventCode("999")
-                .dateReceived(caseData.getSubmittedDate())
-                .eventDetailsText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
-                                  .build())
-                .build();
-
-            var eventHistory = mapper.buildEvents(caseData);
-
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory)
-                .extracting("miscellaneous")
-                .asList()
-                .containsExactly(expectedEvent);
-            assertEmptyEvents(
-                eventHistory,
-                "acknowledgementOfServiceReceived",
-                "consentExtensionFilingDefence",
-                "defenceFiled",
-                "defenceAndCounterClaim",
-                "receiptOfPartAdmission",
-                "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
-            );
-        }
-
-        @Test
-        void shouldPrepareMiscellaneousEvent_whenClaimWith2UnrepresentedDefendants() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
-
-            Event expectedEvent1 = Event.builder()
-                .eventSequence(1)
-                .eventCode("999")
-                .dateReceived(caseData.getSubmittedDate())
-                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                + "Unrepresented defendant: Mr. Sole Trader")
-                                  .build())
-                .build();
-
-            Event expectedEvent2 = Event.builder()
-                .eventSequence(2)
-                .eventCode("999")
-                .dateReceived(caseData.getSubmittedDate())
-                .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-                .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-                                  .build())
-                .build();
-
-            var eventHistory = mapper.buildEvents(caseData);
-
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory)
-                .extracting("miscellaneous")
-                .asList()
-                .containsExactly(expectedEvent1, expectedEvent2);
-            assertEmptyEvents(
-                eventHistory,
-                "acknowledgementOfServiceReceived",
-                "consentExtensionFilingDefence",
-                "defenceFiled",
-                "defenceAndCounterClaim",
-                "receiptOfPartAdmission",
-                "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
-            );
-        }
-    }
-
-    @Nested
     class UnregisteredDefendant {
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
@@ -306,228 +221,10 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled"
             );
         }
-
-        @Nested
-        class ToBeRemovedAfterNOC {
-            @BeforeEach
-            public void setup() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-            }
-
-            @Test
-            void prod_shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-                Event expectedEvent = Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader")
-                                      .build())
-                    .build();
-
-                var eventHistory = mapper.buildEvents(caseData);
-
-                assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory)
-                    .extracting("miscellaneous")
-                    .asList()
-                    .containsExactly(expectedEvent);
-                assertEmptyEvents(
-                    eventHistory,
-                    "acknowledgementOfServiceReceived",
-                    "consentExtensionFilingDefence",
-                    "defenceFiled",
-                    "defenceAndCounterClaim",
-                    "receiptOfPartAdmission",
-                    "receiptOfAdmission",
-                    "replyToDefence",
-                    "directionsQuestionnaireFiled"
-                );
-            }
-
-            @Test
-            void prod_shouldPrepareMiscellaneousEvent_whenClaimWith2UnregisteredDefendants() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-                Event expectedEvent1 = Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                          + "Unregistered defendant solicitor firm: Mr. Sole Trader")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                    + "Unregistered defendant solicitor firm: Mr. Sole Trader")
-                                      .build())
-                    .build();
-
-                Event expectedEvent2 = Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                          + "Unregistered defendant solicitor firm: Mr. John Rambo")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                                    + "Unregistered defendant solicitor firm: Mr. John Rambo")
-                                      .build())
-                    .build();
-
-                var eventHistory = mapper.buildEvents(caseData);
-
-                assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory)
-                    .extracting("miscellaneous")
-                    .asList()
-                    .containsExactly(expectedEvent1, expectedEvent2);
-                assertEmptyEvents(
-                    eventHistory,
-                    "acknowledgementOfServiceReceived",
-                    "consentExtensionFilingDefence",
-                    "defenceFiled",
-                    "defenceAndCounterClaim",
-                    "receiptOfPartAdmission",
-                    "receiptOfAdmission",
-                    "replyToDefence",
-                    "directionsQuestionnaireFiled"
-                );
-            }
-        }
     }
 
     @Nested
     class UnrepresentedAndUnregisteredDefendant {
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-        }
-
-        // Remove after NOC
-        @Nested
-        class ToBeRemovedAfterNOC {
-            @BeforeEach
-            public void setup() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-            }
-
-            @Test
-            void prod_shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant1UnregisteredDefendant2() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-                Event expectedEvent1 = Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                          + "Unrepresented defendant: Mr. Sole Trader")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                    + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                                    + "Unrepresented defendant: Mr. Sole Trader")
-                                      .build())
-                    .build();
-
-                Event expectedEvent2 = Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                          + "Unregistered defendant solicitor firm: Mr. John Rambo")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                                    + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                                    + "Unregistered defendant solicitor firm: Mr. John Rambo")
-                                      .build())
-                    .build();
-
-                var eventHistory = mapper.buildEvents(caseData);
-
-                assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory)
-                    .extracting("miscellaneous")
-                    .asList()
-                    .containsExactly(expectedEvent1, expectedEvent2);
-                assertEmptyEvents(
-                    eventHistory,
-                    "acknowledgementOfServiceReceived",
-                    "consentExtensionFilingDefence",
-                    "defenceFiled",
-                    "defenceAndCounterClaim",
-                    "receiptOfPartAdmission",
-                    "receiptOfAdmission",
-                    "replyToDefence",
-                    "directionsQuestionnaireFiled"
-                );
-            }
-
-            @Test
-            void prod_shouldPrepareMiscellaneousEvent_whenClaimWithUnregisteredDefendant1UnrepresentedDefendant2() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .build();
-                Event expectedEvent1 = Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                          + "Unrepresented defendant: Mr. John Rambo")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                    + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                                    + "Unrepresented defendant: Mr. John Rambo")
-                                      .build())
-                    .build();
-
-                Event expectedEvent2 = Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                          + "Unregistered defendant solicitor firm: Mr. Sole Trader")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
-                                                    + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                                    + "Unregistered defendant solicitor firm: Mr. Sole Trader")
-                                      .build())
-                    .build();
-
-                var eventHistory = mapper.buildEvents(caseData);
-
-                assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory)
-                    .extracting("miscellaneous")
-                    .asList()
-                    .containsExactly(expectedEvent1, expectedEvent2);
-                assertEmptyEvents(
-                    eventHistory,
-                    "acknowledgementOfServiceReceived",
-                    "consentExtensionFilingDefence",
-                    "defenceFiled",
-                    "defenceAndCounterClaim",
-                    "receiptOfPartAdmission",
-                    "receiptOfAdmission",
-                    "replyToDefence",
-                    "directionsQuestionnaireFiled"
-                );
-            }
-
-        }
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant1UnregisteredDefendant2() {
@@ -6466,6 +6163,164 @@ class EventHistoryMapperTest {
                 "consentExtensionFilingDefence"
             );
         }
+
+        @Test
+        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant1DecisionDefenseStruckOut() {
+            final String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .getGeneralApplicationWithStrikeOut("001")
+                    .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                    .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                    Event.builder()
+                            .eventSequence(1)
+                            .eventCode("999")
+                            .dateReceived(caseData.getIssueDate().atStartOfDay())
+                            .eventDetailsText("Claim issued in CCD.")
+                            .eventDetails(EventDetails.builder()
+                                    .miscText("Claim issued in CCD.")
+                                    .build())
+                            .build(),
+                    Event.builder()
+                            .eventSequence(4)
+                            .eventCode("999")
+                            .dateReceived(caseData.getTakenOfflineByStaffDate())
+                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetails(EventDetails.builder()
+                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .build())
+                            .build()
+            );
+            Event generalApplicationEvent = Event.builder()
+                    .eventSequence(2)
+                    .eventCode("136")
+                    .litigiousPartyID("001")
+                    .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                    .eventDetailsText(eventDetailText)
+                    .eventDetails(EventDetails.builder()
+                            .miscText(eventDetailText)
+                            .build())
+                    .build();
+            Event defenceStruckOutJudgment = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("57")
+                    .litigiousPartyID("001")
+                    .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                    .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
+        }
+
+        @Test
+        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant2DecisionDefenseStruckOut() {
+            String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .getGeneralApplicationWithStrikeOut("004")
+                    .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                    .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                    Event.builder()
+                            .eventSequence(1)
+                            .eventCode("999")
+                            .dateReceived(caseData.getIssueDate().atStartOfDay())
+                            .eventDetailsText("Claim issued in CCD.")
+                            .eventDetails(EventDetails.builder()
+                                    .miscText("Claim issued in CCD.")
+                                    .build())
+                            .build(),
+                    Event.builder()
+                            .eventSequence(4)
+                            .eventCode("999")
+                            .dateReceived(caseData.getTakenOfflineByStaffDate())
+                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetails(EventDetails.builder()
+                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .build())
+                            .build()
+            );
+            Event generalApplicationEvent = Event.builder()
+                    .eventSequence(2)
+                    .eventCode("136")
+                    .litigiousPartyID("004")
+                    .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                    .eventDetailsText(eventDetailText)
+                    .eventDetails(EventDetails.builder()
+                            .miscText(eventDetailText)
+                            .build())
+                    .build();
+            Event defenceStruckOutJudgment = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("57")
+                    .litigiousPartyID("004")
+                    .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                    .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
+        }
+
+        @Test
+        void shouldNotPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionOrderMade() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .getGeneralApplicationWithStrikeOut("001")
+                    .getGeneralStrikeOutApplicationsDetailsWithCaseState("Order Made")
+                    .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                    Event.builder()
+                            .eventSequence(1)
+                            .eventCode("999")
+                            .dateReceived(caseData.getIssueDate().atStartOfDay())
+                            .eventDetailsText("Claim issued in CCD.")
+                            .eventDetails(EventDetails.builder()
+                                    .miscText("Claim issued in CCD.")
+                                    .build())
+                            .build(),
+                    Event.builder()
+                            .eventSequence(2)
+                            .eventCode("999")
+                            .dateReceived(caseData.getTakenOfflineByStaffDate())
+                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetails(EventDetails.builder()
+                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .build())
+                            .build()
+            );
+            Event generalApplicationEvent = Event.builder().build();
+
+            Event defenceStruckOutJudgment = Event.builder().build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
+        }
     }
 
     @Nested
@@ -7416,56 +7271,6 @@ class EventHistoryMapperTest {
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
             eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
-    }
-
-    @Test
-    public void specCaseEvents() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v2UnrepresentedDefendant()
-            .defendant1LIPAtClaimIssued(NO)
-            .defendant2LIPAtClaimIssued(null)
-            .build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .build();
-        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-        Event expectedEvent = Event.builder()
-            .eventSequence(1)
-            .eventCode("999")
-            .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
-            .eventDetails(EventDetails.builder()
-                              .miscText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
-                              .build())
-            .build();
-
-        Event expectedEvent2 = Event.builder()
-            .eventSequence(2)
-            .eventCode("999")
-            .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-            .eventDetails(EventDetails.builder()
-                              .miscText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-                              .build())
-            .build();
-
-        var eventHistory = mapper.buildEvents(caseData);
-
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory)
-            .extracting("miscellaneous")
-            .asList()
-            .containsExactly(expectedEvent, expectedEvent2);
-        assertEmptyEvents(
-            eventHistory,
-            "acknowledgementOfServiceReceived",
-            "consentExtensionFilingDefence",
-            "defenceFiled",
-            "defenceAndCounterClaim",
-            "receiptOfPartAdmission",
-            "receiptOfAdmission",
-            "replyToDefence",
-            "directionsQuestionnaireFiled"
-        );
     }
 
     @Test

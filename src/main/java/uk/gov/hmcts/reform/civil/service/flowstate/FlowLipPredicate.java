@@ -10,8 +10,11 @@ public class FlowLipPredicate {
 
     }
 
-    public static final Predicate<CaseData> isLipCase = caseData ->
-        caseData.isApplicantNotRepresented();
+    public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
+
+    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
+
+    public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
 
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
 
@@ -23,5 +26,8 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
         CaseData::isCcjRequestJudgmentByAdmission;
+
+    public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
+        CaseData::isRespondentRespondedToSettlementAgreement;
 
 }

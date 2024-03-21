@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 
@@ -36,7 +37,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     TrialReadyFormGenerator.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 class TrialReadyFormGeneratorTest {
 
@@ -52,6 +54,8 @@ class TrialReadyFormGeneratorTest {
     private UnsecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
     @Autowired
     private TrialReadyFormGenerator generator;
 

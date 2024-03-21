@@ -90,6 +90,17 @@ public class LocationHelper {
                 log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                 prioritized.add(requestedCourt);
             });
+
+            Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
+            if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+                return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
+                        .caseLocation(getCcmccCaseLocation()).build())
+                                       .orElseGet(() -> RequestedCourt.builder()
+                                           .caseLocation(getCcmccCaseLocation())
+                                           .build()));
+            } else {
+                return byParties;
+            }
         } else {
             log.debug(
                 "Case {}, defendant is a group, so claimant's court request has priority",
@@ -105,17 +116,7 @@ public class LocationHelper {
                 log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                 prioritized.add(requestedCourt);
             });
-        }
-
-        Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-        if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
-            return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
-                    .caseLocation(getCcmccCaseLocation()).build())
-                                   .orElseGet(() -> RequestedCourt.builder()
-                                       .caseLocation(getCcmccCaseLocation())
-                                       .build()));
-        } else {
-            return byParties;
+            return prioritized.stream().findFirst();
         }
     }
 

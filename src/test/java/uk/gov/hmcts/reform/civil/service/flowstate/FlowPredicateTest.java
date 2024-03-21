@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -28,6 +28,8 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
@@ -49,12 +51,14 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.casemanMarksMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted1v1RespondentOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothRespondentUnrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
@@ -77,8 +81,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isCarmApplicableLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
@@ -97,16 +103,23 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specSmallClaimCarm;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimantResponseBeforeSDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterSDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
@@ -156,6 +169,29 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtDraftState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseTakenOfflineBeforeIssue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+                .takenOfflineByStaff()
+                .build();
+            assertTrue(takenOfflineByStaffBeforeClaimIssued.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentSolicitorUnregistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedRespondent1Unregistered()
+                .addRespondent2(NO)
+                .build();
+            assertTrue(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentSolicitorRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            assertFalse(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
         }
     }
 
@@ -368,6 +404,87 @@ class FlowPredicateTest {
 
             assertTrue(claimDetailsNotified.test(caseData));
             assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
+        }
+    }
+
+    @Nested
+    class CarmApplicable {
+
+        @Test
+        void shouldReturnTrue_whenCarmApplicableDefendantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertTrue(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotApplicableDefendantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmApplicableDefendantLipFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(FAST_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCarmApplicableClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertTrue(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotApplicableClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmApplicableClaimantLipUnspecCase() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
         }
     }
 
@@ -1256,6 +1373,50 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
             assertFalse(fullDefence.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence()
+                .respondent2Responds(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2SS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateBothRespondentsSameResponse(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoApplicants()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAfterClaimantResponseAfterDefendantResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff().build();
+            assertFalse(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
     }
 
     @Nested
@@ -1509,6 +1670,15 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnTrue_whenLipClaimantDoesNotSettle() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateLipClaimantDoesNotSettle()
+                .setClaimTypeToSpecClaim()
+                .build();
+            assertTrue(lipFullDefenceProceed.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateFullDefence1v1AndApplicantNotProceed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1569,6 +1739,32 @@ class FlowPredicateTest {
                 .applicant1ProceedWithClaimSpec2v1(NO)
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantProceedsSpecSmallClaimCarmEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setClaimTypeToSpecClaim()
+                .applicant1ProceedWithClaim(YES)
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build().toBuilder()
+                .submittedDate(LocalDateTime.of(2024, 6, 1, 1, 1))
+                .build();
+            assertTrue(specSmallClaimCarm.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantProceedsSpecSmallClaimCarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setClaimTypeToSpecClaim()
+                .applicant1ProceedWithClaim(YES)
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build().toBuilder()
+                .submittedDate(LocalDateTime.of(2022, 6, 1, 1, 1))
+                .build();
+            assertFalse(specSmallClaimCarm.test(caseData));
         }
     }
 
@@ -1705,6 +1901,89 @@ class FlowPredicateTest {
 
             assertTrue(takenOfflineBySystem.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAferClaimantResponseBeforeSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build();
+
+            assertTrue(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffAferClaimantResponseAfterSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .drawDirectionsOrderRequired(YES).build();
+
+            assertFalse(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffInMediationBeforeMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .mediation(Mediation.builder().build())
+                .build();
+
+            assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseworkerMarksMediationSuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertFalse(casemanMarksMediationUnsuccessful.test(caseData));
+        }
     }
 
     @Nested
@@ -1816,6 +2095,14 @@ class FlowPredicateTest {
         @Test
         void shouldReturnFalse_whenCaseDataIsAtStateApplicantRespondToDefenceAndProceed() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            assertFalse(applicantOutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataPastApplicantResponseDeadlineButHasApplicantResponseDate() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline()
+                .applicant1ResponseDate(LocalDateTime.now().minusDays(1))
+                .build();
             assertFalse(applicantOutOfTime.test(caseData));
         }
     }
@@ -2579,7 +2866,7 @@ class FlowPredicateTest {
         public void when1v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
@@ -2606,7 +2893,7 @@ class FlowPredicateTest {
         public void when1v2ss() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -2635,7 +2922,7 @@ class FlowPredicateTest {
         public void when1v2ds() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(NO)
                 .build();
@@ -2669,7 +2956,7 @@ class FlowPredicateTest {
         public void when2v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
@@ -2704,7 +2991,7 @@ class FlowPredicateTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
                                                                               .hasAgreedFreeMediation(MediationDecision.Yes)
@@ -2910,6 +3197,27 @@ class FlowPredicateTest {
                 .build();
             assertFalse(takenOfflineSDONotDrawn.test(caseData));
             assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterSdoDrawn() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineByStaffAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterNotSuitableSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineAfterNotSuitableForSdo.test(caseData));
         }
     }
 

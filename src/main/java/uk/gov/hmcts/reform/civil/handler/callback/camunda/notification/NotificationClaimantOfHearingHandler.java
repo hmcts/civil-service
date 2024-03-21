@@ -10,11 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -34,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARI
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.isDisposalHearing;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
@@ -76,9 +80,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
+            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);
         } else if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING)) {
             sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
@@ -94,14 +98,15 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
         String emailTemplate;
-        if (caseData.getHearingFeePaymentDetails() != null
-            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+        HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
+        boolean isDisposalHearing = isDisposalHearing(camundaVars.getHearingType());
+        if (isDisposalHearing || (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus()))) {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
         } else {
             emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC();
         }
-        String hearingId = camundaService
-            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId();
+        String hearingId = camundaVars.getHearingId();
         notificationService.sendMail(recipient, emailTemplate, addPropertiesHMC(caseData),
                                      String.format(REFERENCE_TEMPLATE_HEARING, hearingId)
         );
@@ -142,7 +147,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getRecipient(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
+        return isApplicantLip ? caseData.getClaimantUserDetails().getEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
@@ -155,8 +160,12 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         if (isApplicantLip) {
             return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         }
+        // If fee already paid do not renotify upon hearing being relisted
+        // If hearing type is OTHER no fee is due
         if (caseData.getHearingFeePaymentDetails() != null
-            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())
+            || caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)
+            || caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
             return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         } else {
             return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
@@ -164,7 +173,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     public Map<String, String> addPropertiesHMC(final CaseData caseData) {
-        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack());
         LocalDateTime hearingStartDateTime = camundaService
             .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
 

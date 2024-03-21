@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getOtherReasonableAdjustmentDetails;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -70,13 +71,44 @@ public class HearingsPartyMapper {
         addRespondent1Objects(caseData, organisationService, parties);
         // respondent 2 and related parties
         addRespondent2Objects(caseData, organisationService, parties);
+
+        addSolicitorOrgIndividuals(caseData, parties);
+
         return parties;
     }
 
+    private static void addSolicitorOrgIndividuals(CaseData caseData, List<PartyDetailsModel> parties) {
+
+        // applicant 1 solicitor firm individuals
+        if (caseData.getApplicant1LRIndividuals() != null) {
+            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1LRIndividuals()));
+        }
+
+        // respondent 1 solicitor firm individuals
+        if (caseData.getRespondent1LRIndividuals() != null) {
+            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1LRIndividuals()));
+        }
+
+        // respondent 2 solicitor firm individuals
+        if (caseData.getRespondent2LRIndividuals() != null) {
+            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2LRIndividuals()));
+        }
+    }
+
     private static void addRespondent2Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-        // respondent 2
+
         if (YES.equals(caseData.getAddRespondent2())) {
+
+            // respondent 2
             parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
+
+            // respondent 2 org individuals for COMPANY/ORG PartyType
+            if (caseData.getRespondent2().isCompanyOROrganisation()) {
+                if (caseData.getRespondent2OrgIndividuals() != null) {
+                    parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2OrgIndividuals()));
+                }
+            }
+
             // respondent 2 solicitor
             if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
                 && caseData.getRespondent2OrganisationPolicy().getOrganisation() != null) {
@@ -85,6 +117,7 @@ public class HearingsPartyMapper {
                     organisationService
                 ));
             }
+
             // 1v2 Same sol and defs file different response
             // or 1v2 diff sol
             // only def 2 files full defence
@@ -94,6 +127,7 @@ public class HearingsPartyMapper {
                 && (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
                 : FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
+
                 // respondent 2 expert
                 if (caseData.getRespondent2Experts() != null
                     && !caseData.getRespondent2Experts().isEmpty()) {
@@ -106,6 +140,7 @@ public class HearingsPartyMapper {
                     parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getRespondent2Witnesses()));
                 }
             }
+
             // respondent 2 lit friend
             if (caseData.getRespondent2LitigationFriend() != null) {
                 parties.add(getDetailsForLitigationFriendObject(caseData.getRespondent2LitigationFriend()));
@@ -116,6 +151,14 @@ public class HearingsPartyMapper {
     private static void addRespondent1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
         // respondent 1
         parties.add(getDetailsForPartyObject(caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
+
+        // respondent 1 org individuals for COMPANY/ORG PartyType
+        if (caseData.getRespondent1().isCompanyOROrganisation()) {
+            if (caseData.getRespondent1OrgIndividuals() != null) {
+                parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1OrgIndividuals()));
+            }
+        }
+
         // respondent 1 solicitor
         if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null) {
             parties.add(getDetailsForSolicitorOrganisation(
@@ -123,6 +166,7 @@ public class HearingsPartyMapper {
                 organisationService
             ));
         }
+
         // respondent 1 expert
         if (caseData.getRespondent1Experts() != null
             && !caseData.getRespondent1Experts().isEmpty()) {
@@ -143,8 +187,17 @@ public class HearingsPartyMapper {
 
     private static void addApplicant2Objects(CaseData caseData, List<PartyDetailsModel> parties) {
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+
             // applicant 2
             parties.add(getDetailsForPartyObject(caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
+
+            // applicant 2 org individuals for COMPANY/ORG PartyType
+            if (caseData.getApplicant2().isCompanyOROrganisation()) {
+                if (caseData.getApplicant2OrgIndividuals() != null) {
+                    parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant2OrgIndividuals()));
+                }
+            }
+
             // 2v1 claimant response - if different response and app 2 proceeds
             if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
                 && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
@@ -161,6 +214,7 @@ public class HearingsPartyMapper {
                     }
                 }
             }
+
             // applicant 2 lit friend
             if (caseData.getApplicant2LitigationFriend() != null) {
                 parties.add(getDetailsForLitigationFriendObject(caseData.getApplicant2LitigationFriend()));
@@ -171,6 +225,14 @@ public class HearingsPartyMapper {
     private static void addApplicant1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
         // applicant 1
         parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
+
+        // applicant 1 org individuals for COMPANY/ORG PartyType
+        if (caseData.getApplicant1().isCompanyOROrganisation()) {
+            if (caseData.getApplicant1OrgIndividuals() != null) {
+                parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
+            }
+        }
+
         // applicant 1 solicitor
         parties.add(getDetailsForSolicitorOrganisation(
             caseData.getApplicant1OrganisationPolicy(),
@@ -235,17 +297,18 @@ public class HearingsPartyMapper {
                                           null);
     }
 
-    private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
+    private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole,
+                                                         List<Element<PartyFlagStructure>> hearingIndividuals) {
         List<PartyDetailsModel> partyDetails = new ArrayList<>();
-        List<PartyFlagStructure> filteredList = unwrapElements(experts);
+        List<PartyFlagStructure> filteredList = unwrapElements(hearingIndividuals);
+
         if (!filteredList.isEmpty()) {
             for (PartyFlagStructure partyFlagStructure : filteredList) {
                 partyDetails.add(buildIndividualPartyObject(
                     partyFlagStructure.getPartyID(),
                     partyFlagStructure.getFirstName(),
                     partyFlagStructure.getLastName(),
-                    String.format(FULL_NAME, partyFlagStructure.getFirstName(),
-                                  partyFlagStructure.getLastName()),
+                    String.format(FULL_NAME, partyFlagStructure.getFirstName(), partyFlagStructure.getLastName()),
                     partyRole.getPartyRoleValue(),
                     partyFlagStructure.getEmail(),
                     partyFlagStructure.getPhone(),
@@ -289,6 +352,7 @@ public class HearingsPartyMapper {
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(emptyList())
             .custodyStatus(getCustodyStatus(flagDetails))
+            .otherReasonableAdjustmentDetails(getOtherReasonableAdjustmentDetails(flagDetails))
             .build();
 
         return PartyDetailsModel.builder()

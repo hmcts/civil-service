@@ -9,8 +9,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public enum UnrepresentedOrUnregisteredScenario {
     UNREPRESENTED,
-    UNREGISTERED,
-    UNREGISTERED_NOTICE_OF_CHANGE;
+    UNREGISTERED;
 
     public static List<String> getDefendantNames(UnrepresentedOrUnregisteredScenario scenario, CaseData caseData) {
         List<String> defendantNames = new ArrayList<>();
@@ -24,20 +23,6 @@ public enum UnrepresentedOrUnregisteredScenario {
                 }
                 break;
             case UNREGISTERED:
-                if (caseData.getRespondent1OrgRegistered() != YES
-                    && caseData.getRespondent1OrganisationPolicy() == null
-                    && caseData.getRespondent1Represented() == YES) {
-                    defendantNames.add(caseData.getRespondent1().getPartyName());
-                }
-                if (caseData.getRespondent2OrgRegistered() != YES
-                    && caseData.getRespondent2Represented() == YES
-                    && caseData.getRespondent2OrganisationPolicy() == null
-                    && caseData.getRespondent2() != null) {
-                    defendantNames.add(caseData.getRespondent2().getPartyName());
-                }
-                break;
-                //this should be removed during removal of notice of change flag
-            case UNREGISTERED_NOTICE_OF_CHANGE:
                 if (caseData.getRespondent1OrgRegistered() != YES
                     && caseData.getRespondent1OrganisationPolicy() != null
                     && caseData.getRespondent1OrganisationPolicy().getOrganisation() == null

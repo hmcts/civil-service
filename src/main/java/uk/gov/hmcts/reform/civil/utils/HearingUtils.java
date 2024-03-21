@@ -146,6 +146,10 @@ public class HearingUtils {
         };
     }
 
+    public static boolean isDisposalHearing(String hearingType) {
+        return hearingType.contains("DIS");
+    }
+
     public static CaseHearing getActiveHearing(HearingsResponse hearingsResponse) {
         List<CaseHearing> caseHearings = hearingsResponse.getCaseHearings()
             .stream().filter(hearing -> hearing.getHmcStatus().equals(LISTED.name())).collect(Collectors.toList());

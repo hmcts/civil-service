@@ -12,17 +12,17 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -60,8 +60,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
     private NotificationsProperties notificationsProperties;
     @Autowired
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -72,6 +70,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()).thenReturn("spec-template-id");
+            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
         }
 
@@ -114,6 +114,30 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @Test
+        void shouldNotifyRespondentSolicitor_whenSpecRejectAllNoMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .setClaimTypeToSpecClaim()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build().toBuilder()
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "spec-template-no-mediation",
+                getNotificationDataMapSpec(caseData,
+                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -149,6 +173,30 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "spec-template-id",
+                getNotificationDataMapSpec(caseData,
+                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenSpecRejectAllNoMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .setClaimTypeToSpecClaim()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build().toBuilder()
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "spec-template-no-mediation",
                 getNotificationDataMapSpec(caseData,
                                            CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
@@ -316,11 +364,11 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build())
+                "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build())
                                                  .build())).isEqualTo(Task_ID_RESPONDENT_SOL2);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC").build()).build())).isEqualTo(
-                TASK_ID_CC);
+            TASK_ID_CC);
     }
 }

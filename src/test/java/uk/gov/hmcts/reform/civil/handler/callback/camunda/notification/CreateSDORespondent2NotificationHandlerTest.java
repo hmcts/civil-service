@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -48,6 +49,8 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private CreateSDORespondent2NotificationHandler handler;
 
@@ -57,6 +60,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
+            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-ea");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         }
@@ -85,6 +89,36 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-id",
+                getNotificationDataMap(caseData),
+                "create-sdo-respondent-2-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedEA() {
+            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("Company 1")
+                                 .partyEmail("company@email.com")
+                                 .build())
+                .respondent2Represented(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-id-ea",
                 getNotificationDataMap(caseData),
                 "create-sdo-respondent-2-notification-000DC001"
             );

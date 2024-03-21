@@ -2,6 +2,11 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
@@ -20,10 +25,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
@@ -610,6 +618,212 @@ class HmcDataUtilsTest {
     }
 
     @Test
+    void getHearingDaysText_shouldReturnExpectedText_1Hour30minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of(
+            "23 December 2023 at 14:30 for 1 hour and 30 minutes"));
+    }
+
+    @Test
+    void getHearingDaysText_shouldReturnExpectedText_30minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of(
+            "23 December 2023 at 14:00 for 30 minutes"));
+    }
+
+    @Test
+    void getHearingDaysText_shouldReturnExpectedText_1Hour15minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 45))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of(
+            "23 December 2023 at 14:45 for 1 hour and 15 minutes"));
+    }
+
+    @Test
+    void getHearingDaysText_shouldReturnExpectedText_1Hour45minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 15))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of(
+            "23 December 2023 at 14:15 for 1 hour and 45 minutes"));
+    }
+
+    @Test
+    void getTotalHearingDurationText_1Day_3Hours_30minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "1 day and 3 hours and 30 minutes");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDurationLessThan1Hour() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 10, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "30 minutes");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDuration5Hours() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "5 hours");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDuration5Hours30Minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "5 hours and 30 minutes");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDuration1Day5Hours() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "5 hours");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDuration1day30Minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 10, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "1 day and 30 minutes");
+    }
+
+    @Test
+    void getTotalHearingDurationText_whenDuration1Day5Hours30Minutes() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 15, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+
+        assertEquals(result, "1 day and 5 hours and 30 minutes");
+    }
+
+    @Test
     void getTotalHearingDurationText_1Day_FullDay() {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
@@ -945,6 +1159,42 @@ class HmcDataUtilsTest {
             boolean actual = includesVideoHearing(hearings);
 
             assertTrue(actual);
+        }
+    }
+
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    class GetHearingLocation {
+
+        @MockBean
+        private LocationRefDataService locationRefDataService;
+
+        @Test
+        void shouldReturnLocation_whenInvoked() {
+            List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("venue").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments("authToken"))
+                .thenReturn(locations);
+            LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
+                "HER123",
+                "venue",
+                "authToken",
+                locationRefDataService
+            );
+
+            assertThat(locationRefData).isEqualTo(LocationRefData.builder().epimmsId("venue").build());
+        }
+
+        @Test
+        void shouldThrowException_whenLocationIsNull() {
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments("abc"))
+                .thenReturn(null);
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> HmcDataUtils.getLocationRefData(
+                    "HER123",
+                    "abc",
+                    "authToken",
+                    locationRefDataService));
         }
     }
 }

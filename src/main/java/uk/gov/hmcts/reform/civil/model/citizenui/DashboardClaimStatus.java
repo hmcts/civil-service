@@ -6,6 +6,12 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
@@ -18,14 +24,29 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
+    CLAIMANT_HWF_PARTIAL_REMISSION(
+        Claim::isHwfPartialRemission
+    ),
+    CLAIMANT_HWF_UPDATED_REF_NUMBER(
+        Claim::isHwfUpdatedRefNumber
+    ),
+    CLAIMANT_HWF_INVALID_REF_NUMBER(
+        Claim::isHwfInvalidRefNumber
+    ),
+    CLAIM_SUBMIT_HWF(
+        Claim::isHwFClaimSubmit
+    ),
+    HWF_MORE_INFORMATION_NEEDED(
+        Claim::isHwFMoreInformationNeeded
+    ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
-    ),
-    MEDIATION_UNSUCCESSFUL(
-        Claim::isMediationUnsuccessful
-    ),
-    MEDIATION_SUCCESSFUL(
-        Claim::isMediationSuccessful
     ),
     IN_MEDIATION(
         Claim::isMediationPending
@@ -33,8 +54,8 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
+    CLAIMANT_REJECTED_PAYMENT_PLAN(
+        Claim::isPaymentPlanRejected
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
@@ -42,8 +63,23 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantAndDefendantSignedSettlementAgreement
+    ),
+    DEFENDANT_REJECTED_SETTLEMENT_AGREEMENT(
+        Claim::hasDefendantRejectedSettlementAgreement
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT_DEADLINE_EXPIRED(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineExpired
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantSignedSettlementAgreement
+    ),
     SETTLED(
         Claim::isSettled
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -64,17 +100,14 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
     ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
-    ),
-    ELIGIBLE_FOR_CCJ(
-        Claim::isEligibleForCCJ
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -112,7 +145,15 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-
+    CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionAccepted
+    ),
+    ELIGIBLE_FOR_CCJ(
+        Claim::isEligibleForCCJ
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
     NO_STATUS(c -> false);
 
     @Getter

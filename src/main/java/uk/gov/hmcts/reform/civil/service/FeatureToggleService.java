@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+
+import java.time.ZoneId;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -24,10 +29,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isNoticeOfChangeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
-    }
-
     public boolean isCaseFlagsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-flags");
     }
@@ -38,10 +39,6 @@ public class FeatureToggleService {
 
     public boolean isPbaV3Enabled() {
         return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
-    }
-
-    public boolean isCertificateOfServiceEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("isCertificateOfServiceEnabled");
     }
 
     public boolean isRPAEmailEnabled() {
@@ -77,8 +74,15 @@ public class FeatureToggleService {
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
-        return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", locationEpimms,
-                                                            true);
+        return
+            // because default value is true
+            locationEpimms != null
+                && featureToggleApi
+                .isFeatureEnabledForLocation(
+                    "case-progression-location-whitelist",
+                    locationEpimms,
+                    true
+                );
     }
 
     public boolean isTransferOnlineCaseEnabled() {
@@ -87,5 +91,22 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
+    }
+
+    public boolean isEarlyAdoptersEnabled() {
+        return featureToggleApi.isFeatureEnabled("early-adopters");
+    }
+
+    public boolean isSdoR2Enabled() {
+        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
+
+    public boolean isCarmEnabledForCase(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
+            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
+                                                        epoch, false);
     }
 }

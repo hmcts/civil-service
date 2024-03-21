@@ -19,8 +19,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
 
 @SpringBootTest(classes = {
     EvidenceUploadRespondentNotificationHandler.class,
@@ -47,7 +49,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             //given: case data has one respondent solicitor
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("example of uploaded documents")
+                .build();;
             //when: RepondentNotificationhandler for solictior1 is called
             handler.notifyRespondentEvidenceUpload(caseData, true);
             //then: email should be sent to respondent solicitor1
@@ -62,7 +66,8 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent1Lip_whenInvoked() {
             //given: case data has one respondent litigant in person
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("example of uploaded documents")
                 .respondent1Represented(YesOrNo.NO)
                 .respondent1(Party.builder().partyName("Billy").partyEmail("respondent@example.com").build())
                 .build();
@@ -81,8 +86,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
             //given: case data has two respondent solicitor
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified().addRespondent2(YesOrNo.YES)
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("example of uploaded documents")
+                .addRespondent2(YesOrNo.YES)
                 .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
                 .build();
             //when: RepondentNotificationhandler for solictior2 is called
@@ -99,8 +105,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
             //given: case data has two respondents, with second being litigant in person
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified().addRespondent2(YesOrNo.YES)
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("example of uploaded documents")
+                .addRespondent2(YesOrNo.YES)
                 .respondent2Represented(YesOrNo.NO)
                 .respondent2(Party.builder().partyName("Billy").partyEmail("respondent@example.com").build())
                 .build();
@@ -115,10 +122,37 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             );
         }
 
+        @Test
+        void shouldNotNotifyRespondent1Solicitor_whenInvokedAndNoNotificationContent() {
+            //Once emails are sent, we want to null notificationText, so any future emails will not contain past content.
+            //unable to null directly in EvidenceUploadNotificationEventHandler, so assigned as NULLED.
+            //given: case data has one respondent solicitor
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("NULLED")
+                .build();
+            //when: RepondentNotificationhandler for solictior1 is called
+            handler.notifyRespondentEvidenceUpload(caseData, true);
+            //then: email should be sent to respondent solicitor1
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyRespondent1Solicitor_whenInvokedAndNoContentNull() {
+            //given: case data has one respondent solicitor
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText(null)
+                .build();
+            //when: RepondentNotificationhandler for solictior1 is called
+            handler.notifyRespondentEvidenceUpload(caseData, true);
+            //then: email should be sent to respondent solicitor1
+            verifyNoInteractions(notificationService);
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    UPLOADED_DOCUMENTS, "example of uploaded documents"
             );
         }
     }

@@ -7,6 +7,7 @@ import java.util.Map;
 public interface NotificationData {
 
     String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
+    String CLAIM_16_DIGIT_NUMBER = "claim16DigitNumber";
     String RESPONDENT_NAME = "defendantName";
     String ISSUED_ON = "issuedOn";
     String CLAIM_NOTIFICATION_DEADLINE = "claimNotificationDeadline";
@@ -83,6 +84,22 @@ public interface NotificationData {
     String FORMER_SOL = "former solicitor";
     String OTHER_SOL_NAME = "other solicitor name";
     String EXTERNAL_ID = "externalId";
+
+    // evidence upload
+    String UPLOADED_DOCUMENTS = "uploaded documents";
+    String HWF_MORE_INFO_DATE = "date";
+    String HWF_MORE_INFO_DOCUMENTS = "documents";
+    String HWF_MORE_INFO_DOCUMENTS_WELSH  = "documentsWelsh";
+
+    // hwf outcome
+    String REASONS = "reasons";
+    String REASONS_WELSH = "reasonsWelsh";
+    String TYPE_OF_FEE = "typeOfFee";
+    String TYPE_OF_FEE_WELSH = "typeOfFeeWelsh";
+    String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
+    String AMOUNT = "amount";
+    String PART_AMOUNT = "partAmount";
+    String REMAINING_AMOUNT = "remainingAmount";
 
     Map<String, String> addProperties(CaseData caseData);
 

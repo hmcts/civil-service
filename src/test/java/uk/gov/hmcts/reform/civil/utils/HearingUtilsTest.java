@@ -195,6 +195,17 @@ public class HearingUtilsTest {
         assertThat(claimantVDefendant).isEqualTo("Doe v Company");
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS,true",
+        "AAA7-TRI,false"
+    })
+    void shouldReturnCorrectValue_whenHearingTypeIsDisposalOrTrial(String hearingType, boolean expected) {
+        boolean isDisposalHearing = HearingUtils.isDisposalHearing(hearingType);
+
+        assertThat(isDisposalHearing).isEqualTo(expected);
+    }
+
     @Nested
     class GetActiveHearing {
         private final LocalDateTime currentDate = LocalDateTime.of(2024, 01, 06, 0, 0, 0);

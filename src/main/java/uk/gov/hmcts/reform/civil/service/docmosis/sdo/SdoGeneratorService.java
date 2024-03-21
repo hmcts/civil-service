@@ -53,7 +53,10 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+        if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
@@ -73,15 +76,18 @@ public class SdoGeneratorService {
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(docmosisTemplate, caseData),
+                getFileName(judgeName),
                 docmosisDocument.getBytes(),
                 DocumentType.SDO_ORDER
             )
         );
     }
 
-    private String getFileName(DocmosisTemplates docmosisTemplate, CaseData caseData) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        updatedFileName.append(LocalDate.now()).append("_").append(judgeName).append(".pdf");
+
+        return updatedFileName.toString();
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
@@ -148,7 +154,8 @@ public class SdoGeneratorService {
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle")
             )
             .disposalHearingMethodToggle(
-                SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")
+                // SNI-5142
+                true
             )
             .disposalHearingBundleToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
@@ -276,9 +283,8 @@ public class SdoGeneratorService {
             .fastTrackTrialToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")
             )
-            .fastTrackMethodToggle(
-                SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
-            )
+            // SNI-5142
+            .fastTrackMethodToggle(true)
             .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()));
 
         sdoDocumentFormBuilder
@@ -301,6 +307,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -353,9 +360,9 @@ public class SdoGeneratorService {
             .smallClaimsHearingToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
             )
-            .smallClaimsMethodToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")
-            )
+            // SNI-5142
+            .smallClaimsMethodToggle(true)
+            .smallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationText(caseData))
             .smallClaimsDocumentsToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
             )
@@ -364,7 +371,18 @@ public class SdoGeneratorService {
             )
             .smallClaimsNumberOfWitnessesToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
-            );
+            )
+            .smallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSection(caseData, carmEnabled)
+            )
+            .carmEnabled(carmEnabled);
+
+        if (featureToggleService.isSdoR2Enabled()) {
+            sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(
+                    SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
+                )
+                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay());
+        }
 
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(

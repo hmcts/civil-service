@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -223,6 +224,45 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
+
+        @Test
+        void shouldReturnError_WhenAboutSmallClaimUnspec() {
+            //given: unspecified small claim
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .hearingDate(LocalDate.now().plusWeeks(4).plusDays(6))
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: an error is returned
+            System.out.println(response.getErrors());
+            assertThat(response.getErrors()).contains("This event is not available for small claims cases.");
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutSmallClaimSpec() {
+            //given: specified small claim
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .hearingDate(LocalDate.now().plusWeeks(4).plusDays(6))
+                .responseClaimTrack("SMALL_CLAIM")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: an error is returned
+            System.out.println(response.getErrors());
+            assertThat(response.getErrors()).contains("This event is not available for small claims cases.");
+        }
+
     }
 
     @Nested

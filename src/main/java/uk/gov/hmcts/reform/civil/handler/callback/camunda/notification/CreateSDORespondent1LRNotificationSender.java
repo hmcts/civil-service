@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 /**
@@ -18,8 +19,9 @@ public class CreateSDORespondent1LRNotificationSender extends AbstractCreateSDOR
     public CreateSDORespondent1LRNotificationSender(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
-        OrganisationService organisationService) {
-        super(notificationService, notificationsProperties, organisationService);
+        OrganisationService organisationService,
+        FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, organisationService, featureToggleService);
     }
 
     @Override

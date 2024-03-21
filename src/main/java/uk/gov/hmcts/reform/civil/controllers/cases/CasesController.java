@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
@@ -84,7 +85,6 @@ public class CasesController {
         );
 
         var caseDetailsResponse = coreCaseDataService.getCase(caseId, authorisation);
-        log.info("Returning case details: {}", caseDetailsResponse);
 
         return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
     }
@@ -164,7 +164,6 @@ public class CasesController {
             .event(eventDto.getEvent())
             .updates(eventDto.getCaseDataUpdate())
             .build();
-        log.info(eventDto.getCaseDataUpdate().toString());
         CaseDetails caseDetails = caseEventService.submitEvent(params);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
@@ -174,8 +173,9 @@ public class CasesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline) {
-        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
+    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody ExtendedDeadlineDto deadlineDateDetails) {
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
+            deadlineDateDetails.getResponseDate(), deadlineDateDetails.getPlusDays());
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
 
@@ -208,7 +208,6 @@ public class CasesController {
                 .event(submitEventDto.getEvent())
                 .updates(submitEventDto.getData())
                 .build();
-            log.info("Updated case data:  " + submitEventDto.getData().toString());
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
         } catch (Exception ex) {

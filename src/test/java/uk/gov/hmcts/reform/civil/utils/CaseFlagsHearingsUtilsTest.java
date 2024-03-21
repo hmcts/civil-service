@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,25 +188,25 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details, caseData.getRespondent1().getPartyID());
+        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Defendant 1", details, caseData.getRespondent1().getPartyID());
     }
 
     private PartyFlags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details, caseData.getApplicant1().getPartyID());
+        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Claimant 1", details, caseData.getApplicant1().getPartyID());
     }
 
     private PartyFlags getRespondent1LitFriendFlags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1LitigationFriend().getFullName(),
-                                "Respondent 1 Litigation Friend", details, caseData.getRespondent1LitigationFriend().getPartyID());
+                                "Defendant 1 Litigation Friend", details, caseData.getRespondent1LitigationFriend().getPartyID());
     }
 
     private PartyFlags getRespondent1WitnessFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("W First W Last", "Respondent 1 Witness", details,
+        return getFlagsForParty("W First W Last", "Defendant 1 Witness", details,
                                 "res-1-witness-party-id");
     }
 
     private PartyFlags getRespondent1ExpertsFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("E First E Last", "Respondent 1 Expert", details,
+        return getFlagsForParty("E First E Last", "Defendant 1 Expert", details,
                                 "res-1-expert-party-id");
     }
 
@@ -225,6 +226,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details2 = FlagDetail.builder()
@@ -233,6 +236,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("SM001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details3 = FlagDetail.builder()
@@ -241,6 +246,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("RA001")
             .hearingRelevant(NO)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details4 = FlagDetail.builder()
@@ -249,6 +256,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Inactive")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details1, details2, details3, details4);
@@ -261,6 +270,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details2 = FlagDetail.builder()
@@ -269,6 +280,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("SM001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details3 = FlagDetail.builder()
@@ -277,6 +290,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("RA001")
             .hearingRelevant(NO)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details1, details2, details3);
@@ -289,6 +304,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details2 = FlagDetail.builder()
@@ -297,6 +314,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("SM001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details1, details2);
@@ -309,6 +328,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("SM001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details2);
@@ -321,6 +342,8 @@ public class CaseFlagsHearingsUtilsTest {
             .flagCode("RA001")
             .hearingRelevant(NO)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details3);

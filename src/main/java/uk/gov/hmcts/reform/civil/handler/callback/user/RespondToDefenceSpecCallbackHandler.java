@@ -16,13 +16,14 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -41,8 +42,11 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -71,7 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -83,9 +87,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -109,6 +116,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
+    private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -258,10 +268,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         if (featureToggleService.isCaseFileViewEnabled()) {
@@ -270,13 +285,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.respondent1ClaimResponseDocumentSpec(null);
         }
 
-        locationHelper.getCaseManagementLocation(caseData)
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
+        //Update the caseManagement location to the flight location if
+        //Small claim & Flight Delay &Airline is not OTHER
+        if (isFlightDelaySmallClaimAndAirline(caseData)) {
+            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
+        } else if (!isFlightDelayAndSmallClaim(caseData)) {
+            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
+            locationHelper.getCaseManagementLocation(caseData)
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                        CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
@@ -289,7 +311,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            updateDQCourtLocations(callbackParams, caseData, builder, dq);
+            //Update Case Management location with DQ location only if either of following is true
+            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
+            if (!isFlightDelayAndSmallClaim(caseData)
+                || isFlightDelaySmallClaimAndOther(caseData)) {
+                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+            }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
             if (smallClaimWitnesses != null) {
@@ -313,6 +340,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .details(wrapElements(expert))
                                              .build())
                     .build());
+        } else if (caseData.getApplicant1DQ() != null
+            && (NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())
+                || NO.equals(caseData.getApplicant1ClaimExpertSpecRequired()))) {
+            builder.applicant1DQ(
+                builder.build().getApplicant1DQ().toBuilder()
+                    .applicant1DQExperts(Experts.builder()
+                                             .expertRequired(NO)
+                                             .build())
+                    .build());
         }
 
         if (caseData.getApplicant2DQ() != null
@@ -323,6 +359,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant2DQExperts(Experts.builder()
                                              .expertRequired(caseData.getApplicantMPClaimExpertSpecRequired())
                                              .details(wrapElements(expert))
+                                             .build())
+                    .build());
+        } else if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicantMPClaimExpertSpecRequired() != null
+            && NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())) {
+            builder.applicant2DQ(
+                builder.build().getApplicant2DQ().toBuilder()
+                    .applicant2DQExperts(Experts.builder()
+                                             .expertRequired(NO)
                                              .build())
                     .build());
         }
@@ -340,6 +385,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)
+            && caseData.hasClaimantAgreedToFreeMediation()) {
+            builder.claimMovedToMediationOn(LocalDate.now());
+        }
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -364,18 +415,34 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.CASE_SETTLED.name());
             }
         }
+
+        // must always move to in mediation for small claims when claimant proceeds
+        if (shouldMoveToInMediationState(
+            caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+            response.state(CaseState.IN_MEDIATION.name());
+        }
+
         return response.build();
     }
 
-    private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, Applicant1DQ.Applicant1DQBuilder dq) {
+    private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
+                                        Applicant1DQ.Applicant1DQBuilder dq, boolean forceClaimantCourt) {
         handleCourtLocationData(caseData, builder, dq, callbackParams);
-        locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
-                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
+        Optional<RequestedCourt> newCourt = Optional.empty();
+
+        if (forceClaimantCourt) {
+            //This will be true only if its Small Claim & Flight Delay & Airline is OTHER
+            newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
+        } else {
+            newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build());
+        }
+
+        newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+            builder,
+            requestedCourt,
+            () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+        ));
         if (log.isDebugEnabled()) {
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
                           + " is " + builder.build().getCaseManagementLocation());
@@ -384,7 +451,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
         if (caseData.isRespondentResponseFullDefence()
-            && RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
@@ -415,7 +482,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
             LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
-            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
 
@@ -431,7 +498,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             ).build());
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
 
             Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
@@ -442,6 +509,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
+                null,
                 null
             ).name());
         }
@@ -553,27 +621,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
-        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
-                return null;
-            }
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_DEFENCE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
-                case FULL_ADMISSION:
-                    return setUpOneVOneFlowForFullAdmit(caseData);
-                case PART_ADMISSION:
-                    return setUpOneVOneFlowForPartAdmit(caseData);
-                case COUNTER_CLAIM:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
-
     private String setUpPayDateToString(CaseData caseData) {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
@@ -586,42 +633,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            return caseData.getRespondent1ResponseDate().plusDays(5)
+            return deadlineCalculatorService.calculateExtendedDeadline(
+                caseData.getRespondent1ResponseDate().toLocalDate(),
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
-    }
-
-    private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
-        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
-        }
-        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-        }
-    }
-
-    private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
-        if (YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
-        }
-        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-        }
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
@@ -709,5 +726,25 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
+        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+            && caseData.getIsFlightDelayClaim().equals(YES)
+            &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
+    private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
+        //Update the Case Management Location when the Airline  is not Other
+        return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
+            && !caseData.getFlightDelayDetails().getAirlineList()
+            .getValue().getCode().equals("OTHER"));
+    }
+
+    private boolean isFlightDelaySmallClaimAndOther(CaseData caseData) {
+        //Update the Case Management Location with Claimant preferred court when Airlines is Other
+        return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
+            && caseData.getFlightDelayDetails().getAirlineList()
+            .getValue().getCode().equals("OTHER"));
     }
 }

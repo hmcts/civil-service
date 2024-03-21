@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -77,6 +78,8 @@ public class SealedClaimFormGeneratorForSpecTest {
     private InterestCalculator interestCalculator;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
@@ -270,6 +273,51 @@ public class SealedClaimFormGeneratorForSpecTest {
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(representativeService).getRespondent1Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
+    }
+
+    @Test
+    void generateSealedClaimForm1v1_whenBulkClaimNoInterest() {
+        when(featureToggleService.isBulkClaimEnabled()).thenReturn(true);
+        CaseData.CaseDataBuilder<?, ?> caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .specRespondent1Represented(YesOrNo.NO)
+            .sdtRequestIdFromSdt("1234")
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
+    }
+
+    @Test
+    void generateSealedClaimForm1v1_whenBulkClaimWithInterest() {
+        when(featureToggleService.isBulkClaimEnabled()).thenReturn(true);
+        CaseData.CaseDataBuilder<?, ?> caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .specRespondent1Represented(YesOrNo.NO)
+            .sdtRequestIdFromSdt("1234")
+            .claimInterest(YesOrNo.YES)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder().differentRate(new BigDecimal(5)).differentRateReason("Bulk Claim").build())
+            .interestFromSpecificDate(LocalDate.now().minusDays(10))
+            .build();
+
+        when(interestCalculator.calculateBulkInterest(any(CaseData.class))).thenReturn(BigDecimal.valueOf(5));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }

@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,9 +37,14 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final UserRoleCaching userRoleCaching;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    public static final String APPLICANT_ID = "001";
+    public static final String RESPONDENT_ID = "002";
+    public static final String RESPONDENT2_ID = "003";
+    public static final String APPLICANT2_ID = "004";
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -53,10 +62,8 @@ public class InitiateGeneralApplicationServiceHelper {
                 || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
             throw new IllegalArgumentException("Solicitor Org details are not set correctly.");
         }
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
         String parentCaseId = caseData.getCcdCaseReference().toString();
-
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
@@ -81,8 +88,10 @@ public class InitiateGeneralApplicationServiceHelper {
 
         List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles()
             .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
-
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
+        boolean sameDefSol1v2 = applicantSolicitor.size() == 2
+                && applicantSolicitor.get(0).getUserId()
+                .equals(applicantSolicitor.get(1).getUserId());
+        if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
 
             CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
 
@@ -116,10 +125,10 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
             }
         }
-
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
-        String applicantPartyName = null;
+        GAParties applicantPartyData = GAParties.builder().build();
         /*
          * Set GA respondent solicitors' details
          * */
@@ -130,13 +139,13 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder specBuilder = GASolicitorDetailsGAspec
                     .builder();
 
-                specBuilder.id(respSol.getUserId());
-
                 if (respSol.getCaseRole() != null) {
+                    log.info(respSol.getCaseRole(), "**", respSol.getUserId());
                     /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
                 details if case role of collected user matches with case role of Applicant 1*/
                     if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
                         if (caseData.getApplicantSolicitor1UserDetails() != null) {
+                            specBuilder.id(respSol.getUserId());
                             specBuilder.email(caseData.getApplicantSolicitor1UserDetails().getEmail());
                             specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                    .getOrganisation().getOrganisationID());
@@ -144,14 +153,19 @@ public class InitiateGeneralApplicationServiceHelper {
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
+                        specBuilder.id(respSol.getUserId());
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
-                        specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
-                        specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        if (Objects.nonNull(caseData.getAddRespondent2())
+                                            && caseData.getAddRespondent2().equals(YES)) {
+                            specBuilder.id(respSol.getUserId());
+                            specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
+                            specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        }
                     }
                     /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {
@@ -164,10 +178,14 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
 
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
-                respondentSols.add(element(gaSolicitorDetailsGAspec));
+                if (Objects.nonNull(gaSolicitorDetailsGAspec.getId())) {
+                    respondentSols.add(element(gaSolicitorDetailsGAspec));
+                }
+
             });
-            applicantPartyName = getApplicantPartyName(userRoles, userDetails, caseData);
-            applicationBuilder.applicantPartyName(applicantPartyName);
+            applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
+            applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
+            applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
@@ -177,9 +195,9 @@ public class InitiateGeneralApplicationServiceHelper {
 
         String gaApplicantDisplayName;
         if (isGAApplicantSameAsParentCaseClaimant) {
-            gaApplicantDisplayName = applicantPartyName + " - Claimant";
+            gaApplicantDisplayName = applicantPartyData.getApplicantPartyName() + " - Claimant";
         } else {
-            gaApplicantDisplayName = applicantPartyName + " - Defendant";
+            gaApplicantDisplayName = applicantPartyData.getApplicantPartyName() + " - Defendant";
         }
         applicationBuilder.gaApplicantDisplayName(gaApplicantDisplayName);
         applicationBuilder
@@ -195,8 +213,8 @@ public class InitiateGeneralApplicationServiceHelper {
             && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
-    public String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
-                                         CaseData caseData) {
+    private GAParties getApplicantPartyData(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
+                                            CaseData caseData) {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String applicant2OrgCaseRole = caseData.getApplicant2OrganisationPolicy() != null
@@ -209,43 +227,51 @@ public class InitiateGeneralApplicationServiceHelper {
         if (applicantSol.isPresent()) {
             CaseAssignedUserRole applicantSolicitor = applicantSol.get();
             if (applicant1OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                return caseData.getApplicant1().getPartyName();
+                return GAParties.builder()
+                        .applicantPartyName(caseData.getApplicant1().getPartyName())
+                        .litigiousPartyID(APPLICANT_ID)
+                        .build();
             }
             if (applicant2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
                 if (caseData.getApplicant2() != null) {
-                    return caseData.getApplicant2().getPartyName();
+                    return GAParties.builder()
+                            .applicantPartyName(caseData.getApplicant2().getPartyName())
+                            .litigiousPartyID(APPLICANT2_ID)
+                            .build();
                 }
             }
             if (respondent1OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                return caseData.getRespondent1().getPartyName();
+                return GAParties.builder()
+                        .applicantPartyName(caseData.getRespondent1().getPartyName())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build();
             }
             if (respondent2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
                 if (caseData.getRespondent2() != null) {
-                    return caseData.getRespondent2().getPartyName();
+                    return GAParties.builder()
+                            .applicantPartyName(caseData.getRespondent2().getPartyName())
+                            .litigiousPartyID(RESPONDENT2_ID)
+                            .build();
                 }
             }
         }
-        return EMPTY;
+        return GAParties.builder().build();
     }
 
-    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
+        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId);
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
-
-        List<CaseAssignedUserRole> applicantSolicitor = getApplicantSolicitor(userRoles, userDetails);
+        boolean isApplicantSolicitor = UserRoleUtils.isApplicantSolicitor(userRolesCaching);
 
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
+        if (!CollectionUtils.isEmpty(userRolesCaching) && userRolesCaching.size() == 1 && isApplicantSolicitor) {
 
-            CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
+            String applnSol = userRolesCaching.get(0);
 
-            if (applnSol.getCaseRole() != null) {
-
-                if (applnSol.getCaseRole().equals(applicant1OrgCaseRole)) {
-                    return true;
-                }
+            if (applnSol != null && applnSol.equals(applicant1OrgCaseRole)) {
+                return true;
             }
         }
 
@@ -253,15 +279,10 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        return caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
-    }
-
-    public List<CaseAssignedUserRole> getApplicantSolicitor(CaseAssignedUserRolesResource userRoles,
-                                                            UserDetails userDetails) {
-        return userRoles.getCaseAssignedUserRoles().stream()
-            .filter(CA -> CA.getUserId().equals(userDetails.getId()))
-            .collect(Collectors.toList());
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+                getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        log.info("UserRoles from API :" + userRoles);
+        return userRoles;
     }
 
     public String getCaaAccessToken() {

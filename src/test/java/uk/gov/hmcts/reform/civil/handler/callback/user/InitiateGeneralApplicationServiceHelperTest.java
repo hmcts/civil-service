@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -77,6 +78,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @MockBean
     protected IdamClient idamClient;
+
+    @MockBean
+    protected UserRoleCaching userRoleCaching;
 
     public UserDetails getUserDetails(String id, String email) {
         return UserDetails.builder().id(id)
@@ -264,6 +268,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .addRespondent2(YesOrNo.YES)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(Organisation.builder().organisationID("200").build())
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
@@ -305,6 +310,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
                 .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                .addRespondent2(YesOrNo.YES)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(Organisation.builder().organisationID("200").build())
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
@@ -421,6 +427,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("001");
     }
 
     @Test
@@ -473,6 +480,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("002");
     }
 
     @Test
@@ -538,6 +546,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("003");
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {

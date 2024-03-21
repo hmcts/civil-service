@@ -104,6 +104,16 @@ public class Party {
     }
 
     @JsonIgnore
+    public boolean isCompanyOROrganisation() {
+        return this.isCompany() || this.isOrganisation();
+    }
+
+    @JsonIgnore
+    public boolean isIndividualORSoleTrader() {
+        return this.isIndividual() || this.isSoleTrader();
+    }
+
+    @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
     }

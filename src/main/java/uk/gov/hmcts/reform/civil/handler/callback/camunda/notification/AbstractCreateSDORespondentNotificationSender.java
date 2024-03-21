@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     protected abstract String getDocReference(CaseData caseData);
 
@@ -43,12 +45,14 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     private String getSDOTemplate(CaseData caseData) {
         if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-            if (caseData.isRespondentResponseBilingual()) { 
+            if (caseData.isRespondentResponseBilingual()) {
                 return notificationsProperties.getSdoOrderedSpecBilingual();
-            } 
-            return notificationsProperties.getSdoOrderedSpec();  
+            }
+            return featureToggleService.isEarlyAdoptersEnabled()
+                ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
         }
-        return notificationsProperties.getSdoOrdered();
+        return featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
     }
 
     /**

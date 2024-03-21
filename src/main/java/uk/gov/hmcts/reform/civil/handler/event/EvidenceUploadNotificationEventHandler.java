@@ -4,13 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.EvidenceUploadApplicantNotificationHandler;
 import uk.gov.hmcts.reform.civil.notification.EvidenceUploadRespondentNotificationHandler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK;
 
 @Slf4j
 @Service
@@ -50,5 +57,19 @@ public class EvidenceUploadNotificationEventHandler {
         } catch (Exception e) {
             log.warn("Failed to send email notification to respondent solicitor2 for case '{}'", event.getCaseId());
         }
+        // null notificationText so it cleared each day, for any future evidence uploads
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(event.getCaseId().toString(), EVIDENCE_UPLOAD_CHECK);
+        CaseDataContent caseContent = getCaseContent(startEventResponse);
+        coreCaseDataService.submitUpdate(event.getCaseId().toString(), caseContent);
+    }
+
+    private CaseDataContent getCaseContent(StartEventResponse startEventResponse) {
+        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        data.put("notificationText", "NULLED");
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(data)
+            .build();
     }
 }

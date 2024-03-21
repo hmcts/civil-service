@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,17 +10,18 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateDetailsForm {
 
-    @JsonProperty("partyChosen")
     private DynamicList partyChosen;
-
-    @JsonProperty("additionalUnavailableDates")
-    private List<Element<UnavailableDate>> additionalUnavailableDates;
-
-    @JsonProperty("hidePartyChoice")
+    private String partyChosenId;
+    private String partyChosenType;
     private YesOrNo hidePartyChoice;
+    private List<Element<UnavailableDate>> additionalUnavailableDates;
+    private List<Element<UpdatePartyDetailsForm>> updateExpertsDetailsForm;
+    private List<Element<UpdatePartyDetailsForm>> updateWitnessesDetailsForm;
+    private YesOrNo manageContactDetailsEventUsed;
 }
+

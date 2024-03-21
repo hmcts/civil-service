@@ -21,4 +21,5 @@ public class UserRoleCaching {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
         return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
     }
+
 }

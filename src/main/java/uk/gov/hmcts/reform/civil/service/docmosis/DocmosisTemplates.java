@@ -26,6 +26,7 @@ public enum DocmosisTemplates {
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01329.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01376.docx", "Order_trial_%s.pdf"),
     SDO_SMALL("CV-UNS-STD-ENG-01382.docx", "small_claims_sdo_%s.pdf"),
+    SDO_SMALL_FLIGHT_DELAY("CV-UNS-STD-ENG-01388.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-UNS-STD-ENG-01380.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT("CV-UNS-STD-ENG-01378.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP.docx", "response_sealed_form_%s.pdf"),
@@ -50,11 +51,27 @@ public enum DocmosisTemplates {
     DQ_RESPONSE_2V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01348.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_LR_V_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01282.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf"),
+    TRIAL_READY("CV-UNS-HRN-ENG-01247-10180.docx", "%s_%s_Trial_Arrangements.pdf"),
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
+
+    DRAFT_CLAIM_FORM("CV-SPC-CLM-ENG-00001-DRAFT.docx", "draft_claim_form_%s.pdf"),
+    HEARING_SMALL_CLAIMS_AHN("CV-UNS-HNO-ENG-01202.docx", "hearing_small_claim_%s.pdf"),
+    HEARING_FAST_TRACK_AHN("CV-UNS-HNO-ENG-01203.docx", "hearing_fast_track_%s.pdf"),
+    HEARING_APPLICATION_AHN("CV-UNS-HNO-ENG-01204.docx", "hearing_application_%s.pdf"),
+    HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_claim_%s.pdf"),
+
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+
+    SETTLEMENT_AGREEMENT_PDF("CV-SPC-CLM-ENG-00001-SETTLEMENT.docx", "%s-settlement-agreement.pdf"),
+    CLAIMANT_LIP_MANUAL_DETERMINATION_PDF("CV-SPC-CLM-ENG-00001-LIP-MD.docx", "%s_request-org-repayment-amount.pdf"),
+    JUDGMENT_BY_ADMISSION_OR_DETERMINATION("CV-SPC-CLM-ENG-00001-JBA-JBD.docx", "%s-ccj-request-%s.pdf"),
+    INTERLOCUTORY_JUDGEMENT_DOCUMENT("CV-SPC-CLM-ENG-INTERLOCUTORY-JUDGEMENT.docx", "%s-request-interloc-judgment.pdf"),
+    GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
+    GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
+    RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf");
+
     private final String template;
     private final String documentTitle;
 

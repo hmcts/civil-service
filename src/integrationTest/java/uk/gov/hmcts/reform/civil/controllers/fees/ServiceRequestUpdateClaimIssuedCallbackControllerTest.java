@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrationTest {
@@ -31,7 +33,6 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     private static final String PAID = "Paid";
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
-
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
 
@@ -40,6 +41,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         CaseData
             caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
@@ -77,6 +79,30 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
             .andExpect(status().is5xxServerError());
     }
 
+    @Test
+    public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithoutServiceAuthorisationReturn400() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(buildServiceDto()))).andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            // Then: the result status must be an HTTP-4xx
+            .andExpect(status().is5xxServerError());
+
+    }
+
     private ServiceRequestUpdateDto buildServiceDto() {
         return ServiceRequestUpdateDto.builder()
             .ccdCaseNumber(CCD_CASE_NUMBER)
@@ -94,6 +120,8 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     protected <T> ResultActions doPut(T content, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.put(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
@@ -102,6 +130,8 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     protected <T> ResultActions doPost(T content, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.post(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }

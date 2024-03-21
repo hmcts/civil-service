@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -55,12 +56,14 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
@@ -72,6 +75,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -100,6 +104,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -162,7 +167,21 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CourtLocationUtils courtLocationUtils;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
+    @Mock
+    private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
+    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
+        + "cannot attend hearing within next 3 months.";
+    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
+        + "Unavailability Date to. Please enter valid range.";
+    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability date must not"
+        + " be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability date from must not"
+        + " be before today.";
+    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability date to must not"
+        + " be more than one year in the future.";
+    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability date must not"
+        + " be more than one year in the future.";
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
@@ -743,6 +762,143 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
         }
 
+        @Nested
+        class UpdateExperts {
+            @Test
+            void updateRespondent1Experts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1DQSmallClaimExperts(experts, YES)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateRespondent1Experts_WhenNoExperts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1DQSmallClaimExperts(null, NO)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("No");
+            }
+
+            @Test
+            void updateRespondent2Experts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2DQSmallClaimExperts(experts, YES)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired2").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateRespondent2Experts_WhenNoExperts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2DQSmallClaimExperts(null, NO)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired2").isEqualTo("No");
+            }
+        }
+
         @Test
         void updateRespondent2AddressWhenUpdated() {
             // Given
@@ -750,8 +906,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-
-            Address changedAddress = AddressBuilder.maximal().build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
@@ -1084,7 +1238,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                 ))
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder().build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1104,10 +1257,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(true);
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
             AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
@@ -2123,6 +2279,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -2137,6 +2294,43 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("list_items").asList()
                 .extracting("label")
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
+            assertThat(response.getData().get("showCarmFields")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldCheckToggleNotToShowCarmFieldsBeforePopulateCourtLocations() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder()
+                                 .partyName("name")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                          .build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .thenReturn(locations);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            when(courtLocationUtils.getLocationsFromList(locations))
+                .thenReturn(locationValues);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            System.out.println(response.getData());
+
+            // Then
+            assertThat(response.getData())
+                .extracting("respondToCourtLocation")
+                .extracting("responseCourtLocations")
+                .extracting("list_items").asList()
+                .extracting("label")
+                .containsExactly(locationValues.getListItems().get(0).getLabel());
+            assertThat(response.getData().get("showCarmFields")).isEqualTo("No");
         }
     }
 
@@ -2215,6 +2409,325 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("isRespondent2", "No");
             assertThat(response.getData()).containsEntry("isApplicant1", "Yes");
         }
+    }
+
+    @Nested
+    class MidValidateMediationUnavailabiltyDates {
+
+        @Test
+        public void testValidateResp2UnavailableDateWhenAvailabilityIsNo() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateResp2UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateResp1UnavailableDateWhenAvailabilityIsNo() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        public void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateErrored() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().minusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+        }
+
+        @Test
+        public void testResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusYears(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(4))
+                    .toDate(LocalDate.now().plusDays(6))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+        }
+
+        @Test
+        public void testResp1UnavailableDateWhenDateToIsBeforeDateFrom() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().plusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+        }
+
+        @Test
+        public void testResp1UnavailableDateWhenDateFromIsBeforeToday() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().minusDays(6))
+                    .toDate(LocalDate.now().plusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+        }
+
+        @Test
+        public void testResp1UnavailableDateWhenDateToIsBeforeToday() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().minusDays(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+        }
+
+        @Test
+        public void testResp1UnavailableDateWhenDateToIsBeyondOneYear() {
+
+            List<Element<UnavailableDate>> unAvailableDates = Stream.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .date(LocalDate.now().plusDays(4))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                    .fromDate(LocalDate.now().plusDays(6))
+                    .toDate(LocalDate.now().plusYears(4))
+                    .build()
+            ).map(ElementUtils::element).collect(Collectors.toList());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1DQ()
+                .build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .resp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                                .unavailableDatesForMediation(unAvailableDates)
+                                                .build()).build();
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+        }
+
     }
 
     @Nested

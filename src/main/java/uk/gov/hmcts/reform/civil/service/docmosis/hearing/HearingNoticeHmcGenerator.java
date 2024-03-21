@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -31,6 +30,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 
 @Service
@@ -43,10 +43,10 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final HearingFeesService hearingFeesService;
     private final AssignCategoryId assignCategoryId;
 
-    public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation) {
+    public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation, String hearingLocation, String hearingId) {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        HearingNoticeHmc templateData = getHearingNoticeTemplateData(caseData, hearing, authorisation);
+        HearingNoticeHmc templateData = getHearingNoticeTemplateData(caseData, hearing, authorisation, hearingLocation, hearingId);
         DocmosisTemplates template = getTemplate(caseData);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
@@ -61,23 +61,22 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return caseDocuments;
     }
 
-    public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken) {
+    public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken,
+                                                         String hearingLocation, String hearingId) {
         var paymentFailed = caseData.getHearingFeePaymentDetails() == null
             || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED);
-        var feeAmount = paymentFailed
-            ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack())) : null;
-        var hearingDueDate = paymentFailed ? HearingFeeUtils
+        var feeAmount = paymentFailed && !isDisposalHearing(hearing)
+            ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;
+        var hearingDueDate = paymentFailed && !isDisposalHearing(hearing) ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
-        LocationRefData hearingLocation = getLocationRefData(
-            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
-            bearerToken);
+
         LocationRefData caseManagementLocation =
-            getLocationRefData(caseData.getCaseManagementLocation().getBaseLocation(), bearerToken);
+            getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
         return HearingNoticeHmc.builder()
             .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getSiteName() : null)
-            .hearingLocation(LocationRefDataService.getDisplayEntry(hearingLocation))
+            .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .hearingType(getHearingType(hearing))
@@ -107,13 +106,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HEARING_NOTICE_HMC;
     }
 
-    @Nullable
-    private LocationRefData getLocationRefData(String venueId, String bearerToken) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
-        return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
-    }
-
     private String getHearingType(HearingGetResponse hearing) {
         if (hearing.getHearingDetails().getHearingType().contains("TRI")) {
             return "trial";
@@ -123,5 +115,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return null;
     }
 
+    private boolean isDisposalHearing(HearingGetResponse hearing) {
+        return hearing.getHearingDetails().getHearingType().contains("DIS");
+    }
 }
 

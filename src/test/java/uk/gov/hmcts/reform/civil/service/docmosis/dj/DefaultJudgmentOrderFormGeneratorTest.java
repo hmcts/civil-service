@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementS
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,12 +53,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
 public class DefaultJudgmentOrderFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
-    private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileNameDisposal = String.format(DJ_SDO_DISPOSAL.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final String FILE_NAME_DISPOSAL_HNL = String.format(DJ_SDO_DISPOSAL.getDocumentTitle(),
-                                                                   REFERENCE_NUMBER);
-    private static final String fileNameTrial = String.format(DJ_SDO_TRIAL.getDocumentTitle(), REFERENCE_NUMBER);
+    private static String fileNameDisposal = null;
+    private static String FILE_NAME_DISPOSAL_HNL = null;
+    private static String fileNameTrial = null;
     private static final CaseDocument CASE_DOCUMENT_DISPOSAL = CaseDocumentBuilder.builder()
         .documentName(fileNameDisposal)
         .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
@@ -84,12 +83,20 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
 
+    @BeforeEach
+    void setUp() {
+        fileNameDisposal = LocalDate.now() + "_Judge Dredd" + ".pdf";
+        fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
+        FILE_NAME_DISPOSAL_HNL = LocalDate.now() + "_Judge Dredd" + ".pdf";
+
+        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                    .forename("Judge")
+                                                                    .surname("Dredd")
+                                                                    .roles(Collections.emptyList()).build());
+    }
+
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com",
-                                        "Test", "User",
-                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -112,10 +119,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndTelephoneHearing() {
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com",
-                                        "Test", "User",
-                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -137,10 +140,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndVidoeHearing() {
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com",
-                                        "Test", "User",
-                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -162,10 +161,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com",
-                                        "Test", "User",
-                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
                                                                eq(DJ_SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
@@ -200,14 +195,11 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenNoticeOfChangeEnabled() {
-        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                .roles(Collections.emptyList()).build());
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()

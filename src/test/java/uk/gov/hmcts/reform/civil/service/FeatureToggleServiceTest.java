@@ -7,8 +7,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -31,15 +34,6 @@ class FeatureToggleServiceTest {
         givenToggle("myFeature", toggleState);
 
         assertThat(featureToggleService.isFeatureEnabled("myFeature")).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
-        var noticeOfChangeKey = "notice-of-change";
-        givenToggle(noticeOfChangeKey, toggleState);
-
-        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isEqualTo(toggleState);
     }
 
     @ParameterizedTest
@@ -76,15 +70,6 @@ class FeatureToggleServiceTest {
         givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
-        var certificateOfServiceKey = "isCertificateOfServiceEnabled";
-        givenToggle(certificateOfServiceKey, toggleStat);
-
-        assertThat(featureToggleService.isCertificateOfServiceEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -177,6 +162,43 @@ class FeatureToggleServiceTest {
         givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
+        var caseFileKey = "early-adopters";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
+        var sdoR2Key = "isSdoR2Enabled";
+        givenToggle(sdoR2Key, toggleStat);
+
+        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
+        var carmKey = "carm";
+        var carmDateKey = "cam-enabled-for-case";
+        givenToggle(carmKey, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(carmDateKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+
+        assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

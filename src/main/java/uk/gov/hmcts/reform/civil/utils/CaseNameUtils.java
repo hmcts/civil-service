@@ -10,7 +10,7 @@ public class CaseNameUtils {
         //no op
     }
 
-    public static String buildCaseNamePublic(CaseData caseData) {
+    public static String buildCaseName(CaseData caseData) {
         return new StringBuilder()
             .append(getFormattedPartyName(caseData.getApplicant1()))
             .append(getFormattedLitigationFriendName(caseData.getApplicant1LitigationFriend()))
@@ -18,7 +18,9 @@ public class CaseNameUtils {
             .append(getFormattedLitigationFriendName(caseData.getApplicant2LitigationFriend()))
             .append(" v ")
             .append(getFormattedPartyName(caseData.getRespondent1()))
+            .append(getFormattedLitigationFriendName(caseData.getRespondent1LitigationFriend()))
             .append(getFormattedPartyName(caseData.getRespondent2(), true))
+            .append(getFormattedLitigationFriendName(caseData.getRespondent2LitigationFriend()))
             .toString();
     }
 
