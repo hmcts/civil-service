@@ -527,7 +527,7 @@ task buildCCDXlsx(type: Exec) {
 task runOtherServices(type: Exec) {
   group 'ccd tasks'
 
-  environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-camunda.yml,cftlib-wiremock.yml'
+  environment 'ADDITIONAL_COMPOSE_FILES', 'cftlib-additional-services.yml'
   environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
 
   commandLine './bin/add-services.sh'

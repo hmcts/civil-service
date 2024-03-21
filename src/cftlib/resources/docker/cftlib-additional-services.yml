@@ -1,0 +1,27 @@
+---
+version: '2.4'
+
+name: cftlib-additional-services
+
+services:
+  camunda:
+    image: camunda/camunda-bpm-platform:7.20.0-alpha1
+    ports:
+      - 9404:8080
+    networks:
+      - cftlib_default
+
+  wiremock:
+      image: wiremock/wiremock
+      volumes:
+        - ./../mocks/wiremock:/home/wiremock:rw
+      ports:
+        - 8765:8080
+      networks:
+        - cftlib_default
+      command:
+        - -global-response-templating
+
+networks:
+  cftlib_default:
+    external: true
