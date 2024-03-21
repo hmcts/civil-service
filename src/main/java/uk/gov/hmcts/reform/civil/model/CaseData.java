@@ -375,6 +375,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
     private final YesOrNo specDefenceAdmittedRequired;
 
+    private final MediationContactInformation app1MediationContactInfo;
+    private final MediationAvailability app1MediationAvailability;
     private final MediationContactInformation resp1MediationContactInfo;
     private final MediationContactInformation resp2MediationContactInfo;
     private final MediationAvailability resp1MediationAvailability;
@@ -1066,7 +1068,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRejectWithNoMediation() {
         return isClaimantNotSettlePartAdmitClaim()
-            && ((hasClaimantNotAgreedToFreeMediation()
+            && isMediationRejectedOrFastTrack();
+    }
+
+    @JsonIgnore
+    public boolean isMediationRejectedOrFastTrack() {
+        return ((hasClaimantNotAgreedToFreeMediation()
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
     }
@@ -1396,6 +1403,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
+    }
+
+    public boolean hasApplicant1CourtDecisionInFavourOfDefendant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfDefendant).isPresent();
     }
 
     @JsonIgnore
