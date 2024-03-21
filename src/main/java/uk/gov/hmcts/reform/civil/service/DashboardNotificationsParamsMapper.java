@@ -35,7 +35,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
-                "£" + this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
             );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
