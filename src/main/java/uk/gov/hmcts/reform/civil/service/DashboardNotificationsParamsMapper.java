@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -90,12 +91,22 @@ public class DashboardNotificationsParamsMapper {
         });
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("defendantInstallmentAmount", caseData.getRespondent1RepaymentPlan().getPaymentAmount());
-            params.put("installmentTimePeriod", caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay());
-            params.put("installmentStartDate", caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate());
+            params.put("installmentAmount", caseData.getRespondent1RepaymentPlan().getPaymentAmount());
+            params.put("installmentTimePeriod", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getLabel());
+            getFirstRepaymentDate(caseData).map(date -> {
+                params.put("installmentStartDateCy", date);
+                params.put("installmentStartDateEn", date);
+                return Optional.of(date);
+            });
         }
 
         return params;
+    }
+
+    private Optional<String> getFirstRepaymentDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .map(DateUtils::formatDate);
     }
 
     private Optional<String> getClaimSettledAmount(CaseData caseData) {
