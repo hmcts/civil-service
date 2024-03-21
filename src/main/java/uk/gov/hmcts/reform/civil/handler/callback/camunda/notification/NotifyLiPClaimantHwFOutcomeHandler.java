@@ -54,7 +54,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent hwfEvent = caseData.getHwFEvent();
-        if (Objects.nonNull(caseData.getApplicant1Email())) {
+        //CIV-12798: bypassing sendMail for Full Remission Granted event.
+        if (Objects.nonNull(caseData.getApplicant1Email()) && CaseEvent.FULL_REMISSION_HWF != hwfEvent) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
                 caseData.isBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
