@@ -78,15 +78,13 @@ public class DashboardNotificationService {
         dashboardNotification.ifPresent(notification -> {
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
-                .dashboardNotificationsId(notification.getId())
+                .dashboardNotification(notification)
                 .actionPerformed("Click")
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-            NotificationActionEntity actionEntity = notificationActionRepository.save(notificationAction);
-
-            dashboardNotificationsRepository.save(notification.toBuilder().notificationAction(actionEntity).build());
+            notificationActionRepository.save(notificationAction);
         });
     }
 

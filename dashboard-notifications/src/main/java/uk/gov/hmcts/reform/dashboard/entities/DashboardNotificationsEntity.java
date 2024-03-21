@@ -3,14 +3,7 @@ package uk.gov.hmcts.reform.dashboard.entities;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -37,8 +30,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "dashboard_notifications_templates_id")
     private NotificationTemplateEntity dashboardNotificationsTemplates;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
     @Schema(name = "notification_action_id")
     private NotificationActionEntity notificationAction;
 
