@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT));
+            caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT_REQUEST));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
