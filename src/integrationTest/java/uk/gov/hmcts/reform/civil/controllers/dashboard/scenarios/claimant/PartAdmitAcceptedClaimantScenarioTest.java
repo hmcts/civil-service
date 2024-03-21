@@ -30,7 +30,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of("respondent1PartyName", "John Doe",
-                                  "defendantAdmittedAmount", "500",
+                                  "defendantAdmittedAmount", "£500",
                                   "respondent1AdmittedAmountPaymentDeadlineEn", "19th March 2024",
                                   "respondent1AdmittedAmountPaymentDeadlineCy", "19th March 2024"
                    )).build(),
