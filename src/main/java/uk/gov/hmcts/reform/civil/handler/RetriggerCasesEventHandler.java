@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.Map;
 
+import static java.lang.Long.parseLong;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -24,6 +26,9 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
 
         String caseIds = externalTask.getVariable("caseIds");
         CaseEvent caseEvent = CaseEvent.valueOf(externalTask.getVariable("caseEvent"));
+        String eventSummary = "Re-trigger of " + caseEvent.name();
+        String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
+
         Map<String, Object> caseData = externalTask.getVariable("caseData") != null
             ? externalTask.getVariable("caseData")
             : Map.of();
@@ -32,7 +37,13 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
             try {
                 log.info("Retrigger CaseId: {} started", caseId);
                 externalTask.getAllVariables().put("caseId", caseId);
-                coreCaseDataService.triggerEvent(Long.parseLong(caseId), caseEvent, caseData);
+                coreCaseDataService.triggerEvent(
+                    parseLong(caseId.trim()),
+                    caseEvent,
+                    caseData,
+                    eventSummary,
+                    eventDescription
+                );
                 log.info("Retrigger CaseId: {} finished", caseId);
             } catch (Exception e) {
                 log.error("ERROR Retrigger CaseId: {} {}", caseId, e.getMessage(), e);
