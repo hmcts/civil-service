@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_DATE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -96,7 +96,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_DATE_CLAIMANT.getScenario(),
+                SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
         );
@@ -134,7 +134,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_DATE_CLAIMANT.getScenario(),
+                SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
         );
