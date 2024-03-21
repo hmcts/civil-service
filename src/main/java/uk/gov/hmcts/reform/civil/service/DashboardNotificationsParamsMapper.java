@@ -89,6 +89,12 @@ public class DashboardNotificationsParamsMapper {
             return Optional.of(date);
         });
 
+        if(nonNull(caseData.getRespondent1RepaymentPlan())) {
+            params.put("defendantInstallmentAmount", caseData.getRespondent1RepaymentPlan().getPaymentAmount());
+            params.put("installmentTimePeriod", caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay());
+            params.put("installmentStartDate", caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate());
+        }
+
         return params;
     }
 
