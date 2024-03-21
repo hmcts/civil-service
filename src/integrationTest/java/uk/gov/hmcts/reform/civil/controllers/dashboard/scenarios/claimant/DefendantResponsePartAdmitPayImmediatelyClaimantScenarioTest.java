@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Random;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,7 +29,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
     @Test
     void should_create_part_admit_defendant_response_scenario() throws Exception {
 
-        String caseId = "1234";
+        String caseId = generateRandomCaseId();
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -57,4 +58,13 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             );
     }
 
+    private String generateRandomCaseId() {
+        Random random = new Random();
+        StringBuilder randomNumber = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            int digit = random.nextInt(10);
+            randomNumber.append(digit);
+        }
+        return randomNumber.toString();
+    }
 }
