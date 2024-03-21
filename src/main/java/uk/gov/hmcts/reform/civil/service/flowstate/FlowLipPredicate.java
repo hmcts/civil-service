@@ -9,7 +9,7 @@ public class FlowLipPredicate {
     private FlowLipPredicate() {
 
     }
-
+  
     public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
     public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
@@ -35,5 +35,8 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> isClaimantSettleTheClaim =
         CaseData::isClaimantIntentionSettlePartAdmit;
+
+    public static final Predicate<CaseData> isDefendantNotPaidFullDefenceClaim =
+        CaseData::isFullDefenceNotPaid;
 
 }
