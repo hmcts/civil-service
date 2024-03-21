@@ -63,9 +63,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
 
     private boolean isPartOrFullAdmitPayByInstallments(CaseData caseData) {
 
-        return ((caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_ADMISSION) ||
-                caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.PART_ADMISSION)) &&
-                caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(
+        return ((caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_ADMISSION)
+               || caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.PART_ADMISSION))
+               && caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(
                     RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN));
     }
 
