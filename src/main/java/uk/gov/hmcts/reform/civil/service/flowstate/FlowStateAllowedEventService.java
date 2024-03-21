@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -605,6 +606,7 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
                 CLAIMANT_RESPONSE_CUI,
@@ -1230,6 +1232,7 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
+                REFER_JUDGE_DEFENCE_RECEIVED,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
@@ -1586,7 +1589,8 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
         entry(
