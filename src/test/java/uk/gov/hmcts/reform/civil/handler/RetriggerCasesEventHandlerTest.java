@@ -9,7 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -29,11 +33,12 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(null);
 
         handler.handleTask(externalTask);
 
-        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE);
-        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE);
+        verify(coreCaseDataService).triggerEvent(eq(1L), eq(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE), anyMap());
+        verify(coreCaseDataService).triggerEvent(eq(2L), eq(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE), anyMap());
     }
 
     @Test
@@ -41,11 +46,12 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE_SPEC");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(null);
 
         handler.handleTask(externalTask);
 
-        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC);
-        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC);
+        verify(coreCaseDataService).triggerEvent(eq(1L), eq(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC), anyMap());
+        verify(coreCaseDataService).triggerEvent(eq(2L), eq(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC), anyMap());
     }
 
     @Test
@@ -53,11 +59,12 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(null);
 
         handler.handleTask(externalTask);
 
-        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
-        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CASES);
+        verify(coreCaseDataService).triggerEvent(eq(1L), eq(CaseEvent.RETRIGGER_CASES), anyMap());
+        verify(coreCaseDataService).triggerEvent(eq(2L), eq(CaseEvent.RETRIGGER_CASES), anyMap());
     }
 
     @Test
@@ -73,6 +80,7 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
         when(externalTask.getVariable("caseIds")).thenReturn(null);
+        when(externalTask.getVariable("caseData")).thenReturn(null);
 
         assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
     }
@@ -82,11 +90,26 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(null);
         doThrow(new RuntimeException()).when(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
 
         handler.handleTask(externalTask);
 
-        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CASES);
+        verify(coreCaseDataService).triggerEvent(eq(2L), eq(CaseEvent.RETRIGGER_CASES), anyMap());
+    }
+
+    @Test
+    void testHandleTask_RetriggerCasesSetsCaseData() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        Map<String, Object> caseData = Map.of("myField", "myValue");
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(caseData);
+        doThrow(new RuntimeException()).when(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
+
+        handler.handleTask(externalTask);
+
+        verify(coreCaseDataService).triggerEvent(eq(2L), eq(CaseEvent.RETRIGGER_CASES), eq(caseData));
     }
 
 }
