@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,6 +14,7 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -24,6 +28,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -33,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -64,8 +70,9 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             .isEqualTo(TASK_ID);
     }
 
-    @Test
-    public void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate() {
+    @ParameterizedTest
+    @MethodSource("defendantTypeAndScenarioArguments")
+    public void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
         Map<String, Object> params = new HashMap<>();
 
@@ -78,8 +85,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 .ccdCaseReference(Long.valueOf(8723L))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
-                        .companyName("Org one")
-                        .type(Party.Type.ORGANISATION).build())
+                        .type(Party.Type.valueOf(partyType.name())).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                         .builder()
                         .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -96,14 +102,15 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
+                dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
         );
     }
 
-    @Test
-    public void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate() {
+    @ParameterizedTest
+    @MethodSource("defendantTypeAndScenarioArguments")
+    public void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
         Map<String, Object> params = new HashMap<>();
 
@@ -116,8 +123,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 .ccdCaseReference(Long.valueOf(23055L))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
-                        .companyName("company one")
-                        .type(Party.Type.COMPANY).build())
+                        .type(Party.Type.valueOf(partyType.name())).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                         .builder()
                         .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -134,9 +140,18 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
+                dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    private static Stream<Arguments> defendantTypeAndScenarioArguments() {
+        return Stream.of(
+            Arguments.of(Party.Type.ORGANISATION, SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
+            Arguments.of(Party.Type.COMPANY, SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
+            Arguments.of(Party.Type.INDIVIDUAL, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT),
+            Arguments.of(Party.Type.SOLE_TRADER, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT)
         );
     }
 }
