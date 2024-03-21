@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.DocumentHearingType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -16,6 +17,9 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 
 public class HearingUtils {
 
@@ -141,14 +145,9 @@ public class HearingUtils {
         };
     }
 
-    public static String parseHearingType(String hearingType) {
-        String[] parts = hearingType.split("-");
-        return parts.length == 2 ? parts[1] : hearingType;
-    }
-
     public static boolean hearingFeeRequired(String hearingType) {
-        List<String> hearingTypesExcludedFromFee = List.of("DIS", "DRH");
+        List<DocumentHearingType> hearingTypesExcludedFromFee = List.of(DIS, DRH);
         return hearingTypesExcludedFromFee.stream().filter(
-            type -> parseHearingType(hearingType).equals(type)).count() < 1;
+            type -> getType(hearingType).equals(type)).count() < 1;
     }
 }

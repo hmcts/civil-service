@@ -195,18 +195,4 @@ public class HearingUtilsTest {
         assertThat(hearingFeeRequired).isEqualTo(expected);
     }
 
-    @Test
-    void shouldReturnExpectedHearingType_whenGivenCorrectlyFormattedString() {
-        String actual = HearingUtils.parseHearingType("AAA7-DIS");
-        assertEquals("DIS", actual);
-    }
-
-    @Test
-    void shouldReturnGivenString_whenGivenIncorrectlyFormattedString() {
-        String hearingType = "DIS";
-
-        String actual = HearingUtils.parseHearingType(hearingType);
-
-        assertEquals(hearingType, actual);
-    }
 }

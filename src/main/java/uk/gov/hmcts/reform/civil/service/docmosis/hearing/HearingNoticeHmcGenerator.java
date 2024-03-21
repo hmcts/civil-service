@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.parseHearingType;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
@@ -82,7 +82,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
-            .hearingType(getHearingTypeText(hearing))
+            .hearingType(getType(hearing.getHearingDetails().getHearingType()).getLabel())
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -107,22 +107,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
         return HEARING_NOTICE_HMC;
-    }
-
-    private String getHearingTypeText(HearingGetResponse hearing) {
-        String hearingType = parseHearingType(hearing.getHearingDetails().getHearingType());
-        switch (hearingType) {
-            case "TRI": {
-                return "trial";
-            }
-            case "DIS":
-            case "DRH": {
-                return "hearing";
-            }
-            default: {
-                return null;
-            }
-        }
     }
 }
 
