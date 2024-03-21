@@ -80,7 +80,6 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
         when(externalTask.getVariable("caseIds")).thenReturn(null);
-        when(externalTask.getVariable("caseData")).thenReturn(null);
 
         assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
     }
