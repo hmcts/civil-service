@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HearingUtilsTest {
@@ -185,9 +184,9 @@ public class HearingUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AAA7-DIS,false",
-            "AAA7-DRH,false",
-            "AAA7-TRI,true"
+        "AAA7-DIS,false",
+        "AAA7-DRH,false",
+        "AAA7-TRI,true"
     })
     void shouldReturnCorrectValue_whenHearingTypeIs(String hearingType, boolean expected) {
         boolean hearingFeeRequired = HearingUtils.hearingFeeRequired(hearingType);
