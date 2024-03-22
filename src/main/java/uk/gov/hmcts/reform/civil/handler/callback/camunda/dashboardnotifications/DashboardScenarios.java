@@ -48,7 +48,6 @@ public enum DashboardScenarios {
         "Scenario.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_MEDIATION_DEFENDANT("Scenario.AAA7.ClaimantIntent.Mediation.Defendant");
 
-
     private final String scenario;
 
     DashboardScenarios(String scenario) {

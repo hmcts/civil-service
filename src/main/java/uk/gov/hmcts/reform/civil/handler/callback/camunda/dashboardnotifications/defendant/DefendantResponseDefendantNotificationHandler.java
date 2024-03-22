@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT;
+
 @Service
 @RequiredArgsConstructor
 public class DefendantResponseDefendantNotificationHandler extends CallbackHandler {
@@ -50,7 +51,7 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
 
     private String getScenario(CaseData caseData) {
 
-        if(caseData.isPayBySetDate()) {
+        if (caseData.isPayBySetDate()) {
             return SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario();
         }
 
