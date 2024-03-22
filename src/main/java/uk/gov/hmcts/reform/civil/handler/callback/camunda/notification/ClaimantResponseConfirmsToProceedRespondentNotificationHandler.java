@@ -55,7 +55,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
 
     public static final String TASK_ID_MULTITRACK = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1Multitrack";
-    public static final String Task_ID_RESPONDENT_SOL2_MULTITRACK = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2Multitrack";
+    public static final String TASK_ID_RESPONDENT_SOL2_MULTITRACK = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2Multitrack";
     public static final String TASK_ID_CC_MULTITRACK = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CCMultitrack";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
     private static final String NP_PROCEED_REFERENCE_TEMPLATE
@@ -76,10 +76,10 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public String camundaActivityId(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            if (isRespondentSolicitor2Notification(callbackParams)) {
-                return Task_ID_RESPONDENT_SOL2_MULTITRACK;
+            if (isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
+                return TASK_ID_RESPONDENT_SOL2_MULTITRACK;
             }
-            return isCcNotification(callbackParams) ? TASK_ID_CC_MULTITRACK : TASK_ID_MULTITRACK;
+            return isCcNotificationMultiTrack(callbackParams) ? TASK_ID_CC_MULTITRACK : TASK_ID_MULTITRACK;
         }
         if (isRespondentSolicitor2Notification(callbackParams)) {
             return Task_ID_RESPONDENT_SOL2;
@@ -220,9 +220,19 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
     }
 
+    private boolean isCcNotificationMultiTrack(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK.name());
+    }
+
     private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED.name());
+    }
+
+    private boolean isRespondentSolicitor2NotificationMultiTrack(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK.name());
     }
 
     //finding legal org name
