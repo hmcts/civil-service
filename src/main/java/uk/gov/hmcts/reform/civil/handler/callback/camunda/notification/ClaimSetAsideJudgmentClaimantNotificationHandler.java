@@ -11,19 +11,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
 @Service
 @RequiredArgsConstructor
@@ -59,23 +55,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        String defendantName = "";
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
-            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            defendantName = getPartyNameBasedOnType(caseData.getRespondent1());
-        } else {
-            defendantName = getPartyNameBasedOnType(caseData.getRespondent1())
-                .concat(" and ")
-                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
-        }
-
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData),
-            DEFENDANT_NAME_INTERIM,  defendantName,
+            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
+            DEFENDANT_NAME_INTERIM,  getDefendantNameBasedOnCaseType(caseData),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
         );
-
     }
 
     private CallbackResponse notifyClaimSetAsideJudgmentToClaimant(CallbackParams callbackParams) {
@@ -98,13 +83,6 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
-    }
-
-    private String getApplicantLegalOrganizationName(CaseData caseData) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
 }
