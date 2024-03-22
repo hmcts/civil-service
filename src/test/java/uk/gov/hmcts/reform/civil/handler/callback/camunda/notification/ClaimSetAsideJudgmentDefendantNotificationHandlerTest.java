@@ -36,11 +36,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
 
 @SpringBootTest(classes = {
-    ClaimSetAsideJudgementDefendantNotificationHandler.class,
+    ClaimSetAsideJudgmentDefendantNotificationHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
@@ -66,14 +66,14 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
     private ArgumentCaptor<String> reference;
 
     @Autowired
-    private ClaimSetAsideJudgementDefendantNotificationHandler handler;
+    private ClaimSetAsideJudgmentDefendantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifySetAsideJudgementTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
@@ -97,7 +97,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
                 "respondentsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "set-aside-judgement-applicant-notification-000DC001"
+                "set-aside-judgment-defendant-notification-000DC001"
             );
         }
 
@@ -126,12 +126,12 @@ public class ClaimSetAsideJudgementDefendantNotificationHandlerTest extends Base
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondentsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
-            assertThat(reference.getAllValues().get(0)).isEqualTo("set-aside-judgement-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(0)).isEqualTo("set-aside-judgment-defendant-notification-000DC001");
             //Email to respondent2
             assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
             assertThat(emailTemplate.getAllValues().get(1)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap2(caseData));
-            assertThat(reference.getAllValues().get(1)).isEqualTo("set-aside-judgement-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(1)).isEqualTo("set-aside-judgment-defendant-notification-000DC001");
 
         }
 
