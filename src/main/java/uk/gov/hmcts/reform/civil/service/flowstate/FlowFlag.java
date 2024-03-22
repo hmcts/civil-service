@@ -18,5 +18,5 @@ public enum FlowFlag {
     LIP_CASE,
     CLAIM_ISSUE_HWF,
     LIP_JUDGMENT_ADMISSION,
-    SETTLE_THE_CLAIM
+    SETTLE_THE_CLAIM;
 }

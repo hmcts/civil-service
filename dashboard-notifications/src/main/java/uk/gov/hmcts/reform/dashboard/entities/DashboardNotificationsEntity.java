@@ -37,8 +37,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "dashboard_notifications_templates_id")
     private NotificationTemplateEntity dashboardNotificationsTemplates;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
     @Schema(name = "notification_action_id")
     private NotificationActionEntity notificationAction;
 

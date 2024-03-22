@@ -11,8 +11,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.HWF.Requested', '{"Notice.AAA7.ClaimIssue.Clai
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.HWF.Requested', 'We’re reviewing your help with fees application' , 'We’re reviewing your help with fees application',
-        'You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.',
-        'You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.',
+        '<p class="govuk-body">You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.</p>',
+        '<p class="govuk-body">You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.</p>',
         'CLAIMANT');
 
 /**
