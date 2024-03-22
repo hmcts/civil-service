@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,45 +11,32 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.HearingNotes;
-import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
+
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.*;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+
 @Service
 @RequiredArgsConstructor
 public class CourtOfficerOrderHandler extends CallbackHandler {
@@ -58,15 +44,18 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
-    private final IdamClient idamClient;
     private final WorkingDayIndicator workingDayIndicator;
     private final DocumentHearingLocationHelper locationHelper;
+    //private final BundleRequestMapper bundleRequestMapper;
+
+    public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prePopulateValues,
+            callbackKey(MID, "validateValues"), this::validateFormValues,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-            callbackKey(SUBMITTED), this::emptyCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -81,6 +70,13 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authToken));
 
+//        var a = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+//                                                                     "final-order-bundle",
+//                                                                     "jurisdiction",
+//                                                                     caseData.getCcdCaseReference().toString(),
+//                                                                     Long.valueOf(11111));
+//        System.out.println("bundleleeee" +a);
+
         caseDataBuilder
             .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                    .datesToAvoidDateDropdown(DatesFinalOrders.builder()
@@ -89,16 +85,8 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
                                                                                             LocalDate.now().plusDays(
                                                                                                 7))).build())
                                                    .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
-                                                   .alternativeHearingList(getLocationsFromList(locations)).build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse populateFormValues(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+                                                   .alternativeHearingList(getLocationsFromList(locations)).build())
+            .courtOfficerGiveReasonsYesNo(YesOrNo.NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -129,6 +117,30 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
                 .append(" - ").append(location.getPostcode()).toString())
                             .sorted()
                             .toList());
+    }
+
+    private CallbackResponse validateFormValues(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+        if (nonNull(caseData.getCourtOfficerFurtherHearingComplex().getListFromDate())
+            && caseData.getCourtOfficerFurtherHearingComplex().getListFromDate().isBefore(LocalDate.now())) {
+            errors.add("List from date cannot be in the past");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(getHeader(caseData))
+            .build();
+    }
+
+    private String getHeader(CaseData caseData) {
+        return format(HEADER, caseData.getCcdCaseReference());
     }
 
 }
