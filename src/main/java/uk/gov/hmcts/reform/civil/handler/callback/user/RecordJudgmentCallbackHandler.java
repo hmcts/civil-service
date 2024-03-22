@@ -97,7 +97,11 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-        caseData.setJoSetAsideDate(null);
+        caseData.setJoSetAsideOrderDate(null);
+        caseData.setJoSetAsideDefenceReceivedDate(null);
+        caseData.setJoSetAsideOrderType(null);
+        caseData.setJoSetAsideReason(null);
+        caseData.setJoSetAsideJudgmentErrorText(null);
         caseData.setJoJudgmentPaidInFull(null);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
