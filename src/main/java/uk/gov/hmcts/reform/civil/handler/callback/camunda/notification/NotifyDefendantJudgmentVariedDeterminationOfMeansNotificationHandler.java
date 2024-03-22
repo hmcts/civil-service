@@ -83,7 +83,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
             );
     }
 
-    public Map<String, String> addRespondent2Properties(CaseData caseData) {
+    private Map<String, String> addRespondent2Properties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
