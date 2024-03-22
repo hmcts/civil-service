@@ -752,6 +752,7 @@ public class CaseDataParent implements MappableObject {
 
     // Court officer order
     private FinalOrderFurtherHearing courtOfficerFurtherHearingComplex;
+    private YesOrNo courtOfficerGiveReasonsYesNo;
 
     //Hearing Scheduled
     private DynamicList hearingLocation;
