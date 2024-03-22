@@ -80,8 +80,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .judgmentStatusTypes(JudgmentStatusType.SET_ASIDE)
             .lastUpdatedDate(LocalDateTime.now()).build();
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(
-                JudgmentStatusType.SET_ASIDE));
+            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SET_ASIDE));
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);

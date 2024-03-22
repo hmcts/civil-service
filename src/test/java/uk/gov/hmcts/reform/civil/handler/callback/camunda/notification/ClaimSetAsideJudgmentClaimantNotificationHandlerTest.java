@@ -33,11 +33,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
 
 @SpringBootTest(classes = {
-    ClaimSetAsideJudgementClaimantNotificationHandler.class,
+    ClaimSetAsideJudgmentClaimantNotificationHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
@@ -48,7 +48,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseC
     private NotificationsProperties notificationsProperties;
 
     @Autowired
-    private ClaimSetAsideJudgementClaimantNotificationHandler handler;
+    private ClaimSetAsideJudgmentClaimantNotificationHandler handler;
 
     @MockBean
     private OrganisationService organisationService;
@@ -58,7 +58,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseC
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifySetAsideJudgementTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
@@ -84,7 +84,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandlerTest extends BaseC
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "set-aside-judgement-applicant-notification-000DC001"
+                "set-aside-judgment-applicant-notification-000DC001"
             );
         }
     }
