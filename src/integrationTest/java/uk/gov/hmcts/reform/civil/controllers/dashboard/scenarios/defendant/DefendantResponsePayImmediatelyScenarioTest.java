@@ -29,7 +29,6 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
     void should_create_part_admit_pay_immediately_scenario() throws Exception {
 
         String caseId = "123451432";
-
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
