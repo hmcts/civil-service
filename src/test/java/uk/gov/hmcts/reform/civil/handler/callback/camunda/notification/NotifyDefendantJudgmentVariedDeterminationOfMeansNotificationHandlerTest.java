@@ -104,7 +104,7 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
-                "respondentsolicitor@example.com",
+                "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
                 "defendant-judgment-varied-determination-of-means-000DC001"
