@@ -56,11 +56,6 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
 
     private String getScenario(CaseData caseData) {
 
-        /**
-         * Full defence, states paid in full
-         * Part admit, states paid in full
-         */
-
         if ((caseData.isFullAdmitClaimSpec() || caseData.isPartAdmitClaimSpec()) && caseData.respondent1PaidInFull()) {
             return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario();
         }
