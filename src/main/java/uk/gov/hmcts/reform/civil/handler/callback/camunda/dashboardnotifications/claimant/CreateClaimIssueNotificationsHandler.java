@@ -50,12 +50,19 @@ public class CreateClaimIssueNotificationsHandler extends CallbackHandler {
     private CallbackResponse configureScenarioForClaimSubmission(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                           DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), authToken,
                                           ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
         );
-
+        if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
+            dashboardApiClient.recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(),
+                authToken,
+                ScenarioRequestParams.builder()
+                    .params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
