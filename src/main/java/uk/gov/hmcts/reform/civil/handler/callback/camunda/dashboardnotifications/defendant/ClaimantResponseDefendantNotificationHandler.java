@@ -10,26 +10,39 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_MEDIATION_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -65,26 +78,48 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
             }
+        } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
+            return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
         } else if (caseData.hasApplicant1SignedSettlementAgreement() && caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
                 .getScenario();
-        }  else if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
+        } else if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
+            RespondToClaim respondToClaim = getRespondToClaim(caseData);
+            if ((caseData.hasDefendantNotPaid()
+                    || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && (caseData.isFullDefenceNotPaid() || caseData.isClaimantIntentionNotSettlePartAdmit()))
+                    && caseData.isMediationRejectedOrFastTrack())) {
+                return SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario();
+            }
+            if (Objects.nonNull(respondToClaim)
+                && Objects.nonNull(respondToClaim.getHowMuchWasPaid())
+                && caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() == YesOrNo.YES
+                && (caseData.hasClaimantNotAgreedToFreeMediation()
+                || caseData.hasDefendantNotAgreedToFreeMediation())) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
+                    .getScenario();
+            }
+
             if (caseData.isRespondentResponseFullDefence()
                 && (isNull(caseData.getResponseClaimMediationSpecRequired())
                 || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT
                     .getScenario();
             }
-
+            if (getGoToHearingScenarioClaimantRejectsMediation(caseData)) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT
+                    .getScenario();
+            }
             if (Objects.nonNull(caseData.getApplicant1AcceptAdmitAmountPaidSpec()) && caseData.isClaimantRejectsClaimAmount()
-                    && (caseData.hasClaimantNotAgreedToFreeMediation()
-                    || caseData.hasDefendantNotAgreedToFreeMediation())) {
+                && (caseData.hasClaimantNotAgreedToFreeMediation()
+                || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario();
             }
+        } else if (caseData.getCcdState() == IN_MEDIATION) {
+            return SCENARIO_AAA7_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
         }
-
         return null;
     }
 
@@ -104,4 +139,24 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
+    private RespondToClaim getRespondToClaim(CaseData caseData) {
+        RespondToClaim respondToClaim = null;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            respondToClaim = caseData.getRespondToClaim();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            respondToClaim = caseData.getRespondToAdmittedClaim();
+        }
+
+        return respondToClaim;
+    }
+
+    private boolean getGoToHearingScenarioClaimantRejectsMediation(CaseData caseData) {
+        Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
+        return caseDataLip.filter(caseDataLiP -> caseData.isRespondentResponseFullDefence()
+            && (isNull(caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip())
+            || (caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip()
+            .getHasAgreedFreeMediation().equals(MediationDecision.No)))).isPresent();
+    }
+
 }

@@ -35,7 +35,6 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Bas
             .ccdCaseReference(1234L)
             .build();
 
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

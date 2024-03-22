@@ -2,7 +2,9 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimIssue.Response.Await', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.Response.Await":["respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "respondent1PartyName"]}');
+VALUES ('Scenario.AAA7.ClaimIssue.Response.Await',
+        '{"Notice.AAA7.ClaimIssue.ClaimFee.Required", "Notice.AAA7.ClaimIssue.HWF.Requested", "Notice.AAA7.ClaimIssue.HWF.InvalidRef", "Notice.AAA7.ClaimIssue.HWF.InfoRequired", "Notice.AAA7.ClaimIssue.HWF.Updated", "Notice.AAA7.ClaimIssue.HWF.PartRemission", "Notice.AAA7.ClaimIssue.HWF.Rejected", "Notice.AAA7.ClaimIssue.HWF.PhonePayment", "Notice.AAA7.ClaimIssue.HWF.FullRemission"}',
+        '{"Notice.AAA7.ClaimIssue.Response.Await":["respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "respondent1PartyName"]}');
 
 /**
  * Add notification template
@@ -10,8 +12,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.Response.Await', '{"Notice.AAA7.ClaimIssue.Cla
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.Response.Await', 'Wait for defendant to respond', 'Wait for defendant to respond',
-        '${respondent1PartyName} has until ${respondent1ResponseDeadlineEn} to respond. They can request an extra 28 days if they need it.',
-        '${respondent1PartyName} has until ${respondent1ResponseDeadlineCy} to respond. They can request an extra 28 days if they need it.',
+        '<p class="govuk-body">${respondent1PartyName} has until ${respondent1ResponseDeadlineEn} to respond. They can request an extra 28 days if they need it.</p>',
+        '<p class="govuk-body">${respondent1PartyName} has until ${respondent1ResponseDeadlineCy} to respond. They can request an extra 28 days if they need it.</p>',
         'CLAIMANT');
 
 /**
