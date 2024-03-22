@@ -33,6 +33,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
         handler = new FullRemissionHWFCallbackHandler(mapper, hwfForTabService);
     }
 
