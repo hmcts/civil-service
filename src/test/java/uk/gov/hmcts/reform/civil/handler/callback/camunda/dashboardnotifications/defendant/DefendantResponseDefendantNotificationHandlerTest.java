@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -128,6 +129,76 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDate() {
+        //given
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(1234L))
+            .respondent1Represented(YesOrNo.NO)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                               .builder()
+                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
+                                               .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+        //when
+        handler.handle(callbackParams);
+        //then
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotificationsForDefendantResponseForFullAdmitBySetDate() {
+        //given
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(1234L))
+            .respondent1Represented(YesOrNo.NO)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                               .builder()
+                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
+                                               .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+        //when
+        handler.handle(callbackParams);
+        //then
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
