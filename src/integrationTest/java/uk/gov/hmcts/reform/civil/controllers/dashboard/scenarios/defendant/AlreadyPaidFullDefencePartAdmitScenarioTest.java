@@ -30,7 +30,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
     @Test
     void should_create_part_admit_already_paid_scenario() throws Exception {
 
-        String caseId = "13163";
+        String caseId = "131631";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -72,7 +72,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
     @Test
     void should_create_full_defence_already_paid_scenario() throws Exception {
 
-        String caseId = "13163";
+        String caseId = "131632";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
