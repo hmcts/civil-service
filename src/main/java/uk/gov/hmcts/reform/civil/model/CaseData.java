@@ -1456,11 +1456,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
             respondToClaim = getRespondToAdmittedClaim();
         }
-        boolean test = Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
+        return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
-        System.out.println(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()));
-        System.out.println(totalClaimAmount);
-        System.out.println("compare " + test);
-        return test;
     }
 }
