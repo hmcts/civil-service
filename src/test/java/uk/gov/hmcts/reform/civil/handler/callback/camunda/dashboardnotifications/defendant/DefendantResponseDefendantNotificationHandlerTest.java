@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.math.BigDecimal;
@@ -49,7 +51,15 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationDefendantResponse";
+
+    @BeforeEach
+    void setup() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
