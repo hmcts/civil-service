@@ -337,8 +337,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @CsvSource({
-                "AAA7-DIS",
-                "AAA7-DRH"
+            "AAA7-DIS",
+            "AAA7-DRH"
         })
         void shouldNotCalculateFee_whenHearingTypeIs(String hearingType) {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()

@@ -60,8 +60,8 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AAA7-DIS",
-            "AAA7-DRH"
+        "AAA7-DIS",
+        "AAA7-DRH"
     })
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmit(String hearingType) {
         when(camundaService.getProcessVariables(any()))
