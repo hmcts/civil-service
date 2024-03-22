@@ -63,7 +63,7 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                     "<p class=\"govuk-body\">You’ve offered to pay £1000 by " +
                         DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
                         "The court will contact you when they respond.</p> " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>."
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>"
                 )
             );
 
@@ -115,7 +115,7 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                     "<p class=\"govuk-body\">You’ve offered to pay £1000 by " +
                         DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
                         "The court will contact you when they respond.</p> " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>."
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>"
                 )
             );
 
