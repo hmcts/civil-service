@@ -146,6 +146,17 @@ public class NotificationUtils {
             && YES.equals(caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
+    public static String getDefendantNameBasedOnCaseType(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            return getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
+    }
+
     public static String getRespondentLegalOrganizationName(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
         String id = organisationPolicy.getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
@@ -155,6 +166,13 @@ public class NotificationUtils {
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
+    }
+
+    public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
     public static String getDefendantName(CaseData caseData) {
