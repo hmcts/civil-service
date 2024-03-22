@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -152,6 +153,34 @@ class CoreCaseDataServiceTest {
                 eq(CASE_ID),
                 anyBoolean(),
                 any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldSetEventSummaryAndDescription_WhenCalled() {
+            service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID), Map.of(), "Summary", "Desc");
+
+            verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
+                                                            JURISDICTION, CASE_TYPE, CASE_ID, EVENT_ID
+            );
+
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                eq(CaseDataContent.builder()
+                       .data(caseDetails.getData())
+                       .event(Event.builder()
+                                  .id(EVENT_ID)
+                                  .summary("Summary")
+                                  .description("Desc")
+                                  .build())
+                       .eventToken(EVENT_TOKEN)
+                       .build())
             );
         }
 

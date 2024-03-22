@@ -54,6 +54,16 @@ public class CoreCaseDataService {
         submitUpdate(caseId.toString(), caseDataContentFromStartEventResponse(startEventResponse, contentModified));
     }
 
+    public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified,
+                             String eventSummary, String eventDescription) {
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, contentModified);
+        caseDataContent.getEvent().setSummary(eventSummary);
+        caseDataContent.getEvent().setDescription(eventDescription);
+
+        submitUpdate(caseId.toString(), caseDataContent);
+    }
+
     public StartEventResponse startUpdate(String caseId, CaseEvent eventName) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
