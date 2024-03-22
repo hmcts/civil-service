@@ -22,7 +22,7 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
     @Test
     void should_create_claimant_settled_claim_scenario() throws Exception {
 
-        String caseId = "55551111";
+        String caseId = "55551122";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
