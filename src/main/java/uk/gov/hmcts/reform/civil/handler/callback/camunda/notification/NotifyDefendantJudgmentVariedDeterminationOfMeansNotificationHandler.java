@@ -63,7 +63,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
         if (nonNull(recipient)) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                recipient,
                 getTemplate(),
                 callbackParams.getRequest().getEventId()
                         .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
