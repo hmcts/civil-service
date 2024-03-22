@@ -46,7 +46,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final WorkingDayIndicator workingDayIndicator;
     private final DocumentHearingLocationHelper locationHelper;
-    //private final BundleRequestMapper bundleRequestMapper;
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
     @Override
@@ -69,13 +68,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authToken));
-
-//        var a = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
-//                                                                     "final-order-bundle",
-//                                                                     "jurisdiction",
-//                                                                     caseData.getCcdCaseReference().toString(),
-//                                                                     Long.valueOf(11111));
-//        System.out.println("bundleleeee" +a);
 
         caseDataBuilder
             .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
