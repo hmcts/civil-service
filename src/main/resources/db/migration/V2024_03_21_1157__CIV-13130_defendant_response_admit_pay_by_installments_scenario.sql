@@ -1,3 +1,6 @@
+/**
+ * Add scenario
+ */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant',
         '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant"}', '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant":["defendantAdmittedAmount", "installmentAmount", "installmentTimePeriod", "installmentStartDateEn", "installmentStartDateCy"]}');
@@ -11,3 +14,14 @@ VALUES ('Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant', 'Re
         '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in installments of ${installmentAmount} ${installmentTimePeriod} starting ${installmentStartDateEn}.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}"  rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
         '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in installments of ${installmentAmount} ${installmentTimePeriod} starting ${installmentStartDateCy}.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}"  rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
+
+/**
+ * Add task list items
+ */
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role,task_order)
+values
+       ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
+        'The response',
+        '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
+        'The response', 'Response.View', 'Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant', '{3, 3}', 'CLAIMANT', 3)
