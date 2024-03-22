@@ -41,7 +41,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT("Scenario.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"),
     SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT("Scenario.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant"),
     SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant"),
-    SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission");
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant");
 
     private final String scenario;
 

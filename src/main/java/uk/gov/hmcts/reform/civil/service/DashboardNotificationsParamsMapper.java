@@ -26,11 +26,27 @@ public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
 
+        /**
+         * defendantAdmittedAmount <amount> the amount the defendant admitted to owing (inputted during defendant response). For this scenario, it will be the full amount. (if amount is not in whole pounds, then display with a decimal place in pounds and pence. If the amount is in whole pounds, then do not display decimal)
+         * <date> the date the defendant inputted when completing during defendant response. (display in following format 'Date Month Year' eg. 22 June 2024) (Qu - 'When did you pay this amount')
+         * "defaultRespondTime" <time> display the time the claimant must submit their intention to proceed by
+         * <deadline> display the deadline date by which claimant must submit their intention to proceed by  (display in following format 'Date Month Year' eg. 22 June 2024)
+
+         howMuchWasPaid
+         whenWasThisAmountPaid
+         */
+
         Map<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
+
+        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+            LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
+            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
+            params.put("applicant1ResponseDeadlineCy", DateUtils.formatDate(applicant1ResponseDeadline));
+        }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
