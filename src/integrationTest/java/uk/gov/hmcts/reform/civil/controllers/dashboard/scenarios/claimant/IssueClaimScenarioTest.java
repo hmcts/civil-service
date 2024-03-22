@@ -48,7 +48,8 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
                 jsonPath("$[0].descriptionEn").value(
-                    defendantName + " has until " + responseDeadline + " to respond. They can request an extra 28 days if they need it.")
+                    "<p class=\"govuk-body\">" + defendantName + " has until "
+                        + responseDeadline + " to respond. They can request an extra 28 days if they need it.</p>")
             );
 
         //Verify task Item is created
