@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -27,13 +27,13 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Service
 @RequiredArgsConstructor
-public class ClaimSetAsideJudgementDefendantNotificationHandler extends CallbackHandler
+public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_DEFENDANT);
-    public static final String TASK_ID = "NotifyDefendantSetAsideJudgement";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT);
+    public static final String TASK_ID = "NotifyDefendantSetAsideJudgment";
     private static final String REFERENCE_TEMPLATE =
-        "set-aside-judgement-defendant-notification-%s";
+        "set-aside-judgment-defendant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -43,7 +43,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimSetAsideJudgementToDefendant
+            this::notifyClaimSetAsideJudgmentToDefendant
         );
     }
 
@@ -57,7 +57,17 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimSetAsideJudgementToDefendant(CallbackParams callbackParams) {
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
+            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
+            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
+        );
+    }
+
+    private CallbackResponse notifyClaimSetAsideJudgmentToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
@@ -81,17 +91,7 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
-            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
-            REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
-        );
-    }
-
-    public Map<String, String> addPropertiesDef2(final CaseData caseData) {
+    private Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
@@ -100,9 +100,8 @@ public class ClaimSetAsideJudgementDefendantNotificationHandler extends Callback
         );
     }
 
-    //TODO: Change to notifySetAsideJudgementTemplate property in civil-commons
     private String getTemplate() {
-        return notificationsProperties.getNotifySetAsideJudgementTemplate();
+        return notificationsProperties.getNotifySetAsideJudgmentTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
