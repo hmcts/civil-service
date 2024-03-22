@@ -295,8 +295,8 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AAA7-DIS",
-            "AAA7-DRH"
+        "AAA7-DIS",
+        "AAA7-DRH"
     })
     void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType) {
 

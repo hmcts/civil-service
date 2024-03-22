@@ -185,9 +185,9 @@ public class HearingUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "AAA7-DIS,false",
-            "AAA7-DRH,false",
-            "AAA7-TRI,true"
+        "AAA7-DIS,false",
+        "AAA7-DRH,false",
+        "AAA7-TRI,true"
     })
     void shouldReturnCorrectValue_whenHearingTypeIs(String hearingType, boolean expected) {
         boolean hearingFeeRequired = HearingUtils.hearingFeeRequired(hearingType);
