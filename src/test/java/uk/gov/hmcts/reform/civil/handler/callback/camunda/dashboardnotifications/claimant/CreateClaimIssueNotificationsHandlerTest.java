@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -35,12 +36,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 @ExtendWith(MockitoExtension.class)
 public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
+    private CreateClaimIssueNotificationsHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @InjectMocks
-    private CreateClaimIssueNotificationsHandler handler;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -48,6 +51,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
