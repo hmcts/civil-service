@@ -24,7 +24,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("defendantAdmittedAmount", "£100",
+                   .params(Map.of("defendantAdmittedAmount", "100",
                                   "respondent1AdmittedAmountPaymentDeadlineEn", "1 January 2024",
                                   "respondent1AdmittedAmountPaymentDeadlineCy", "1 January 2024"
                    ))
