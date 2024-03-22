@@ -74,12 +74,11 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantResponseForFullDefencePaidPartcialClaimant() {
+    public void configureDashboardNotificationsForDefendantResponseForFullDefencePaidPartialClaimant() {
         //given
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
         String caseId = "12345673";
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
@@ -111,12 +110,11 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartcialClaimant() {
+    public void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartialClaimant() {
         //given
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
         String caseId = "12345674";
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
