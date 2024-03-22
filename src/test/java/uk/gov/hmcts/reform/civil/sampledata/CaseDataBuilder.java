@@ -575,9 +575,6 @@ public class CaseDataBuilder {
 
     private YesOrNo eaCourtLocation;
 
-    private String legalOrgName;
-    private String defendantName;
-
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
@@ -6714,11 +6711,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder hearingHwfDetails(HelpWithFeesDetails details) {
         this.hearingHwfDetails = details;
-        return this;
-    }
-
-    public CaseDataBuilder atStateJudgementVaried_1v2() {
-        atStateClaimDetailsNotified();
         return this;
     }
 
