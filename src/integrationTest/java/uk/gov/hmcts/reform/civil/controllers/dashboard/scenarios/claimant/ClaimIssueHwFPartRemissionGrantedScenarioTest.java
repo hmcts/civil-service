@@ -41,13 +41,13 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
+                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
+                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }

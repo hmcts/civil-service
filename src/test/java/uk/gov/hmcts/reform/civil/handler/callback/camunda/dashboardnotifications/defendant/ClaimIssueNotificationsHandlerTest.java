@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
@@ -39,6 +40,8 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService toggleService;
 
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
 
@@ -68,6 +71,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
         params.put("respondent1ResponseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
