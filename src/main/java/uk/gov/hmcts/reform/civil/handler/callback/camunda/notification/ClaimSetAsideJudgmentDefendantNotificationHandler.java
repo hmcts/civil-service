@@ -30,9 +30,10 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1,
                                                           NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT2);
-    public static final String TASK_ID = "NotifyDefendantSetAsideJudgment";
     private static final String REFERENCE_TEMPLATE =
         "set-aside-judgment-defendant-notification-%s";
+    public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantSetAsideJudgment1";
+    public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantSetAsideJudgment2";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -48,7 +49,12 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1.equals(caseEvent)) {
+            return TASK_ID_RESPONDENT1;
+        } else {
+            return TASK_ID_RESPONDENT2;
+        }
     }
 
     @Override
