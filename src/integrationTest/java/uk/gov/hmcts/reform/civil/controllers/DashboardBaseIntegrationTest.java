@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @Testcontainers
 @RunWith(SpringRunner.class)
 @EnableFeignClients(defaultConfiguration = DashboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     public static class MockMvcFeignConfiguration {
