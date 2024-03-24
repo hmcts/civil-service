@@ -13,7 +13,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA7.ClaimIssue.HWF.PartRemission',
         'Your help with fees application has been reviewed',
         'Your help with fees application has been reviewed',
-        '<p class="govuk-body">You''ll get help with the claim fee. You''ll receive ${claimIssueRemissionAmount} towards it.<br> You must still pay the remaining fee of ${claimIssueOutStandingAmount}.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
-        '<p class="govuk-body">You''ll get help with the claim fee. You''ll receive ${claimIssueRemissionAmount} towards it.<br> You must still pay the remaining fee of ${claimIssueOutStandingAmount}.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">You''ll get help with the claim fee. You''ll receive ${claimIssueRemissionAmount} towards it.<br>You must still pay the remaining fee of ${claimIssueOutStandingAmount}. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">You''ll get help with the claim fee. You''ll receive ${claimIssueRemissionAmount} towards it.<br>You must still pay the remaining fee of ${claimIssueOutStandingAmount}. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
         'CLAIMANT');
 
