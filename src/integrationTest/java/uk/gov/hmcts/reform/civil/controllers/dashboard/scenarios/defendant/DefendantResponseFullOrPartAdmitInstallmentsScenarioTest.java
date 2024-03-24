@@ -27,7 +27,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
     private DefendantResponseDefendantNotificationHandler handler;
 
     @Test
-    void should_create_part_admit_pay_immediately_scenario() throws Exception {
+    void should_create_full_or_part_admit_installments_scenario() throws Exception {
 
         String caseId = "19923451432";
         LocalDate firstPaymentDate = LocalDate.now();
