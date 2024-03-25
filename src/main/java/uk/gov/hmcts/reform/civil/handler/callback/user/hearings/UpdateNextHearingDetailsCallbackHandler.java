@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.hearings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
@@ -71,8 +73,12 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         HearingsResponse hearingsResponse = getHearings(caseId);
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
+        log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
+                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
 
         if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
+            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating next hearing details",
+                     latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
             LocalDateTime nextHearingDate = getNextHearingDate(latestHearing);
             caseDataBuilder.nextHearingDetails(
                     nextHearingDate != null
@@ -84,9 +90,17 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         }
 
         if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
+            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
+                     latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
             caseDataBuilder.nextHearingDetails(null);
         }
 
+        NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
+        log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating nextHearingDetails with"
+                     + " hearingId [{}] and hearingDateTime [{}]",
+                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus(),
+                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingID() : "Null",
+                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingDateTime() : "Null");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
