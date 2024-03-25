@@ -89,6 +89,12 @@ public class DashboardNotificationsParamsMapper {
             return Optional.of(date);
         });
 
+        if(nonNull(caseData.getApplicant1ResponseDeadline())) {
+            String date = DateUtils.formatDate(caseData.getApplicant1ResponseDeadline());
+            params.put("applicant1ResponseDeadlineEn", date);
+            params.put("applicant1ResponseDeadlineCy", date);
+        }
+
         return params;
     }
 
