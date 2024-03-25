@@ -122,7 +122,7 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.7'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
@@ -266,6 +266,9 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runProdApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'aat'
+  }
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
@@ -338,7 +341,7 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.8.5'
+  springSecurity     : '5.8.7'
 ]
 
 ext.libraries = [
@@ -361,7 +364,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.56'
+  implementation 'com.github.hmcts:civil-commons:1.0.65'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -374,7 +377,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
@@ -540,4 +543,29 @@ pact {
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+task loadEnvSecrets() {
+  doLast {
+    new ByteArrayOutputStream().withStream { os ->
+      exec {
+        commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'civil-aat', '-o', 'tsv', '--query', 'value', '--name', 'civil-service-dot-env'
+        standardOutput = os
+      }
+      project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+    }
+  }
+}
+
+bootRun {
+  doFirst() {
+    if (project.file('./.aat-env').exists()) {
+      project.file('./.aat-env').readLines().each() {
+        def index = it.indexOf("=")
+        def key = it.substring(0, index)
+        def value = it.substring(index + 1)
+        environment key, value
+      }
+    }
+  }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -47,8 +49,11 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.time.LocalDate;
@@ -58,6 +63,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -96,6 +102,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
 
+    @MockBean
+    private IdamClient idamClient;
+
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
@@ -115,7 +127,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
-                          .documentFileName("file-name")
+                          .documentFileName("file-name.pdf")
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
@@ -131,6 +143,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .courtName("Court Name Ccmc").region("Region").regionId("4").courtVenueId("000")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
+
+    @BeforeEach
+    void setUp() {
+        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                    .forename("Judge")
+                                                                    .surname("Judy")
+                                                                    .roles(Collections.emptyList()).build());
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -206,6 +226,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
             // Given
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(7));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -227,6 +248,18 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldPopulateFields_whenIsCalledAfterSdo() {
             // Given
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
+                .thenReturn(LocalDate.now())//singleDateSelection.singleDate
+                .thenReturn(LocalDate.now().plusDays(7))//datesToAvoidDateDropdown
+                .thenReturn(LocalDate.now().plusDays(7))//ownInitiativeDate
+                .thenReturn(LocalDate.now().plusDays(7))//withOutNoticeDate
+                .thenReturn(LocalDate.now().plusDays(14))//assistedOrderCostsFirstDropdownDate
+                .thenReturn(LocalDate.now().plusDays(14))//assistedOrderAssessmentThirdDropdownDate
+                .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownA
+                .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownB
+                .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownA and refused
+                .thenReturn(LocalDate.now().plusDays(21)); //appealChoiceSecondDropdownB and refused
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -242,9 +275,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
-                .extracting("ownInitiativeText")
-                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("finalOrderDateHeardComplex")
+                .extracting("singleDateSelection")
+                .extracting("singleDate")
+                .isEqualTo(LocalDate.now().toString());
             assertThat(response.getData()).extracting("finalOrderRepresentation")
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationClaimantOneDynamic")
@@ -257,6 +291,15 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("typeRepresentationComplex")
                 .extracting("typeRepresentationDefendantTwoDynamic")
                 .isEqualTo("Mr. John Rambo");
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("hearingLocationList").asString().contains("SiteName after Sdo");
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("datesToAvoidDateDropdown")
+                .extracting("datesToAvoidDates")
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeText")
+                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeDate")
                 .isEqualTo(LocalDate.now().plusDays(7).toString());
@@ -287,30 +330,28 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("assistedOrderAssessmentSecondDropdownList2")
                 .isEqualTo("NO");
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
-                .extracting("hearingLocationList").asString().contains("SiteName after Sdo");
         }
 
         @Test
@@ -796,9 +837,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("finalOrders");
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
         }
 
         @Test

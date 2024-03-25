@@ -30,11 +30,11 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             SealedClaimLipResponseForm.toTemplate(caseData);
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
                 SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
-                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
+                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
                     .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
                     .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
                     .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
@@ -50,15 +50,13 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private List<Element<UnavailableDate>> getDefendant1FromDateUnavailableList(CaseData caseData) {
         List<Element<UnavailableDate>> datesUnavailableList = null;
         if (caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
-            .getHasUnavailabilityNextThreeMonths() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getHasUnavailabilityNextThreeMonths() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm()
             .getHasUnavailabilityNextThreeMonths().equals(YesOrNo.YES)) {
 
-            datesUnavailableList = caseData.getCaseDataLiP().getRespondent1LiPResponse()
-                .getRespondent1MediationLiPResponse().getUnavailableDatesForMediation();
+            datesUnavailableList = caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm()
+                .getUnavailableDatesForMediation();
 
         }
         return datesUnavailableList;
@@ -66,19 +64,19 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private boolean checkDefendant1MediationHasUnavailabilityDates(CaseData caseData) {
         return caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse().getHasUnavailabilityNextThreeMonths().equals(
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getHasUnavailabilityNextThreeMonths() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getHasUnavailabilityNextThreeMonths().equals(
             YesOrNo.YES);
     }
 
     private String getDefendant1MediationEmail(CaseData caseData) {
         String mediationEmail = caseData.getRespondent1().getPartyEmail();
         if (caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse().getIsMediationEmailCorrect().equals(YesOrNo.NO)) {
-            mediationEmail = caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse().getAlternativeMediationEmail();
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getIsMediationEmailCorrect() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getIsMediationEmailCorrect().equals(YesOrNo.NO)) {
+            mediationEmail = caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getAlternativeMediationEmail();
         }
         return mediationEmail;
     }
@@ -86,10 +84,10 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private String getDefendant1MediationContactNumber(CaseData caseData) {
         String mediationContactNumber = caseData.getRespondent1().getPartyPhone();
         if (caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse().getIsMediationPhoneCorrect().equals(YesOrNo.NO)) {
-            mediationContactNumber = caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse().getAlternativeMediationTelephone();
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getIsMediationPhoneCorrect() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getIsMediationPhoneCorrect().equals(YesOrNo.NO)) {
+            mediationContactNumber = caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getAlternativeMediationTelephone();
         }
         return mediationContactNumber;
     }
@@ -98,14 +96,12 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
         String mediationContactName = caseData.getRespondent1().getPartyName();
         if (caseData.getCaseDataLiP() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
-            .getIsMediationContactNameCorrect() != null
-            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm().getIsMediationContactNameCorrect() != null
+            && caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm()
             .getIsMediationContactNameCorrect().equals(YesOrNo.NO)) {
-            mediationContactName = caseData.getCaseDataLiP().getRespondent1LiPResponse()
-                    .getRespondent1MediationLiPResponse().getAlternativeMediationContactPerson();
+            mediationContactName = caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm()
+                    .getAlternativeMediationContactPerson();
         }
 
         return mediationContactName;

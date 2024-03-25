@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -241,7 +242,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            + caseData.getTotalInterest().doubleValue();
+            +  Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
@@ -280,8 +281,15 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : BigDecimal.ZERO;
+        var claimWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
+        var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
+        BigDecimal claimFeePounds;
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            claimFeePounds = caseData.getOutstandingFeeInPounds();
+        } else {
+            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        }
         BigDecimal fixedCost = calculateFixedCosts(caseData);
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,

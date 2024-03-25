@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -80,8 +81,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isCarmApplicableLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
@@ -401,6 +404,87 @@ class FlowPredicateTest {
 
             assertTrue(claimDetailsNotified.test(caseData));
             assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
+        }
+    }
+
+    @Nested
+    class CarmApplicable {
+
+        @Test
+        void shouldReturnTrue_whenCarmApplicableDefendantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertTrue(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotApplicableDefendantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmApplicableDefendantLipFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(FAST_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCarmApplicableClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertTrue(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotApplicableClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2000, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmApplicableClaimantLipUnspecCase() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
+                .build();
+
+            assertFalse(isCarmApplicableLipCase.test(caseData));
         }
     }
 
@@ -1586,6 +1670,15 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnTrue_whenLipClaimantDoesNotSettle() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateLipClaimantDoesNotSettle()
+                .setClaimTypeToSpecClaim()
+                .build();
+            assertTrue(lipFullDefenceProceed.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateFullDefence1v1AndApplicantNotProceed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -2002,6 +2095,14 @@ class FlowPredicateTest {
         @Test
         void shouldReturnFalse_whenCaseDataIsAtStateApplicantRespondToDefenceAndProceed() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            assertFalse(applicantOutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataPastApplicantResponseDeadlineButHasApplicantResponseDate() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline()
+                .applicant1ResponseDate(LocalDateTime.now().minusDays(1))
+                .build();
             assertFalse(applicantOutOfTime.test(caseData));
         }
     }
