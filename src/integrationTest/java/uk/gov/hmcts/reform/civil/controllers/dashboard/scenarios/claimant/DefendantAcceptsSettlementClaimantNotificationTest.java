@@ -42,11 +42,11 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends BaseInte
             jsonPath("$[0].titleEn").value(
                 "Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{VIEW_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's settled</a></p>"),
+                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's settled</a></p>"),
             jsonPath("$[0].titleCy").value(
                 "Settlement agreement"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{VIEW_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's settled</a></p>")
+                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's settled</a></p>")
 
         );
     }
