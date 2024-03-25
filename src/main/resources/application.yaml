@@ -135,7 +135,10 @@ payments:
 idam:
   s2s-auth:
     microservice: civil_service
-
+    totp_secret: ${CIVIL_CLIENT_TOTP_SECRET}
+  client:
+    id: civil
+    secret: ${CIVIL_CLIENT_SECRET}
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
@@ -499,11 +502,11 @@ idam:
     url: http://localhost:5000
   s2s-auth:
     url: http://localhost:4502
-    totp_secret: ${CIVIL_CLIENT_TOTP_SECRET:AABBCCDDEEFFGGHH}
+    totp_secret: AABBCCDDEEFFGGHH
   client:
     id: civil
     redirect_uri: https://localhost:9000/oauth2/callback
-    secret: ${CIVIL_CLIENT_SECRET:AAAAAAAAA}
+    secret: OOOOOOOOOOOOOOOO
 
 document_management:
   url: http://localhost:3453
