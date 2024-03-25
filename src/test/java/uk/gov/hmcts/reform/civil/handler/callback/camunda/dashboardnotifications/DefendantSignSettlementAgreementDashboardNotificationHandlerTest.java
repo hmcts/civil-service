@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -37,6 +38,9 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
 
     @Mock
     private DashboardApiClient dashboardApiClient;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -65,6 +69,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -95,6 +100,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(

@@ -8,8 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DefendantSignSettlementAgreementDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-
-import java.util.UUID;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,14 +20,16 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Das
 
     @Test
     void should_create_scenario_for_defendant_accept_defendant_plan_settlement_agreement() throws Exception {
-        UUID caseId = UUID.randomUUID();
-        CaseData caseData = CaseData.builder()
+
+        String caseId = "1234899102";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+            .toBuilder()
             .caseDataLiP(
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
                 ).build()
             )
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(Long.valueOf(caseId))
             .build();
 
         handler.handle(callbackParams(caseData));
