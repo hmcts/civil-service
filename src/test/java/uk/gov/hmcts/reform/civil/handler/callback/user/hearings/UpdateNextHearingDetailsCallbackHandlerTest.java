@@ -34,7 +34,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
     private ObjectMapper mapper;
 
     @Nested
-    class AboutToSubmit {
+    class AboutToStart {
 
         @Nested
         class UpdateNextHearingDetails {
@@ -80,6 +80,22 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                     .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
+        }
+
+        @Test
+        void shouldSetNextHearingDetails() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            NextHearingDetails expected = NextHearingDetails.builder()
+                .hearingID("HER12345")
+                .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
+            assertEquals(expected, updatedData.getNextHearingDetails());
         }
     }
 }
