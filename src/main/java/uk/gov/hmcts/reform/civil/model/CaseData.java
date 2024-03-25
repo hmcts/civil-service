@@ -1449,6 +1449,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public LocalDate getApplicant1ClaimSettleDate() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1ClaimSettledDate).orElse(null);
+    }
+
+    @JsonIgnore
     public boolean isPaidLessThanClaimAmount() {
         RespondToClaim respondToClaim = null;
         if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
