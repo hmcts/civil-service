@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.civil.handler.ReviewHearingExceptionHandler;
+import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
@@ -58,7 +58,7 @@ public class ServiceBusConfiguration {
     private int threadCount;
 
     private final ObjectMapper objectMapper;
-    private final ReviewHearingExceptionHandler handler;
+    private final HmcMessageHandler handler;
     private final FeatureToggleService featureToggleService;
 
     @Bean
@@ -91,8 +91,7 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        boolean exceptionEventTriggered = false;
-                        log.info("message received");
+                        log.info("HMC Message Received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
                         HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
@@ -103,11 +102,14 @@ public class ServiceBusConfiguration {
                                 ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
                                         .orElse("-")
                         );
-                        exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
-                        if (exceptionEventTriggered) {
+
+                        try {
+                            handler.handleMessage(hmcMessage);
                             return receiveClient.completeAsync(message.getLockToken());
+                        } catch (Exception e) {
+                            log.error("These was a problem processing the message: {}", e.getMessage());
+                            return receiveClient.abandonAsync(message.getLockToken());
                         }
-                        return receiveClient.abandonAsync(message.getLockToken());
                     }
 
                     @Override
