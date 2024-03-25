@@ -37,9 +37,9 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends BaseIntegrationTest {
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn").value("Your help with fees application has been updated"),
                         jsonPath("$[0].descriptionEn")
-                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."),
+                                .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"),
                         jsonPath("$[0].titleCy").value("Your help with fees application has been updated"),
                         jsonPath("$[0].descriptionCy")
-                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."));
+                                .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"));
     }
 }

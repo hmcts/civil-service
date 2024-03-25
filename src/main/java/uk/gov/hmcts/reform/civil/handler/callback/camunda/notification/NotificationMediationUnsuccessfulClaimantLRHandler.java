@@ -20,11 +20,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NOT_ASSIGNED;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_TWO;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
@@ -101,7 +98,11 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
 
     private void sendEmail(final CaseData caseData) {
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            sendMailAccordingToReason(caseData);
+            if (NO.equals(caseData.getApplicant1Represented())) {
+                sendMailUnrepresentedClaimant(caseData);
+            } else {
+                sendMailAccordingToReason(caseData);
+            }
         } else {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
@@ -110,19 +111,13 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR, caseData.getLegacyCaseReference())
             );
         }
-
     }
 
     private void sendMailAccordingToReason(CaseData caseData) {
-        if (findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE))) {
+        if (findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_CLAIMANT_TWO))) {
             sendMailRepresentedClaimantNoAttendance(caseData);
-        } else if (findMediationUnsuccessfulReason(caseData, List.of(
-            PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED, NOT_CONTACTABLE_DEFENDANT_ONE))) {
-            if (NO.equals(caseData.getApplicant1Represented())) {
-                sendMailUnrepresentedClaimant(caseData);
-            } else {
-                sendMailRepresentedClaimant(caseData);
-            }
+        } else {
+            sendMailRepresentedClaimant(caseData);
         }
     }
 
