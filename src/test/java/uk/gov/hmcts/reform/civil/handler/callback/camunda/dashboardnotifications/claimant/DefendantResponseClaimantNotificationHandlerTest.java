@@ -34,6 +34,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     @Mock
     private DashboardApiClient dashboardApiClient;
+
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
