@@ -1451,4 +1451,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && (claimIssueFeePaymentDoneWithHWF()
             || getChangeOfRepresentation() != null));
     }
+
+    @JsonIgnore
+    public LocalDate getApplicant1ClaimSettleDate() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1ClaimSettledDate).orElse(null);
+    }
+
 }
