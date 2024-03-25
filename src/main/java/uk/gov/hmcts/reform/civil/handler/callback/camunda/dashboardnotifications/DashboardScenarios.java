@@ -42,7 +42,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT("Scenario.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT(
         "Scenario.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant"),
-    SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT("Scenario.AAA7.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"),
     SCENARIO_AAA7_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_MEDIATION_DEFENDANT("Scenario.AAA7.ClaimantIntent.Mediation.Defendant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission"),
