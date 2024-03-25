@@ -69,73 +69,81 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
             .isEqualTo(TASK_ID);
     }
 
-    @Test
-    public void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
-        //given
-        Map<String, Object> params = new HashMap<>();
+    @Nested
+    class AboutToSubmitCallback {
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        @Test
+        public void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
+            //given
+            Map<String, Object> params = new HashMap<>();
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
-            .respondent1Represented(YesOrNo.NO)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-            .build();
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-        //when
-        handler.handle(callbackParams);
-        //then
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(Long.valueOf(1234L))
+                .respondent1Represented(YesOrNo.NO)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                                   .builder()
+                                                   .whenWillThisAmountBePaid(admitPaymentDeadline)
+                                                   .build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+                .build();
 
-    @Test
-    public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
-        //given
-        Map<String, Object> params = new HashMap<>();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            //when
+            handler.handle(callbackParams);
+            //then
+            verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        @Test
+        public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
+            //given
+            Map<String, Object> params = new HashMap<>();
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
-            .respondent1Represented(YesOrNo.NO)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-        //when
-        handler.handle(callbackParams);
-        //then
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(Long.valueOf(1234L))
+                .respondent1Represented(YesOrNo.NO)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                                   .builder()
+                                                   .whenWillThisAmountBePaid(admitPaymentDeadline)
+                                                   .build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            //when
+            handler.handle(callbackParams);
+            //then
+            verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA7_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
     }
 }
