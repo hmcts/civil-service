@@ -1015,6 +1015,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPartAdmitPayImmediatelyClaimSpec() {
+        return isPartAdmitClaimSpec() && isPayImmediately();
+    }
+
+    @JsonIgnore
     public boolean isClaimantIntentionSettlePartAdmit() {
         return YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
     }
