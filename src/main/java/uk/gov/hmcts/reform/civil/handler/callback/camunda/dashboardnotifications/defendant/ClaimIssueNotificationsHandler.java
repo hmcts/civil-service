@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
@@ -32,12 +33,13 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
 
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::createDashboardNotifications
-        );
+        return toggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::createDashboardNotifications)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     @Override
@@ -53,7 +55,6 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
     private CallbackResponse createDashboardNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
         Map<String, Object> params = dashboardNotificationsParamsMapper.mapCaseDataToParams(caseData);
 
         dashboardApiClient.recordScenario(
@@ -62,7 +63,6 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
             authToken,
             ScenarioRequestParams.builder().params(params).build()
         );
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
