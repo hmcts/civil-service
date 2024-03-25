@@ -62,7 +62,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " " + frequency.getLabel() + " starting"
+                        + " " + frequency.getDashboardLabel() + " starting "
                         + DateUtils.formatDate(firstPaymentDate)
                         + ".</p>"
                         + " <a href=\"{VIEW_AND_RESPOND}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
