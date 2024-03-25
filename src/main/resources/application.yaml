@@ -503,7 +503,7 @@ idam:
   client:
     id: civil
     redirect_uri: https://localhost:9000/oauth2/callback
-    secret: OOOOOOOOOOOOOOOO
+    secret: ${CIVIL_CLIENT_SECRET:AAAAAAAAA}
 
 document_management:
   url: http://localhost:3453
