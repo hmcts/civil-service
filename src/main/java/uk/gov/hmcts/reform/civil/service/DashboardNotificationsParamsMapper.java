@@ -35,7 +35,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
-                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+                "£" + this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
             );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
@@ -88,6 +88,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
             return Optional.of(date);
         });
+
+        LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
+        if (nonNull(claimSettleDate)) {
+            params.put("applicant1ClaimSettledDateEn", DateUtils.formatDate(claimSettleDate));
+            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDate(claimSettleDate));
+        }
 
         return params;
     }
