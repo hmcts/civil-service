@@ -63,7 +63,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
-        when(locationHelper.getHearingLocation(any(),any(),any())).thenReturn(locationRefData);
+        when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
         List<LocationRefData> locationRefDataList = new ArrayList<>();
         locationRefDataList.add(locationRefData);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
@@ -108,6 +108,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldNoError_whenDateInFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -141,8 +142,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             // Given
             String confirmationHeader = format(HEADER, 1234567);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .ccdCaseReference(1234567L)
-                .build();
+                .ccdCaseReference(1234567L).build();
             // When
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -153,7 +153,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-        @Test
+    @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(COURT_OFFICER_ORDER);
     }
