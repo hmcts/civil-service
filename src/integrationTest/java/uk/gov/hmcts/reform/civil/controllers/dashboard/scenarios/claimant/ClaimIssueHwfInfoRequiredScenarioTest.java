@@ -35,12 +35,12 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends BaseIntegrationTest {
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Your help with fees application needs more information"),
             jsonPath("$[0].descriptionEn").value(
-                "We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}."),
+                "<p class=\"govuk-body\">We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value("Your help with fees application needs more information"),
             jsonPath("$[0].descriptionCy").value(
-                "We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "<p class=\"govuk-body\">We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }

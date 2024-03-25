@@ -105,7 +105,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
     private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
-        "caseworker-civil-admin");
+        "caseworker-civil-admin", "caseworker-civil-staff");
     private static final List<CaseEvent> EVENTS = List.of(
         MANAGE_CONTACT_INFORMATION
     );
