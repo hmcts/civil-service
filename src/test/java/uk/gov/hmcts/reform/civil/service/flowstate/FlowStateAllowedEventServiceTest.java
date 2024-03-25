@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
@@ -75,7 +77,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -338,7 +339,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -367,7 +369,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -396,7 +399,9 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER
+
                     }
                 ),
                 of(
@@ -434,7 +439,8 @@ class FlowStateAllowedEventServiceTest {
                         MOVE_TO_DECISION_OUTCOME,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
-                        BUNDLE_CREATION_NOTIFICATION
+                        BUNDLE_CREATION_NOTIFICATION,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -613,7 +619,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIMANT_RESPONSE_CUI,
                         REQUEST_FOR_RECONSIDERATION,
                         DECISION_ON_RECONSIDERATION_REQUEST,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -823,7 +830,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
                         TRANSFER_ONLINE_CASE,
-                        INVALID_HWF_REFERENCE
+                        INVALID_HWF_REFERENCE,
+                        COURT_OFFICER_ORDER
                     }
                 )
             );
