@@ -1,4 +1,3 @@
-    private DashboardApiClient dashboardApiClient;
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Test;
