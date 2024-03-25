@@ -17,7 +17,6 @@ public class OrganisationDetailsService {
         Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getApplicantOrganisationId());
         System.out.println(organisation);
         System.out.println(organisation.map(Organisation::getName).orElse("somehow this is very broken"));
-        System.out.println(organisation.get().getName());
         return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
