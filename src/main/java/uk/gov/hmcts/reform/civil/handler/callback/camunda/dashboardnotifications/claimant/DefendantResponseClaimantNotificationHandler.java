@@ -49,6 +49,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
+
         if (caseData.getRespondent1().isCompanyOROrganisation()
                 && caseData.isPayBySetDate()) {
             return SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
