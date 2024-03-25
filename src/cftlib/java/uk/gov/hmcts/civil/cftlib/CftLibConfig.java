@@ -57,7 +57,7 @@ public class CftLibConfig implements CFTLibConfigurer {
 
         for (var entry : users.entrySet()) {
             lib.createIdamUser(entry.getKey(), entry.getValue().toArray(new String[0]));
-            lib.createProfile(entry.getKey(), "DIVORCE", "NO_FAULT_DIVORCE", "Submitted");
+            lib.createProfile(entry.getKey(), "CIVIL", "CIVIL", "Submitted");
         }
 
         lib.createRoles(
