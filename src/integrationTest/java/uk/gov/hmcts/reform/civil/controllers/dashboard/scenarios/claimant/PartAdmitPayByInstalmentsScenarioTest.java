@@ -65,7 +65,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         + " " + frequency.getDashboardLabel() + " starting "
                         + DateUtils.formatDate(firstPaymentDate)
                         + ".</p>"
-                        + " <a href=\"{VIEW_AND_RESPOND}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
+                        + "<p class=\"govuk-body\"><a href=\"{VIEW_AND_RESPOND}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
                         + " respond</a></p>"
                 )
             );
