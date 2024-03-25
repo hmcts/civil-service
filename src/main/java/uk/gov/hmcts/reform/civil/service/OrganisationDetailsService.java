@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -7,6 +8,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrganisationDetailsService {
@@ -15,6 +17,8 @@ public class OrganisationDetailsService {
 
     public String getApplicantLegalOrganisationName(CaseData caseData) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getApplicantOrganisationId());
+        log.info("-----------show org-------------", organisation);
+        log.info("-----------show org name-------------", organisation.map(Organisation::getName).orElse("somehow this is very broken"));
         return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
