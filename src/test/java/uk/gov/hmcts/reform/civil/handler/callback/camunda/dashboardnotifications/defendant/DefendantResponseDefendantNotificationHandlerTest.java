@@ -197,7 +197,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         );
     }
   
-  @Test
+    @Test
     public void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDate() {
         //given
         Map<String, Object> params = new HashMap<>();
