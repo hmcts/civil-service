@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 @Service
 @RequiredArgsConstructor
 public class CourtOfficerOrderHandler extends CallbackHandler {
+
     private static final List<CaseEvent> EVENTS = Collections.singletonList(COURT_OFFICER_ORDER);
 
     private final LocationRefDataService locationRefDataService;
