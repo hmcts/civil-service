@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MediationSuccessfulApplicantNotificationHandler extends CallbackHandler implements NotificationData {
@@ -53,16 +51,13 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     }
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
-        log.info("--Entered MediationSuccessfulApplicantNotificationHandler handler--");
         CaseData caseData = callbackParams.getCaseData();
         Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         if (isCarmEnabled) {
-            log.info("--Entered MediationSuccessfulApplicantNotificationHandler it is carm enabled--");
-            String claimId = caseData.getCcdCaseReference().toString();
+            String claimId = caseData.getLegacyCaseReference();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             if (caseData.isLipvLipOneVOne()) {
-                log.info("--Entered MediationSuccessfulApplicantNotificationHandler lip v lip 1v1--");
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getNotifyLipSuccessfulMediation(),
@@ -70,7 +65,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                     referenceTemplate
                 );
             } else if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                log.info("--Entered MediationSuccessfulApplicantNotificationHandler 1v2--");
                 sendEmail(
                     caseData.getApplicantSolicitor1UserDetails().getEmail(),
                     notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),
@@ -79,7 +73,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             } else {
                 // LR scenarios
-                log.info("--Entered MediationSuccessfulApplicantNotificationHandler 1v1/2v1--");
                 sendEmail(
                     caseData.getApplicantSolicitor1UserDetails().getEmail(),
                     notificationsProperties.getNotifyLrClaimantSuccessfulMediation(),
@@ -88,7 +81,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            log.info("--Entered MediationSuccessfulApplicantNotificationHandler non carm--");
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
