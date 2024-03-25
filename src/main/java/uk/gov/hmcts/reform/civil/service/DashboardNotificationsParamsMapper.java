@@ -91,11 +91,12 @@ public class DashboardNotificationsParamsMapper {
         });
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("installmentAmount", "£" + this.removeDoubleZeros(formatAmount(caseData.getRespondent1RepaymentPlan().getPaymentAmount())));
-            params.put("installmentTimePeriod", caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay());
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
+                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
             getFirstRepaymentDate(caseData).map(date -> {
-                params.put("installmentStartDateCy", date);
-                params.put("installmentStartDateEn", date);
+                params.put("firstRepaymentDateEn", date);
+                params.put("firstRepaymentDateCy", date);
                 return Optional.of(date);
             });
         }
