@@ -19,14 +19,34 @@ public class CftLibConfig implements CFTLibConfigurer {
     @Override
     public void configure(CFTLib lib) throws Exception {
         var users = Map.of(
-            "solicitor@example.com", List.of("caseworker","caseworker-civil","caseworker-civil-solicitor","pui-caa","pui-organisation-manager","pui-case-manager","pui-user-manager"),
-            "hmcts.civil+organisation.1.superuser@gmail.com", List.of("caseworker","caseworker-civil","caseworker-civil-solicitor","pui-caa,pui-case-manager","pui-organisation-manager","pui-user-manager"),
-            "hmcts.civil+organisation.1.solicitor.1@gmail.com", List.of("caseworker", "caseworker-divorce", "caseworker-divorce-solicitor"),
-            "TEST_JUDGE@mailinator.com", List.of("caseworker", "caseworker-divorce", "caseworker-divorce-judge"),
-            "dummysystemupdate@test.com", List.of("caseworker", "caseworker-divorce", "caseworker-divorce-systemupdate"),
-            "role.assignment.admin@gmail.com", List.of("caseworker"),
-            "data.store.idam.system.user@gmail.com", List.of("caseworker"),
-            "divorce_as_caseworker_admin@mailinator.com", List.of("caseworker-divorce", "caseworker-divorce-superuser"));
+            "solicitor@example.com",
+            List.of("caseworker",
+                    "caseworker-civil",
+                    "caseworker-civil-solicitor",
+                    "pui-caa",
+                    "pui-organisation-manager",
+                    "pui-case-manager",
+                    "pui-user-manager"),
+            "hmcts.civil+organisation.1.superuser@gmail.com",
+            List.of("caseworker",
+                    "caseworker-civil",
+                    "caseworker-civil-solicitor",
+                    "pui-caa,pui-case-manager",
+                    "pui-organisation-manager",
+                    "pui-user-manager"),
+            "hmcts.civil+organisation.1.solicitor.1@gmail.com",
+            List.of("caseworker", "caseworker-divorce", "caseworker-divorce-solicitor"),
+            "TEST_JUDGE@mailinator.com",
+            List.of("caseworker", "caseworker-divorce", "caseworker-divorce-judge"),
+            "dummysystemupdate@test.com",
+            List.of("caseworker", "caseworker-divorce", "caseworker-divorce-systemupdate"),
+            "role.assignment.admin@gmail.com",
+            List.of("caseworker"),
+            "data.store.idam.system.user@gmail.com",
+            List.of("caseworker"),
+            "divorce_as_caseworker_admin@mailinator.com",
+            List.of("caseworker-divorce", "caseworker-divorce-superuser")
+        );
 
         for (var entry : users.entrySet()) {
             lib.createIdamUser(entry.getKey(), entry.getValue().toArray(new String[0]));
