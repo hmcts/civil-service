@@ -11,8 +11,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'You need to pay your claim fee',
-        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.',
-        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.',
+        '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
+        '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
         'CLAIMANT');
 
 /**

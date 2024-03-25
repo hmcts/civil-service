@@ -69,8 +69,8 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("This claim has not been submitted"),
                 jsonPath("$[0].descriptionEn")
-                    .value("Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" "
-                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.")
+                    .value("<p class=\"govuk-body\">Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" "
+                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.</p>")
             );
     }
 
