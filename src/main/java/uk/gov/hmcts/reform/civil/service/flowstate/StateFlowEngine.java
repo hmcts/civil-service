@@ -21,10 +21,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
@@ -279,6 +282,18 @@ public class StateFlowEngine {
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
                     })
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(nocSubmittedForLiPApplicant)
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), false,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
+                        )))
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )))
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -503,9 +518,15 @@ public class StateFlowEngine {
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()))
+                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim
+                        .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+            })
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
             .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
             .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)

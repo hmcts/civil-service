@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -100,6 +101,8 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirement
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -259,6 +262,7 @@ public class CaseDataBuilder {
     protected String personalInjuryTypeOther;
     protected DynamicList applicantSolicitor1PbaAccounts;
     protected Fee claimFee;
+    protected Fee hearingFee;
     protected StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     protected StatementOfTruth uiStatementOfTruth;
     protected String paymentReference;
@@ -557,11 +561,29 @@ public class CaseDataBuilder {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
-    private YesOrNo eaCourtLocation;
+    private  HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
+    private  HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
+
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
     private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private FeeType hwfFeeType;
+    private HelpWithFeesDetails claimIssuedHwfDetails;
+    private HelpWithFeesDetails hearingHwfDetails;
+
+    private YesOrNo eaCourtLocation;
+
+    public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
+        this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
+        return this;
+    }
+
+    public CaseDataBuilder helpWithFeesMoreInformationHearing(HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing) {
+        this.helpWithFeesMoreInformationHearing = helpWithFeesMoreInformationHearing;
+        return this;
+    }
 
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -4971,6 +4993,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder mediation(Mediation mediation) {
+        this.mediation = mediation;
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -5767,6 +5794,12 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
+    public CaseData buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .confirmReferToJudgeDefenceReceived(List.of(ConfirmationToggle.CONFIRM)).build();
+    }
+
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -5790,30 +5823,30 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
-    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days() {
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 2))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
             .joJudgmentStatusDetails(judgmentStatusDetails).build();
     }
 
-    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days() {
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 1))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
@@ -5884,6 +5917,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimFee(Fee fee) {
         this.claimFee = fee;
+        return this;
+    }
+
+    public CaseDataBuilder hearingFee(Fee fee) {
+        this.hearingFee = fee;
         return this;
     }
 
@@ -6661,6 +6699,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hwfFeeType(FeeType feeType) {
+        hwfFeeType = feeType;
+        return this;
+    }
+
+    public CaseDataBuilder claimIssuedHwfDetails(HelpWithFeesDetails details) {
+        this.claimIssuedHwfDetails = details;
+        return this;
+    }
+
+    public CaseDataBuilder hearingHwfDetails(HelpWithFeesDetails details) {
+        this.hearingHwfDetails = details;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6670,6 +6723,8 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
+            .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)
             .generalAppType(generalAppType)
             .generalAppVaryJudgementType(generalAppVaryJudgementType)
@@ -6686,6 +6741,7 @@ public class CaseDataBuilder {
             .personalInjuryTypeOther(personalInjuryTypeOther)
             .applicantSolicitor1PbaAccounts(applicantSolicitor1PbaAccounts)
             .claimFee(claimFee)
+            .hearingFee(hearingFee)
             .applicant1(applicant1)
             .applicant2(applicant2)
             .applicant1Represented(applicant1Represented)
@@ -6700,7 +6756,6 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .paymentDetails(paymentDetails)
-            .claimFee(claimFee)
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
@@ -6980,6 +7035,9 @@ public class CaseDataBuilder {
             .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
             .res1MediationNonAttendanceDocs(res1MediationNonAttendanceDocs)
             .res1MediationDocumentsReferred(res1MediationDocumentsReferred)
+            .hwfFeeType(hwfFeeType)
+            .claimIssuedHwfDetails(claimIssuedHwfDetails)
+            .hearingHwfDetails(hearingHwfDetails)
             .build();
     }
 }
