@@ -46,6 +46,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIMANT_INTENT_MEDIATION_DEFENDANT("Scenario.AAA7.ClaimantIntent.Mediation.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT("Scenario.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA7.ClaimIssue.HWF.FullRemission"),
+    SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT("Scenario.AAA7.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant"),
     SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant");
 
     private final String scenario;
