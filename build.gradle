@@ -542,7 +542,6 @@ bootWithCCD {
   //AAT or Local (IDAM and S2S Simulators)
   authMode = AuthMode.AAT
 
-  environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-camunda.yml,cftlib-wiremock.yml'
   environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
   environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
   doFirst() {
