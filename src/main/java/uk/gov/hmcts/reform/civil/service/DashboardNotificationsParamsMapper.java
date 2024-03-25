@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -55,16 +56,14 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put(
-                "installmentAmount",
-                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
-                    caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString())
-            );
-            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getLabel());
-            params.put(
-                "firstRepaymentDate",
-                DateUtils.formatDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-            );
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
+                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
+            getFirstRepaymentDate(caseData).map(date -> {
+                params.put("firstRepaymentDateEn", date);
+                params.put("firstRepaymentDateCy", date);
+                return Optional.of(date);
+            });
         }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
@@ -108,6 +107,12 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return params;
+    }
+
+    private Optional<String> getFirstRepaymentDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .map(DateUtils::formatDate);
     }
 
     private Optional<String> getClaimSettledAmount(CaseData caseData) {
