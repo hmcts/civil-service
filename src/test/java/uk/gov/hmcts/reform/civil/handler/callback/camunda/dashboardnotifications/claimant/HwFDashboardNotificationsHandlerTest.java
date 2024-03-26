@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -55,6 +56,8 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @InjectMocks
     private HwFDashboardNotificationsHandler handler;
 
@@ -76,6 +79,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
@@ -114,7 +118,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
-
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             //When
             handler.handle(params);
 

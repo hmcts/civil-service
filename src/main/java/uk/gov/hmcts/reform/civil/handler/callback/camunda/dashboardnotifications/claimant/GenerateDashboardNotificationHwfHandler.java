@@ -30,11 +30,11 @@ public class GenerateDashboardNotificationHwfHandler extends CallbackHandler {
     public static final String TASK_ID = "GenerateDashboardNotificationClaimIssueHwfClaimant1";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService toggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isDashboardServiceEnabled()
+        return featureToggleService.isDashboardServiceEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHelpWithFees)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }

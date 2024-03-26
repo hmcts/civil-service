@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     public static final String TASK_ID = "Claimant1HwFDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
+    private final FeatureToggleService featureToggleService;
     private final Map<CaseEvent, String> dashboardScenarios = Map.of(
         NO_REMISSION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_NO_REMISSION.getScenario(),
         INVALID_HWF_REFERENCE, SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
@@ -51,8 +53,9 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHwfEvents
+        return featureToggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHwfEvents)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
         );
     }
 

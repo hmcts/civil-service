@@ -35,13 +35,10 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
 
     @InjectMocks
     private DefendantSignSettlementAgreementDashboardNotificationHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private FeatureToggleService featureToggleService;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 

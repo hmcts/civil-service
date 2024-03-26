@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.math.BigDecimal;
@@ -39,12 +40,12 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     @InjectMocks
     private DefendantResponseClaimantNotificationHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponse";
 
@@ -70,6 +71,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -108,6 +110,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()

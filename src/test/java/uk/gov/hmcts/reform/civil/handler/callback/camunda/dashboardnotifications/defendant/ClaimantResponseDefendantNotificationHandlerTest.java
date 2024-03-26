@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -52,12 +53,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
     @InjectMocks
     private ClaimantResponseDefendantNotificationHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationClaimantResponse";
 
@@ -83,6 +84,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -113,6 +115,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -144,6 +147,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -174,6 +178,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -210,6 +215,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -243,6 +249,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("reference")
@@ -273,6 +280,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -302,6 +310,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -336,6 +345,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -369,6 +379,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -398,6 +409,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -429,6 +441,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -462,6 +475,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @InjectMocks
     private ClaimantResponseNotificationHandler handler;
 
@@ -62,6 +65,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Given
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             caseData = caseData.toBuilder().ccdState(caseState).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -145,6 +149,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
@@ -173,6 +178,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()

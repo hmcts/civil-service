@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.math.BigDecimal;
@@ -41,12 +42,12 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
     @InjectMocks
     private DefendantResponseDefendantNotificationHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationDefendantResponse";
 
@@ -72,8 +73,9 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -107,8 +109,9 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -142,7 +145,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -172,7 +175,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")

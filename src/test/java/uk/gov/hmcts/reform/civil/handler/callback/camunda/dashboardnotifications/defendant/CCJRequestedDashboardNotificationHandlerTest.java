@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -30,12 +31,12 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
     @InjectMocks
     private CCJRequestedDashboardNotificationDefendantHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForRespondent1";
 
@@ -63,6 +64,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
