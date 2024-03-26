@@ -80,7 +80,7 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimantIntent.ClaimSettledEvent.Claimant",
+                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
