@@ -115,22 +115,17 @@ public class DashboardNotificationServiceTest {
 
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
-                .dashboardNotificationsId(notification.getId())
+                .dashboardNotification(notification)
                 .actionPerformed("Click")
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(any())
                 .build();
 
-            when(notificationActionRepository.save(notificationAction)).thenReturn(notificationAction);
-
             //when
             dashboardNotificationService.recordClick(id, authToken);
 
-            //then
-            DashboardNotificationsEntity updated = notification.toBuilder()
-                .notificationAction(notificationAction).build();
-
-            verify(dashboardNotificationsRepository).save(updated);
+            //verify
+            verify(notificationActionRepository).save(notificationAction);
         }
     }
 }
