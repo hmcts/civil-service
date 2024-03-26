@@ -58,7 +58,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
         }
         if (isFullDefenseMediationRefusedScenario(caseData)) {
             return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
-
+        }
         if (caseData.getRespondent1().isCompanyOROrganisation()
                 && caseData.isPayBySetDate()) {
             return SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
