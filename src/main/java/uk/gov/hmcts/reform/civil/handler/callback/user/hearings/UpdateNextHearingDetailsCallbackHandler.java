@@ -92,7 +92,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
                      latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
-            caseDataBuilder.nextHearingDetails(NextHearingDetails.builder().build());
+            caseDataBuilder.nextHearingDetails(NextHearingDetails.builder().hearingID("").build());
         }
 
         NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
