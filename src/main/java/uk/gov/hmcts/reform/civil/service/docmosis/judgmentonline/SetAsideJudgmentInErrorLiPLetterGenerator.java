@@ -31,7 +31,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     public static final String TASK_ID = "SendSetAsideLiPLetterDef1";
-    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
+    private static final String SET_ASIDE_JUDGMENT_LETTER = "set-aside-judgment-letter";
 
     public byte[] generateAndPrintSetAsideLetter(CaseData caseData, String authorisation) {
         DocmosisDocument setAsideLetter = generate(caseData);
@@ -40,7 +40,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
             new PDF(
                 SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 setAsideLetter.getBytes(),
-                DocumentType.PIP_LETTER
+                DocumentType.SET_ASIDE_JUDGMENT_LETTER
             )
         );
         String documentUrl = setAsideLetterCaseDocument.getDocumentLink().getDocumentUrl();
@@ -56,7 +56,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), FINAL_ORDER_PACK_LETTER_TYPE, recipients);
+                caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients);
         return letterContent;
     }
 

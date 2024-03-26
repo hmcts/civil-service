@@ -9,6 +9,7 @@ import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -31,7 +32,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.PIP_LETTER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER;
 
 @SpringBootTest(classes = {
@@ -50,7 +50,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
     private BulkPrintService bulkPrintService;
     @Autowired
     private SetAsideJudgmentInErrorLiPLetterGenerator setAsideJudgmentInErrorLiPLetterGenerator;
-    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
+    private static final String SET_ASIDE_JUDGMENT_LETTER = "set-aside-judgment-letter";
     public static final String TASK_ID_DEFENDANT = "SendSetAsideLiPLetterDef1";
     private static final String TEST = "test";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
@@ -59,7 +59,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
 
     private static final CaseDocument SET_ASIDE = CaseDocumentBuilder.builder()
         .documentName(null)
-        .documentType(PIP_LETTER)
+        .documentType(DocumentType.SET_ASIDE_JUDGMENT_LETTER)
         .build();
 
     @Test
@@ -89,7 +89,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
                      BEARER_TOKEN,
                      new PDF(SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                              LETTER_CONTENT,
-                             PIP_LETTER
+                             DocumentType.SET_ASIDE_JUDGMENT_LETTER
                      )
                  ))
             .thenReturn(SET_ASIDE);
@@ -107,7 +107,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
                 LETTER_CONTENT,
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
-                FINAL_ORDER_PACK_LETTER_TYPE,
+                SET_ASIDE_JUDGMENT_LETTER,
                 List.of(caseData.getRespondent1().getPartyName())
             );
     }
