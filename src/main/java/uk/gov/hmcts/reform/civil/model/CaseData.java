@@ -759,6 +759,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasRespondent1PaidFullAmount() {
+        return ((getResponseToClaim().getHowMuchWasPaid().divide(new BigDecimal(100)))
+            .compareTo(totalClaimAmount) >= 0);
+    }
+
+    @JsonIgnore
     public boolean isPayBySetDate() {
         return defenceAdmitPartPaymentTimeRouteRequired != null
             && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
