@@ -2,13 +2,11 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantMediationSuccessfulDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -19,9 +17,6 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
 
     @Autowired
     private ClaimantMediationSuccessfulDashboardNotificationHandler handler;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Test
     void should_create_mediation_scenario() throws Exception {
