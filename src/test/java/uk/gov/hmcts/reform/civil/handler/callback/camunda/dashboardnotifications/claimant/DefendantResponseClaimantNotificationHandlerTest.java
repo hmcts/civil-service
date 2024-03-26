@@ -19,14 +19,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -52,8 +46,6 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     @Mock
     private DashboardApiClient dashboardApiClient;
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
     @Mock
@@ -105,7 +97,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     public void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate() {
 
         Map<String, Object> params = new HashMap<>();
-
+        when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
@@ -141,7 +133,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     @Test
     public void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate() {
-
+        when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         Map<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
