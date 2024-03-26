@@ -129,7 +129,6 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference())
                 );
             }
-
         }
     }
 
