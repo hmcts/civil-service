@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
 
 @Service
@@ -35,11 +36,11 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponse";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService toggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isDashboardServiceEnabled()
+        return featureToggleService.isDashboardServiceEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
 
@@ -56,6 +57,10 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
+        if (caseData.isPaidLessThanClaimAmount()) {
+            return SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
+        }
+
         if (caseData.getCcdState() == AWAITING_APPLICANT_INTENTION) {
             if (isPartOrFullAdmitPayByInstallments(caseData)) {
                 return SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
@@ -63,7 +68,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
         }
 
         if (caseData.getRespondent1().isCompanyOROrganisation()
-                && caseData.isPayBySetDate()) {
+            && caseData.isPayBySetDate()) {
             return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
         }
         return null;
@@ -72,9 +77,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     private boolean isPartOrFullAdmitPayByInstallments(CaseData caseData) {
 
         return ((caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_ADMISSION)
-               || caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.PART_ADMISSION))
-               && caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(
-                    RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN));
+            || caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.PART_ADMISSION))
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN));
     }
 
     private CallbackResponse configureScenarioForDefendantResponse(CallbackParams callbackParams) {
