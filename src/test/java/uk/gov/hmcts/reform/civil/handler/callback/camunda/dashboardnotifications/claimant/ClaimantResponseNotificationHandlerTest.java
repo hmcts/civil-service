@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,13 +60,17 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
     @Nested
     class AboutToSubmitCallback {
 
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
+
         @ParameterizedTest
         @MethodSource("provideCaseStateAndScenarioArguments")
         void shouldRecordScenario_whenInvokedInJudicialReferralState(CaseState caseState, DashboardScenarios dashboardScenarios) {
             // Given
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             caseData = caseData.toBuilder().ccdState(caseState).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -149,7 +154,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
@@ -178,7 +182,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()

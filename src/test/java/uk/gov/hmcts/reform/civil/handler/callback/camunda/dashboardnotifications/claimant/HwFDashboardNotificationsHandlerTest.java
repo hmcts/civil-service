@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -63,7 +64,11 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmitCallback {
-
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
+        
         @ParameterizedTest
         @MethodSource("provideHwfEventsForConfigureScenario")
         void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
@@ -79,7 +84,6 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
@@ -118,7 +122,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
             //When
             handler.handle(params);
 
