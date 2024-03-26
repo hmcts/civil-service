@@ -1,4 +1,4 @@
-package uk.gov.hmcts.civil.cftlib;
+package uk.gov.hmcts.reform.civil;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -18,6 +18,33 @@ public class CftLibConfig implements CFTLibConfigurer {
 
     @Override
     public void configure(CFTLib lib) throws Exception {
+        lib.createRoles(
+            "national-business-centre",
+            "nbc-team-leader",
+            "ctsc-team-leader",
+            "ctsc",
+            "task-supervisor",
+            "cwd-user",
+            "civil-national-business-centre",
+            "ccd-import",
+            "caseworker",
+            "caseworker-civil",
+            "caseworker-caa",
+            "caseworker-approver",
+            "prd-aac-system",
+            "caseworker-civil-solicitor",
+            "caseworker-civil-admin",
+            "caseworker-civil-staff",
+            "caseworker-civil-judge",
+            "pui-case-manager",
+            "pui-finance-manager",
+            "pui-organisation-manager",
+            "pui-user-manager",
+            "pui-caa",
+            "prd-admin",
+            "payments"
+        );
+
         var users = Map.of(
             "solicitor@example.com",
             List.of("caseworker",
@@ -57,40 +84,7 @@ public class CftLibConfig implements CFTLibConfigurer {
 
         for (var entry : users.entrySet()) {
             lib.createIdamUser(entry.getKey(), entry.getValue().toArray(new String[0]));
-            lib.createProfile(entry.getKey(), "CIVIL", "CIVIL", "Submitted");
         }
-
-        lib.createRoles(
-            "national-business-centre",
-            "nbc-team-leader",
-            "ctsc-team-leader",
-            "ctsc",
-            "task-supervisor",
-            "cwd-user",
-            "civil-national-business-centre",
-            "ccd-import",
-            "caseworker",
-            "caseworker-civil",
-            "caseworker-caa",
-            "caseworker-approver",
-            "prd-aac-system",
-            "caseworker-civil-solicitor",
-            "caseworker-civil-admin",
-            "caseworker-civil-staff",
-            "caseworker-civil-judge",
-            "pui-case-manager",
-            "pui-finance-manager",
-            "pui-organisation-manager",
-            "pui-user-manager",
-            "pui-caa",
-            "prd-admin",
-            "payments"
-        );
-
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        var json = IOUtils.toString(resourceLoader.getResource("classpath:cftlib-am-role-assignments.json")
-                                        .getInputStream(), Charset.defaultCharset());
-        lib.configureRoleAssignments(json);
 
         var civilDefs = Files.readAllBytes(Path.of("build/ccd-def/civil-ccd-definition.xlsx"));
         lib.importDefinition(civilDefs);
