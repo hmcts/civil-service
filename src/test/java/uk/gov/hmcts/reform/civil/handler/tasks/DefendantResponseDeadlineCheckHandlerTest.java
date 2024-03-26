@@ -11,16 +11,26 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.RespondentResponseDeadlineCheckEvent;
-import uk.gov.hmcts.reform.civil.service.search.RespondentResponseDeadlineCheckSearchService;
+import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
+import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class RespondentResponseDeadlineCheckHandlerTest {
+class DefendantResponseDeadlineCheckHandlerTest {
 
     @Mock
     private ExternalTask mockTask;
@@ -29,13 +39,13 @@ class RespondentResponseDeadlineCheckHandlerTest {
     private ExternalTaskService externalTaskService;
 
     @Mock
-    private RespondentResponseDeadlineCheckSearchService searchService;
+    private DefendantResponseDeadlineCheckSearchService searchService;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
-    private RespondentResponseDeadlineCheckHandler handler;
+    private DefendantResponseDeadlineCheckHandler handler;
 
     @BeforeEach
     void init() {
@@ -53,7 +63,7 @@ class RespondentResponseDeadlineCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new RespondentResponseDeadlineCheckEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
@@ -118,7 +128,7 @@ class RespondentResponseDeadlineCheckHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new RespondentResponseDeadlineCheckEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(eq(new DefendantResponseDeadlineCheckEvent(caseId)));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -130,8 +140,8 @@ class RespondentResponseDeadlineCheckHandlerTest {
             anyLong()
         );
 
-        verify(applicationEventPublisher, times(2)).publishEvent(any(RespondentResponseDeadlineCheckEvent.class));
-        verify(applicationEventPublisher).publishEvent(new RespondentResponseDeadlineCheckEvent(caseId));
-        verify(applicationEventPublisher).publishEvent(new RespondentResponseDeadlineCheckEvent(otherId));
+        verify(applicationEventPublisher, times(2)).publishEvent(any(DefendantResponseDeadlineCheckEvent.class));
+        verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(otherId));
     }
 }

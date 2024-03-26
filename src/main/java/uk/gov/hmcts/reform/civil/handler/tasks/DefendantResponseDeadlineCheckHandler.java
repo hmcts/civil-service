@@ -6,17 +6,17 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.RespondentResponseDeadlineCheckEvent;
-import uk.gov.hmcts.reform.civil.service.search.RespondentResponseDeadlineCheckSearchService;
+import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
+import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RespondentResponseDeadlineCheckHandler implements BaseExternalTaskHandler {
+public class DefendantResponseDeadlineCheckHandler implements BaseExternalTaskHandler {
 
-    private final RespondentResponseDeadlineCheckSearchService caseSearchService;
+    private final DefendantResponseDeadlineCheckSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -26,7 +26,7 @@ public class RespondentResponseDeadlineCheckHandler implements BaseExternalTaskH
 
         cases.forEach(caseDetails -> {
             try {
-                applicationEventPublisher.publishEvent(new RespondentResponseDeadlineCheckEvent(caseDetails.getId()));
+                applicationEventPublisher.publishEvent(new DefendantResponseDeadlineCheckEvent(caseDetails.getId()));
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }

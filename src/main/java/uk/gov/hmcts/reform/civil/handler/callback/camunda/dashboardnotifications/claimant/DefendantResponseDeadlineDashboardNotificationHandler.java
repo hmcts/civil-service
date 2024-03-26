@@ -23,11 +23,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 @RequiredArgsConstructor
-public class RespondentResponseDeadlineDashboardNotificationHandler extends CallbackHandler {
+public class DefendantResponseDeadlineDashboardNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_CLAIMANT);
-    public static final String TASK_ID = "CreateClaimSettledDashboardNotificationsForClaimant1";
+    public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponseDeadlineCheck";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
 
@@ -52,10 +52,13 @@ public class RespondentResponseDeadlineDashboardNotificationHandler extends Call
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA7_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-        );
+        if (caseData.isApplicant1NotRepresented()) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA7_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT.getScenario(),
+                                              authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
