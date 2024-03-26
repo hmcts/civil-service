@@ -109,7 +109,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
                 ).build()
             )
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(12345L)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -138,7 +138,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
                 ).build()
             )
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(12378L)
             .build();
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
