@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,8 +79,8 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -118,8 +118,8 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -151,8 +151,8 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     private static Stream<Arguments> defendantTypeAndScenarioArguments() {
         return Stream.of(
-                Arguments.of(Party.Type.ORGANISATION, SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
-                Arguments.of(Party.Type.COMPANY, SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
+                Arguments.of(Party.Type.ORGANISATION, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
+                Arguments.of(Party.Type.COMPANY, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
                 Arguments.of(Party.Type.INDIVIDUAL, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT),
                 Arguments.of(Party.Type.SOLE_TRADER, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT)
         );
