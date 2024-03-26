@@ -1209,12 +1209,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
         // Given caseBundles with bundle created date is before witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url2"))
+            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url3"))
+            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url4"))
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url5"))
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url6"))
+            // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1234,8 +1236,66 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotAddRespondentEvidenceDocWhenBundleCreatedDateIsAfterEvidenceUploaded() {
         // Given caseBundles with bundle created date is after witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentDisclosureListApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url2"))
+            .documentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url3"))
+            .documentForDisclosureApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url4"))
+            .documentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url5"))
+            .documentReferredInStatementApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url6"))
+            .documentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url7"))
+            .documentCaseSummaryApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url8"))
+            .documentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url9"))
+            .documentSkeletonArgumentApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url10"))
+            .documentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url11"))
+            .documentAuthoritiesApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url12"))
+            .documentCostsRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url13"))
+            .documentCostsApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url14"))
+            .documentHearsayNoticeRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url15"))
+            .documentHearsayNoticeApp2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url16"))
+            .documentWitnessSummaryRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"))
+            .documentWitnessSummaryApp2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url18"))
+            .documentQuestionsRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url19"))
+            .documentQuestionsApp2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"))
+            .documentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url21"))
+            .documentEvidenceForTrialApp2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url22"))
+            .documentAnswersRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"))
+            .documentAnswersApp2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url24"))
+            .documentJointStatementRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url25"))
+            .documentJointStatementApp2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url26"))
+            .documentExpertReportRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url27"))
+            .documentExpertReportRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url28"))
+            .documentWitnessStatementRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url29"))
+            .documentWitnessStatementRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url30"))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1247,8 +1307,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        // Then respondent docs uploaded after bundle should return size 0
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(0);
+        // Then applicant docs uploaded after bundle should return size 0
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).isNull();
+    }
+
+    @Test
+    void shouldAddAdditionalBundleDocuments_RespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
+        // Given caseBundles with bundle created date is before witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then applicant docs uploaded after bundle should return size 2
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(2);
     }
 
     @Test
@@ -1265,8 +1345,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
             .caseBundles(caseBundles)
             .build();
 
@@ -1293,8 +1373,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
             .caseBundles(caseBundles)
             .build();
 
@@ -1661,12 +1741,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return caseBundles;
     }
 
-    private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()
                                                          .witnessOptionDocument(Document.builder().documentBinaryUrl(
                                                                  TEST_URL)
+                                                                                    .documentUrl(uniqueUrl)
                                                                                     .documentFileName(TEST_FILE_NAME).build())
                                                          .witnessOptionName("FirstName LastName")
                                                          .createdDatetime(uploadedDate)
@@ -1674,23 +1755,27 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return witnessEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
+                                                        .expertOptionUploadDate(LocalDate.now())
                                                         .createdDatetime(uploadedDate)
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentUrl(uniqueUrl)
                                                                             .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  expertEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocs = new ArrayList<>();
         uploadEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                         .builder()
+                                                        .documentIssuedDate(LocalDate.now())
                                                         .createdDatetime(uploadedDate)
                                                         .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                                                .documentUrl(uniqueUrl)
                                                                             .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  uploadEvidenceDocs;
