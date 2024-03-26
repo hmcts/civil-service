@@ -37,9 +37,8 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return featureToggleService.isDashboardServiceEnabled()
-                ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse)
-                : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
-        );
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     @Override
