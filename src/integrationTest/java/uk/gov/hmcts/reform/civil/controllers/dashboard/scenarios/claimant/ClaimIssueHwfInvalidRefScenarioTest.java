@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -26,7 +26,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
             BEARER_TOKEN,
             ScenarioRequestParams.builder().params(Map.of("typeOfFee", "claim")).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
+            SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
             caseId
         ).andExpect(status().isOk());
 
