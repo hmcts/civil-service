@@ -27,7 +27,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
@@ -55,8 +54,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     private final Time datetime;
     private final ObjectMapper objectMapper;
 
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::updateNextHearingDetails,
-                                                       callbackKey(ABOUT_TO_SUBMIT), this::updateNextHearingDetails);
+    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::updateNextHearingDetails);
 
     @Override
     protected Map<String, Callback> callbacks() {

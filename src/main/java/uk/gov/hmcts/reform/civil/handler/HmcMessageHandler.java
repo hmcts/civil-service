@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -38,7 +41,7 @@ public class HmcMessageHandler {
         }
 
         if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
-            triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+            triggerUpdateNextHearingDetailsEvent(hmcMessage.getCaseId(), hmcMessage.getHearingId());
         } else if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
             triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
         } else {
@@ -53,6 +56,29 @@ public class HmcMessageHandler {
             coreCaseDataService.triggerEvent(caseId, event);
         } catch (Exception e) {
             log.error("Error triggering {} event: {}", event, e.getMessage());
+            throw e;
+        }
+    }
+
+    private void triggerUpdateNextHearingDetailsEvent(Long caseId, String hearingId) {
+        try {
+            log.info("Triggering {} event for Case ID {} and Hearing ID {}.", UPDATE_NEXT_HEARING_DETAILS.name(), caseId, hearingId);
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), UPDATE_NEXT_HEARING_DETAILS);
+
+            var updatedData = startEventResponse.getCaseDetails().getData();
+
+            if (updatedData.get("nextHearingDetails") == null) {
+                updatedData.put("nextHearingDetails", null);
+            }
+            coreCaseDataService.submitUpdate(caseId.toString(), CaseDataContent.builder()
+                .eventToken(startEventResponse.getToken())
+                .event(Event.builder()
+                           .id(startEventResponse.getEventId())
+                           .build())
+                .data(updatedData)
+                .build());
+        } catch (Exception e) {
+            log.error("Error triggering {} event: {}", UPDATE_NEXT_HEARING_DETAILS, e.getMessage());
             throw e;
         }
     }
