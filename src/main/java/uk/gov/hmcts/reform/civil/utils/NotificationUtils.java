@@ -175,15 +175,4 @@ public class NotificationUtils {
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    public static String getDefendantName(CaseData caseData) {
-        String defendantName = null;
-        if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
-            defendantName = caseData.getRespondent1().getPartyName();
-        }
-        if (caseData.getRespondent2() != null && !caseData.getRespondent2().getPartyName().isEmpty()) {
-            defendantName = defendantName + " and " + caseData.getRespondent2().getPartyName();
-        }
-
-        return defendantName;
-    }
 }

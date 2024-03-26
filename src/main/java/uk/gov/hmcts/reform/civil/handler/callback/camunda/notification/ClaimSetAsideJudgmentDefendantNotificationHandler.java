@@ -19,7 +19,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT2;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
@@ -94,7 +93,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText(),
-            DEFENDANT_NAME_INTERIM, getDefendantName(caseData)
+            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData)
         );
     }
 
