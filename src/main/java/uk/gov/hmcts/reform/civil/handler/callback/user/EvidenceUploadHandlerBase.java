@@ -1211,7 +1211,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
         // If either claimant or respondent additional bundle doc collection exists, we add to that
         if (existingDocsSupplier.get() != null) {
-            System.out.println("make new list");
             additionalBundleDocs = existingDocsSupplier.get();
         }
 
