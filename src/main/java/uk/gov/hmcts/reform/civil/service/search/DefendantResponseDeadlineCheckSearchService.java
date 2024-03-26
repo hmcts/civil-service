@@ -15,9 +15,9 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
-public class RespondentResponseDeadlineCheckSearchService extends ElasticSearchService {
+public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchService {
 
-    public RespondentResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService) {
+    public DefendantResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 

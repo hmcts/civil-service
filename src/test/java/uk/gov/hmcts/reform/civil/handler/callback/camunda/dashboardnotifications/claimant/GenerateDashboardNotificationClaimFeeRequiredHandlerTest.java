@@ -66,7 +66,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.ClaimFee.Required",
+                "Scenario.AAA6.ClaimIssue.ClaimFee.Required",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

@@ -8,13 +8,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class RespondentResponseDeadlineCheckSearchServiceTest extends ElasticSearchServiceTest {
+class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new RespondentResponseDeadlineCheckSearchService(coreCaseDataService);
+        searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService);
     }
 
     @Override
