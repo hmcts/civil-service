@@ -53,9 +53,10 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
     @Autowired
     private MediationSuccessfulApplicantNotificationHandler handler;
 
+    private static final String REFERENCE_NUMBER = "8372942374";
     public static final String TEMPLATE_ID = "template-id";
     public static final String APPLICANT_MAIL = "applicantsolicitor@example.com";
-    public static final String MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591 = "mediation-successful-applicant-notification-1594901956117591";
+    public static final String MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION = "mediation-successful-applicant-notification-" + REFERENCE_NUMBER;
     public static final String NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL = "NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL";
 
     @Nested
@@ -108,7 +109,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
                 lrClaimantProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 
@@ -129,7 +130,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
                 oneVTwoProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 
@@ -150,7 +151,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
                 oneVTwoProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 
@@ -172,7 +173,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
                 lrClaimantProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 
@@ -193,7 +194,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
                 lrClaimantProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 
@@ -215,7 +216,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 "rambo@email.com",
                 TEMPLATE_ID,
                 lipProperties(caseData),
-                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
 

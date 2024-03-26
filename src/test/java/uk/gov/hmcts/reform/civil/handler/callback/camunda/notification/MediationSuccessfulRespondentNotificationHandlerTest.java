@@ -65,9 +65,10 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
     public static final String TEMPLATE_ID = "template-id";
     public static final String RESPONDENT_MAIL = "respondentsolicitor@example.com";
-    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-LIP-1594901956117591";
-    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-LR-1594901956117591";
-    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-2v1-LR-1594901956117591";
+    private static final String REFERENCE_NUMBER = "8372942374";
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION = "notification-mediation-successful-defendant-LIP-" + REFERENCE_NUMBER;
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION = "notification-mediation-successful-defendant-LR-" + REFERENCE_NUMBER;
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION = "notification-mediation-successful-defendant-2v1-LR-" + REFERENCE_NUMBER;
     public static final String NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL = "NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL";
 
     @Nested
@@ -212,7 +213,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
                 lrDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
 
@@ -233,7 +234,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
                 lrDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
 
@@ -254,7 +255,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
                 lrDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
 
@@ -275,7 +276,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
                 lrDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
 
@@ -297,7 +298,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
                 twoVOneDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION
             );
         }
 
@@ -318,7 +319,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 "sole.trader@email.com",
                 TEMPLATE_ID,
                 lipDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION
             );
         }
 
@@ -340,7 +341,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 "sole.trader@email.com",
                 TEMPLATE_ID,
                 lipDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION
             );
         }
 
