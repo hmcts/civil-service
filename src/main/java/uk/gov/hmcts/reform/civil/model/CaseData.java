@@ -132,8 +132,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -1458,4 +1459,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getApplicant1ClaimSettledDate).orElse(null);
     }
 
+    @JsonIgnore
+    public boolean isPaidLessThanClaimAmount() {
+        RespondToClaim respondToClaim = null;
+        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            respondToClaim = getRespondToClaim();
+        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+            respondToClaim = getRespondToAdmittedClaim();
+        }
+        return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
+            .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
+    }
 }
