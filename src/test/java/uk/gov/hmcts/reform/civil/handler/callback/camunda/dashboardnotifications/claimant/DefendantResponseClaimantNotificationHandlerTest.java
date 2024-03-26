@@ -45,7 +45,6 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponse";
 
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE);
