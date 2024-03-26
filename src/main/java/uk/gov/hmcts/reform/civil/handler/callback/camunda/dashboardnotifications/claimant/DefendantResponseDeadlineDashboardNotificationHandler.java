@@ -19,7 +19,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +54,7 @@ public class DefendantResponseDeadlineDashboardNotificationHandler extends Callb
 
         if (caseData.isApplicant1NotRepresented()) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA7_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT.getScenario(),
+                                              SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT.getScenario(),
                                               authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
