@@ -10,4 +10,4 @@ mkdir -p $outputPath
 touch "$xlsxOutputFile"
 
 echo "${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile} ${ccdDefArgs}"
-sh ${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile} ${ccdDefArgs}
+sh ${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile} "${ccdDefArgs}"
