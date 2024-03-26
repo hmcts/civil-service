@@ -238,6 +238,7 @@ tasks.withType(Copy) {
 }
 
 task integration(type: Test) {
+  maxHeapSize = '1G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -385,7 +386,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 

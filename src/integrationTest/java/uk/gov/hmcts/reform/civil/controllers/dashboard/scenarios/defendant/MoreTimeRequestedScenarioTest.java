@@ -22,7 +22,7 @@ public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest 
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
 
-        String caseId = "123491";
+        String caseId = "1234914567";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .respondent1ResponseDeadline(LocalDateTime.of(2024, 4, 1, 12, 0))

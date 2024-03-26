@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -36,7 +36,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Bas
                    ))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,
-               SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(), caseId
+               SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(), caseId
         )
             .andExpect(status().isOk());
 
@@ -48,7 +48,9 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Bas
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to "
-                               + "sign a settlement agreement.The claimant proposed a repayment plan, and the court "
+                               + "sign a settlement agreement."
+                               + "</p><p class=\"govuk-body\">"
+                               + "The claimant proposed a repayment plan, and the court "
                                + "then responded with an alternative plan that was accepted."
                                + "</p><p class=\"govuk-body\">"
                                + " You must respond by " + responseDeadline + ". If you do not respond by then, "

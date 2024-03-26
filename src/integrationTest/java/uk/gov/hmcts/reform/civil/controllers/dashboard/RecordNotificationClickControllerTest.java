@@ -43,7 +43,8 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
         assertThat(notification).isPresent();
         DashboardNotificationsEntity dashboardNotificationsEntity = notification.get();
         NotificationActionEntity notificationAction = dashboardNotificationsEntity.getNotificationAction();
-        assertThat(notificationAction.getDashboardNotificationsId()).isEqualTo(dashboardNotificationsEntity.getId());
+        assertThat(notificationAction.getDashboardNotification().getId())
+            .isEqualTo(dashboardNotificationsEntity.getId());
         assertThat(notificationAction.getActionPerformed()).isEqualTo(ACTION_PAERFORMED);
         assertThat(notificationAction.getReference()).isEqualTo(CCD_CASE_ID);
     }

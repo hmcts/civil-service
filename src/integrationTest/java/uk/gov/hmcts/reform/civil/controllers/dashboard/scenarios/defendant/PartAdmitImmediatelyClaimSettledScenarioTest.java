@@ -24,12 +24,12 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("defendantAdmittedAmount", "100",
+                   .params(Map.of("defendantAdmittedAmount", "£100",
                                   "respondent1AdmittedAmountPaymentDeadlineEn", "1 January 2024",
                                   "respondent1AdmittedAmountPaymentDeadlineCy", "1 January 2024"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.PartAdmit.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.PartAdmit.Defendant", caseId
         )
             .andExpect(status().isOk());
 
@@ -42,7 +42,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The claimant has accepted your plan to pay £100 "
                                + "immediately. Funds must clear <a href={VIEW_INFO_ABOUT_CLAIMANT} "
-                               + "class=\"govuk-link\">their account</a> by 1 January 2024. If they don´t receive the "
+                               + "class=\"govuk-link\">their account</a> by 1 January 2024.</p><p class=\"govuk-body\">If they don´t receive the "
                                + "money by then, they can request a County Court Judgment.</p>")
             );
     }

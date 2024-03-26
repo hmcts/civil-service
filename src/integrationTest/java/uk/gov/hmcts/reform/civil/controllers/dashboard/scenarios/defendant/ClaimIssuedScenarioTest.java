@@ -44,7 +44,7 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
                                   "ccdCaseReference", caseId
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.Response.Required", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.Response.Required", caseId
         )
             .andExpect(status().isOk());
 
@@ -85,10 +85,10 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You haven´t responded to the claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("You need to respond before 4 pm on "
+                    .value("<p class=\"govuk-body\">You need to respond before 4 pm on "
                                + hearingFeeByDate
                                + ". There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
-                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.")
+                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
             );
     }
 }

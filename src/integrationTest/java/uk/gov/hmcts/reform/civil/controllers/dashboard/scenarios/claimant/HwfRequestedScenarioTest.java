@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class HwfRequestedScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_HWF_REQUESTED = "Scenario.AAA7.ClaimIssue.HWF.Requested";
+    public static final String SCENARIO_HWF_REQUESTED = "Scenario.AAA6.ClaimIssue.HWF.Requested";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
@@ -73,7 +73,7 @@ public class HwfRequestedScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("We’re reviewing your help with fees application"),
-                jsonPath("$[0].descriptionEn").value("You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">You’ve applied for help with the claim fee. You’ll receive an update in 5 to 10 working days.</p>")
             );
     }
 
