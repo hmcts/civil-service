@@ -26,17 +26,13 @@ import java.util.Map;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
 
@@ -48,9 +44,6 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
     @Mock
     private DashboardApiClient dashboardApiClient;
-
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
@@ -77,7 +70,6 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         Map<String, Object> params = new HashMap<>();
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
