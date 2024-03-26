@@ -95,7 +95,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
                      latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
             caseDataMap = caseDataBuilder.build().toMap(objectMapper);
-            caseDataMap.put("nextHearingDetails", null);
+            caseDataMap.put("nextHearingDetails", new Object());
         }
 
         NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
