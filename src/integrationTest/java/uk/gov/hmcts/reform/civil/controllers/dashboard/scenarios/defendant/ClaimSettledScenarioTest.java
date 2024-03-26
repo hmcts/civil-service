@@ -29,7 +29,7 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
                                   "claimSettledDateCy", "16th March 2024"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.ClaimSettled.Defendant", caseId
         )
             .andExpect(status().isOk());
 
