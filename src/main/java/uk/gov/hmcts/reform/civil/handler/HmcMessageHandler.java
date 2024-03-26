@@ -66,9 +66,9 @@ public class HmcMessageHandler {
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), UPDATE_NEXT_HEARING_DETAILS);
 
             var updatedData = startEventResponse.getCaseDetails().getData();
-
+            log.info("Received start event data - NextHearingDetails: {}", updatedData.get("nextHearingDetails"));
             if (updatedData.get("nextHearingDetails") == null) {
-                updatedData.put("nextHearingDetails", null);
+                updatedData.put("nextHearingDetails", new Object());
             }
             coreCaseDataService.submitUpdate(caseId.toString(), CaseDataContent.builder()
                 .eventToken(startEventResponse.getToken())
