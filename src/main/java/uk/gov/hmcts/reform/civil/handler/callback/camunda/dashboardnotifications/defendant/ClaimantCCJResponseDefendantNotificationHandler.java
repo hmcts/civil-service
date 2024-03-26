@@ -20,7 +20,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class ClaimantCCJResponseDefendantNotificationHandler extends CallbackHan
 
     private String getScenario(CaseData caseData) {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant() && caseData.isCcjRequestJudgmentByAdmission()) {
-            return SCENARIO_AAA7_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT
+            return SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT
                 .getScenario();
         }
         return null;
