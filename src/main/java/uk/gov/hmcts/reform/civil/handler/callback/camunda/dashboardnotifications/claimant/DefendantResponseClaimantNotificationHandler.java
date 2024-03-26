@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +32,14 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponse";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse
-        );
+        return featureToggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+
     }
 
     @Override
@@ -49,7 +53,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
-
+        if (caseData.isPaidLessThanClaimAmount()) {
+            return SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
+        }
         if (caseData.getRespondent1().isCompanyOROrganisation()
                 && caseData.isPayBySetDate()) {
             return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
