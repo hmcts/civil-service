@@ -183,5 +183,21 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("applicant1ClaimSettledDateEn").isEqualTo("19 March 2024");
         assertThat(result).extracting("applicant1ClaimSettledDateCy").isEqualTo("19 March 2024");
     }
+
+    @Test
+    public void shouldMapParameters_whenStatesPaidInFull() {
+        caseData = caseData.toBuilder()
+            .respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
+            .respondToClaim(RespondToClaim.builder()
+                                .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("applicant1ResponseDeadlineEn").isEqualTo("29 March 2020");
+        assertThat(result).extracting("applicant1ResponseDeadlineCy").isEqualTo("29 March 2020");
+    }
 }
 
