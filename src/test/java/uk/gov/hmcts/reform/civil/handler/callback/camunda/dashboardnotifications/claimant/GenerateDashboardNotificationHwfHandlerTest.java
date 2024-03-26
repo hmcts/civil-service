@@ -67,7 +67,7 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.HWF.Requested",
+                "Scenario.AAA6.ClaimIssue.HWF.Requested",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
