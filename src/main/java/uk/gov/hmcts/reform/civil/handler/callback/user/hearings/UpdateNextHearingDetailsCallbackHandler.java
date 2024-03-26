@@ -76,6 +76,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
                  latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
 
+        Map<String, Object> caseDataMap = caseDataBuilder.build().toMap(objectMapper);
         if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating next hearing details",
                      latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
@@ -87,12 +88,14 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
                             .hearingDateTime(nextHearingDate)
                             .build() : null)
                 .build();
+            caseDataMap = caseDataBuilder.build().toMap(objectMapper);
         }
 
         if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
                      latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
-            caseDataBuilder.nextHearingDetails(NextHearingDetails.builder().hearingID("").build());
+            caseDataMap = caseDataBuilder.build().toMap(objectMapper);
+            caseDataMap.put("nextHearingDetails", null);
         }
 
         NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
@@ -102,7 +105,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
                  latestNextHearingDetails != null ? latestNextHearingDetails.getHearingID() : "Null",
                  latestNextHearingDetails != null ? latestNextHearingDetails.getHearingDateTime() : "Null");
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(caseDataMap).build();
     }
 
     private HearingsResponse getHearings(Long caseId) {
