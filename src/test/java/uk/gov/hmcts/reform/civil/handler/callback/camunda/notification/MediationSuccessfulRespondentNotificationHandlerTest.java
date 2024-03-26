@@ -198,6 +198,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(
@@ -223,6 +224,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
@@ -244,6 +246,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
@@ -265,6 +268,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
@@ -287,6 +291,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
@@ -308,6 +313,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
@@ -330,6 +336,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
