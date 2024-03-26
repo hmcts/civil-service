@@ -151,6 +151,7 @@ public class DashboardNotificationsParamsMapper {
             BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
     }
 
