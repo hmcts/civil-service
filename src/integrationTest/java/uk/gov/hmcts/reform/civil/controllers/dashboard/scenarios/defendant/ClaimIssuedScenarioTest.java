@@ -44,7 +44,7 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
                                   "ccdCaseReference", caseId
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.Response.Required", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.Response.Required", caseId
         )
             .andExpect(status().isOk());
 
