@@ -34,7 +34,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
-            DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
             userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()),
             ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
         );
