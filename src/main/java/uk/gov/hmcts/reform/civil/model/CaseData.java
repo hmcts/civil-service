@@ -864,6 +864,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPartAdmitAlreadyPaid() {
+        return YES.equals(getSpecDefenceAdmittedRequired());
+    }
+
+    @JsonIgnore
     public boolean isFullDefence() {
         return YES.equals(getApplicant1ProceedWithClaim());
     }
