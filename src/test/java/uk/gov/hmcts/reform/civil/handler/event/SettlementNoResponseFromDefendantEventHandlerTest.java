@@ -72,7 +72,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
 
         verify(dashboardApiClient, times(1)).recordScenario(
             CASE_ID.toString(),
-            DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT.getScenario(),
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT.getScenario(),
             AUTH_TOKEN,
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

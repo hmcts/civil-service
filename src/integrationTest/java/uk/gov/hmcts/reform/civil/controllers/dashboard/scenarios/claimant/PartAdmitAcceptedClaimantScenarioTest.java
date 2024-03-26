@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT = "Scenario.AAA7.ClaimantIntent.PartAdmit.Claimant";
+    public static final String SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT = "Scenario.AAA6.ClaimantIntent.PartAdmit.Claimant";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
