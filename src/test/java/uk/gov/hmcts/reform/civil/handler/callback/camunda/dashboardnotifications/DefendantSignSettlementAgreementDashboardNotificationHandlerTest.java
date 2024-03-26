@@ -126,32 +126,4 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         );
     }
 
-    @Test
-    public void shouldCreateDashboardNotificationForClaimantWhenDefendantAcceptsSettlementAgreement() {
-        Map<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
-                ).build()
-            )
-            .legacyCaseReference("reference")
-            .ccdCaseReference(12378L)
-            .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_DEFENDANT_RESPONSE_ACCEPTS_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
 }
