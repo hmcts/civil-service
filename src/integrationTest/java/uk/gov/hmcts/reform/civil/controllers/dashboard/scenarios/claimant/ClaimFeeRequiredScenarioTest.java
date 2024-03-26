@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
 
-    public static final String SCENARIO_CLAIM_FEE_REQUIRED = "Scenario.AAA7.ClaimIssue.ClaimFee.Required";
+    public static final String SCENARIO_CLAIM_FEE_REQUIRED = "Scenario.AAA6.ClaimIssue.ClaimFee.Required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL

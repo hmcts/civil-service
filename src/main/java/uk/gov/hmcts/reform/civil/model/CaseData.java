@@ -864,6 +864,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPartAdmitAlreadyPaid() {
+        return YES.equals(getSpecDefenceAdmittedRequired());
+    }
+
+    @JsonIgnore
     public boolean isFullDefence() {
         return YES.equals(getApplicant1ProceedWithClaim());
     }
@@ -1012,6 +1017,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isFullAdmitPayImmediatelyClaimSpec() {
         return isFullAdmitClaimSpec() && isPayImmediately();
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitPayImmediatelyClaimSpec() {
+        return isPartAdmitClaimSpec() && isPayImmediately();
     }
 
     @JsonIgnore
@@ -1441,4 +1451,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && (claimIssueFeePaymentDoneWithHWF()
             || getChangeOfRepresentation() != null));
     }
+
+    @JsonIgnore
+    public LocalDate getApplicant1ClaimSettleDate() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1ClaimSettledDate).orElse(null);
+    }
+
 }
