@@ -48,7 +48,9 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Bas
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to "
-                               + "sign a settlement agreement.The claimant proposed a repayment plan, and the court "
+                               + "sign a settlement agreement."
+                               + "</p><p class=\"govuk-body\">"
+                               + "The claimant proposed a repayment plan, and the court "
                                + "then responded with an alternative plan that was accepted."
                                + "</p><p class=\"govuk-body\">"
                                + " You must respond by " + responseDeadline + ". If you do not respond by then, "
