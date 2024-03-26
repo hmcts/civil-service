@@ -124,7 +124,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
             } else if (NO.equals(caseData.getApplicant1Represented())) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate(),
+                    notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate(),
                     addPropertiesLip(caseData),
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference())
                 );

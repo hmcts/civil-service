@@ -57,7 +57,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         } else if (NO.equals(caseData.getApplicant1Represented())) {
             notificationService.sendMail(
                 caseData.getApplicant1().getPartyEmail(),
-                notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
+                notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate(),
                 addPropertiesLip(caseData),
                 String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
         }
