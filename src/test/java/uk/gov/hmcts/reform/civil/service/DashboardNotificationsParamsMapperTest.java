@@ -59,7 +59,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
-        assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
+        assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("£100");
 
         assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));

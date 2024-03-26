@@ -35,7 +35,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
-                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+                "£" + this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
             );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
@@ -141,6 +141,7 @@ public class DashboardNotificationsParamsMapper {
             BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
     }
 
