@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseDeadlineDashboardNotificationHandler;
@@ -17,8 +15,6 @@ import java.time.OffsetDateTime;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -47,7 +43,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has not responded to the claim.</p>" +
-                    "<p class=\"govuk-body\">You can now request a county court judgement.<p/>" +
+                    "<p class=\"govuk-body\">You can now request a county court judgment.<p/>" +
                     "<p class=\"govuk-body\">The defendant can still respond to the claim before you ask for a judgment.</p>" +
                     "<p class=\"govuk-body\"><a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" class=\"govuk-link\">Request a CCJ</a></p>")
             );

@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -26,11 +25,9 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
                 boolQuery()
                     .minimumShouldMatch(1)
                     .should(boolQuery()
-                                .must(rangeQuery("data.respondent1ResponseDeadline").lt(LocalDate.now()
-                                        .atTime(LocalTime.MIN)
-                                        .toString()))
+                                .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
                                 .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-                                .must(beState(CaseState.AWAITING_DEFENDANT_RESPONSE))
+                                .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                         ),
                 List.of("reference"),
                 startIndex

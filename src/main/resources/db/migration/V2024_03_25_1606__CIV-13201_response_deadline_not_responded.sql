@@ -14,11 +14,11 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
 VALUES ('Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant',
         'Response to the claim', 'Response to the claim',
         '<p class="govuk-body">The defendant has not responded to the claim.</p>'
-          '<p class="govuk-body">You can now request a county court judgement.<p/>'
+          '<p class="govuk-body">You can now request a county court judgment.<p/>'
           '<p class="govuk-body">The defendant can still respond to the claim before you ask for a judgment.</p>'
           '<p class="govuk-body"><a href="{COUNTY_COURT_JUDGEMENT_URL}" class="govuk-link">Request a CCJ</a></p>',
         '<p class="govuk-body">The defendant has not responded to the claim.</p>'
-          '<p class="govuk-body">You can now request a county court judgement.<p/>'
+          '<p class="govuk-body">You can now request a county court judgment.<p/>'
           '<p class="govuk-body">The defendant can still respond to the claim before you ask for a judgment.</p>'
           '<p class="govuk-body"><a href="{COUNTY_COURT_JUDGEMENT_URL}" class="govuk-link">Request a CCJ</a></p>',
         'CLAIMANT');
