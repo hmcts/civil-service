@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.caseprogression;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,6 @@ import java.time.ZoneId;
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
-@AllArgsConstructor
 public class UploadEvidenceExpert {
 
     private String expertOptionName;
@@ -24,6 +22,20 @@ public class UploadEvidenceExpert {
     private String expertDocumentAnswer;
     private LocalDate expertOptionUploadDate;
     private Document expertDocument;
-    @Builder.Default
-    private LocalDateTime createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
+    private LocalDateTime createdDatetime;
+    // Constructor to set createdDatetime only if it's not already set
+    public UploadEvidenceExpert(String expertOptionName,  String expertOptionExpertise, String expertOptionExpertises,
+                                String expertOptionOtherParty, String expertDocumentQuestion, String expertDocumentAnswer,
+                                LocalDate expertOptionUploadDate, Document expertDocument, LocalDateTime createdDatetime) {
+        this.expertOptionName = expertOptionName;
+        this.expertOptionExpertise = expertOptionExpertise;
+        this.expertOptionExpertises = expertOptionExpertises;
+        this.expertOptionOtherParty = expertOptionOtherParty;
+        this.expertDocumentQuestion = expertDocumentQuestion;
+        this.expertDocumentAnswer = expertDocumentAnswer;
+        this.expertOptionUploadDate = expertOptionUploadDate;
+        this.expertDocument = expertDocument;
+        if (createdDatetime != null) this.createdDatetime = createdDatetime;
+        else this.createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
+    }
 }
