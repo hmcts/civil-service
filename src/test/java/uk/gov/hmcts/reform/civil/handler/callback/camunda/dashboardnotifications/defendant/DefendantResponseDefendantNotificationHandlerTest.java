@@ -35,9 +35,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ALREADY_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -206,6 +208,37 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
                 SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllWithMediation() {
+            //given
+            Map<String, Object> params = new HashMap<>();
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                    .toBuilder()
+                    .legacyCaseReference("reference")
+                    .ccdCaseReference(Long.valueOf(530012L))
+                    .respondent1Represented(YesOrNo.NO)
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .defenceRouteRequired(DISPUTES_THE_CLAIM)
+                    .responseClaimMediationSpecRequired(YesOrNo.YES)
+                    .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .build();
+            //when
+            handler.handle(callbackParams);
+            //then
+            verify(dashboardApiClient, times(1)).recordScenario(
+                    caseData.getCcdCaseReference().toString(),
+                    SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION.getScenario(),
+                    "BEARER_TOKEN",
+                    ScenarioRequestParams.builder().params(params).build()
             );
         }
     }
