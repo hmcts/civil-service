@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
@@ -27,8 +28,7 @@ public class UploadEvidenceDocumentType {
         this.typeOfDocument = typeOfDocument;
         this.documentIssuedDate = documentIssuedDate;
         this.documentUpload = documentUpload;
-        if (createdDatetime != null) this.createdDatetime = createdDatetime;
-        else this.createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
+        this.createdDatetime = Objects.requireNonNullElseGet(createdDatetime, () -> LocalDateTime.now(ZoneId.of("Europe/London")));
     }
 }
 

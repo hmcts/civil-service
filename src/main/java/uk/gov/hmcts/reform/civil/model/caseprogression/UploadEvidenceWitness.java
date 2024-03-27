@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
@@ -25,7 +26,6 @@ public class UploadEvidenceWitness {
         this.witnessOptionName = witnessOptionName;
         this.witnessOptionUploadDate = witnessOptionUploadDate;
         this.witnessOptionDocument = witnessOptionDocument;
-        if (createdDatetime != null) this.createdDatetime = createdDatetime;
-        else this.createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
+        this.createdDatetime = Objects.requireNonNullElseGet(createdDatetime, () -> LocalDateTime.now(ZoneId.of("Europe/London")));
     }
 }
