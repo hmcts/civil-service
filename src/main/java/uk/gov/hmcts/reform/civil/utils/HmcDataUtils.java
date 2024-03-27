@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -273,5 +274,18 @@ public class HmcDataUtils {
         } else {
             throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId);
         }
+    }
+
+    public static CaseHearing getLatestHearing(HearingsResponse hearingsResponse) {
+        return hearingsResponse.getCaseHearings().stream()
+            .max(Comparator.comparing(CaseHearing::getHearingRequestDateTime)).orElse(null);
+    }
+
+    public static LocalDateTime getNextHearingDate(CaseHearing hearing, LocalDateTime currentDateTime) {
+        return hearing.getHearingDaySchedule().stream()
+            .filter(day -> day.getHearingStartDateTime().isAfter(currentDateTime.withHour(0).withMinute(0).withSecond(0)))
+            .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
+            .orElse(HearingDaySchedule.builder().build())
+            .getHearingStartDateTime();
     }
 }
