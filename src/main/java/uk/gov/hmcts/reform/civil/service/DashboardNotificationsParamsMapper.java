@@ -61,7 +61,7 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
                     caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString())
             );
-            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getLabel());
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
             params.put(
                 "firstRepaymentDate",
                 DateUtils.formatDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
