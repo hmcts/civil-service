@@ -1209,12 +1209,12 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
         // Given caseBundles with bundle created date is before witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url2"))
-            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url3"))
-            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url4"))
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url5"))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url6"))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
+            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
+            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
             // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
             .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
@@ -1237,37 +1237,37 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Given caseBundles with bundle created date is after witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .documentDisclosureListApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url2"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
             .documentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url3"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
             .documentForDisclosureApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url4"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
             .documentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url5"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
             .documentReferredInStatementApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url6"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
             .documentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url7"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url7"))
             .documentCaseSummaryApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url8"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url8"))
             .documentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url9"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url9"))
             .documentSkeletonArgumentApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url10"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url10"))
             .documentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url11"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url11"))
             .documentAuthoritiesApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url12"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url12"))
             .documentCostsRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url13"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url13"))
             .documentCostsApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url14"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url14"))
             .documentHearsayNoticeRes(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url15"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url15"))
             .documentHearsayNoticeApp2(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url16"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url16"))
             .documentWitnessSummaryRes(getWitnessDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"))
             .documentWitnessSummaryApp2(getWitnessDocs(
@@ -1277,9 +1277,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .documentQuestionsApp2(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"))
             .documentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url21"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url21"))
             .documentEvidenceForTrialApp2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url22"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
             .documentAnswersRes(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"))
             .documentAnswersApp2(getExpertDocs(
@@ -1316,7 +1316,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Given caseBundles with bundle created date is before witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
 
@@ -1373,8 +1373,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .caseBundles(caseBundles)
             .build();
 
