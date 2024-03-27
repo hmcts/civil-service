@@ -45,6 +45,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"),
     SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT("Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant"),
     SCENARIO_AAA6_CLAIM_ISSUE_HWF_FULL_REMISSION("Scenario.AAA6.ClaimIssue.HWF.FullRemission"),
+    SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant"),
     SCENARIO_AAA6_DEFENDANT_ALREADY_PAID("Scenario.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT(
         "Scenario.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant"),
@@ -61,6 +62,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Defendant"),
     SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT("Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant"),
     SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT("Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant"),
     SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant");
 
     private final String scenario;
