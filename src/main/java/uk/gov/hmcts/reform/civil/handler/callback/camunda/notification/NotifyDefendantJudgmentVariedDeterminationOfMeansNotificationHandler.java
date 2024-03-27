@@ -18,9 +18,9 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +28,8 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
-                                                           NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+                                                           NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
+                                                          NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
     public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-varied-determination-of-means-%s";
@@ -57,16 +58,23 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private CallbackResponse notifyDefendantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String recipient = (callbackParams.getRequest().getEventId()
-                .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()))
-            ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+        boolean isRespondentLip = (callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()));
+
+        String emailTemplateID = isRespondentLip ? getLIPTemplate() : getTemplate();
+
+        String recipient = isRespondentLip ? caseData.getRespondent1().getPartyEmail() :
+            callbackParams.getRequest().getEventId()
+                .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
 
         if (nonNull(recipient)) {
             notificationService.sendMail(
                 recipient,
-                getTemplate(),
-                callbackParams.getRequest().getEventId()
-                        .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                emailTemplateID,
+                isRespondentLip ? addPropertiesLip(caseData)
+                    : callbackParams.getRequest().getEventId()
+                    .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
                     ? addProperties(caseData) : addRespondent2Properties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -74,6 +82,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
@@ -90,12 +99,25 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
         );
     }
 
+    private Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            APPLICANT_ONE_NAME, caseData.getRespondent1().getPartyName()
+        );
+    }
+
+
     private String getTemplate() {
         return notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    }
+
+    private String getLIPTemplate() {
+        return notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
 }
