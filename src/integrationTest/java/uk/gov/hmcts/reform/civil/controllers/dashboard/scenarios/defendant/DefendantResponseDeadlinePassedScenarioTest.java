@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-    public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIntegrationTest {
+public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DefendantResponseDeadlinePassedNotificationHandler handler;
