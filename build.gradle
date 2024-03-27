@@ -364,7 +364,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:v1.0.69-CIV-13109'
+  implementation 'com.github.hmcts:civil-commons:v1.0.70-CIV-13109'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -377,7 +377,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'

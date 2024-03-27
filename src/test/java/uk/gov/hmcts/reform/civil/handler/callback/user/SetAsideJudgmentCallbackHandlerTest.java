@@ -151,5 +151,4 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertTrue(response.getConfirmationBody().contains("The judgment has been set aside"));
         }
     }
-
 }

@@ -19,23 +19,24 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getApplicantEmail;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackHandler
+public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGEMENT_CLAIMANT);
-    public static final String TASK_ID = "NotifyClaimantSetAsideJudgement";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT);
+    public static final String TASK_ID = "NotifyClaimantSetAsideJudgment";
 
-    private static final String REFERENCE_TEMPLATE = "set-aside-judgement-applicant-notification-%s";
-    private static final String REFERENCE_TEMPLATE_LIP = "set-aside-judgement-applicant-notification-lip-%s";
+    private static final String REFERENCE_TEMPLATE = "set-aside-judgment-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "set-aside-judgment-applicant-notification-lip-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -45,7 +46,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimSetAsideJudgementToClaimant
+            this::notifyClaimSetAsideJudgmentToClaimant
         );
     }
 
@@ -77,20 +78,10 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        String defendantName = "";
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
-            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            defendantName = getPartyNameBasedOnType(caseData.getRespondent1());
-        } else {
-            defendantName = getPartyNameBasedOnType(caseData.getRespondent1())
-                .concat(" and ")
-                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
-        }
-
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData),
-            DEFENDANT_NAME_INTERIM,  defendantName,
+            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
+            DEFENDANT_NAME_INTERIM,  getDefendantNameBasedOnCaseType(caseData),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
         );
 
@@ -98,7 +89,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
 
     private String getTemplate(boolean isApplicantLip) {
         return isApplicantLip ? notificationsProperties.getNotifyUpdateTemplate()
-            : notificationsProperties.getNotifySetAsideJudgementTemplate();
+            : notificationsProperties.getNotifySetAsideJudgmentTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {
