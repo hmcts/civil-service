@@ -144,4 +144,5 @@ public class HearingUtils {
     public static boolean isDisposalHearing(String hearingType) {
         return hearingType.contains("DIS");
     }
+
 }

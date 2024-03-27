@@ -5826,7 +5826,7 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
-    public CaseData buildJudmentOnlineCaseDataWithPaymentByDate() {
+    public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
