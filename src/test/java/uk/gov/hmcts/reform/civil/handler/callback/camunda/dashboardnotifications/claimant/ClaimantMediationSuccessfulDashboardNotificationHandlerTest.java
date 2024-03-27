@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,15 +8,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,30 +27,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_APPLICANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL;
 
 @ExtendWith(MockitoExtension.class)
-public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private DefendantSignSettlementAgreementDashboardNotificationHandler handler;
+    private ClaimantMediationSuccessfulDashboardNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationSignSettlementAgreement";
+    public static final String TASK_ID = "GenerateDashboardNotificationClaimantMediationSuccessful";
+
+    Map<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE);
+        assertThat(handler.handledEvents()).contains(
+            CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_APPLICANT);
     }
 
     @Test
@@ -57,25 +60,46 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_APPLICANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
     }
 
     @Test
-    public void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
+    public void createDashboardNotificationsWhenCarmIsEnabled() {
 
-        Map<String, Object> params = new HashMap<>();
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
-            )
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(dateTime)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void createDashboardNotificationsWhenCarmIsDisabled() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+        CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .build();
@@ -85,44 +109,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
-    public void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
-
-        Map<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
-                ).build()
-            )
-            .legacyCaseReference("reference")
-            .ccdCaseReference(12345L)
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
     }
 
 }
