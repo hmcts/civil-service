@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DEADLINE_CHECK;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -29,7 +30,8 @@ public class DefendantResponseDeadlineCheckCallbackHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::setRespondentResponseDeadlineChecked
+            callbackKey(ABOUT_TO_SUBMIT), this::setRespondentResponseDeadlineChecked,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
