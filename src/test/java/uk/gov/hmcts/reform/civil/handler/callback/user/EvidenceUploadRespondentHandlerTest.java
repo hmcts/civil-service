@@ -1209,27 +1209,29 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
         // Given caseBundles with bundle created date is before witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
-            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
-            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
+            // populate respondentDocsUploadedAfterBundle with an existing upload
+            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
+            // added before trial bundle, so will not be added
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url11"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url22"))
+            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url33"))
+            // added after trial bundle, so will  be added
+            .documentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
+            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url55"))
+            .documentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url77"))
             // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
-
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        // Then respondent docs uploaded after bundle should return size 4
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(6);
+        // Then respondent docs uploaded after bundle should return size 5, 4 new docs and 1 existing.
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(5);
     }
 
     @Test
