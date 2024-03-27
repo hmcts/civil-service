@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ALREADY_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -208,5 +209,38 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
+    }
+
+    @Test
+    public void configureDashboardNotificationsForDefendantResponseForDefenceNoMediation() {
+        //given
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(1234L))
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        //when
+        handler.handle(callbackParams);
+
+        //then
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
     }
 }
