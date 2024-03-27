@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -557,6 +558,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+
+            assertThat(response.getData()).extracting("hearingMethodValuesTrialHearingDJ").isNull();
+            assertThat(response.getData()).extracting("hearingMethodValuesDisposalHearingDJ").isNull();
         }
 
         @Test
@@ -616,12 +620,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .map(DynamicListElement::getLabel)
                 .collect(Collectors.toList());
 
-            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesTrialHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
                 .collect(Collectors.toList());
 
             assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
             assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
+
+            assertThat(hearingMethodValuesTrialHearingDJ.getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
+            assertThat(hearingMethodValuesDisposalHearingDJ.getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
         }
 
         private DynamicList getHearingMethodValuesDisposalHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
