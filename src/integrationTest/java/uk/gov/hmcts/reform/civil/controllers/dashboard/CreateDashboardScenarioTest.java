@@ -77,7 +77,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
                    .params(Map.of("claimFee", "£70"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.ClaimFee.Required.Test", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.ClaimFee.Required.Test", caseId
         )
             .andExpect(status().isOk());
 

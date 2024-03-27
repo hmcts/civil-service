@@ -2,16 +2,16 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant',
-        '{"Notice.AAA7.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant"}',
-        '{"Notice.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant" : ["applicant1PartyName"]}');
+VALUES ('Scenario.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant',
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant" : ["applicant1PartyName"]}');
 
 /**
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant',
+VALUES ('Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant',
         'Wait for the court to review the case', 'Wait for the court to review the case',
         '<p class="govuk-body">${applicant1PartyName} wants to proceed to court.</p>'
         '<p class="govuk-body">They rejected your response.</p>'
