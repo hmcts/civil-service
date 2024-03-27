@@ -28,7 +28,7 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
                     .should(boolQuery()
                                 .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
                                 .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-                                .must(beState(CaseState.AWAITING_DEFENDANT_RESPONSE))
+                                .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                         ),
                 List.of("reference"),
                 startIndex

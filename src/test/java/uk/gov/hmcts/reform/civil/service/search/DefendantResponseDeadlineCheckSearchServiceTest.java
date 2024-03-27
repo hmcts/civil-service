@@ -26,7 +26,7 @@ class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServi
             .should(boolQuery()
                 .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
                 .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-                .must(boolQuery().must(matchQuery("state", "AWAITING_DEFENDANT_RESPONSE"))));
+                .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
