@@ -11,6 +11,7 @@ public enum PaymentFrequencyLRspec {
     ONCE_THREE_WEEKS("Paid every 3 weeks", "every 3 weeks"),
     ONCE_FOUR_WEEKS("Paid every 4 weeks", "every 4 weeks"),
     ONCE_ONE_MONTH("Paid every month", "every month");
+
     private final String label;
     private final String dashboardLabel;
 }

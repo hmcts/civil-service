@@ -106,6 +106,17 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ClaimSettledDateCy", DateUtils.formatDate(claimSettleDate));
         }
 
+        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
+                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
+            getFirstRepaymentDate(caseData).map(date -> {
+                params.put("firstRepaymentDateEn", date);
+                params.put("firstRepaymentDateCy", date);
+                return Optional.of(date);
+            });
+        }
+
         return params;
     }
 
@@ -154,10 +165,11 @@ public class DashboardNotificationsParamsMapper {
 
     private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-            MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros)
+                MonetaryConversions::penniesToPounds).map(
+                BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
     }
 
