@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_RESPONSE_DEADLINE_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -49,7 +49,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_DEFENDANT);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_RESPONSE_DEADLINE_DEFENDANT);
     }
 
     @Test
@@ -57,7 +57,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_DEFENDANT.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_RESPONSE_DEADLINE_DEFENDANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -80,7 +80,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
             when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_DEFENDANT.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_RESPONSE_DEADLINE_DEFENDANT.name()).build()
             ).build();
 
             handler.handle(params);
