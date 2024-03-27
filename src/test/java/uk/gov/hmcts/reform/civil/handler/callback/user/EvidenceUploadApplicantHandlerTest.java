@@ -628,7 +628,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then respondent docs uploaded after bundle should return size 5, 4 new docs and 1 existing.
-        System.out.println("test  "+updatedData.getApplicantDocsUploadedAfterBundle());
         assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(5);
     }
 
