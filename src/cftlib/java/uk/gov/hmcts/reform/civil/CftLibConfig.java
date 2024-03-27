@@ -42,7 +42,37 @@ public class CftLibConfig implements CFTLibConfigurer {
             "pui-user-manager",
             "pui-caa",
             "prd-admin",
-            "payments"
+            "payments",
+            "caseworker-wa-task-configuration",
+            "judge-profile",
+            "payment-access",
+            "hearing-centre-team-leader",
+            "caseworker-ras-validation",
+            "citizen-profile",
+            "next-hearing-date-admin",
+            "RES-SOL-TWO-SPEC-PROFILE",
+            "legal-adviser",
+            "full-access",
+            "CITIZEN-DEFENDANT-PROFILE",
+            "civil-administrator-basic",
+            "civil-administrator-standard",
+            "judge",
+            "APP-SOL-SPEC-PROFILE",
+            "hearing-schedule-access",
+            "cui-nbc-profile",
+            "RES-SOL-TWO-UNSPEC-PROFILE",
+            "CITIZEN-CLAIMANT-PROFILE",
+            "caseworker-civil-citizen-ui-pcqextractor",
+            "caseflags-admin",
+            "RES-SOL-ONE-UNSPEC-PROFILE",
+            "caseworker-civil-systemupdate",
+            "caseflags-viewer",
+            "GS_profile",
+            "hearing-centre-admin",
+            "APP-SOL-UNSPEC-PROFILE",
+            "RES-SOL-ONE-SPEC-PROFILE",
+            "admin-access",
+            "cui-admin-profile"
         );
 
         var users = Map.of(
@@ -83,7 +113,7 @@ public class CftLibConfig implements CFTLibConfigurer {
         );
 
         for (var entry : users.entrySet()) {
-            lib.createIdamUser(entry.getKey(), entry.getValue().toArray(new String[0]));
+            lib.createProfile(entry.getKey(), "CIVIL", "CIVIL", "Submitted");
         }
 
         var civilDefs = Files.readAllBytes(Path.of("build/ccd-def/civil-ccd-definition.xlsx"));
