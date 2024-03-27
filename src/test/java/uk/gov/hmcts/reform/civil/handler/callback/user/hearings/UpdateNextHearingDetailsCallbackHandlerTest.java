@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
@@ -104,7 +105,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
-                    ABOUT_TO_START
+                    ABOUT_TO_SUBMIT
                 );
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -144,7 +145,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
-                    ABOUT_TO_START
+                    ABOUT_TO_SUBMIT
                 );
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -189,7 +190,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
-                    ABOUT_TO_START
+                    ABOUT_TO_SUBMIT
                 );
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -232,7 +233,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
-                    ABOUT_TO_START
+                    ABOUT_TO_SUBMIT
                 );
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -266,7 +267,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
-                    ABOUT_TO_START
+                    ABOUT_TO_SUBMIT
                 );
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
