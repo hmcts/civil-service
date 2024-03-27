@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -284,7 +285,7 @@ class NotificationUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
-        CaseData caseData = CaseDataBuilder.builder().claimantUserDetails(IdamUserDetails.builder().email("lipapplicant@example.com").build()).build();
+        CaseData caseData = CaseDataBuilder.builder().applicant1(Party.builder().partyEmail("lipapplicant@example.com").build()).build();
 
         if (!isApplicantLip) {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();

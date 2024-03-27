@@ -19,9 +19,9 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -101,8 +101,8 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
     private Map<String, String> addPropertiesLip(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            PARTY_NAME, caseData.getApplicant1().getPartyName()
         );
     }
 }
