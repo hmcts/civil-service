@@ -62,7 +62,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " every " + frequency.getLabel() + ".They are offering to do this starting from "
+                        + " " + frequency.getDashboardLabel() + ".They are offering to do this starting from "
                         + DateUtils.formatDate(firstPaymentDate)
                         + ".</p><p class=\"govuk-body\">The defendant needs to send you their financial details."
                         + " <a href=\"{VIEW_AND_RESPOND}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"

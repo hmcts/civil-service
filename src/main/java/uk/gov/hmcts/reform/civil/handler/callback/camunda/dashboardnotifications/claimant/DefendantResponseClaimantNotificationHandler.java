@@ -68,7 +68,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
         }
 
         if (caseData.getCcdState() == AWAITING_APPLICANT_INTENTION) {
-            if (isPartOrFullAdmitPayByInstallments(caseData)) {
+            if (isPartOrFullAdmitPayByInstallments(caseData) && !caseData.getRespondent1().isCompanyOROrganisation()) {
                 return SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
             }
         }
