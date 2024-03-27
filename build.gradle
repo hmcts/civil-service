@@ -387,10 +387,8 @@ dependencies {
 
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
-
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.2'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
-
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'

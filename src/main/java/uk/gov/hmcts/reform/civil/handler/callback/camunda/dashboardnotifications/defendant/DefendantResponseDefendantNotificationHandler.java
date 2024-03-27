@@ -21,9 +21,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ALREADY_PAID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -54,17 +56,27 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
 
     private String getScenario(CaseData caseData) {
 
+        if (caseData.isPayBySetDate()) {
+            return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario();
+        }
+
         if ((caseData.isRespondentResponseFullDefence() && caseData.hasDefendantPayedTheAmountClaimed())
             || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitAlreadyPaid())) {
             return SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario();
-        } else if (caseData.isFullAdmitPayImmediatelyClaimSpec()
-            || caseData.isPartAdmitPayImmediatelyClaimSpec()) {
-            return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario();
-        } else if ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
-            && caseData.isPayByInstallment()) {
-            return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario();
         }
 
+        if (caseData.isFullAdmitPayImmediatelyClaimSpec()
+            || caseData.isPartAdmitPayImmediatelyClaimSpec()) {
+            return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario();
+        }
+        if ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+            && caseData.isPayByInstallment()) {
+            if (caseData.getRespondent1().isCompanyOROrganisation()) {
+                return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario();
+            } else {
+                return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario();
+            }
+        }
         return null;
     }
 
