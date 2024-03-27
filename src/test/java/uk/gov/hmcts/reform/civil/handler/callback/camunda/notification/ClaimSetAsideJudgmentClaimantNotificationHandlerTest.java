@@ -27,10 +27,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 
 @SpringBootTest(classes = {
     ClaimSetAsideJudgmentClaimantNotificationHandler.class,
@@ -87,6 +90,32 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 "set-aside-judgment-applicant-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyApplicantLipSolicitor_whenInvoked() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                .build();
+            caseData.setJoSetAsideJudgmentErrorText("test error");
+
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "applicantsolicitor@example.com",
+                TEMPLATE_ID,
+                getNotificationDataMapLip(caseData),
+                "set-aside-judgment-applicant-notification-000DC001"
+            );
+        }
     }
 
     @NotNull
@@ -96,6 +125,14 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
             LEGAL_ORG_NAME, "Test Org Name",
             REASON_FROM_CASEWORKER, "test error",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader"
+        );
+    }
+
+    private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 }

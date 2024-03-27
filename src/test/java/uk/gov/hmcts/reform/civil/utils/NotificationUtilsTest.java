@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -16,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
 class NotificationUtilsTest {
 
@@ -263,5 +267,29 @@ class NotificationUtilsTest {
         );
 
         assertThat(actual).isEqualTo("Signer Name");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnTheCorrectApplicantEmail_ForApplicantLR(boolean isApplicantLip) {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+        if (isApplicantLip) {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
+        } else {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("applicantsolicitor@example.com");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
+        CaseData caseData = CaseDataBuilder.builder().claimantUserDetails(IdamUserDetails.builder().email("lipapplicant@example.com").build()).build();
+
+        if (!isApplicantLip) {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
+        } else {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("lipapplicant@example.com");
+        }
     }
 }

@@ -11,19 +11,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getApplicantEmail;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
@@ -60,7 +56,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimSetAsideJudgementToClaimant(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimSetAsideJudgmentToClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = caseData.isApplicantLiP();
         String recipientEmail = getApplicantEmail(caseData, isApplicantLip);
@@ -68,7 +64,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
             notificationService.sendMail(
                 recipientEmail,
                 getTemplate(isApplicantLip),
-                addProperties(caseData),
+                getEmailProperties(caseData),
                 getReferenceTemplate(caseData, isApplicantLip)
             );
         }
@@ -97,11 +93,16 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
             : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getApplicantLegalOrganizationName(CaseData caseData) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    private Map<String, String> getEmailProperties(CaseData caseData) {
+        return caseData.isApplicantLiP() ? addPropertiesLip(caseData)
+            : addProperties(caseData);
     }
 
+    private Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
+        );
+    }
 }

@@ -175,4 +175,11 @@ public class NotificationUtils {
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
+    public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
+        if (isApplicantLip) {
+            return caseData.getClaimantUserDetails() != null ? caseData.getClaimantUserDetails().getEmail() : null;
+        } else {
+            return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
+        }
+    }
 }
