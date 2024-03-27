@@ -276,7 +276,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         public Map<String, String> getNotificationLipDataMapSpec(CaseData caseData) {
             return Map.of(
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                RESPONDENT_NAME,getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
