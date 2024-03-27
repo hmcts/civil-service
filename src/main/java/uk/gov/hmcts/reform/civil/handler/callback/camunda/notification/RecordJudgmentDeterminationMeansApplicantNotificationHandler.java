@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_FOR_RECORD_JUDGMENT;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
@@ -70,6 +70,7 @@ public class RecordJudgmentDeterminationMeansApplicantNotificationHandler extend
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
