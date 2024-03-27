@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -26,7 +26,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
             BEARER_TOKEN,
             ScenarioRequestParams.builder().params(Map.of("typeOfFee", "claim")).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
+            SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
             caseId
         ).andExpect(status().isOk());
 
@@ -35,12 +35,16 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionEn").value(
-                "You've applied for help with the claim fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}."),
+                "<p class=\"govuk-body\">You've applied for help with the claim fee, but the reference"
+                    + " number is invalid.<br>You've been sent an email with instructions on what to do next."
+                    + " If you've already read the email and taken action, disregard this message.<br>You can pay by"
+                    + " phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value("You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionCy").value(
-                "You've applied for help with the claim fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "<p class=\"govuk-body\">You've applied for help with the claim fee, but the reference"
+                    + " number is invalid.<br>You've been sent an email with instructions on what to do next."
+                    + " If you've already read the email and taken action, disregard this message.<br>You can pay by"
+                    + " phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }

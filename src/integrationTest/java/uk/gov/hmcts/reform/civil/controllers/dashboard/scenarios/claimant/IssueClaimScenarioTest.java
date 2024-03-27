@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -37,7 +37,7 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                        )
                    )
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), caseId
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), caseId
         )
             .andExpect(status().isOk());
 
@@ -48,7 +48,8 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
                 jsonPath("$[0].descriptionEn").value(
-                    defendantName + " has until " + responseDeadline + " to respond. They can request an extra 28 days if they need it.")
+                    "<p class=\"govuk-body\">" + defendantName + " has until "
+                        + responseDeadline + " to respond. They can request an extra 28 days if they need it.</p>")
             );
 
         //Verify task Item is created

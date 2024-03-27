@@ -17,7 +17,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_RESPONDENT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +50,7 @@ public class CCJRequestedDashboardNotificationDefendantHandler extends CallbackH
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(),
+                                          SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(),
                                           authToken,
                                           ScenarioRequestParams.builder()
                                               .params(mapper.mapCaseDataToParams(caseData)).build());
