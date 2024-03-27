@@ -31,32 +31,30 @@ public class HmcMessageHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsConfiguration paymentsConfiguration;
 
-    public boolean handleMessage(HmcMessage hmcMessage) {
-        if (isMessageRelevantForService(hmcMessage)) {
-            if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                return triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
-            }
-            if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                return triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
-            }
+    public void handleMessage(HmcMessage hmcMessage) {
+        if (!isMessageRelevantForService(hmcMessage)) {
+            log.info("HMC message not relevant for service - Service code: {}", hmcMessage.getHmctsServiceCode());
+            return;
         }
-        return true;
+
+        if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+        } else if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+        } else {
+            log.info("HMC message status {} is not supported by handler.", hmcMessage.getHearingUpdate().getHmcStatus());
+        }
     }
 
-    private boolean triggerCaseEvent(CaseEvent event, Long caseId, String hearingId) {
+    private void triggerCaseEvent(CaseEvent event, Long caseId, String hearingId) {
         // trigger event for WA
         try {
-            log.info("Triggering {} event for Case ID {}, and Hearing ID {}.",
-                      event.name(), caseId, hearingId);
+            log.info("Triggering {} event for Case ID {} and Hearing ID {}.", event.name(), caseId, hearingId);
             coreCaseDataService.triggerEvent(caseId, event);
-            log.info(
-                "Triggered {} event for Case ID {}, and Hearing ID {}.",
-                event.name(), caseId, hearingId);
-            return true;
         } catch (Exception e) {
-            log.info("Error triggering CCD event {}", e.getMessage());
+            log.error("Error triggering {} event: {}", event, e.getMessage());
+            throw e;
         }
-        return false;
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {

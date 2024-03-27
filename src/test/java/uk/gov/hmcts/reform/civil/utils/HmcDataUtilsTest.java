@@ -1173,7 +1173,7 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnLocation_whenInvoked() {
             List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("venue").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments("authToken"))
+            when(locationRefDataService.getHearingCourtLocations("authToken"))
                 .thenReturn(locations);
             LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
                 "HER123",
@@ -1187,7 +1187,7 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldThrowException_whenLocationIsNull() {
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments("abc"))
+            when(locationRefDataService.getHearingCourtLocations("abc"))
                 .thenReturn(null);
             assertThrows(
                 IllegalArgumentException.class,

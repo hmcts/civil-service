@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SD
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -406,7 +408,7 @@ public class CaseDataTest {
     void isFastTrackClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-                .responseClaimTrack(FAST_CLAIM.name())
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                 .build();
         //When
         //Then
@@ -784,6 +786,75 @@ public class CaseDataTest {
         assertThat(fee).isEqualTo(ZERO);
     }
 
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullSpec() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
     @Nested
     class GetHearingLocationText {
 
@@ -971,6 +1042,56 @@ public class CaseDataTest {
         void shouldReturnExpectedAssignedTrack_whenResponseClaimTrackIsDefined() {
             CaseData caseData = CaseData.builder().responseClaimTrack(MULTI_CLAIM.name()).build();
             assertEquals(MULTI_CLAIM.name(), caseData.getAssignedTrack());
+        }
+    }
+
+    @Nested
+    class HWFType {
+        @Test
+        void shouldReturnTrueIfHWFTypeIsHearing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertTrue(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertFalse(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnTrueIfHWFTypeIsClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertTrue(isHWFTypeClaimIssued);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertFalse(isHWFTypeClaimIssued);
         }
     }
 }

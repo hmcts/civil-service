@@ -87,6 +87,23 @@ public interface NotificationData {
 
     // evidence upload
     String UPLOADED_DOCUMENTS = "uploaded documents";
+    String HWF_MORE_INFO_DATE = "date";
+    String HWF_MORE_INFO_DOCUMENTS = "documents";
+    String HWF_MORE_INFO_DOCUMENTS_WELSH  = "documentsWelsh";
+
+    // hwf outcome
+    String REASONS = "reasons";
+    String REASONS_WELSH = "reasonsWelsh";
+    String TYPE_OF_FEE = "typeOfFee";
+    String TYPE_OF_FEE_WELSH = "typeOfFeeWelsh";
+    String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
+    String AMOUNT = "amount";
+    String PART_AMOUNT = "partAmount";
+    String REMAINING_AMOUNT = "remainingAmount";
+    String DEFENDANT_NAME_ONE = "defendantName1";
+    String DEFENDANT_NAME_TWO = "defendantName2";
+    String CLAIMANT_NAME_ONE = "claimant1Name";
+    String CLAIMANT_NAME_TWO = "claimant2Name";
 
     Map<String, String> addProperties(CaseData caseData);
 

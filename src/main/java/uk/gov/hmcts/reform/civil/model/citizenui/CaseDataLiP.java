@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLiP {
@@ -24,6 +24,8 @@ public class CaseDataLiP {
     private MediationLiPCarm respondent1MediationLiPResponseCarm;
     @JsonProperty("applicant1LiPResponse")
     private ClaimantLiPResponse applicant1LiPResponse;
+    @JsonProperty("applicant1LiPResponseCarm")
+    private MediationLiPCarm applicant1LiPResponseCarm;
     private List<Element<TranslatedDocument>> translatedDocuments;
     @JsonProperty("respondent1LiPFinancialDetails")
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
@@ -38,6 +40,9 @@ public class CaseDataLiP {
 
     @JsonProperty("respondentSignSettlementAgreement")
     private YesOrNo respondentSignSettlementAgreement;
+
+    @JsonProperty("applicant1SettleClaim")
+    private YesOrNo applicant1SettleClaim;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {

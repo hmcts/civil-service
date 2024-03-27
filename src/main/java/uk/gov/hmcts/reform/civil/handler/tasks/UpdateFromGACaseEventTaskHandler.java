@@ -35,6 +35,7 @@ import static java.util.Optional.ofNullable;
 public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private static final String gaDocSuffix = "Document";
+    private static final String gaAddlDocSuffix = "Doc";
     private static final String civilDocStaffSuffix = "DocStaff";
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
@@ -102,6 +103,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, gaDraft);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaResp");
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -158,6 +160,10 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
         //staff collection will hold ga doc accessible for judge and staff
         String fromGaList = docFieldName + gaDocSuffix;
+        if (civilDocPrefix.equals("gaAddl")) {
+            fromGaList = docFieldName + gaAddlDocSuffix;
+        }
+
         String toCivilStaffList = civilDocPrefix + civilDocStaffSuffix;
         updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilStaffList);
@@ -207,17 +213,23 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         List<Element<?>> civilDocs =
             (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
+        boolean anyChange = false;
         if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<?> gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
+                    anyChange = true;
                 }
             }
         } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+            anyChange = true;
             civilDocs.addAll(gaDocs);
         }
-        output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
+        if (anyChange) {
+            output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
+            log.info("{} will be updated in UpdateFromGACaseEventTaskHandler for case {}", toCivilList, civilCaseData.getCcdCaseReference());
+        }
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {

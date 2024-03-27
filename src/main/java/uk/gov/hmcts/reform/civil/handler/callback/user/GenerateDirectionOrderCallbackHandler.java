@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -41,6 +43,8 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -103,6 +107,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
+    private String ext = "";
+    private final IdamClient idamClient;
+    private final WorkingDayIndicator workingDayIndicator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -227,11 +234,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return builder
             .orderOnCourtInitiative(FreeFormOrderValues.builder()
                                         .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
-                                        .onInitiativeSelectionDate(LocalDate.now().plusDays(7))
+                                        .onInitiativeSelectionDate(workingDayIndicator
+                                                                       .getNextWorkingDay(LocalDate.now().plusDays(7)))
                                         .build())
             .orderWithoutNotice(FreeFormOrderValues.builder()
                                     .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-                                    .withoutNoticeSelectionDate(LocalDate.now().plusDays(7))
+                                    .withoutNoticeSelectionDate(workingDayIndicator
+                                                                    .getNextWorkingDay(LocalDate.now().plusDays(7)))
                                     .build());
     }
 
@@ -263,11 +272,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
-        LocalDate advancedDate = LocalDate.now().plusDays(14);
-
         populateClaimant2Defendant2PartyNames(caseData);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
-                                                                               .builder().singleDate(LocalDate.now())
+                                                                               .builder().singleDate(workingDayIndicator
+                                                                                                         .getNextWorkingDay(LocalDate.now()))
                                                                                .build()).build())
             .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationComplex(ClaimantAndDefendantHeard
@@ -282,16 +290,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                     .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
                     .alternativeHearingList(getLocationsFromList(locations))
                     .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                                           .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
+                                           .datesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7))).build()).build())
             .orderMadeOnDetailsOrderCourt(
-                OrderMadeOnDetails.builder().ownInitiativeDate(
-                    LocalDate.now().plusDays(7)).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
+                OrderMadeOnDetails.builder().ownInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
+                    .ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
-                OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now().plusDays(7)).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+                OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
+                    .withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderCostsFirstDropdownDate(advancedDate)
-                                                  .assistedOrderAssessmentThirdDropdownDate(advancedDate)
+                                                  .assistedOrderCostsFirstDropdownDate(workingDayIndicator
+                                                                                           .getNextWorkingDay(LocalDate.now().plusDays(14)))
+                                                  .assistedOrderAssessmentThirdDropdownDate(workingDayIndicator
+                                                                                                .getNextWorkingDay(LocalDate.now().plusDays(14)))
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .makeAnOrderForCostsList(CLAIMANT)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
@@ -303,21 +313,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                          .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                            .appealChoiceSecondDropdownA(
                                                                                AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                             .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                                    .build())
                                                                            .appealChoiceSecondDropdownB(
                                                                                AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                                    .build())
                                                                            .build())
                                          .appealRefusedDropdown(AppealGrantedRefused.builder()
                                                                     .appealChoiceSecondDropdownA(
                                                                         AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                             .build())
                                                                     .appealChoiceSecondDropdownB(
                                                                         AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                             .build())
 
                                                                     .build()).build())
@@ -420,15 +434,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
-
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
+
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
-        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("finalOrders"));
+
+        String judgeName = userDetails.getFullName();
+        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("caseManagementOrders"));
+        finalCaseDocuments.forEach(document -> {
+            StringBuilder updatedFileName = new StringBuilder();
+            ext = FilenameUtils.getExtension(document.getValue().getDocumentLink().getDocumentFileName());
+            document.getValue().getDocumentLink().setDocumentFileName(updatedFileName
+                                                                          .append(document.getValue().getCreatedDatetime().toLocalDate().toString())
+                                                                          .append("_").append(judgeName).append(".").append(ext).toString());
+        });
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
