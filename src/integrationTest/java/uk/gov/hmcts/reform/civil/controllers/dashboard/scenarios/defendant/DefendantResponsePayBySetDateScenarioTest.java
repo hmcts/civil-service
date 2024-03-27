@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -17,11 +15,12 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends DashboardBaseIntegrationTest {
+public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DefendantResponseDefendantNotificationHandler handler;
@@ -29,25 +28,19 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
     @Test
     void should_create_part_admit_pay_by_set_date_scenario() throws Exception {
 
-        String caseId = "12341350218";
-        LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+        String caseId = "1830212";
+        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("Company")
-                             .build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .paymentSetDate(whenWillPay)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                             .builder()
-                                             .whenWillThisAmountBePaid(whenWillPay)
-                                             .build())
+                                               .builder()
+                                               .whenWillThisAmountBePaid(responseDeadline)
+                                               .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
 
@@ -60,9 +53,9 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You’ve offered to pay £1000 by " +
-                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
-                        "The court will contact you when they respond.</p> " +
+                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
+                        DateUtils.formatDate(responseDeadline) + ". " +
+                        "The court will contact you when they respond.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
@@ -79,27 +72,20 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
     }
 
     @Test
-    void should_create_full_admit_pay_by_set_date_scenario() throws Exception {
+    void should_create_full_admit_pay_pay_by_set_date_scenario() throws Exception {
 
-        String caseId = "12341350218";
-        LocalDate whenWillPay = LocalDate.now().plusMonths(1);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+        String caseId = "1830213";
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(Party.builder()
-                             .type(Party.Type.ORGANISATION)
-                             .companyName("Organisation")
-                             .build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .paymentSetDate(whenWillPay)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
-                                               .whenWillThisAmountBePaid(whenWillPay)
+                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
                                                .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 
@@ -112,9 +98,9 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You’ve offered to pay £1000 by " +
-                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
-                        "The court will contact you when they respond.</p> " +
+                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
+                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
+                        "The court will contact you when they respond.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
@@ -129,5 +115,4 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
             );
     }
-
 }
