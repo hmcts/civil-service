@@ -628,7 +628,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then respondent docs uploaded after bundle should return size 5, 4 new docs and 1 existing.
-        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(5);
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle()).hasSize(5);
     }
 
     @Test
@@ -648,7 +648,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then applicant docs uploaded after bundle should return size 2
-        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(2);
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle()).hasSize(2);
     }
 
     @Test
