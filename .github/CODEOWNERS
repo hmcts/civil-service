@@ -19,3 +19,9 @@ CODEOWNERS @hmcts/civil-admins
 charts/ @hmcts/civil-infra-admins
 infrastructure/ @hmcts/civil-infra-admins
 
+# Ignore files updated by Renovate
+gradle/wrapper/gradle-wrapper.properties
+Dockerfile
+build.gradle
+charts/**/Chart.yaml
+.github/workflows/*.yaml
