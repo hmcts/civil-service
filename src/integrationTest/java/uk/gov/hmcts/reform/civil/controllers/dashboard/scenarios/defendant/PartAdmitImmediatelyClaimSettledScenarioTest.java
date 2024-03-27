@@ -29,7 +29,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
                                   "respondent1AdmittedAmountPaymentDeadlineCy", "1 January 2024"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.PartAdmit.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.PartAdmit.Defendant", caseId
         )
             .andExpect(status().isOk());
 
