@@ -4,14 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
@@ -22,29 +20,27 @@ import java.time.OffsetDateTime;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest extends DashboardBaseIntegrationTest {
+public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DefendantResponseDefendantNotificationHandler handler;
 
     @Test
-    void should_create_part_admit_pay_instalment_company_organisation_scenario() throws Exception {
+    void should_create_part_admit_pay_by_set_date_scenario() throws Exception {
 
-        String caseId = "12345671";
-        LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
+        String caseId = "1830212";
+        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(PartyBuilder.builder().company().build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal(1000))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                                          .build())
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                               .builder()
+                                               .whenWillThisAmountBePaid(responseDeadline)
+                                               .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
 
@@ -57,11 +53,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
-                        "You've offered to do this starting from " +
-                        DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
-                        "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
+                        DateUtils.formatDate(responseDeadline) + ". " +
+                        "The court will contact you when they respond.</p>" +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
 
@@ -77,24 +72,21 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     }
 
     @Test
-    void should_create_full_admit_pay_instalment_company_organisation_scenario() throws Exception {
+    void should_create_full_admit_pay_pay_by_set_date_scenario() throws Exception {
 
-        String caseId = "12345672";
-        LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
-
+        String caseId = "1830213";
+        LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(PartyBuilder.builder().company().build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal(1000))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                                          .build())
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                               .builder()
+                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
+                                               .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .totalClaimAmount(new BigDecimal(1000))
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -106,11 +98,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
-                        "You've offered to do this starting from " +
-                        DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
-                        "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">You have offered to pay £1000 by " +
+                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
+                        "The court will contact you when they respond.</p>" +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
 
