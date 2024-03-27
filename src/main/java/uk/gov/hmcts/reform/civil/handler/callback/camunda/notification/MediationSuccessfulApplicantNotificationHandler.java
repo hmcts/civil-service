@@ -8,15 +8,20 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -26,6 +31,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     private final OrganisationDetailsService organisationDetailsService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
+
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyApplicant";
@@ -45,13 +52,53 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
+        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
+        if (isCarmEnabled) {
+            String claimId = caseData.getLegacyCaseReference();
+            String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
+            MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+            if (caseData.isLipvLipOneVOne()) {
+                sendEmail(
+                    caseData.getApplicant1().getPartyEmail(),
+                    notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    lipProperties(caseData),
+                    referenceTemplate
+                );
+            } else if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                sendEmail(
+                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                    notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),
+                    oneVtwoProperties(caseData),
+                    referenceTemplate
+                );
+            } else {
+                // LR scenarios
+                sendEmail(
+                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                    notificationsProperties.getNotifyLrClaimantSuccessfulMediation(),
+                    lrClaimantProperties(caseData),
+                    referenceTemplate
+                );
+            }
+        } else {
+            notificationService.sendMail(
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
 
+    }
+
+    private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
+        notificationService.sendMail(
+            targetEmail,
+            emailTemplate,
+            properties,
+            referenceTemplate
+        );
     }
 
     @Override
@@ -66,6 +113,31 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    public Map<String, String> lrClaimantProperties(CaseData caseData) {
+
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    public Map<String, String> oneVtwoProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_ONE, getPartyNameBasedOnType(caseData.getRespondent1()),
+            DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2())
+        );
+    }
+
+    public Map<String, String> lipProperties(CaseData caseData) {
+        return Map.of(
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 

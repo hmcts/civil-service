@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @MockBean
-    private FeatureToggleService featureToggleService;
+    protected FeatureToggleService featureToggleService;
 
     @Autowired
     private DashboardNotificationsRepository dashboardNotificationsRepository;
