@@ -105,7 +105,24 @@ public class DashboardNotificationsParamsMapper {
             params.put("instalmentTimePeriodCy", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
         }
 
+        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
+                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
+            getFirstRepaymentDate(caseData).map(date -> {
+                params.put("firstRepaymentDateEn", date);
+                params.put("firstRepaymentDateCy", date);
+                return Optional.of(date);
+            });
+        }
+
         return params;
+    }
+
+    private Optional<String> getFirstRepaymentDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .map(DateUtils::formatDate);
     }
 
     private Optional<String> getClaimSettledAmount(CaseData caseData) {
@@ -147,8 +164,8 @@ public class DashboardNotificationsParamsMapper {
 
     private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-            MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros)
+                MonetaryConversions::penniesToPounds).map(
+                BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
             .map(this::removeDoubleZeros)
