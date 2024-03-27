@@ -1175,8 +1175,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
                 .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
         LocalDateTime trialBundleDate = null;
-        if (bundleDetails.isPresent() && bundleDetails.get().getCreatedOn().isPresent()) {
-            trialBundleDate = bundleDetails.get().getCreatedOn().get();
+        if (bundleDetails.isPresent()) {
+            Optional<LocalDateTime> createdOn = bundleDetails.get().getCreatedOn();
+            if (createdOn.isPresent()) {
+                trialBundleDate = createdOn.get();
+            }
         }
         if (Objects.equals(respondentOrApplicant, "applicant")) {
             populateBundleCollection(
