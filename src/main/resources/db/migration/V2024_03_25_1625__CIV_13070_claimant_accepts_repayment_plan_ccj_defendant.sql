@@ -6,6 +6,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan
         '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant",
           "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant",
+          "Notice.AAA6.ClaimIssue.Response.Required",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant":["applicant1PartyName"]}');
 
