@@ -1345,8 +1345,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12),"url1"))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .caseBundles(caseBundles)
             .build();
 
