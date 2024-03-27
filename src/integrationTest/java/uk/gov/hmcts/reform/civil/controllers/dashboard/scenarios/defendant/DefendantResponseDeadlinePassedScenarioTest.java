@@ -53,7 +53,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
                                + "<p class=\"govuk-body\">You can still respond to the claim before they ask for a judgment.</p>"
                                + "<p class=\"govuk-body\">A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact."
                                + " Bailiffs could also be sent to your home.</p>"
-                               + "<p class=\"govuk-body\"><a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to"
+                               + "<p class=\"govuk-body\"><a href=\"{RESPONSE_TASK_LIST_URL}\" class=\"govuk-link\">Respond to"
                                + " claim</a></p>")
             );
     }
