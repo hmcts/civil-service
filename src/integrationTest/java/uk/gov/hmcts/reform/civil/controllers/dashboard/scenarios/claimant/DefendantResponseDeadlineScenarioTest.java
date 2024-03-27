@@ -17,8 +17,6 @@ import java.time.OffsetDateTime;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -47,7 +45,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has not responded to the claim.</p>" +
-                    "<p class=\"govuk-body\">You can now request a county court judgement.<p/>" +
+                    "<p class=\"govuk-body\">You can now request a county court judgment.<p/>" +
                     "<p class=\"govuk-body\">The defendant can still respond to the claim before you ask for a judgment.</p>" +
                     "<p class=\"govuk-body\"><a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" class=\"govuk-link\">Request a CCJ</a></p>")
             );
