@@ -43,13 +43,13 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation.The claimant can reject or agree to mediation.</p>" +
-                              "<p class=\"govuk-body\">The court will contact you when they respond.<br>"
+                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>" +
+                              "The court will contact you when they respond.<br>"
                                + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation.The claimant can reject or agree to mediation.</p>" +
-                        "<p class=\"govuk-body\">The court will contact you when they respond.<br>"
+                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>" +
+                        "The court will contact you when they respond.<br>"
                          + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>")
 
             );
