@@ -22,6 +22,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPO
 @Service
 public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
+    private static final String RESPONDENT = "respondent";
+
     public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService,
                                            CaseDetailsConverter caseDetailsConverter,
                                            CoreCaseDataService coreCaseDataService,
@@ -88,151 +90,151 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
         addUploadDocList(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName(), "respondent");
+                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName(), RESPONDENT);
 
         addUploadDocList(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentReferredInStatementRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentReferredInStatementRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentCaseSummaryRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentCaseSummaryRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentWitnessSummaryRes(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentWitnessSummaryRes2(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentHearsayNoticeRes(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentHearsayNoticeRes2(), document -> document.getValue().getWitnessOptionDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentExpertReportRes(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentExpertReportRes2(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentJointStatementRes(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentJointStatementRes2(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentQuestionsRes(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentQuestionsRes2(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentAnswersRes(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName(), RESPONDENT
         );
 
         addUploadDocList(caseData.getDocumentAnswersRes2(), document -> document.getValue().getExpertDocument(),
                          documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), caseDataBuilder, caseData,
-                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName(), "respondent"
+                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName(), RESPONDENT
         );
     }
 }

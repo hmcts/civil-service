@@ -1231,7 +1231,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then respondent docs uploaded after bundle should return size 5, 4 new docs and 1 existing.
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(5);
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).hasSize(5);
     }
 
     @Test
@@ -1240,55 +1240,55 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentDisclosureListApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
             .documentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
-            .documentForDisclosureApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentForDisclosureRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
             .documentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
-            .documentReferredInStatementApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentReferredInStatementRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
             .documentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url7"))
-            .documentCaseSummaryApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentCaseSummaryRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url8"))
             .documentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url9"))
-            .documentSkeletonArgumentApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentSkeletonArgumentRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url10"))
             .documentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url11"))
-            .documentAuthoritiesApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentAuthoritiesRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url12"))
             .documentCostsRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url13"))
-            .documentCostsApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentCostsRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url14"))
             .documentHearsayNoticeRes(getWitnessDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url15"))
-            .documentHearsayNoticeApp2(getWitnessDocs(
+            .documentHearsayNoticeRes2(getWitnessDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url16"))
             .documentWitnessSummaryRes(getWitnessDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"))
-            .documentWitnessSummaryApp2(getWitnessDocs(
+            .documentWitnessSummaryRes2(getWitnessDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url18"))
             .documentQuestionsRes(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url19"))
-            .documentQuestionsApp2(getExpertDocs(
+            .documentQuestionsRes2(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"))
             .documentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url21"))
-            .documentEvidenceForTrialApp2(getUploadEvidenceDocumentTypeDocs(
+            .documentEvidenceForTrialRes2(getUploadEvidenceDocumentTypeDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
             .documentAnswersRes(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"))
-            .documentAnswersApp2(getExpertDocs(
+            .documentAnswersRes2(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url24"))
             .documentJointStatementRes(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url25"))
-            .documentJointStatementApp2(getExpertDocs(
+            .documentJointStatementRes2(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url26"))
             .documentExpertReportRes(getExpertDocs(
                 LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url27"))
@@ -1330,7 +1330,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then applicant docs uploaded after bundle should return size 2
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(2);
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).hasSize(2);
     }
 
     @Test
