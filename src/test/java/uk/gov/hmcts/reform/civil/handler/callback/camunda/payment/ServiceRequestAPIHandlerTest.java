@@ -5,6 +5,8 @@ import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -333,14 +335,18 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
         }
 
-        @Test
-        void shouldNotCalculateFee_whenHearingTypeIsDisposal() {
+        @ParameterizedTest
+        @CsvSource({
+            "AAA7-DIS",
+            "AAA7-DRH"
+        })
+        void shouldNotCalculateFee_whenHearingTypeIs(String hearingType) {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
                 .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
 
             when(camundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-DIS")
+                                .hearingType(hearingType)
                                 .build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
