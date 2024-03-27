@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASID
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getApplicantEmail;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -34,6 +35,7 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
     public static final String TASK_ID = "NotifyClaimantSetAsideJudgement";
 
     private static final String REFERENCE_TEMPLATE = "set-aside-judgement-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "set-aside-judgement-applicant-notification-lip-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -59,12 +61,14 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
 
     private CallbackResponse notifyClaimSetAsideJudgementToClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
+        boolean isApplicantLip = caseData.isApplicantLiP();
+        String recipientEmail = getApplicantEmail(caseData, isApplicantLip);
+        if (recipientEmail != null) {
             notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                getTemplate(),
+                recipientEmail,
+                getTemplate(isApplicantLip),
                 addProperties(caseData),
-                getReferenceTemplate(caseData)
+                getReferenceTemplate(caseData, isApplicantLip)
             );
         }
 
@@ -92,12 +96,14 @@ public class ClaimSetAsideJudgementClaimantNotificationHandler extends CallbackH
 
     }
 
-    private String getTemplate() {
-        return notificationsProperties.getNotifySetAsideJudgementTemplate();
+    private String getTemplate(boolean isApplicantLip) {
+        return isApplicantLip ? notificationsProperties.getNotifyUpdateTemplate()
+            : notificationsProperties.getNotifySetAsideJudgementTemplate();
     }
 
-    private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {
+        return isApplicantLip ? String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference())
+            : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
     private String getApplicantLegalOrganizationName(CaseData caseData) {

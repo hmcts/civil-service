@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -143,5 +144,10 @@ public class HearingUtils {
 
     public static boolean isDisposalHearing(String hearingType) {
         return hearingType.contains("DIS");
+    }
+
+    public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
+        return isApplicantLip ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }
