@@ -78,6 +78,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
                 && caseData.isPayBySetDate()) {
             return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario();
         }
+
         return null;
     }
 
