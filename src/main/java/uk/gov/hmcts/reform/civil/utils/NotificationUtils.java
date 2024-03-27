@@ -140,6 +140,17 @@ public class NotificationUtils {
             && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())));
     }
 
+    public static String getDefendantNameBasedOnCaseType(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            return getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
+    }
+
     public static boolean shouldSendMediationNotificationDefendant2LRCarm(CaseData caseData, boolean isCarmEnabled) {
         return isCarmEnabled
             && !caseData.isRespondent2NotRepresented()
@@ -155,5 +166,12 @@ public class NotificationUtils {
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
+    }
+
+    public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }

@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -186,6 +188,26 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("applicant1ClaimSettledDateEn").isEqualTo("19 March 2024");
         assertThat(result).extracting("applicant1ClaimSettledDateCy").isEqualTo("19 March 2024");
+    }
+
+    @Test
+    public void shouldMapParameters_whenRepaymentPlanIsSet() {
+        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
+
+        caseData = caseData.toBuilder().respondent1RepaymentPlan(
+            RepaymentPlanLRspec.builder()
+                .firstRepaymentDate(date)
+                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                .paymentAmount(new BigDecimal(1000))
+                .build()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("instalmentAmount").isEqualTo("£10");
+        assertThat(result).extracting("instalmentTimePeriodEn").isEqualTo("week");
+        assertThat(result).extracting("instalmentTimePeriodCy").isEqualTo("week");
+        assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
+        assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDate(date));
     }
 }
 
