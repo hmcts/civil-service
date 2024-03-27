@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -85,6 +86,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyApplicant_whenInvoked() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .applicant1Represented(YES)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -278,7 +280,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-
     }
 
     public Map<String, String> lrClaimantProperties(CaseData caseData) {
