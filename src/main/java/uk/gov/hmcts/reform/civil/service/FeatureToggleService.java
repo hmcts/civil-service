@@ -70,7 +70,7 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardServiceEnabled() {
-        return featureToggleApi.isFeatureEnabled("dashboard-service");
+        return true;
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
