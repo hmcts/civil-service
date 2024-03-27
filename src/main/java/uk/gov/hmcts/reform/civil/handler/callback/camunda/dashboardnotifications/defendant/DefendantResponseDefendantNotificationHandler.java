@@ -69,7 +69,6 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
             return SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario();
         }
 
-
         if (caseData.isFullAdmitPayImmediatelyClaimSpec()
             || caseData.isPartAdmitPayImmediatelyClaimSpec()) {
             return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT.getScenario();
