@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 
 public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  DashboardBaseIntegrationTest {
+
     @Autowired
     private DefendantResponseDefendantNotificationHandler handler;
 
