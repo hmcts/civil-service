@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class HwfRequestedScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_HWF_REQUESTED = "Scenario.AAA7.ClaimIssue.HWF.Requested";
+    public static final String SCENARIO_HWF_REQUESTED = "Scenario.AAA6.ClaimIssue.HWF.Requested";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL

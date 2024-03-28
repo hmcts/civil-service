@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -95,13 +97,32 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ClaimSettledDateCy", DateUtils.formatDate(claimSettleDate));
         }
 
-        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
-            String date = DateUtils.formatDate(caseData.getApplicant1ResponseDeadline());
-            params.put("applicant1ResponseDeadlineEn", date);
-            params.put("applicant1ResponseDeadlineCy", date);
+        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
+            getInstalmentAmount(caseData).map(amount -> params.put("instalmentAmount", amount));
+            getInstalmentStartDate(caseData).map(dateEn -> params.put("instalmentStartDateEn", dateEn));
+            getInstalmentStartDate(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
+            params.put("instalmentTimePeriodEn", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+            params.put("instalmentTimePeriodCy", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+        }
+
+        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
+                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
+            getFirstRepaymentDate(caseData).map(date -> {
+                params.put("firstRepaymentDateEn", date);
+                params.put("firstRepaymentDateCy", date);
+                return Optional.of(date);
+            });
         }
 
         return params;
+    }
+
+    private Optional<String> getFirstRepaymentDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .map(DateUtils::formatDate);
     }
 
     private Optional<String> getClaimSettledAmount(CaseData caseData) {
@@ -143,8 +164,8 @@ public class DashboardNotificationsParamsMapper {
 
     private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-            MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros)
+                MonetaryConversions::penniesToPounds).map(
+                BigDecimal::stripTrailingZeros)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)
             .map(this::removeDoubleZeros)
@@ -156,5 +177,31 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
+    }
+
+    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "week";
+            case ONCE_TWO_WEEKS -> "2 weeks";
+            case ONCE_THREE_WEEKS -> "3 weeks";
+            case ONCE_FOUR_WEEKS -> "4 weeks";
+            case ONCE_ONE_MONTH -> "month";
+            default -> null;
+        };
+    }
+
+    private Optional<String> getInstalmentStartDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
+            .map(DateUtils::formatDate);
+    }
+
+    private Optional<String> getInstalmentAmount(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+            .map(RepaymentPlanLRspec::getPaymentAmount)
+            .map(MonetaryConversions::penniesToPounds)
+            .map(amount -> amount.setScale(2))
+            .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
+            .map(amount -> "£" + amount);
     }
 }

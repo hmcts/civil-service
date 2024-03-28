@@ -69,7 +69,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.Response.Await",
+                "Scenario.AAA6.ClaimIssue.Response.Await",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -93,7 +93,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.HWF.PhonePayment",
+                "Scenario.AAA6.ClaimIssue.HWF.PhonePayment",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
