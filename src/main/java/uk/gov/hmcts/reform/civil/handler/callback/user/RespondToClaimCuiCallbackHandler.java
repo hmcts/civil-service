@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 
 @Slf4j
 @Service
@@ -38,6 +41,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,9 +59,17 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData updatedData = getUpdatedCaseData(callbackParams);
+        CaseData caseData = getUpdatedCaseData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        boolean responseLanguageIsBilingual = updatedData.isRespondentResponseBilingual();
+        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateDQPartyIds(builder);
+        }
+        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
+
+        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
