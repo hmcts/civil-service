@@ -331,6 +331,7 @@ notifications:
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
@@ -390,6 +391,8 @@ notifications:
   notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
+  
+  notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
