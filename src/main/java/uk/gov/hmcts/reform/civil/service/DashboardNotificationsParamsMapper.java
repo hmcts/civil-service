@@ -62,22 +62,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
-        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
-                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
-            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
-            getFirstRepaymentDate(caseData).map(date -> {
-                params.put("firstRepaymentDateEn", date);
-                params.put("firstRepaymentDateCy", date);
-                return Optional.of(date);
-            });
-        }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
                 "claimIssueRemissionAmount",
-                "£" + this.removeDoubleZeros(MonetaryConversions
-                                                 .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
+                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                    caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
         }
         if (caseData.getOutstandingFeeInPounds() != null) {
@@ -117,19 +107,35 @@ public class DashboardNotificationsParamsMapper {
             getInstalmentAmount(caseData).map(amount -> params.put("instalmentAmount", amount));
             getInstalmentStartDate(caseData).map(dateEn -> params.put("instalmentStartDateEn", dateEn));
             getInstalmentStartDate(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
-            params.put("instalmentTimePeriodEn", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
-            params.put("instalmentTimePeriodCy", getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()));
+            params.put(
+                "instalmentTimePeriodEn",
+                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
+            );
+            params.put(
+                "instalmentTimePeriodCy",
+                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
+            );
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
-                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
-            params.put("paymentFrequency", caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel());
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+
+            params.put(
+                "paymentFrequency",
+                caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
+            );
             getFirstRepaymentDate(caseData).map(date -> {
                 params.put("firstRepaymentDateEn", date);
                 params.put("firstRepaymentDateCy", date);
                 return Optional.of(date);
             });
+        }
+
+        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+            String date = DateUtils.formatDate(caseData.getApplicant1ResponseDeadline());
+            params.put("applicant1ResponseDeadlineEn", date);
+            params.put("applicant1ResponseDeadlineCy", date);
         }
 
         return params;
