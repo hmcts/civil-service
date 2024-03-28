@@ -164,6 +164,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
+    private List<Element<UploadEvidenceDocumentType>> additionalBundleDocs;
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
@@ -219,6 +220,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 dynamicListOptions.add(OPTION_DEF_BOTH);
             }
         }
+        additionalBundleDocs = new ArrayList<>();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //Evidence upload will have different screen for Fast claims and Small claims.
         // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
@@ -1210,12 +1212,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                               Consumer<List<Element<UploadEvidenceDocumentType>>> docsUpdater,
                                               String documentTypeDisplayName,
                                               LocalDateTime trialBundleDate) {
-        List<Element<UploadEvidenceDocumentType>> additionalBundleDocs = new ArrayList<>();
         // If either claimant or respondent additional bundle doc collection exists, we add to that
         if (existingDocsSupplier.get() != null) {
             additionalBundleDocs = existingDocsSupplier.get();
         }
-        List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDocs = additionalBundleDocs;
         documentUploaded.forEach(uploadEvidenceDocumentType -> {
             Document documentToAdd = documentExtractor.apply(uploadEvidenceDocumentType);
             LocalDateTime documentCreatedDateTime = documentUploadTimeExtractor.apply(uploadEvidenceDocumentType);
@@ -1225,7 +1225,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 && documentCreatedDateTime.isAfter(trialBundleDate)
             ) {
                 // If a document already exists in the collection, it cannot be re-added.
-                boolean containsValue = finalAdditionalBundleDocs.stream()
+                boolean containsValue = additionalBundleDocs.stream()
                     .map(Element::getValue)
                     .map(UploadEvidenceDocumentType::getDocumentUpload)
                     .map(Document::getDocumentUrl)
@@ -1236,8 +1236,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                         .createdDatetime(documentCreatedDateTime)
                         .documentUpload(documentToAdd)
                         .build();
-                    finalAdditionalBundleDocs.add(element(newDocument));
-                    docsUpdater.accept(finalAdditionalBundleDocs);
+                    additionalBundleDocs.add(element(newDocument));
+                    docsUpdater.accept(additionalBundleDocs);
                 }
             }
         });
