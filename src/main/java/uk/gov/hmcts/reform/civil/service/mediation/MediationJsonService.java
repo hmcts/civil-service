@@ -47,6 +47,7 @@ public class MediationJsonService {
         buildLitigantFields(caseData, litigantList);
 
         return MediationCase.builder()
+            .ccdCaseNumber(caseData.getCcdCaseReference())
             .caseFlags(activeCaseFlags)
             .litigants(litigantList)
             .build();
