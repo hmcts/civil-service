@@ -323,4 +323,29 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             );
         }
     }
+
+    @Test
+    void shouldRecordScenario_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
+            .toBuilder().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
+        ).build();
+
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+        Map<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
 }
