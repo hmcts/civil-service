@@ -62,9 +62,20 @@ public class ResponseRepaymentDetailsForm {
     public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData) {
         ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
 
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent1ClaimResponseTypeForSpec());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent2ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
                 case PART_ADMISSION -> partAdmissionData(caseData, builder);
                 case FULL_DEFENCE -> fullDefenceData(caseData, builder);
@@ -111,6 +122,16 @@ public class ResponseRepaymentDetailsForm {
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
             builder.amountToPay(totalClaimAmount + "");
+        } else if (caseData.getRespondent2RepaymentPlan() != null) {
+            repaymentPlan = caseData.getRespondent2RepaymentPlan();
+            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
+                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
+                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
+                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
+                                      .build())
+                .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            builder.amountToPay = (totalClaimAmount + "");
         }
     }
 

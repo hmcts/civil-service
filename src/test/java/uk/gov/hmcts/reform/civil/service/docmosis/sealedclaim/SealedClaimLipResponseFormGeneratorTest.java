@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -288,6 +289,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ResponseDate(now())
             .respondent2(company("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent1ResponseDate(LocalDateTime.now())
             .specDefenceAdmittedRequired(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
