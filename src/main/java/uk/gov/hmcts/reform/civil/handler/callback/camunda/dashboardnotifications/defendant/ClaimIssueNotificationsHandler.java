@@ -33,11 +33,11 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
 
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    private final FeatureToggleService toggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isDashboardServiceEnabled()
+        return featureToggleService.isDashboardServiceEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::createDashboardNotifications)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }

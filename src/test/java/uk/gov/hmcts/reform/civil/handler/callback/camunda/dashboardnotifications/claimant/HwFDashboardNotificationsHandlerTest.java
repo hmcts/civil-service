@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -55,12 +57,18 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @InjectMocks
     private HwFDashboardNotificationsHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
-
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
+        
         @ParameterizedTest
         @MethodSource("provideHwfEventsForConfigureScenario")
         void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {

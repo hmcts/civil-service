@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -36,6 +37,8 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateDashboardNotificationMoreTimeRequestedForRespondent1";
 
@@ -63,6 +66,7 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

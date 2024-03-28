@@ -30,11 +30,11 @@ public class CreateClaimIssueNotificationsHandler extends CallbackHandler {
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForApplicant1";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService toggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isDashboardServiceEnabled()
+        return featureToggleService.isDashboardServiceEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }

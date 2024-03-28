@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
@@ -36,6 +37,8 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
     @Mock
     private DashboardApiClient dashboardApiClient;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -68,6 +71,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("responseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
