@@ -487,6 +487,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
     private final LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+    private final YesOrNo respondent1ResponseDeadlineChecked;
     private final String paymentTypePBA;
     private final String paymentTypePBASpec;
     private final String whenToBePaidText;
