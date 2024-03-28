@@ -47,7 +47,15 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has rejected the claim and agreed to mediation. You can reject or agree to mediation. You need to respond by " +
+                    "<p class=\"govuk-body\">The defendant has rejected the claim and agreed to mediation. You can reject or agree to mediation.</p>" +
+                        "<p class=\"govuk-body\">You need to respond by " +
+                        DateUtils.formatDate(paymentDate) + ".</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and respond</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Response to the claim"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">The defendant has rejected the claim and agreed to mediation. You can reject or agree to mediation.</p>" +
+                        "<p class=\"govuk-body\">You need to respond by " +
                         DateUtils.formatDate(paymentDate) + ".</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and respond</a></p>"
                 )
