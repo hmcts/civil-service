@@ -1,32 +1,40 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
+
+import java.math.BigDecimal;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +51,8 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
 
     @Mock
     private DashboardApiClient dashboardApiClient;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -65,73 +75,112 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
             .isEqualTo(TASK_ID);
     }
 
-    @Test
-    void shouldCreateNotificationForDefendantWhenClaimantAcceptsRepaymentPlanRaisesCCJ() {
-        Map<String, Object> params = new HashMap<>();
+    @Nested
+    class AboutToSubmitCallback {
+        @BeforeEach
+        void setup() {
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        @Test
+        void shouldRecordScenario_whenClaimantAcceptsCourtDecision() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(1234L)
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                                                            .claimantResponseOnCourtDecision(
+                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
+                                                            .build())
+                                 .build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DEFENDANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
+            ).build();
+            Map<String, Object> scenarioParams = new HashMap<>();
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(123674L)
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1ChoosesHowToProceed(
-                                                                             ChooseHowToProceed.REQUEST_A_CCJ).build())
-                             .build())
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
+            handler.handle(params);
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithDef.Defendant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
 
-        handler.handle(callbackParams);
+        @Test
+        void shouldCreateNotificationForDefendantWhenClaimantAcceptsRepaymentPlanRaisesCCJ() {
+            Map<String, Object> params = new HashMap<>();
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-    @Test
-    public void configureDashboardNotificationsForClaimantResponseCCJ() {
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(123674L)
+                .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                                             .applicant1ChoosesHowToProceed(
+                                                                                 ChooseHowToProceed.REQUEST_A_CCJ).build())
+                                 .build())
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
 
-        Map<String, Object> params = new HashMap<>();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .build();
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.CASE_SETTLED)
-            .ccjPaymentDetails(ccjPaymentDetails)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantCourtDecision(RepaymentDecisionType
-                                                                                   .IN_FAVOUR_OF_CLAIMANT).build())
-                             .build())
-            .build();
+            handler.handle(callbackParams);
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
+            verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
 
-        handler.handle(callbackParams);
+        @Test
+        public void configureDashboardNotificationsForClaimantResponseCCJ() {
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
+            Map<String, Object> params = new HashMap<>();
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .ccdState(CaseState.CASE_SETTLED)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType
+                                                                                       .IN_FAVOUR_OF_CLAIMANT).build())
+                                 .build())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+
+            verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
     }
 }
