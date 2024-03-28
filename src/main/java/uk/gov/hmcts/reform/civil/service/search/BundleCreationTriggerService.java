@@ -37,7 +37,7 @@ public class BundleCreationTriggerService extends ElasticSearchService {
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
         return null;
     }
 

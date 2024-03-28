@@ -575,6 +575,8 @@ public class CaseDataBuilder {
 
     private YesOrNo eaCourtLocation;
 
+    private Flags caseFlags;
+
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
@@ -6096,13 +6098,28 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withCaseLevelFlags() {
+        this.caseFlags = Flags.builder()
+            .details(wrapElements(List.of(
+                FlagDetail.builder()
+                    .flagCode("123")
+                    .status("Active")
+                    .build(),
+                FlagDetail.builder()
+                    .flagCode("456")
+                    .status("Inactive")
+                    .build())))
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder withApplicant1Flags() {
         return withApplicant1Flags(flagDetails());
     }
 
     public CaseDataBuilder withApplicant1Flags(List<Element<FlagDetail>> flags) {
         this.applicant1 = applicant1.toBuilder()
-            .partyID("res-1-party-id")
+            .partyID("app-1-party-id")
             .flags(Flags.builder()
                        .partyName(applicant1.getPartyName())
                        .roleOnCase("Claimant 1")
@@ -6151,6 +6168,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withApplicant2Flags() {
         this.applicant2 = applicant2.toBuilder()
+            .partyID("app-2-party-id")
             .flags(Flags.builder()
                        .partyName(applicant2.getPartyName())
                        .roleOnCase("Claimant 2")
@@ -6261,6 +6279,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withRespondent2Flags() {
         this.respondent2 = respondent2.toBuilder()
+            .partyID("res-2-party-id")
             .flags(Flags.builder()
                        .partyName(respondent2.getPartyName())
                        .roleOnCase("Defendant 2")
@@ -7053,6 +7072,7 @@ public class CaseDataBuilder {
             .hwfFeeType(hwfFeeType)
             .claimIssuedHwfDetails(claimIssuedHwfDetails)
             .hearingHwfDetails(hearingHwfDetails)
+            .caseFlags(caseFlags)
             .build();
     }
 }

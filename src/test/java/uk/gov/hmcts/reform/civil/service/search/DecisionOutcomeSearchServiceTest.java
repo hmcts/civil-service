@@ -30,7 +30,7 @@ class DecisionOutcomeSearchServiceTest extends ElasticSearchServiceTest {
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
         return null;
     }
 }
