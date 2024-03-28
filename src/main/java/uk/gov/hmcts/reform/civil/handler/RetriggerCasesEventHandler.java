@@ -62,7 +62,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
             return mapper.readValue(caseDataString, typeRef);
         } catch (Exception e) {
             log.error("Case data could not be deserialized {}", caseDataString, e);
-            throw new RuntimeException("Exception deserializing case data", e);
+            throw new IllegalArgumentException("Exception deserializing case data", e);
         }
     }
 }

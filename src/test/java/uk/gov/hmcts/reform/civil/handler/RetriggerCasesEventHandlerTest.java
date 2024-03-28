@@ -183,6 +183,6 @@ class RetriggerCasesEventHandlerTest {
         when(externalTask.getProcessInstanceId()).thenReturn("1");
 
         // expect exception when handler.handleTask is called
-        assertThrows(RuntimeException.class, () -> handler.handleTask(externalTask));
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 }
