@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -29,7 +30,8 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
                                                            NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
-    public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
+    public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
+    public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-varied-determination-of-means-%s";
 
@@ -47,7 +49,12 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.equals(caseEvent)) {
+            return TASK_ID_RESPONDENT1;
+        } else {
+            return TASK_ID_RESPONDENT2;
+        }
     }
 
     @Override
