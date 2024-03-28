@@ -56,28 +56,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
-        if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put(
-                "installmentAmount",
-                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
-                    caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString())
-            );
-            params.put(
-                "paymentFrequency",
-                caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
-            );
-            getFirstRepaymentDate(caseData).map(date -> {
-                params.put("firstRepaymentDateEn", date);
-                params.put("firstRepaymentDateCy", date);
-                return Optional.of(date);
-            });
-        }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
                 "claimIssueRemissionAmount",
-                "£" + this.removeDoubleZeros(MonetaryConversions
-                                                 .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
+                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                    caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
         }
         if (caseData.getOutstandingFeeInPounds() != null) {
@@ -128,8 +112,9 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions
-                                                                             .penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+            params.put("installmentAmount", "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                caseData.getRespondent1RepaymentPlan().getPaymentAmount()).toPlainString()));
+
             params.put(
                 "paymentFrequency",
                 caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
