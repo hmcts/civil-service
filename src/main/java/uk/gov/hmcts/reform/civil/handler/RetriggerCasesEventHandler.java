@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -51,7 +50,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         }
     }
 
-    @SneakyThrows
     private Map<String, Object> getCaseData(ExternalTask externalTask) {
         var typeRef = mapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
         String caseDataString = externalTask.getVariable("caseData");
@@ -60,13 +58,11 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
             return Map.of();
         }
 
-        Map<String, Object> caseData = mapper.readValue(caseDataString, typeRef);
-
-        if (caseData == null) {
-            log.error("Case data could not be deserialized {}", caseDataString);
-            throw new RuntimeException("Exception deserializing case data");
+        try {
+            return mapper.readValue(caseDataString, typeRef);
+        } catch (Exception e) {
+            log.error("Case data could not be deserialized {}", caseDataString, e);
+            throw new RuntimeException("Exception deserializing case data", e);
         }
-
-        return caseData;
     }
 }

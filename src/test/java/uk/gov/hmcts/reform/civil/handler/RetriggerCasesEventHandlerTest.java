@@ -173,4 +173,16 @@ class RetriggerCasesEventHandlerTest {
         );
     }
 
+    @Test
+    void testHandleTask_RetriggerCasesEmptyCaseData() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        String caseData = "[]";
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(caseData);
+        when(externalTask.getProcessInstanceId()).thenReturn("1");
+
+        // expect exception when handler.handleTask is called
+        assertThrows(RuntimeException.class, () -> handler.handleTask(externalTask));
+    }
 }
