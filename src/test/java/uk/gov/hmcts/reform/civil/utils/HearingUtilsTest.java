@@ -173,9 +173,9 @@ public class HearingUtilsTest {
     void shouldReturnClaimantVDefendant_whenIs1v1Claim() {
         // Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
-            .build();
+                .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
+                .build();
         // When
         String claimantVDefendant = HearingUtils.getClaimantVDefendant(caseData);
         // Then
@@ -184,12 +184,14 @@ public class HearingUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-        "AAA7-DIS,true",
-        "AAA7-TRI,false"
+        "AAA7-DIS,false",
+        "AAA7-DRH,false",
+        "AAA7-TRI,true"
     })
-    void shouldReturnCorrectValue_whenHearingTypeIsDisposalOrTrial(String hearingType, boolean expected) {
-        boolean isDisposalHearing = HearingUtils.isDisposalHearing(hearingType);
+    void shouldReturnCorrectValue_whenHearingTypeIs(String hearingType, boolean expected) {
+        boolean hearingFeeRequired = HearingUtils.hearingFeeRequired(hearingType);
 
-        assertThat(isDisposalHearing).isEqualTo(expected);
+        assertThat(hearingFeeRequired).isEqualTo(expected);
     }
+
 }
