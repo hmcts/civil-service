@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
@@ -176,7 +177,8 @@ public class FlowStateAllowedEventService {
         NOTIFY_HEARING_PARTIES,
         MANAGE_CONTACT_INFORMATION,
         CASE_PROCEEDS_IN_CASEMAN,
-        UpdateNextHearingInfo
+        UpdateNextHearingInfo,
+        UPDATE_NEXT_HEARING_DETAILS
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -1624,6 +1626,13 @@ public class FlowStateAllowedEventService {
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC
+            )
+        ),
+        entry(
+            CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
+            List.of(
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
             )
         )
     );
