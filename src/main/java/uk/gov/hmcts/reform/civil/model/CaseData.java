@@ -786,6 +786,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasRespondent1PaidFullAmount() {
+        return Optional.ofNullable(getResponseToClaim())
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
+            .orElse(false);
+    }
+
+    @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
             .equals(getDefenceRouteRequired());
