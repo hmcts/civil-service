@@ -326,6 +326,7 @@ notifications:
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
