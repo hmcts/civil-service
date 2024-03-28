@@ -64,9 +64,9 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + ".They are offering to do this starting from "
                         + DateUtils.formatDate(firstPaymentDate)
-                        + ".</p><p class=\"govuk-body\">The defendant needs to send you their financial details."
+                        + ".</p><p class=\"govuk-body\">The defendant needs to send you their financial details.</p>"
                         + " <a href=\"{VIEW_AND_RESPOND}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
-                        + " respond</a></p>"
+                        + " respond</a>"
                 )
             );
 

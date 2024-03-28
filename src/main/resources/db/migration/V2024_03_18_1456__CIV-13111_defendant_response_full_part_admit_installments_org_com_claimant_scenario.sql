@@ -13,8 +13,8 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant',
         'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDateEn}.</p><p class="govuk-body">The defendant needs to send you their financial details. <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDateCy}.</p><p class="govuk-body">The defendant needs to send you their financial details. <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDateEn}.</p><p class="govuk-body">The defendant needs to send you their financial details.</p> <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a>',
+        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}.They are offering to do this starting from ${firstRepaymentDateCy}.</p><p class="govuk-body">The defendant needs to send you their financial details.</p> <a href="{VIEW_AND_RESPOND}" rel="noopener noreferrer" class="govuk-link">View and respond</a>',
         'CLAIMANT');
 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
