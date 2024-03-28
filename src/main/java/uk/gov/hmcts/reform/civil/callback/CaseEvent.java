@@ -85,6 +85,7 @@ public enum CaseEvent {
     asyncStitchingComplete(USER),
     EXTEND_RESPONSE_DEADLINE(USER),
     ADD_UNAVAILABLE_DATES(USER),
+    COURT_OFFICER_ORDER(USER),
 
     REVIEW_HEARING_EXCEPTION(USER),
     UpdateNextHearingInfo(USER),
