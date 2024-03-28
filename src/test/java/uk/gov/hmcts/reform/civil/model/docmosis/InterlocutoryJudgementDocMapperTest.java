@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionCalculator;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
