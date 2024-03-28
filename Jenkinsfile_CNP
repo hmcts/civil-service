@@ -85,13 +85,15 @@ withPipeline(type, product, component) {
 
   before('smoketest:preview') {
     validateRpaContract()
-    sh """
-      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-      ./bin/add-roles.sh
-      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
-      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
-    """
+    retry (3) {
+      sh """
+        eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+        ./bin/add-roles.sh
+        ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+        ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
+      """
+    }
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
