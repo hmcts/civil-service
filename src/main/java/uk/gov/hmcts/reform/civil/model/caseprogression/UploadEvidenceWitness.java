@@ -12,7 +12,6 @@ import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
 public class UploadEvidenceWitness {
 
     private String witnessOptionName;
