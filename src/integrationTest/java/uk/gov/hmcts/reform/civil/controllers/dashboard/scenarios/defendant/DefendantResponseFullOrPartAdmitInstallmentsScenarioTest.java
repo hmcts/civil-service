@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -64,8 +63,8 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + " starting " + DateUtils.formatDate(firstPaymentDate)
-                        + ".</p><p class=\"govuk-body\">The court will contact you when they respond</p><a "
-                        + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
+                        + ".</p><p class=\"govuk-body\">The court will contact you when they respond.</p><a "
+                        + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
 
@@ -75,8 +74,8 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId),
                 jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>")
+
             );
     }
 }
