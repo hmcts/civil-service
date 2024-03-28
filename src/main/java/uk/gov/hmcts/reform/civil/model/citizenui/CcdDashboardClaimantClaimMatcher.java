@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private FeatureToggleService featureToggleService;
+    private final FeatureToggleService featureToggleService;
 
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
         super(caseData);
@@ -99,9 +99,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn())
-            || (null != caseData.getCcjPaymentDetails()
+        return (null != caseData.getCcjPaymentDetails()
             && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
@@ -230,9 +228,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
             && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
             || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -298,7 +296,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return  caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
