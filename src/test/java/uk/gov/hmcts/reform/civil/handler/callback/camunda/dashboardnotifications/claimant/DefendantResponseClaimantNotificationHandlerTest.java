@@ -35,8 +35,8 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -99,17 +99,18 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             Map<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
-            LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(8723L))
+                .ccdCaseReference(8723L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
-                        .type(Party.Type.valueOf(partyType.name())).build())
+                                 .type(Party.Type.valueOf(partyType.name())).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                    .builder()
                                                    .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -126,7 +127,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
             verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                    dashboardScenario.getScenario(),
+                dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
             );
@@ -141,15 +142,17 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(23055L))
+                .ccdCaseReference(23055L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
-                        .type(Party.Type.valueOf(partyType.name())).build())
+                                 .companyName("company one")
+                                 .type(Party.Type.valueOf(partyType.name())).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                    .builder()
                                                    .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -166,7 +169,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
             verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                    dashboardScenario.getScenario(),
+                dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
             );
@@ -286,43 +289,72 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                    Optional.empty()));
+                Optional.empty()));
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-                    .toBuilder()
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(Long.valueOf(1234L))
-                    .applicant1Represented(YesOrNo.NO)
-                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                            .builder()
-                            .build())
-                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                    .totalClaimAmount(new BigDecimal(1000))
-                    .build();
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                                   .builder()
+                                                   .build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
 
             handler.handle(callbackParams);
 
             verify(dashboardApiClient, times(1)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(params).build()
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
             );
         }
 
         private static Stream<Arguments> defendantTypeAndScenarioArguments() {
             return Stream.of(
-                    Arguments.of(Party.Type.ORGANISATION, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
-                    Arguments.of(Party.Type.COMPANY, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
-                    Arguments.of(Party.Type.INDIVIDUAL, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT),
-                    Arguments.of(Party.Type.SOLE_TRADER, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT)
+                Arguments.of(
+                    Party.Type.ORGANISATION,
+                    SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT
+                ),
+                Arguments.of(Party.Type.COMPANY, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT),
+                Arguments.of(Party.Type.INDIVIDUAL, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT),
+                Arguments.of(Party.Type.SOLE_TRADER, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT)
             );
         }
+    }
+
+    @Test
+    void shouldRecordScenario_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
+            .toBuilder().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
+        ).build();
+
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+        Map<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
     }
 
     @Test

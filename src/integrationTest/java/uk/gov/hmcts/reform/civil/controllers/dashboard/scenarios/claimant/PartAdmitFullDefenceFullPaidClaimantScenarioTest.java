@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -18,12 +16,12 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -41,6 +39,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDeadline(LocalDateTime.of(deadline, LocalTime.now()))
             .respondToClaim(RespondToClaim.builder()
                                 .howMuchWasPaid(new BigDecimal(100000))
                                 .whenWasThisAmountPaid(paymentDate)
@@ -61,7 +60,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                         "on " + DateUtils.formatDate(paymentDate) + ".</p><p class=\"govuk-body\">You can confirm " +
                         "payment and settle, or proceed with the claim.</p><p class=\"govuk-body\">You need to respond " +
                         "by 4pm on " + DateUtils.formatDate(deadline) + " or the claim will not continue.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>"
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View and respond</a>"
                 )
             );
 
@@ -88,6 +87,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
+            .applicant1ResponseDeadline(LocalDateTime.of(deadline, LocalTime.now()))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaim(RespondToClaim.builder()
                                         .howMuchWasPaid(new BigDecimal(100000))
@@ -110,7 +110,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                         "on " + DateUtils.formatDate(paymentDate) + ".</p><p class=\"govuk-body\">You can confirm " +
                         "payment and settle, or proceed with the claim.</p><p class=\"govuk-body\">You need to respond " +
                         "by 4pm on " + DateUtils.formatDate(deadline) + " or the claim will not continue.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response.</a>"
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View and respond</a>"
                 )
             );
 
