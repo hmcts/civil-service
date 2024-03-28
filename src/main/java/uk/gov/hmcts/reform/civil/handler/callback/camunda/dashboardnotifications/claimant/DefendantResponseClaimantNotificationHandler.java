@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +73,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
                 return SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
             }
         }
-
+        if (isFullDefenseMediationRefusedScenario(caseData)) {
+            return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
+        }
         if (caseData.getRespondent1().isCompanyOROrganisation()
             && caseData.isPayBySetDate()) {
             return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
@@ -117,5 +119,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private boolean isFullDefenseMediationRefusedScenario(CaseData caseData) {
+        return caseData.isRespondentResponseFullDefence() && caseData.hasDefendantNotAgreedToFreeMediation();
     }
 }
