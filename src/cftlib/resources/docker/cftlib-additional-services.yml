@@ -5,6 +5,9 @@ name: cftlib-additional-services
 
 services:
   camunda:
-    image: camunda/camunda-bpm-platform:7.20.0-alpha1
+    container_name: camunda
+    image: camunda/camunda-bpm-platform:run-latest
+    environment:
+      CAMUNDA_BPM_GENERIC-PROPERTIES_PROPERTIES_ENFORCEHISTORYTIMETOLIVE: "false"
     ports:
       - 9404:8080
