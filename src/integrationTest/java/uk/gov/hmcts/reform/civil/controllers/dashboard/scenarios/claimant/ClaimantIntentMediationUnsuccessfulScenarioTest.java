@@ -41,10 +41,10 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You were not able to resolve your claim against John Doe using mediation. The court will review the case. We will contact you to tell you what to do next.</p>"),
+                    "<p class=\"govuk-body\">You weren't able to resolve your claim against John Doe using mediation. The court will review the case. We'll contact you to tell you what to do next.</p>"),
                 jsonPath("$[0].titleCy").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You were not able to resolve your claim against John Doe using mediation. The court will review the case. We will contact you to tell you what to do next.</p>"));
+                    "<p class=\"govuk-body\">You weren't able to resolve your claim against John Doe using mediation. The court will review the case. We'll contact you to tell you what to do next.</p>"));
 
     }
 

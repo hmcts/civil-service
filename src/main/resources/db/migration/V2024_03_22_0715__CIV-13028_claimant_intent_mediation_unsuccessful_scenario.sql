@@ -14,6 +14,6 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
 VALUES ('Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant',
         'Mediation was unsuccessful',
         'Mediation was unsuccessful',
-        '<p class="govuk-body">You were not able to resolve your claim against ${respondent1PartyName} using mediation. The court will review the case. We will contact you to tell you what to do next.</p>',
-        '<p class="govuk-body">You were not able to resolve your claim against ${respondent1PartyName} using mediation. The court will review the case. We will contact you to tell you what to do next.</p>',
+        '<p class="govuk-body">You weren''t able to resolve your claim against ${respondent1PartyName} using mediation. The court will review the case. We''ll contact you to tell you what to do next.</p>',
+        '<p class="govuk-body">You weren''t able to resolve your claim against ${respondent1PartyName} using mediation. The court will review the case. We''ll contact you to tell you what to do next.</p>',
         'CLAIMANT');
