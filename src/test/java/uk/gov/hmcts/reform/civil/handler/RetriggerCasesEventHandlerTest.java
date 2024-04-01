@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -27,8 +26,14 @@ class RetriggerCasesEventHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
+    private ObjectMapper mapper = new ObjectMapper();
+
     private RetriggerCasesEventHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new RetriggerCasesEventHandler(coreCaseDataService, mapper);
+    }
 
     @Test
     void testHandleTask_RetriggerClaimantResponse() {
@@ -132,6 +137,7 @@ class RetriggerCasesEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         when(externalTask.getVariable("caseData")).thenReturn(null);
         when(externalTask.getProcessInstanceId()).thenReturn("1");
+
         doThrow(new RuntimeException()).when(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
 
         handler.handleTask(externalTask);
@@ -148,11 +154,12 @@ class RetriggerCasesEventHandlerTest {
     @Test
     void testHandleTask_RetriggerCasesSetsCaseData() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        Map<String, Object> caseData = Map.of("myField", "myValue");
+        String caseData = "{\"myField\":\"myValue\"}";
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         when(externalTask.getVariable("caseData")).thenReturn(caseData);
         when(externalTask.getProcessInstanceId()).thenReturn("1");
+
         doThrow(new RuntimeException()).when(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
 
         handler.handleTask(externalTask);
@@ -166,4 +173,16 @@ class RetriggerCasesEventHandlerTest {
         );
     }
 
+    @Test
+    void testHandleTask_RetriggerCasesEmptyCaseData() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        String caseData = "[]";
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("caseData")).thenReturn(caseData);
+        when(externalTask.getProcessInstanceId()).thenReturn("1");
+
+        // expect exception when handler.handleTask is called
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
+    }
 }

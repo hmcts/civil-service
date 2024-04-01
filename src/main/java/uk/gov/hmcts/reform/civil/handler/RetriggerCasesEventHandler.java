@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -18,6 +19,7 @@ import static java.lang.Long.parseLong;
 public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final ObjectMapper mapper;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -28,10 +30,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         CaseEvent caseEvent = CaseEvent.valueOf(externalTask.getVariable("caseEvent"));
         String eventSummary = "Re-trigger of " + caseEvent.name();
         String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
-
-        Map<String, Object> caseData = externalTask.getVariable("caseData") != null
-            ? externalTask.getVariable("caseData")
-            : Map.of();
+        Map<String, Object> caseData = getCaseData(externalTask);
 
         for (String caseId : caseIds.split(",")) {
             try {
@@ -44,10 +43,26 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                     eventSummary,
                     eventDescription
                 );
-                log.info("Retrigger CaseId: {} finished", caseId);
+                log.info("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {} {}", caseId, e.getMessage(), e);
+                log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
             }
+        }
+    }
+
+    private Map<String, Object> getCaseData(ExternalTask externalTask) {
+        var typeRef = mapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+        String caseDataString = externalTask.getVariable("caseData");
+
+        if (caseDataString == null || caseDataString.isBlank()) {
+            return Map.of();
+        }
+
+        try {
+            return mapper.readValue(caseDataString, typeRef);
+        } catch (Exception e) {
+            log.error("Case data could not be deserialized {}", caseDataString, e);
+            throw new IllegalArgumentException("Exception deserializing case data", e);
         }
     }
 }
