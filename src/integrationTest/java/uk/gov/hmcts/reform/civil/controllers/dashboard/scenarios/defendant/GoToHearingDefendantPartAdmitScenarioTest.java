@@ -25,10 +25,10 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTe
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of("applicant1PartyName", "Mr.Claimant",
-                                    "defendantAdmittedAmount", "700"
+                                    "defendantAdmittedAmount", "£700"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant", caseId
         )
             .andExpect(status().isOk());
 

@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,12 +32,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NO
 @ExtendWith(MockitoExtension.class)
 public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
+    private GenerateDashboardNotificationClaimFeeRequiredHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @InjectMocks
-    private GenerateDashboardNotificationClaimFeeRequiredHandler handler;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -45,6 +47,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
@@ -63,7 +66,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.ClaimFee.Required",
+                "Scenario.AAA6.ClaimIssue.ClaimFee.Required",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

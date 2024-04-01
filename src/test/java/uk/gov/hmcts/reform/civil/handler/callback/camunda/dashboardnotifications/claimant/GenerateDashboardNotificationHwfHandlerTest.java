@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -32,12 +33,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NO
 @ExtendWith(MockitoExtension.class)
 public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
+    private GenerateDashboardNotificationHwfHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @InjectMocks
-    private GenerateDashboardNotificationHwfHandler handler;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -45,6 +48,7 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
@@ -63,7 +67,7 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.HWF.Requested",
+                "Scenario.AAA6.ClaimIssue.HWF.Requested",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

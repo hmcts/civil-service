@@ -2,16 +2,16 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant',
-        '{"Notice.AAA7.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant"}',
-        '{"Notice.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant" : ["applicant1PartyName","claimSettledAmount"]}');
+VALUES ('Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant',
+        '{"Notice.AAA6.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant" : ["applicant1PartyName","claimSettledAmount"]}');
 
 /**
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant',
+VALUES ('Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant',
         'Wait for the court to review the case',
         'Wait for the court to review the case',
         '<p class="govuk-body">${applicant1PartyName} wants to proceed to court.</p>'

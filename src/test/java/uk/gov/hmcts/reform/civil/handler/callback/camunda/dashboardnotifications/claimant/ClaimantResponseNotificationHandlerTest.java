@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -87,25 +87,25 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             return Stream.of(
                 Arguments.of(
                     CaseState.JUDICIAL_REFERRAL,
-                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING
                 ),
                 Arguments.of(
                     CaseState.CASE_SETTLED,
-                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT
                 ),
                 Arguments.of(
                     CaseState.JUDICIAL_REFERRAL,
-                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING
                 ),
                 Arguments.of(
                     CaseState.CASE_SETTLED,
-                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT
                 ),
                 Arguments.of(
                     CaseState.JUDICIAL_REFERRAL,
-                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING
                 ),
-                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_MEDIATION)
+                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION)
             );
         }
 
@@ -159,7 +159,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Then
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                DashboardScenarios.SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
+                DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -193,7 +193,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Then
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

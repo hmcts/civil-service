@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_CLAIM_FEE_REQUIRED = "Scenario.AAA7.ClaimIssue.ClaimFee.Required";
+    public static final String SCENARIO_CLAIM_FEE_REQUIRED = "Scenario.AAA6.ClaimIssue.ClaimFee.Required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
@@ -74,7 +74,7 @@ public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You need to pay your claim fee"),
-                jsonPath("$[0].descriptionEn").value("Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Pay the claim fee</a>.")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Pay the claim fee</a>.</p>")
             );
     }
 

@@ -27,7 +27,7 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
                                   "admissionPaidAmount", "£3000"))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,
-               "Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
+               "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
                caseId
         )
             .andExpect(status().isOk());
