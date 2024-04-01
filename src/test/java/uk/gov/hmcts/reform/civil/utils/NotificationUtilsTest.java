@@ -273,7 +273,10 @@ class NotificationUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLR(boolean isApplicantLip) {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmitted().applicant1(Party.builder().partyEmail(null).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantsolicitor@example.com").build())
+            .build();
 
         if (isApplicantLip) {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
@@ -285,7 +288,10 @@ class NotificationUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
-        CaseData caseData = CaseDataBuilder.builder().applicant1(Party.builder().partyEmail("lipapplicant@example.com").build()).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyEmail("lipapplicant@example.com").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
+            .build();
 
         if (!isApplicantLip) {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();

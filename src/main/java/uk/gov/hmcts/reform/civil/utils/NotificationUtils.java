@@ -177,7 +177,7 @@ public class NotificationUtils {
 
     public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
         if (isApplicantLip) {
-            return caseData.getApplicant1Email() != null ? caseData.getApplicant1Email() : null;
+            return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
         } else {
             return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
         }
