@@ -44,7 +44,7 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTe
                                         "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
                                         "<p class=\"govuk-body\"><a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View your response</a>" +
                                         "<br><a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
-                                        "View the claimant's hearing requirements.</a></p>"),
+                                        "View the claimant's hearing requirements</a></p>"),
                         jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                         jsonPath("$[0].descriptionCy")
                                 .value("<p class=\"govuk-body\">Mr.Claimant wants to proceed to court.</p>" +
@@ -52,6 +52,6 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTe
                                         "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
                                         "<p class=\"govuk-body\"><a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View your response</a>" +
                                         "<br><a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
-                                        "View the claimant's hearing requirements.</a></p>"));
+                                        "View the claimant's hearing requirements</a></p>"));
     }
 }
