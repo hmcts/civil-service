@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -26,7 +26,7 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends BaseIntegrationTest {
                 ScenarioRequestParams.builder()
                         .params(Map.of("typeOfFee", "claim"))
                         .build(),
-                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario(), caseId
+                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED.getScenario(), caseId
         )
              .andExpect(status().isOk());
 
@@ -37,9 +37,9 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends BaseIntegrationTest {
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn").value("Your help with fees application has been updated"),
                         jsonPath("$[0].descriptionEn")
-                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."),
+                                .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"),
                         jsonPath("$[0].titleCy").value("Your help with fees application has been updated"),
                         jsonPath("$[0].descriptionCy")
-                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."));
+                                .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"));
     }
 }

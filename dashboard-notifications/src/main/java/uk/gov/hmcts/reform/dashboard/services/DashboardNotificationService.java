@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,15 +77,12 @@ public class DashboardNotificationService {
         dashboardNotification.ifPresent(notification -> {
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
-                .dashboardNotificationsId(notification.getId())
+                .dashboardNotification(notification)
                 .actionPerformed("Click")
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
-                .createdAt(OffsetDateTime.now())
                 .build();
 
-            NotificationActionEntity actionEntity = notificationActionRepository.save(notificationAction);
-
-            dashboardNotificationsRepository.save(notification.toBuilder().notificationAction(actionEntity).build());
+            notificationActionRepository.save(notificationAction);
         });
     }
 

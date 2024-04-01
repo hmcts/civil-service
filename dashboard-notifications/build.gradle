@@ -29,7 +29,7 @@ dependencies {
   implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.9'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
-  runtimeOnly 'org.postgresql:postgresql'
+  runtimeOnly 'org.postgresql:postgresql:42.7.2'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   annotationProcessor 'org.projectlombok:lombok'

@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
@@ -60,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
@@ -176,7 +178,8 @@ public class FlowStateAllowedEventService {
         NOTIFY_HEARING_PARTIES,
         MANAGE_CONTACT_INFORMATION,
         CASE_PROCEEDS_IN_CASEMAN,
-        UpdateNextHearingInfo
+        UpdateNextHearingInfo,
+        UPDATE_NEXT_HEARING_DETAILS
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -325,7 +328,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 TRANSFER_ONLINE_CASE,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -355,7 +359,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
                 GENERATE_DIRECTIONS_ORDER,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -385,7 +390,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
                 GENERATE_DIRECTIONS_ORDER,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -424,7 +430,8 @@ public class FlowStateAllowedEventService {
                 MOVE_TO_DECISION_OUTCOME,
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -611,7 +618,8 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 REQUEST_FOR_RECONSIDERATION,
                 DECISION_ON_RECONSIDERATION_REQUEST,
-                EDIT_JUDGMENT
+                EDIT_JUDGMENT,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -847,7 +855,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                COURT_OFFICER_ORDER
             )
         ),
         entry(
@@ -1059,7 +1068,8 @@ public class FlowStateAllowedEventService {
                 MOVE_TO_DECISION_OUTCOME,
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -1245,7 +1255,8 @@ public class FlowStateAllowedEventService {
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 REQUEST_FOR_RECONSIDERATION,
                 DECISION_ON_RECONSIDERATION_REQUEST,
-                EDIT_JUDGMENT
+                EDIT_JUDGMENT,
+                COURT_OFFICER_ORDER
             )
         ),
 
@@ -1411,7 +1422,8 @@ public class FlowStateAllowedEventService {
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                COURT_OFFICER_ORDER
             )
         ),
         entry(
@@ -1452,7 +1464,8 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 CLAIMANT_RESPONSE_CUI,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                COURT_OFFICER_ORDER
             )
         ),
         entry(
@@ -1499,7 +1512,8 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                COURT_OFFICER_ORDER
             )
         ),
         entry(
@@ -1629,6 +1643,13 @@ public class FlowStateAllowedEventService {
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC
+            )
+        ),
+        entry(
+            CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
+            List.of(
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
             )
         )
     );
