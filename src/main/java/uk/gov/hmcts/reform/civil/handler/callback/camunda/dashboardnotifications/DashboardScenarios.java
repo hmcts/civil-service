@@ -76,7 +76,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT("Scenario.AAA6.DefResponse.ResponseTimeElapsed.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT("Scenario.AAA6.DefResponse.ResponseTimeElapsed.Defendant"),
     SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant"),
-    SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant");
+    SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant");
 
     private final String scenario;
 
