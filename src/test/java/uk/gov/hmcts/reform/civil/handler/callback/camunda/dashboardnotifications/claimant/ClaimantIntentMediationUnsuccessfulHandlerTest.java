@@ -45,45 +45,45 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
 
     Map<String, Object> params = new HashMap<>();
 
-        @Test
-        void handleEventsReturnsTheExpectedCallbackEvent() {
-            assertThat(handler.handledEvents()).contains(
-                CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL);
-        }
-
-        @Test
-        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-            assertThat(handler.camundaActivityId(
-                CallbackParamsBuilder.builder()
-                    .request(CallbackRequest.builder()
-                                 .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL.name())
-                                 .build())
-                    .build()))
-                .isEqualTo(TASK_ID);
-        }
-
-        @Test
-        public void createDashboardNotifications() {
-
-            params.put("ccdCaseReference", "123");
-
-            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(1234L)
-                .build();
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .build();
-
-            handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(params).build()
-            );
-        }
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(
+            CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL);
     }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(
+            CallbackParamsBuilder.builder()
+                .request(CallbackRequest.builder()
+                             .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL.name())
+                             .build())
+                .build()))
+            .isEqualTo(TASK_ID);
+    }
+
+    @Test
+    public void createDashboardNotifications() {
+
+        params.put("ccdCaseReference", "123");
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+}
