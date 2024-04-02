@@ -33,4 +33,4 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
        ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}>View information about the defendant</a>',
         'The response', 'Response.Defendant.Info', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 4),
        ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES_URL}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 10);
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 13);
