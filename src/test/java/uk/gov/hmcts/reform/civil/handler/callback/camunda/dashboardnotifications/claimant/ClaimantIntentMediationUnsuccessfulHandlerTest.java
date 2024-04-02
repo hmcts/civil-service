@@ -47,13 +47,6 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
 
     Map<String, Object> params = new HashMap<>();
 
-    @Nested
-    class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        }
-
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(
@@ -77,7 +70,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
             params.put("ccdCaseReference", "123");
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(1234L)
@@ -96,4 +89,3 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
             );
         }
     }
-}
