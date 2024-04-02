@@ -102,7 +102,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
                                 .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
                 .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .applicant1Represented(YesOrNo.NO)
@@ -115,7 +115,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentLip@example.com",
+                "applicantLip@example.com",
                 "template-id",
                 addPropertiesLip(caseData),
                 "record-judgment-determination-means-notification-000DC001"
