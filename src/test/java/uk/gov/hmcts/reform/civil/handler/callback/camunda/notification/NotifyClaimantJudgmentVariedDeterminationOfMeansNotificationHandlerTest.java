@@ -146,7 +146,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
     }
 
     public Map<String, String> getLipNotificationDataMap(CaseData caseData) {
-               return Map.of(
+        return Map.of(
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
