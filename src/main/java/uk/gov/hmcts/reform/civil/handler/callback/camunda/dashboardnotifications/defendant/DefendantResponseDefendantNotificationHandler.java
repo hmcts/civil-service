@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +70,11 @@ public class DefendantResponseDefendantNotificationHandler extends CallbackHandl
         if ((caseData.isRespondentResponseFullDefence() && caseData.hasDefendantPayedTheAmountClaimed())
             || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitAlreadyPaid())) {
             return SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario();
+        }
+
+        if (caseData.isFastTrackClaim() && caseData.isRespondentResponseFullDefence()
+            && caseData.isClaimBeingDisputed()) {
+            return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT.getScenario();
         }
 
         if (caseData.isFullAdmitPayImmediatelyClaimSpec()
