@@ -24,7 +24,7 @@ public class ClaimFullDefenceProceedDefendantNoMediationScenarioTest extends Bas
                    .params(Map.of("applicant1PartyName", claimantName
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant", caseId
         )
             .andExpect(status().isOk());
 

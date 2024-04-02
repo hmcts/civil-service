@@ -29,7 +29,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseInt
                    ))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,
-               "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant",
+               "Scenario.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant",
                caseId
         )
             .andExpect(status().isOk());

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_INFO_REQUIRED;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -26,7 +26,7 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends BaseIntegrationTest {
             BEARER_TOKEN,
             ScenarioRequestParams.builder().params(Map.of("typeOfFee", "claim")).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario(),
+            SCENARIO_AAA6_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario(),
             caseId
         ).andExpect(status().isOk());
 
@@ -35,12 +35,12 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends BaseIntegrationTest {
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Your help with fees application needs more information"),
             jsonPath("$[0].descriptionEn").value(
-                "We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}."),
+                "<p class=\"govuk-body\">We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value("Your help with fees application needs more information"),
             jsonPath("$[0].descriptionCy").value(
-                "We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
-                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "<p class=\"govuk-body\">We need more information on your application for help with the claim fee.<br>You've been sent an email with further details." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -31,7 +31,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
             ScenarioRequestParams.builder()
                 .params(map).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario(),
+            SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario(),
             caseId
         ).andExpect(status().isOk());
 
@@ -41,13 +41,13 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
+                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
+                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }

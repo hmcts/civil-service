@@ -216,4 +216,52 @@ class NotificationUtilsTest {
 
         assertThat(actual).isNull();
     }
+
+    @Test
+    void shouldReturnDefendantName_For1v2WithBothDefendants() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
+
+        assertThat(actual).isEqualTo("Mr. Sole Trader and Mr. John Rambo");
+    }
+
+    @Test
+    void shouldReturnDefendantName_For1v1WithDefendant1() {
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+        String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
+
+        assertThat(actual).isEqualTo("Mr. Sole Trader");
+    }
+
+    @Test
+    void shouldReturnApplicantOrgName_whenOrgIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
+                                                                                         .name("org name")
+                                                                                         .build()));
+
+        String actual = NotificationUtils.getApplicantLegalOrganizationName(
+            caseData,
+            organisationService
+        );
+
+        assertThat(actual).isEqualTo("org name");
+    }
+
+    @Test
+    void shouldReturnApplicantOrgNameAsStmtOfTruth_whenOrgIsNotPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.ofNullable(null));
+
+        String actual = NotificationUtils.getApplicantLegalOrganizationName(
+            caseData,
+            organisationService
+        );
+
+        assertThat(actual).isEqualTo("Signer Name");
+    }
 }

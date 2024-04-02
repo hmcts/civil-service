@@ -11,11 +11,15 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -32,12 +36,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 @ExtendWith(MockitoExtension.class)
 public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
+    @InjectMocks
+    private CreateClaimIssueNotificationsHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @InjectMocks
-    private CreateClaimIssueNotificationsHandler handler;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -45,6 +51,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
@@ -62,7 +69,31 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimIssue.Response.Await",
+                "Scenario.AAA6.ClaimIssue.Response.Await",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenFeePaymentOutcome() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().hwfFeeType(FeeType.CLAIMISSUED)
+                .feePaymentOutcomeDetails(
+                    FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForClaimIssue(YesOrNo.NO).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name())
+                    .build()
+            ).build();
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimIssue.HWF.PhonePayment",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
