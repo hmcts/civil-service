@@ -100,7 +100,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
                                 .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
                 .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .applicant1Represented(YesOrNo.NO)
