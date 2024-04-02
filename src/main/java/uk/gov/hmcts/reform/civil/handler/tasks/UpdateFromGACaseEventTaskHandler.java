@@ -228,23 +228,17 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         List<Element<?>> civilDocs =
             (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
-        boolean anyChange = false;
         if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<?> gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
-                    anyChange = true;
                 }
             }
         } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
-            anyChange = true;
             civilDocs.addAll(gaDocs);
         }
-        if (anyChange) {
-            output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
-            log.info("{} will be updated in UpdateFromGACaseEventTaskHandler for case {}", toCivilList, civilCaseData.getCcdCaseReference());
-        }
+        output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
