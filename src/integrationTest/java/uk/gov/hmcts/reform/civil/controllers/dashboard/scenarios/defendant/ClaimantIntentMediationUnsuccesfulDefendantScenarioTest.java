@@ -19,7 +19,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     private MediationUnsuccessfulDashboardNotificationDefendantHandler handler;
 
     @Test
-    void should_create_ccj_requested_scenario() throws Exception {
+    void should_create_mediation_unsuccessful_scenario() throws Exception {
 
         String caseId = "323491";
         Party respondent1 = new Party();
