@@ -238,7 +238,7 @@ tasks.withType(Copy) {
 }
 
 task integration(type: Test) {
-  maxHeapSize = '1G'
+  maxHeapSize = '2G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
