@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -83,18 +83,18 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            if (YES.equals(caseData.getApplicant1Represented())) {
-                notificationService.sendMail(
-                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                    notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
-                    addProperties(caseData),
-                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
-            } else {
+            if (NO.equals(caseData.getApplicant1Represented()) && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate(),
                     addPropertiesLip(caseData),
                     String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
+            } else {
+                notificationService.sendMail(
+                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                    notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
+                    addProperties(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
