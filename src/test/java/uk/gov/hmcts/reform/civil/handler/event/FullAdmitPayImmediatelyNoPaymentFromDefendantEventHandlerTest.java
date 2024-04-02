@@ -64,17 +64,16 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
     @Test
     void shouldCreateClaimantDashboardNotifications() {
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
-        CaseData updated = caseData.toBuilder()
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build().toBuilder()
             .ccdCaseReference(CASE_ID)
             .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
                                                .build())
             .build();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(updated);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
         Map<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
