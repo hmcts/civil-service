@@ -36,6 +36,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
+    public static final String TASK_ID_RESPONDENT_LIP = "NotifyDefendantLipVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-varied-determination-of-means-%s";
 
@@ -54,6 +55,9 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if(NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.equals(caseEvent)){
+            return TASK_ID_RESPONDENT_LIP;
+        }
         if (NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.equals(caseEvent)) {
             return TASK_ID_RESPONDENT1;
         } else {
