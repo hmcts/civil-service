@@ -94,7 +94,7 @@ public class DashboardNotificationsParamsMapper {
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
         if (nonNull(claimSettleDate)) {
             params.put("applicant1ClaimSettledDateEn", DateUtils.formatDate(claimSettleDate));
-            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDate(claimSettleDate));
+            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDateInWelsh(claimSettleDate));
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
