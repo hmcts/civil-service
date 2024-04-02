@@ -25,7 +25,7 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
             BEARER_TOKEN,
             ScenarioRequestParams.builder()
                 .params(Map.of("respondent1SettlementAgreementDeadline_En", "16 March 2024",
-                               "respondent1SettlementAgreementDeadline_Cy", "16 March 2024"
+                               "respondent1SettlementAgreementDeadline_Cy", "16 Mawrth 2024"
                 ))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
@@ -50,7 +50,7 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
                 jsonPath("$[0].descriptionCy")
                     .value(
                         "<p class=\"govuk-body\">The claimant has accepted your plan and asked you to sign a settlement agreement."
-                            + " You must respond by 16 March 2024.</p><p class=\"govuk-body\">If you do not respond by then, or reject the agreement,"
+                            + " You must respond by 16 Mawrth 2024.</p><p class=\"govuk-body\">If you do not respond by then, or reject the agreement,"
                             + " they can request a County Court Judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\""
                             + " rel=\"noopener noreferrer\" class=\"govuk_link\">View the repayment plan</a><br><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk_link\">View your response</a></p>")
