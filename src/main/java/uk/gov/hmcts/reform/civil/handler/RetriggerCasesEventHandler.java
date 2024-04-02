@@ -43,9 +43,9 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                     eventSummary,
                     eventDescription
                 );
-                log.info("Retrigger CaseId: {} finished", caseId);
+                log.info("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {} {}", caseId, e.getMessage(), e);
+                log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
             }
         }
     }
