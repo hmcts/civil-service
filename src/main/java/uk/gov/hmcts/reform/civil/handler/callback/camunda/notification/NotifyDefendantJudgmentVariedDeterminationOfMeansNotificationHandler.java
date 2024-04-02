@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -31,8 +32,8 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
                                                            NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
                                                           NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+
     public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
-                                                           NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
     private static final String REFERENCE_TEMPLATE =
@@ -92,7 +93,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
@@ -112,10 +112,9 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
         return Map.of(
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_ONE_NAME, caseData.getRespondent1().getPartyName()
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
     }
-
 
     private String getTemplate() {
         return notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate();

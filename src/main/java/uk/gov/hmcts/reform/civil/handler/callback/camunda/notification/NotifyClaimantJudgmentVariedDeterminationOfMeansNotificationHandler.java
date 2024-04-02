@@ -91,7 +91,7 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
         return Map.of(
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_ONE_NAME, caseData.getApplicant1().getPartyName()
+            PARTY_NAME, caseData.getApplicant1().getPartyName()
         );
     }
 
