@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
@@ -29,12 +30,14 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends CallbackH
         List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1);
     public static final String TASK_ID = "CreateClaimSettledDashboardNotificationsForDefendant1";
     private final DashboardApiClient dashboardApiClient;
+    private final FeatureToggleService featureToggleService;
     private final DashboardNotificationsParamsMapper mapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
+        return featureToggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
         );
     }
 

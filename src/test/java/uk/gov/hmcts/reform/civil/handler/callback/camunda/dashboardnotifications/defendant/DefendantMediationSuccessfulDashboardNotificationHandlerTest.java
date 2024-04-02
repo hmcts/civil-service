@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,50 +68,58 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
             .isEqualTo(TASK_ID);
     }
 
-    @Test
-    public void createDashboardNotificationsWhenCarmIsEnabled() {
+    @Nested
+    class AboutToSubmitCallback {
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        params.put("ccdCaseReference", "123");
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
 
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        @Test
+        public void createDashboardNotificationsWhenCarmIsEnabled() {
 
-        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            params.put("ccdCaseReference", "123");
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .build();
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
+            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
+            CaseData caseData = CaseData.builder()
+                    .legacyCaseReference("reference")
+                    .ccdCaseReference(1234L)
+                    .respondent1ResponseDeadline(dateTime)
+                    .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .build();
+
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                    caseData.getCcdCaseReference().toString(),
+                    SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
+                    "BEARER_TOKEN",
+                    ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        public void createDashboardNotificationsWhenCarmIsDisabled() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+            CaseData caseData = CaseData.builder()
+                    .legacyCaseReference("reference")
+                    .ccdCaseReference(1234L)
+                    .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .build();
+
+            handler.handle(callbackParams);
+            verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
+        }
     }
-
-    @Test
-    public void createDashboardNotificationsWhenCarmIsDisabled() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-    }
-
 }

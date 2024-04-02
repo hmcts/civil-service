@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 @Service
@@ -27,12 +28,14 @@ public class ResponseDeadlineExtendedDashboardNotificationHandler extends Callba
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantNewResponseDeadline";
     private final DashboardApiClient dashboardApiClient;
+    private final FeatureToggleService featureToggleService;
     private final DashboardNotificationsParamsMapper mapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse
+        return featureToggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantResponse)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
         );
     }
 
