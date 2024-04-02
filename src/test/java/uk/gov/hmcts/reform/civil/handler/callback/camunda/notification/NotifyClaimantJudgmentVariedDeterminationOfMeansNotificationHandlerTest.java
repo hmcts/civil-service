@@ -113,7 +113,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentLip@example.com",
+                "applicantLip@example.com",
                 TEMPLATE_ID,
                 getLipNotificationDataMap(caseData),
                 "claimant-judgment-varied-determination-of-means-000DC001"

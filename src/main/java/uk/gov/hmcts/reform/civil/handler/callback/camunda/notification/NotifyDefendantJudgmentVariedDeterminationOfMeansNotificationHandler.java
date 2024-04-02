@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_LIP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
-    public static final String TASK_ID_RESPONDENT_LIP = "NotifyDefendantLipVariedDeterminationOfMeans";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-varied-determination-of-means-%s";
 
@@ -55,9 +53,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        if(NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.equals(caseEvent)){
-            return TASK_ID_RESPONDENT_LIP;
-        }
         if (NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.equals(caseEvent)) {
             return TASK_ID_RESPONDENT1;
         } else {
@@ -72,22 +67,16 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private CallbackResponse notifyDefendantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isRespondentLip = (callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()));
 
-        String emailTemplateID = isRespondentLip ? getLIPTemplate() : getTemplate();
-
-        String recipient = isRespondentLip ? caseData.getRespondent1().getPartyEmail() :
-            callbackParams.getRequest().getEventId()
+        String recipient = callbackParams.getRequest().getEventId()
                 .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
                 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
 
         if (nonNull(recipient)) {
             notificationService.sendMail(
                 recipient,
-                emailTemplateID,
-                isRespondentLip ? addPropertiesLip(caseData)
-                    : callbackParams.getRequest().getEventId()
+                getTemplate(),
+                callbackParams.getRequest().getEventId()
                     .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
                     ? addProperties(caseData) : addRespondent2Properties(caseData),
                 getReferenceTemplate(caseData)
@@ -112,24 +101,12 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
         );
     }
 
-    private Map<String, String> addPropertiesLip(CaseData caseData) {
-        return Map.of(
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
-        );
-    }
-
     private String getTemplate() {
         return notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
-    }
-
-    private String getLIPTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
 }
