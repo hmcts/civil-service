@@ -536,11 +536,23 @@ task runOtherServices(type: Exec) {
   commandLine './bin/add-services.sh'
 }
 
+task importBpmnDiagrams(type: Exec) {
+  group 'ccd tasks'
+
+  dependsOn(runOtherServices)
+
+  environment 'CAMUNDA_BASE_URL', 'http://localhost:9404'
+  environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+
+  commandLine './bin/import-bpmn-diagram-cftlib.sh'
+}
+
 bootWithCCD {
   group 'ccd tasks'
 
   dependsOn(buildCCDXlsx)
   dependsOn(runOtherServices)
+  dependsOn(importBpmnDiagrams)
 
   //AAT or Local (IDAM and S2S Simulators)
   authMode = AuthMode.AAT
