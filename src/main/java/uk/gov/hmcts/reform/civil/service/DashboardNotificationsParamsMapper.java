@@ -100,7 +100,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
             getInstalmentAmount(caseData).map(amount -> params.put("instalmentAmount", amount));
             getInstalmentStartDate(caseData).map(dateEn -> params.put("instalmentStartDateEn", dateEn));
-            getInstalmentStartDate(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
+            getInstalmentStartDateInWelsh(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
             params.put(
                 "instalmentTimePeriodEn",
                 getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
@@ -207,6 +207,11 @@ public class DashboardNotificationsParamsMapper {
     private Optional<String> getInstalmentStartDate(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
             .map(DateUtils::formatDate);
+    }
+
+    private Optional<String> getInstalmentStartDateInWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
+            .map(DateUtils::formatDateInWelsh);
     }
 
     private Optional<String> getInstalmentAmount(CaseData caseData) {
