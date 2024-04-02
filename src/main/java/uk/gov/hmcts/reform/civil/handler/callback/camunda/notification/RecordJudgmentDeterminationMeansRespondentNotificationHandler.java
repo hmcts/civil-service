@@ -17,9 +17,11 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_FOR_RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -60,16 +62,25 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
 
     private CallbackResponse notifyRespondentSolicitorForRecordJudgmentDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String emailTemplateID = notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate();
+        boolean isRespondentLip = caseData.isRespondent1NotRepresented();
+        String emailTemplateID = isRespondentLip
+            ? notificationsProperties.getNotifyLipUpdateTemplate()
+            : notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate();
 
-        notificationService.sendMail(
+        String recipient = isRespondentLip ? caseData.getRespondent1().getPartyEmail() :
             callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name())
-                ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress(),
-            emailTemplateID,
-            callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name())
-                ? addProperties(caseData) : addRespondent2Properties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+                ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+
+        if (nonNull(recipient)) {
+            notificationService.sendMail(
+                recipient,
+                emailTemplateID,
+                isRespondentLip ? addPropertiesLip(caseData)
+                    : callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name())
+                    ? addProperties(caseData) : addRespondent2Properties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -92,6 +103,14 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
                 caseData.getRespondent2OrganisationPolicy(),
                 organisationService),
             DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData)
+        );
+    }
+
+    private Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
         );
     }
 }
