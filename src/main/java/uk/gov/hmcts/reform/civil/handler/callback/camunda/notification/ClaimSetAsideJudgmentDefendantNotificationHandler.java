@@ -80,12 +80,13 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
     private CallbackResponse notifyClaimSetAsideJudgmentToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipientEmail = getRecipientEmail(callbackParams);
-        boolean isApplicantLip = caseData.isApplicantLiP();
+        boolean isRespondentLip = callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1_LIP.name());
 
         if (recipientEmail != null) {
             notificationService.sendMail(
                 recipientEmail,
-                getTemplate(isApplicantLip),
+                getTemplate(isRespondentLip),
                 getEmailProperties(callbackParams, caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -104,8 +105,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
         }
     }
 
-    private String getTemplate(boolean isApplicantLip) {
-        return isApplicantLip ? notificationsProperties.getNotifyUpdateTemplate()
+    private String getTemplate(boolean isRespondentLip) {
+        return isRespondentLip ? notificationsProperties.getNotifyUpdateTemplate()
             : notificationsProperties.getNotifySetAsideJudgmentTemplate();
     }
 
