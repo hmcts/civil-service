@@ -130,6 +130,7 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     private boolean isFullDefenseMediationRefusedScenario(CaseData caseData) {
         return caseData.isRespondentResponseFullDefence() && caseData.hasDefendantNotAgreedToFreeMediation();
     }
+
     private boolean isFullDefenseFastTrackScenario(CaseData caseData) {
         return caseData.isRespondentResponseFullDefence() && caseData.isFastTrackClaim();
     }
