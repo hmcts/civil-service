@@ -30,7 +30,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
                                                            NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
 
-    public static final String TASK_ID = "NotifyDefendantJudgmentVariedDeterminationOfMeans";
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
     private static final String REFERENCE_TEMPLATE =
