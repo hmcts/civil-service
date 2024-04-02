@@ -43,6 +43,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
+        LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()
             .hwfFeeType(FeeType.CLAIMISSUED)
             .totalClaimAmount(BigDecimal.valueOf(124.67))
@@ -51,6 +52,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
+            .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -70,9 +72,9 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
-            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(120L)));
+            .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("applicant1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(120L)));
+            .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
@@ -93,6 +95,11 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("applicant1ClaimSettledDateCy")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+
+        assertThat(result).extracting("applicant1ResponseDeadlineEn")
+            .isEqualTo("21 March 2024");
+        assertThat(result).extracting("applicant1ResponseDeadlineEn")
+            .isEqualTo("21 March 2024");
     }
 
     @Test
@@ -105,6 +112,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1ResponseDeadline(null)
             .claimFee(null)
             .respondent1RespondToSettlementAgreementDeadline(null)
+            .applicant1ResponseDeadline(null)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -128,6 +136,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimFee").isNull();
 
+        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
+        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
     }
 
     @Test
