@@ -199,7 +199,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
-        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy
+            (OrganisationPolicy.builder()
                  .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                  .organisationID(value.getOrganisationIdentifier()).build())
                  .orgPolicyReference(null)
