@@ -68,7 +68,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     @Test
     public void createDashboardNotificationsWhenCarmIsEnabled() {
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         params.put("ccdCaseReference", "123");
 
@@ -97,6 +97,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     @Test
     public void createDashboardNotificationsWhenCarmIsDisabled() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseData.builder()

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -23,21 +24,16 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL;
 
 @Service
-@RequiredArgsConstructor
-public class DefendantMediationSuccessfulDashboardNotificationHandler extends CallbackHandler {
+public class DefendantMediationSuccessfulDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_RESPONDENT);
     public static final String TASK_ID = "GenerateDashboardNotificationDefendantMediationSuccessful";
-    private final DashboardApiClient dashboardApiClient;
-    private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
-    @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenario
-        );
+    public DefendantMediationSuccessfulDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+                                                        DashboardNotificationsParamsMapper mapper,
+                                                        FeatureToggleService featureToggleService) {
+        super(dashboardApiClient, mapper, featureToggleService);
     }
 
     @Override
@@ -50,19 +46,13 @@ public class DefendantMediationSuccessfulDashboardNotificationHandler extends Ca
         return EVENTS;
     }
 
-    private CallbackResponse configureScenario(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
-        if (isCarmEnabled) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
-                authToken,
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
-            );
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    @Override
+    public String getScenario(CaseData caseData) {
+        return SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario();
+    }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
 }
