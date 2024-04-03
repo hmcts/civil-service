@@ -97,7 +97,7 @@ allprojects {
         entry 'netty-codec-socks'
       }
       //CVE-2022-40152
-      dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
+      dependencySet(group: 'com.fasterxml.woodstox', version: '6.6.2') {
         entry 'woodstox-core'
       }
       //CVE-2023-3635
