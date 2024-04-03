@@ -83,7 +83,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            if (NO.equals(caseData.getApplicant1Represented()) && featureToggleService.isLipVLipEnabled()) {
+            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate(),
