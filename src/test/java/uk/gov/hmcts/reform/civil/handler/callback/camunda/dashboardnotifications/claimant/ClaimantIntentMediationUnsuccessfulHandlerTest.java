@@ -65,13 +65,13 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
     @Test
     public void createDashboardNotifications() {
 
-        params.put("ccdCaseReference", "123");
+        params.put("ccdCaseReference", "123455L");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(123455L)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
