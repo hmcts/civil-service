@@ -60,6 +60,9 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
     }
 
     private String getScenario(CaseData caseData) {
+        if (isFullDefenseFastTrackScenario(caseData)) {
+            return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();
+        }
         if (caseData.isPaidLessThanClaimAmount()) {
             return SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
         }
@@ -76,9 +79,6 @@ public class DefendantResponseClaimantNotificationHandler extends CallbackHandle
                     return SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
                 }
             }
-        }
-        if (isFullDefenseFastTrackScenario(caseData)) {
-            return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();
         }
         if (caseData.isPayBySetDate()) {
             if (caseData.getRespondent1().isCompanyOROrganisation()) {
