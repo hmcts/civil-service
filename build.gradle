@@ -128,7 +128,7 @@ allprojects {
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.5'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.12'
 
       // solves CVE-2022-25857
       dependencySet(
