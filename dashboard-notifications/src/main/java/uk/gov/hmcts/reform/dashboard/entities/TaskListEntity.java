@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -89,5 +90,5 @@ public class TaskListEntity implements Serializable {
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private Map<String, Object> messageParams;
+    private Map<String, Object> messageParams = new HashMap<>();
 }

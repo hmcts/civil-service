@@ -76,7 +76,7 @@ class DashboardControllerTest {
 
         //then
         verify(taskListService).getTaskList("123", "Claimant");
-        assertThat(output.getStatusCode().is2xxSuccessful());
+        assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(output.getBody()).isEqualTo(taskList);
     }
 
@@ -96,8 +96,8 @@ class DashboardControllerTest {
 
         //then
         verify(taskListService).getTaskList("123", "Claimant");
-        assertThat(output.getStatusCode().is2xxSuccessful());
-        assertThat(output.getBody().isEmpty());
+        assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(output.getBody().isEmpty()).isTrue();
     }
 
     @Test
