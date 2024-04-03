@@ -107,7 +107,7 @@ allprojects {
 
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.77'
       // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.15'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
       dependencySet(group: 'com.google.guava', version: '33.0.0-jre') {
         entry 'guava'
