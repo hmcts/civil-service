@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDateTime;
@@ -46,6 +49,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -54,6 +59,11 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void before() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
 
         @ParameterizedTest
         @MethodSource("provideCaseStateAndScenarioArguments")
@@ -130,8 +140,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-
             handler.handle(params);
 
             verifyNoInteractions(dashboardApiClient);
@@ -174,7 +182,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
