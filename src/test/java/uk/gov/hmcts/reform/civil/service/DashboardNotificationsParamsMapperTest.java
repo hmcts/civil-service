@@ -219,5 +219,17 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDate(date));
     }
+
+    @Test
+    public void shouldMapParameters_whenHearingDueDate() {
+        LocalDate date = LocalDate.of(2024, Month.MARCH, 22);
+        caseData = caseData.toBuilder().hearingDueDate(date)
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("hearingDueDateEn").isEqualTo("22 March 2024");
+        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 March 2024");
+    }
 }
 
