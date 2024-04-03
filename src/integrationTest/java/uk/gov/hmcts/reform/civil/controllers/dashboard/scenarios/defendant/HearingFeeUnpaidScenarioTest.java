@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingFeeUnpaidClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingFeeUnpaidDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -17,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
+
     @Autowired
     private HearingFeeUnpaidDefendantNotificationHandler handler;
 

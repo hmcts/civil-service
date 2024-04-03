@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
+
     @Autowired
     private HearingFeeUnpaidClaimantNotificationHandler handler;
 
