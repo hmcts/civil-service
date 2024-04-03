@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +85,11 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
             return SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
         } else if (caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
+        }
+        if ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
+                && caseData.getRespondent1().isCompanyOROrganisation()
+                && caseData.hasApplicantRejectedRepaymentPlan()) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT.getScenario();
         }
         return null;
     }
