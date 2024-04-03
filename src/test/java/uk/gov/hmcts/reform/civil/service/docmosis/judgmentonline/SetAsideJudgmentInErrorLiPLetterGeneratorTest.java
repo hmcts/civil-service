@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -25,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +73,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
             .respondent1(defendant)
             .buildJudmentOnlineCaseDataWithPaymentByInstalment();
 
-        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
+        caseData.setJoIssuedDate(LocalDate.now());
         caseData.setJoSetAsideJudgmentErrorText("Some text");
 
         when(documentGeneratorService.generateDocmosisDocument(

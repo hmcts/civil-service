@@ -78,6 +78,7 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
+            .issueDate(caseData.getJoIssuedDate())
             .build();
     }
 }

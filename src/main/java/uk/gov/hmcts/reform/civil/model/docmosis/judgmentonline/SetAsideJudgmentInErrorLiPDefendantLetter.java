@@ -24,5 +24,9 @@ public class SetAsideJudgmentInErrorLiPDefendantLetter implements MappableObject
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate letterIssueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate issueDate;
+
 
 }
