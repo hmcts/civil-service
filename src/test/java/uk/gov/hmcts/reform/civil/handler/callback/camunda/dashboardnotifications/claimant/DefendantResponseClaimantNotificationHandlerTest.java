@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -97,7 +96,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @MethodSource("defendantTypeAndScenarioArguments")
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
@@ -138,7 +137,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @MethodSource("defendantTypeAndScenarioArguments")
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -178,7 +177,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediatelyClaimant() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
@@ -213,7 +212,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullDefencePaidPartialClaimant() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -249,7 +248,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @Test
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartialClaimant() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -285,7 +284,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallmentsClaimant() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -322,7 +321,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -365,7 +364,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);
 
