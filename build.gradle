@@ -124,8 +124,9 @@ allprojects {
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.7'
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.0'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.12'
@@ -440,8 +441,8 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.17.0'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
