@@ -144,4 +144,17 @@ public class HearingUtils {
     public static boolean isDisposalHearing(String hearingType) {
         return hearingType.contains("DIS");
     }
+
+    public static String getHearingTypeForDashboardNotifications(CaseData caseData) {
+        switch (caseData.getChannel()) {
+            case IN_PERSON:
+                return "in person";
+            case VIDEO:
+                return "over a video call";
+            case TELEPHONE:
+                return "by telephone";
+            default:
+                return "not defined";
+        }
+    }
 }
