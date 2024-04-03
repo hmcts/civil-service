@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
 import java.util.HashMap;
@@ -25,6 +26,8 @@ public abstract class BaseCallbackHandlerTest {
     protected AuthTokenGenerator authTokenGenerator;
     @MockBean
     protected UserService userService;
+    @MockBean
+    protected FeatureToggleService featureToggleService;
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
         return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));

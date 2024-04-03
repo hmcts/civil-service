@@ -51,4 +51,8 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
+    protected FeatureToggleService getFeatureToggleService() {
+        return featureToggleService;
+    }
 }

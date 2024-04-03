@@ -130,6 +130,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
 
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
             handler.handle(params);
 
             verifyNoInteractions(dashboardApiClient);
@@ -172,6 +174,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()

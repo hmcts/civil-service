@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
