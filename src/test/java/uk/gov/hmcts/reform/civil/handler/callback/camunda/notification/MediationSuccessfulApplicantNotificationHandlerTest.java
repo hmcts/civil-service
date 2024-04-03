@@ -104,6 +104,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
             //Given
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
