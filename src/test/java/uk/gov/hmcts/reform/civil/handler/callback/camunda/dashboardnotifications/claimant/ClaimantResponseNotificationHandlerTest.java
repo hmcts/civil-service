@@ -218,7 +218,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldCreateDashboardNotificationsWhenClaimantRejectRepaymentPlanForFullAdmit() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("legacyCaseReference", "reference");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -256,7 +256,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldCreateDashboardNotificationsWhenClaimantRejectRepaymentPlanForPartAdmit() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("legacyCaseReference", "reference");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
