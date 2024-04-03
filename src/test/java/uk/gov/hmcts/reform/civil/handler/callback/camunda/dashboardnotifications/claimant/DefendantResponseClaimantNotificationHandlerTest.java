@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -46,9 +47,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 
@@ -107,7 +110,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(8723L)
+                .ccdCaseReference(Long.valueOf(8723L))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
                                  .type(Party.Type.valueOf(partyType.name())).build())
@@ -148,10 +151,9 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(23055L)
+                .ccdCaseReference(Long.valueOf(23055L))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
-                                 .companyName("company one")
                                  .type(Party.Type.valueOf(partyType.name())).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                    .builder()
@@ -295,7 +297,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(1234L)
+                .ccdCaseReference(Long.valueOf(1234L))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
@@ -319,6 +321,64 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             );
         }
 
+        @Test
+        public void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
+
+            Map<String, Object> params = new HashMap<>();
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(Long.valueOf(1234L))
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
+                .responseClaimMediationSpecRequired(YesOrNo.YES)
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+
+            verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
+                .toBuilder().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
+            ).build();
+
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
         private static Stream<Arguments> defendantTypeAndScenarioArguments() {
             return Stream.of(
                 Arguments.of(
@@ -330,31 +390,6 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 Arguments.of(Party.Type.SOLE_TRADER, SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT)
             );
         }
-    }
-
-    @Test
-    void shouldRecordScenario_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-            .toBuilder().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-            CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
-        ).build();
-
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-
-        Map<String, Object> scenarioParams = new HashMap<>();
-
-        handler.handle(params);
-
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(scenarioParams).build()
-        );
     }
 
     @Test

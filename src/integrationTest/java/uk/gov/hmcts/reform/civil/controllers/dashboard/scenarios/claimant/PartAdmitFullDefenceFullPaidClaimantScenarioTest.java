@@ -30,7 +30,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
     @Test
     void should_create_full_defence_full_paid_claimant_scenario() throws Exception {
 
-        String caseId = "12345673";
+        String caseId = "123456731";
         LocalDate paymentDate = LocalDate.of(2024, 3, 27);
         LocalDate deadline = LocalDate.of(2024, 7, 25);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
@@ -78,7 +78,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
     @Test
     void should_create_part_admit_full_paid_claimant_scenario() throws Exception {
 
-        String caseId = "12345673";
+        String caseId = "123456732";
         LocalDate paymentDate = LocalDate.of(2024, 3, 27);
         LocalDate deadline = LocalDate.of(2024, 7, 25);
 

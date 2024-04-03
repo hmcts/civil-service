@@ -786,8 +786,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasRespondent1PaidFullAmount() {
-        return Optional.ofNullable(getResponseToClaim())
+    public boolean isPaidFullAmount() {
+        RespondToClaim respondToClaim = null;
+        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            respondToClaim = getRespondToClaim();
+        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+            respondToClaim = getRespondToAdmittedClaim();
+        }
+
+        return Optional.ofNullable(respondToClaim)
             .map(RespondToClaim::getHowMuchWasPaid)
             .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
             .orElse(false);
