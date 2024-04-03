@@ -34,11 +34,11 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return true; // this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return false; //this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isRPAEmailEnabled() {
@@ -66,11 +66,11 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true; //featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isDashboardServiceEnabled() {
-        return  true; //featureToggleApi.isFeatureEnabled("dashboard-service");
+        return featureToggleApi.isFeatureEnabled("dashboard-service");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
