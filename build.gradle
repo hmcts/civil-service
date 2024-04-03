@@ -107,7 +107,7 @@ allprojects {
 
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.77'
       // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.15'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
       dependencySet(group: 'com.google.guava', version: '33.0.0-jre') {
         entry 'guava'
@@ -121,7 +121,7 @@ allprojects {
 
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.7'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
@@ -147,7 +147,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.692'
+        version: '1.12.693'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -339,7 +339,7 @@ def versions = [
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '4.0.0',
-  lombok             : '1.18.26',
+  lombok             : '1.18.32',
   pact               : '3.5.24',
   springSecurity     : '5.8.7'
 ]
@@ -428,7 +428,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.31'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
