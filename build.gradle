@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.1'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.4'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
