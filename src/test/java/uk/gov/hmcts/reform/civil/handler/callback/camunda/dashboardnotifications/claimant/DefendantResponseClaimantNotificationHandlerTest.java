@@ -354,6 +354,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
+    }
 
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
