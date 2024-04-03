@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -77,7 +76,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
             scenarioParams.put("claimIssueRemissionAmount", "£1000");
             scenarioParams.put("claimIssueOutStandingAmount", "£25");
@@ -123,7 +122,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 caseData.getCcdCaseReference().toString(),
                 dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(Map.of()).build()
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
         }
 

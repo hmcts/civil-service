@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,7 +20,7 @@ public class SettlementNoResponseFromDefendantTest extends BaseIntegrationTest {
 
     @Test
     void should_create_settlement_no_response_from_defendant() throws Exception {
-        Map<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("respondent1PartyName", "Mr Defendant");
         UUID caseId = UUID.randomUUID();
         doPost(
