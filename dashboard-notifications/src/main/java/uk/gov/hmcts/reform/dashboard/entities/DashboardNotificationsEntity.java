@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -66,13 +67,17 @@ public class DashboardNotificationsEntity implements Serializable {
     @Type(type = "jsonb")
     @Column(name = "message_params", columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private Map<String, Object> params;
+    private Map<String, Object> params = new HashMap<>();
+
     @Schema(name = "created_by")
     private String createdBy;
+
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
+
     @Schema(name = "updated_by")
     private String updatedBy;
+
     @Schema(name = "updated_on")
     private OffsetDateTime updatedOn;
 }

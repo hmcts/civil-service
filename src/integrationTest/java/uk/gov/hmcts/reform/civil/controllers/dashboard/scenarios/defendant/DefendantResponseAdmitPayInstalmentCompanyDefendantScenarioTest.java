@@ -61,7 +61,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                         "You've offered to do this starting from " +
                         DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>"
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 )
             );
 
@@ -110,7 +110,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                         "You've offered to do this starting from " +
                         DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>"
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 )
             );
 
