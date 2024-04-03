@@ -51,10 +51,15 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getClaimFee().toPounds().toPlainString())
             );
         }
+        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+            LocalDate applicantResponseDeadline = caseData.getApplicant1ResponseDeadline().toLocalDate();
+            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicantResponseDeadline));
+            params.put("applicant1ResponseDeadlineCy", DateUtils.formatDate(applicantResponseDeadline));
+        }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
-            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
-            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(responseDeadline));
+            LocalDate respondentResponseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(respondentResponseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(respondentResponseDeadline));
         }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
