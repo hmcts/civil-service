@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
@@ -38,6 +39,8 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
     private DashboardNotificationsParamsMapper mapper;
     @InjectMocks
     private ClaimSettledDashboardNotificationHandler handler;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "CreateClaimSettledDashboardNotificationsForClaimant1";
 
@@ -72,6 +75,7 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
