@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +30,13 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -55,6 +56,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -63,6 +66,11 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void before() {
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        }
 
         @ParameterizedTest
         @MethodSource("provideCaseStateAndScenarioArguments")
@@ -75,7 +83,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("respondent1PartyName", "Defendant Name");
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -147,7 +155,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
             scenarioParams.put("defendantAdmittedAmount", "£500");
             scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
@@ -176,7 +184,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldCreateDashboardNotificationsForSignSettlementAgreement() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantSettlementAgreement", "accepted");
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 

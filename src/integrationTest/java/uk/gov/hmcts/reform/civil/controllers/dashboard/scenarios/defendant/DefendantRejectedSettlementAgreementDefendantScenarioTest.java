@@ -7,7 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,7 +23,7 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends B
         UUID caseId = UUID.randomUUID();
         doPost(
             BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(Map.of()).build(),
+            ScenarioRequestParams.builder().params(new HashMap<>()).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT.getScenario(),
             caseId

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,10 +21,10 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimSettledAmount", "£3000",
-                                  "claimSettledDateEn", "16th March 2024",
-                                  "claimSettledDateCy", "16th March 2024"
-                   ))
+                   .params(new HashMap<>(Map.of("claimSettledAmount", "£3000",
+                                                "claimSettledDateEn", "16th March 2024",
+                                                "claimSettledDateCy", "16th March 2024"
+                   )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.ClaimSettled.Claimant", caseId
         )
