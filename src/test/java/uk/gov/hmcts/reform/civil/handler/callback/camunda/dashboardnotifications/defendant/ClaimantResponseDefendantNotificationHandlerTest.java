@@ -405,6 +405,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
