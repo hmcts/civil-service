@@ -137,6 +137,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ResponseDeadlineCy", date);
         }
 
+        params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
         return params;
     }
 
