@@ -63,9 +63,10 @@ public class CCJRequestedDashboardNotificationHandler extends CallbackHandler {
     }
 
     private String getScenario(CaseData caseData) {
-        if (!caseData.isRespondentSignedSettlementAgreement()) {
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
         }
+
         return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario();
     }
 }
