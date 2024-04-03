@@ -101,7 +101,7 @@ allprojects {
         entry 'woodstox-core'
       }
       //CVE-2023-3635
-      dependencySet(group: 'com.squareup.okio', version: '3.4.0') {
+      dependencySet(group: 'com.squareup.okio', version: '3.9.0') {
         entry 'okio-jvm'
       }
 
@@ -109,7 +109,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.15'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '33.0.0-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
@@ -120,7 +120,7 @@ allprojects {
       // CVE-2020-29582
 
       // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
+      dependency group: 'commons-io', name: 'commons-io', version: '2.16.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.7'
 
@@ -176,7 +176,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.3.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.11.0"
     }
   }
 
@@ -378,7 +378,7 @@ dependencies {
 
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.1'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -393,10 +393,10 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.2.1'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.4'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
@@ -429,16 +429,16 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.20.0'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.87'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.20'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
