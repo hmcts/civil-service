@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -53,9 +54,13 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (caseData.isApplicant1NotRepresented()) {
+            String scenario = YesOrNo.YES.equals(caseData.getTrialReadyApplicant())
+                ? SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT.getScenario()
+                : SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT.getScenario();
+
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT.getScenario(),
+                scenario,
                 authToken,
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build()

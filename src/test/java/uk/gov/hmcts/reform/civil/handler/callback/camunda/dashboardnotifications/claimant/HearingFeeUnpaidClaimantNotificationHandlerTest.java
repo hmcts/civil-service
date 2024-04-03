@@ -74,7 +74,7 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
         }
 
         @Test
-        void shouldRecordScenario_whenInvoked() {
+        void shouldRecordScenario_notTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateHearingFeeDueUnpaid()
                 .applicant1Represented(YesOrNo.NO)
@@ -94,6 +94,32 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_TrialReady_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyApplicant()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT.name()).build()
+            ).build();
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

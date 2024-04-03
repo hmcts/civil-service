@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -20,7 +21,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_DEFENDANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 
 @Service
 @RequiredArgsConstructor
@@ -53,9 +54,13 @@ public class HearingFeeUnpaidDefendantNotificationHandler extends CallbackHandle
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (caseData.isRespondent1NotRepresented()) {
+            String scenario = YesOrNo.YES.equals(caseData.getTrialReadyRespondent1())
+                ? SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT.getScenario()
+                : SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT.getScenario();
+
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT.getScenario(),
+                scenario,
                 authToken,
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build()

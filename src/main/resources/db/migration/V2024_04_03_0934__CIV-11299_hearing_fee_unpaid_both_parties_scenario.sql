@@ -7,6 +7,12 @@ VALUES ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant',
         '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+        '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
+        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant',
+        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+        '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
+       ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant',
+        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}');
 
 /**
@@ -38,5 +44,9 @@ values ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing docume
         'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant', '{1, 1}', 'DEFENDANT', 6),
        ('<a>Add the trial arrangements</a>', 'Hearings' ,'<a>Add the trial arrangements</a>',
         'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant', '{1, 1}', 'DEFENDANT', 7),
+       ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>',
+        'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant', '{1, 1}', 'CLAIMANT', 6),
        ('<a>Pay the hearing fee</a>', 'Hearings' ,'<a>Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant', '{1, 1}', 'DEFENDANT', 8);
+        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant', '{1, 1}', 'CLAIMANT', 8),
+       ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>',
+        'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant', '{1, 1}', 'DEFENDANT', 6);

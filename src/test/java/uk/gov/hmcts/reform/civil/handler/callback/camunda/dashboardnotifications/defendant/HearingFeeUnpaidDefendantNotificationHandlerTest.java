@@ -74,7 +74,7 @@ public class HearingFeeUnpaidDefendantNotificationHandlerTest {
         }
 
         @Test
-        void shouldRecordScenario_whenInvoked() {
+        void shouldRecordScenario_NotTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateHearingFeeDueUnpaid()
                 .respondent1Represented(YesOrNo.NO)
@@ -94,6 +94,32 @@ public class HearingFeeUnpaidDefendantNotificationHandlerTest {
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_TrialReady_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyRespondent1()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_DEFENDANT1.name()).build()
+            ).build();
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
