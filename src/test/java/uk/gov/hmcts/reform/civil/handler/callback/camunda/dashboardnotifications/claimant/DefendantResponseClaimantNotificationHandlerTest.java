@@ -278,7 +278,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallmentsClaimant() {
 
             Map<String, Object> params = new HashMap<>();
-
+            String caseId = "12345675";
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
@@ -287,7 +287,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(1234L)
+                .ccdCaseReference(Long.valueOf(caseId))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
