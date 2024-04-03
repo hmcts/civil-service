@@ -101,7 +101,7 @@ allprojects {
         entry 'woodstox-core'
       }
       //CVE-2023-3635
-      dependencySet(group: 'com.squareup.okio', version: '3.4.0') {
+      dependencySet(group: 'com.squareup.okio', version: '3.9.0') {
         entry 'okio-jvm'
       }
 
