@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -67,7 +66,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("respondent1PartyName", "Defendant Name");
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -139,7 +138,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
             scenarioParams.put("defendantAdmittedAmount", "£500");
             scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
@@ -168,7 +167,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         @Test
         void shouldCreateDashboardNotificationsForSignSettlementAgreement() {
             // Given
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantSettlementAgreement", "accepted");
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 

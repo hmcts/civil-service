@@ -63,7 +63,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        Map<String, Object> scenarioParams = new HashMap<>();
+        HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

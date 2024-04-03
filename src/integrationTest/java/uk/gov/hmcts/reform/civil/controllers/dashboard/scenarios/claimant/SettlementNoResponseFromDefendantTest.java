@@ -21,7 +21,7 @@ public class SettlementNoResponseFromDefendantTest extends BaseIntegrationTest {
 
     @Test
     void should_create_settlement_no_response_from_defendant() throws Exception {
-        Map<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("respondent1PartyName", "Mr Defendant");
         UUID caseId = UUID.randomUUID();
         doPost(

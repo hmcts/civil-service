@@ -21,7 +21,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
 
     @Test
     void should_create_claim_issue_hwf_part_remission_scenario() throws Exception {
-        Map<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("claimIssueRemissionAmount", "£1000");
         map.put("claimIssueOutStandingAmount", "£25");
         UUID caseId = UUID.randomUUID();

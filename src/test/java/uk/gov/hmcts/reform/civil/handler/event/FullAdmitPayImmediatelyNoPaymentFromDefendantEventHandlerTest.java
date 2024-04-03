@@ -76,7 +76,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(updated);
 
-        Map<String, Object> scenarioParams = new HashMap<>();
+        HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
         scenarioParams.put("fullAdmitPayImmediatelyPaymentAmount", "£124.67");
         scenarioParams.put("responseToClaimAdmitPartPaymentDeadline", DateUtils.formatDate(whenWillThisAmountBePaid));

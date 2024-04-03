@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,8 +22,8 @@ public class ClaimFullDefenceProceedDefendantNoMediationScenarioTest extends Bas
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("applicant1PartyName", claimantName
-                   ))
+                   .params(new HashMap<>(Map.of("applicant1PartyName", claimantName
+                   )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant", caseId
         )
