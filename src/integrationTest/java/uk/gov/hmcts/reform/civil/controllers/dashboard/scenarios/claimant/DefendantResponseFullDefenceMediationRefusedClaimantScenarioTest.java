@@ -47,8 +47,8 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a>.</p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a>.</p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
     }
 

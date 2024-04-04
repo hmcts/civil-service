@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant', '{"Notice.AA
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateEn}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
-        '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateCy}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
+        '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateEn}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateCy}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
 /**
