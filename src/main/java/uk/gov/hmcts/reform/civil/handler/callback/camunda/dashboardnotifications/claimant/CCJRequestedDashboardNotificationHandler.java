@@ -42,7 +42,8 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
     @Override
     public String getScenario(CaseData caseData) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-        if ((caseDataLiP != null && YesOrNo.NO == caseDataLiP.getRespondentSignSettlementAgreement()) || caseData.isSettlementAgreementDeadlineExpired() || !caseData.isJudgementDateNotPermitted()) {
+        if ((caseDataLiP != null && YesOrNo.NO == caseDataLiP.getRespondentSignSettlementAgreement()) || caseData.isSettlementAgreementDeadlineExpired()
+            || !caseData.isJudgementDateNotPermitted()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
         }
 
