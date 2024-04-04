@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,7 +93,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
@@ -128,7 +128,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
@@ -163,7 +163,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitInstalmentCompanyOrganisation() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             String caseId = "12345671";
@@ -201,7 +201,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstalmentCompanyOrganisation() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             String caseId = "12345672";
@@ -239,7 +239,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitAlreadyPaid() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -269,7 +269,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitAlreadyPaid() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -299,7 +299,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDate() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -335,7 +335,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitBySetDate() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -371,7 +371,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallments() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
