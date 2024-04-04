@@ -19,7 +19,7 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
     private TrialArrangementsNotifyOtherPartyNotificationHandler handler;
 
     @Test
-    void should_create_scenario_for_when_defendant_response_deadline_passed() throws Exception {
+    void should_create_notification_for_claimant_when_defendant_finalises_trial_arrangements() throws Exception {
 
         String caseId = "10002348";
         CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
