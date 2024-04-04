@@ -75,7 +75,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2023-44487
-      dependencySet(group: 'io.netty', version: '4.1.100.Final') {
+      dependencySet(group: 'io.netty', version: '4.1.108.Final') {
         entry 'netty-handler'
         entry 'netty-handler-proxy'
         entry 'netty-transport-native-epoll'
@@ -112,13 +112,6 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
-      // CVE-2020-29582
-
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
@@ -134,7 +127,7 @@ allprojects {
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '2.0'
+        version: '2.2'
       ) {
         entry 'snakeyaml'
       }
@@ -373,7 +366,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.71'
+  implementation 'com.github.hmcts:civil-commons:1.0.74'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -452,7 +445,6 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.17.0'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
@@ -488,7 +480,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.1:all'
   //pact contract testing
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
