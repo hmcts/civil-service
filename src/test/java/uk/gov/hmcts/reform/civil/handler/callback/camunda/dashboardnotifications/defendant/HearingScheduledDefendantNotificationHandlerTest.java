@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.bothparties;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.HearingScheduledNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -17,21 +16,20 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_BOTH_PARTIES;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class HearingScheduledNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private HearingScheduledNotificationHandler handler;
+    private HearingScheduledDefendantNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -42,13 +40,13 @@ public class HearingScheduledNotificationHandlerTest extends BaseCallbackHandler
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduled";
+    public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledDefendant";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT);
     }
 
     @Test
@@ -56,7 +54,7 @@ public class HearingScheduledNotificationHandlerTest extends BaseCallbackHandler
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -79,7 +77,7 @@ public class HearingScheduledNotificationHandlerTest extends BaseCallbackHandler
         handler.handle(callbackParams);
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_BOTH_PARTIES.getScenario(),
+            SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );

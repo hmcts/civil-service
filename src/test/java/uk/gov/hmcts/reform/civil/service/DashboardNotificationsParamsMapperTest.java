@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -53,6 +55,8 @@ public class DashboardNotificationsParamsMapperTest {
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
+            .hearingDate(LocalDate.of(2024, 4, 1))
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -100,6 +104,15 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("21 March 2024");
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo("21 March 2024");
+
+        assertThat(result).extracting("hearingDateEn")
+            .isEqualTo("4 April 2024");
+        assertThat(result).extracting("hearingDateCy")
+            .isEqualTo("4 April 2024");
+        assertThat(result).extracting("hearingCourtEn")
+            .isEqualTo("County Court");
+        assertThat(result).extracting("hearingCourtCy")
+            .isEqualTo("County Court");
     }
 
     @Test

@@ -18,7 +18,6 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingTypeForDashboardNotifications;
 
 @Service
 public class DashboardNotificationsParamsMapper {
@@ -138,12 +137,8 @@ public class DashboardNotificationsParamsMapper {
             String date = DateUtils.formatDate(caseData.getHearingDate());
             params.put("hearingDateEn", date);
             params.put("hearingDateCy", date);
-            params.put("hearingTimeEn", caseData.getHearingTimeHourMinute());
-            params.put("hearingTimeCy", caseData.getHearingTimeHourMinute());
             params.put("hearingCourtEn", caseData.getHearingLocation().getValue().getLabel());
             params.put("hearingCourtCy", caseData.getHearingLocation().getValue().getLabel());
-            params.put("hearingIsHeldEn", getHearingTypeForDashboardNotifications(caseData));
-            params.put("hearingIsHeldEn", getHearingTypeForDashboardNotifications(caseData));
         }
 
         return params;
