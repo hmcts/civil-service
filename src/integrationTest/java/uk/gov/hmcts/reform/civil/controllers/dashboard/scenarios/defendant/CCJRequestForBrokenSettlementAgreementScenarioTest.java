@@ -7,10 +7,12 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CCJRequestedDashboardNotificationDefendantHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,8 +33,11 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
+            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES)
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                                          .applicant1SignedSettlementAgreement(
                                                                              YesOrNo.YES).build()).build())
             .build();
@@ -64,8 +69,12 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondentSignSettlementAgreement(YesOrNo.YES)
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                                          .applicant1SignedSettlementAgreement(
                                                                              YesOrNo.YES).build()).build())
             .build();

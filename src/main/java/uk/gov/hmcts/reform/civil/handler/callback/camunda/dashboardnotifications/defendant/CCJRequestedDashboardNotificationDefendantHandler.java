@@ -45,7 +45,7 @@ public class CCJRequestedDashboardNotificationDefendantHandler extends Dashboard
          * 3. Defendant accepts the SA and then breaks the terms of the agreement
          *
          */
-        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+        if (!caseData.isJudgementDateNotPermitted()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT.getScenario();
         }
         return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario();
