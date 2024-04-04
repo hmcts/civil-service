@@ -5,7 +5,7 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
 VALUES ('Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant','{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant",
         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant",
         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant",
-        "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstalments.Claimant",
+        "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.NoDefendantResponse.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Claimant"}','{"Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant" : ["respondent1PartyName", "claimantRepaymentPlanDecision"]}');
