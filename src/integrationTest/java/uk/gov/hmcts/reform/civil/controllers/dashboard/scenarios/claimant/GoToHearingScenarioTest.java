@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ public class GoToHearingScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("respondent1PartyName", "Mr Def Defendant"))
+                   .params(new HashMap<>(Map.of("respondent1PartyName", "Mr Def Defendant")))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario(), caseId
         )

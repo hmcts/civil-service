@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,11 +29,11 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
         String defendantName = "Dave Indent";
         doPost(
             BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(Map.of(
+            ScenarioRequestParams.builder().params(new HashMap<>(Map.of(
                 "respondent1PartyName", defendantName,
                 "respondent1AdmittedAmountPaymentDeadlineEn", respondent1AdmittedAmountPaymentDeadline,
                 "respondent1AdmittedAmountPaymentDeadlineCy", respondent1AdmittedAmountPaymentDeadline
-                )).build(),
+                ))).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
             caseId
