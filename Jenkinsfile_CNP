@@ -88,6 +88,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     sh """
+      mkdir -p test-results/smokeTest
       touch test-results/smokeTest/dummy-smokeTest.xml
     """
   }
