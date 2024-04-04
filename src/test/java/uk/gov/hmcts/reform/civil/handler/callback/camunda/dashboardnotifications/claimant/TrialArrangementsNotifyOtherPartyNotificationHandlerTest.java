@@ -70,7 +70,8 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest  extends BaseCall
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                                     LocalDate.now()).build())
+                .applicant1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

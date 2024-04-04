@@ -41,4 +41,9 @@ public class TrialArrangementsNotifyOtherPartyNotificationHandler extends Dashbo
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario();
     }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicantNotRepresented();
+    }
 }
