@@ -112,13 +112,6 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
-      // CVE-2020-29582
-
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
@@ -441,7 +434,6 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.17.0'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
