@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,6 +74,11 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
         @Test
         void shouldRecordScenario_notTrialReady_whenInvoked() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateHearingFeeDueUnpaid()
                 .applicant1Represented(YesOrNo.NO)
@@ -82,12 +86,6 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT.name()).build()
             ).build();
-
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
-            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 
@@ -101,6 +99,11 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
         @Test
         void shouldRecordScenario_TrialReady_whenInvoked() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTrialReadyApplicant()
                 .applicant1Represented(YesOrNo.NO)
@@ -108,12 +111,6 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT.name()).build()
             ).build();
-
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
-            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 
