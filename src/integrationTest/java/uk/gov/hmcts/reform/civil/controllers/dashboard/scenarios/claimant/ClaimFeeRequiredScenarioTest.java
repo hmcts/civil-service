@@ -7,6 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,8 +31,7 @@ public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimFee", "£70"
-                   )).build(),
+                   .params(new HashMap<>(Map.of("claimFee", "£70"))).build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_CLAIM_FEE_REQUIRED, caseId
         )
             .andExpect(status().isOk());
@@ -41,9 +41,11 @@ public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available"),
-                jsonPath("$[1].taskNameEn").value("<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
@@ -59,7 +61,8 @@ public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
                 jsonPath("$[8].taskNameEn").value("<a>View the bundle</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[9].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[9].currentStatusEn").value("Available"),
                 jsonPath("$[10].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
@@ -74,7 +77,8 @@ public class ClaimFeeRequiredScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You need to pay your claim fee"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Pay the claim fee</a>.</p>")
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Pay the claim fee</a>.</p>")
             );
     }
 
