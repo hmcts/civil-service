@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +60,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("ccdCaseReference", caseData.getCcdCaseReference());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -86,7 +85,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
                     .build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
