@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -406,8 +405,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForDefenceNoMediation() {
             //given
-            Map<String, Object> params = new HashMap<>();
-
+            HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
@@ -441,7 +439,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllWithMediation() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -474,7 +472,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllFastTrack() {
             //given
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
