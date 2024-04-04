@@ -2,17 +2,22 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -22,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -98,8 +104,9 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         );
     }
 
-    @Test
-    public void createDashboardNotificationsWhenClaimantHasSignedSettlementAgreement() {
+    @ParameterizedTest
+    @MethodSource("provideDefendantSignSettlementData")
+    public void createDashboardNotificationsWhenDefendantBreakSSA(CaseData caseData) {
 
         params.put("claimantRepaymentPlanDecision", "accepted");
         params.put("respondent1PartyName", "Mr Defendant Guy");
@@ -108,17 +115,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                                                        .build()
-                             )
-                             .build())
-            .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -131,6 +127,39 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    static Stream<Arguments> provideDefendantSignSettlementData() {
+
+        CaseData defendantRejectedSSA = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondentSignSettlementAgreement(YesOrNo.NO)
+                             .build())
+            .build();
+
+        CaseData defendantNotRespondedToSSA = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0))
+            .build();
+
+        CaseData defendantBreakSSA = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .build();
+
+        return Stream.of(
+            Arguments.of(defendantRejectedSSA),
+            Arguments.of(defendantNotRespondedToSSA),
+            Arguments.of(defendantBreakSSA)
+        );
+
     }
 
 }
