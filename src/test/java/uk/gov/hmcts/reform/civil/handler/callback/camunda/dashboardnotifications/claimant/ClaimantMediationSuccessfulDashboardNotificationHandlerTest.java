@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +46,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
 
     public static final String TASK_ID = "GenerateDashboardNotificationClaimantMediationSuccessful";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -70,6 +69,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     public void createDashboardNotificationsWhenCarmIsEnabled() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -98,6 +98,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     @Test
     public void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

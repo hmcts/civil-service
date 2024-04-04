@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -26,9 +25,9 @@ public class DashboardNotificationsParamsMapper {
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
 
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
+    public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
@@ -85,21 +84,19 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        getAlreadyPaidAmount(caseData).map(amount -> params.put("admissionPaidAmount", amount));
+        getAlreadyPaidAmount(caseData).ifPresent(amount -> params.put("admissionPaidAmount", amount));
 
-        getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
+        getClaimSettledAmount(caseData).ifPresent(amount -> params.put("claimSettledAmount", amount));
 
-        getClaimSettleDate(caseData).map(date -> {
+        getClaimSettleDate(caseData).ifPresent(date -> {
             params.put("claimSettledDateEn", date);
             params.put("claimSettledDateCy", date);
-            return Optional.of(date);
         });
 
-        getRespondToSettlementAgreementDeadline(caseData).map(date -> {
+        getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", date);
             params.put("respondent1SettlementAgreementDeadlineCy", date);
             params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
-            return Optional.of(date);
         });
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
@@ -109,9 +106,9 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
-            getInstalmentAmount(caseData).map(amount -> params.put("instalmentAmount", amount));
-            getInstalmentStartDate(caseData).map(dateEn -> params.put("instalmentStartDateEn", dateEn));
-            getInstalmentStartDate(caseData).map(dateCy -> params.put("instalmentStartDateCy", dateCy));
+            getInstalmentAmount(caseData).ifPresent(amount -> params.put("instalmentAmount", amount));
+            getInstalmentStartDate(caseData).ifPresent(dateEn -> params.put("instalmentStartDateEn", dateEn));
+            getInstalmentStartDate(caseData).ifPresent(dateCy -> params.put("instalmentStartDateCy", dateCy));
             params.put(
                 "instalmentTimePeriodEn",
                 getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
@@ -130,10 +127,9 @@ public class DashboardNotificationsParamsMapper {
                 "paymentFrequency",
                 caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
             );
-            getFirstRepaymentDate(caseData).map(date -> {
+            getFirstRepaymentDate(caseData).ifPresent(date -> {
                 params.put("firstRepaymentDateEn", date);
                 params.put("firstRepaymentDateCy", date);
-                return Optional.of(date);
             });
         }
 

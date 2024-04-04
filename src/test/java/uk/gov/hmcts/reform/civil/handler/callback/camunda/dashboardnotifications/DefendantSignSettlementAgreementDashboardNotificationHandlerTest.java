@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,7 +65,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
     @Test
     public void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
@@ -97,7 +96,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
     @Test
     public void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
