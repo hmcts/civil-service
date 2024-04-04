@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARI
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.isDisposalHearing;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
@@ -99,8 +99,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private void sendEmailHMC(CaseData caseData, String recipient) {
         String emailTemplate;
         HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
-        boolean isDisposalHearing = isDisposalHearing(camundaVars.getHearingType());
-        if (isDisposalHearing || (caseData.getHearingFeePaymentDetails() != null
+        boolean requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
+        if (!requiresHearingFee || (caseData.getHearingFeePaymentDetails() != null
             && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus()))) {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
         } else {
