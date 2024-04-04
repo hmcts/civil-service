@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @ExtendWith(MockitoExtension.class)
 class DefendantMediationUnsuccessfulDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     @Mock
     private FeatureToggleService featureToggleService;
 
@@ -49,7 +49,7 @@ class DefendantMediationUnsuccessfulDashboardNotificationHandlerTest extends Bas
 
     public static final String TASK_ID = "GenerateDashboardNotificationDefendantMediationUnsuccessful";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

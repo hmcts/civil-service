@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,9 +47,9 @@ class ClaimantMediationUnsuccessfulDashboardNotificationHandlerTest extends Base
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationDefendantMediationUnsuccessful";
+    public static final String TASK_ID = "GenerateDashboardNotificationClaimantMediationUnsuccessful";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
