@@ -26,12 +26,11 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName("Claimant").build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName("Defendant").individualLastName("Guy").build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName(
+                "Defendant").individualLastName("Guy").build())
             .build();
 
-
         handler.handle(callbackParams(caseData));
-
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
