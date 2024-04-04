@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseIntegrationTest {
 
     @Autowired
