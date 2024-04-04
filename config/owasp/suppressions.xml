@@ -4,5 +4,7 @@
     <cve>CVE-2021-42306</cve>
     <cve>CVE-2023-36052</cve>
     <cve>CVE-2023-34042</cve>
+    <cve>CVE-2023-20883</cve>
+    <cve>CVE-2023-34055</cve>
   </suppress>
 </suppressions>

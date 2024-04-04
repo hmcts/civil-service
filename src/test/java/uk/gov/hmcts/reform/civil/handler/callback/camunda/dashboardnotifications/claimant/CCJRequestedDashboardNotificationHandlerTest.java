@@ -100,7 +100,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
     @Test
     public void createDashboardNotificationsWhenClaimantHasSignedSettlementAgreement() {
-        
+
         params.put("claimantRepaymentPlanDecision", "accepted");
         params.put("respondent1PartyName", "Mr Defendant Guy");
 
@@ -108,7 +108,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
