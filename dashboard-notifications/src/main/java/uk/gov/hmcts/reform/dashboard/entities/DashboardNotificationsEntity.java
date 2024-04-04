@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @lombok.Data
@@ -67,7 +66,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @Type(type = "jsonb")
     @Column(name = "message_params", columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private Map<String, Object> params = new HashMap<>();
+    private HashMap<String, Object> params;
 
     @Schema(name = "created_by")
     private String createdBy;

@@ -8,10 +8,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
@@ -32,12 +35,14 @@ public class CCJRequestedScenarioTest extends BaseIntegrationTest {
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(
-                       Map.of(
+                       new HashMap<>(Map.of(
                            "applicant1PartyName", claimantName
-                       )
+                       ))
                    )
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(), caseId
+               DASHBOARD_CREATE_SCENARIO_URL,
+               SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(),
+               caseId
         )
             .andExpect(status().isOk());
 
@@ -53,7 +58,8 @@ public class CCJRequestedScenarioTest extends BaseIntegrationTest {
                         + "<p class=\"govuk-body\">If your deadline has passed, but the CCJ has not been issued, you can still respond. " +
                         "Get in touch with HMCTS on {civilMoneyClaimsTelephone} if you are in England and Wales, or 0300 790 6234 if you are in Scotland. " +
                         "You can call from Monday to Friday, between 8.30am to 5pm. <a href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about call charges (opens in new tab).</a></p>"
-                        + "<p class=\"govuk-body\">If you do not get in touch, we will post a CCJ to you and <Name> and explain what to do next.</p>"));
+                        + "<p class=\"govuk-body\">If you do not get in touch, we will post a CCJ to you and <Name> and explain what to do next.</p>")
+            );
 
     }
 

@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -57,7 +56,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
                 CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED_CLAIMANT1.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimFee", "1.00");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
