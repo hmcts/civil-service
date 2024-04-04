@@ -2339,6 +2339,46 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPrePopulateOrderDetailsPagesWithUpdatedExpertEvidenceDataForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getHearingCourtLocations(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input1")
+                .isEqualTo("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                               + " Digital Portal with the particulars of claim");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date1")
+                .isNull();
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
+                .isEqualTo("Any questions which are to be addressed to an expert must be sent to the expert directly "
+                               + "and uploaded to the Digital Portal by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
+                .isEqualTo("The answers to the questions shall be answered by the Expert by");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
+                .isEqualTo("and uploaded to the Digital Portal by");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
+                .isEqualTo(nextWorkingDayDate.toString());
+
+        }
+
+        @Test
         void shouldPrePopulateDRHFields() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
