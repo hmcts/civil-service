@@ -288,11 +288,11 @@ def inStrictOrder(Task... tasks) {
 }
 
 task smoke(description: 'Runs the smoke tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, runSmokeTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness))
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness,
+  dependsOn(inStrictOrder(awaitApplicationReadiness, runSmokeTests,
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
