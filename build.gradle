@@ -75,7 +75,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2023-44487
-      dependencySet(group: 'io.netty', version: '4.1.100.Final') {
+      dependencySet(group: 'io.netty', version: '4.1.108.Final') {
         entry 'netty-handler'
         entry 'netty-handler-proxy'
         entry 'netty-transport-native-epoll'
@@ -341,8 +341,8 @@ jacocoTestReport.dependsOn {
 }
 
 def versions = [
-  junit              : '5.10.0',
-  junitPlatform      : '1.10.0',
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '4.0.0',
@@ -494,10 +494,10 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
 
   // dashboard specific changes
 
