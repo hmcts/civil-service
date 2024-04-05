@@ -5,7 +5,7 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
 VALUES ('Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant',
         '{"Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant"}',
-        '{"Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant":["legacyCaseReference", "cmcCourtEmailId", "cmcCourtAddress"]}');
+        '{"Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant":["legacyCaseReference"]}');
 
 /**
  * Add notification template
