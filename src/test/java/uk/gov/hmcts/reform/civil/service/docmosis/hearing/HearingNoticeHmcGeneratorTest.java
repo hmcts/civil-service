@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -291,12 +293,16 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS",
+        "AAA7-DRH"
+    })
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType) {
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DIS")
+                                .hearingType(hearingType)
                                 .build())
             .build();
 
