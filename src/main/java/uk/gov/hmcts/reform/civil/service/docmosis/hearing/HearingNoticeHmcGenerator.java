@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
@@ -65,9 +67,10 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
                                                          String hearingLocation, String hearingId) {
         var paymentFailed = caseData.getHearingFeePaymentDetails() == null
             || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED);
-        var feeAmount = paymentFailed && !isDisposalHearing(hearing)
+        var hearingType = hearing.getHearingDetails().getHearingType();
+        var feeAmount = paymentFailed && hearingFeeRequired(hearingType)
             ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;
-        var hearingDueDate = paymentFailed && !isDisposalHearing(hearing) ? HearingFeeUtils
+        var hearingDueDate = paymentFailed && hearingFeeRequired(hearingType) ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
 
@@ -79,7 +82,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
-            .hearingType(getHearingType(hearing))
+            .hearingType(getType(hearing.getHearingDetails().getHearingType()).getLabel())
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -104,19 +107,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
         return HEARING_NOTICE_HMC;
-    }
-
-    private String getHearingType(HearingGetResponse hearing) {
-        if (hearing.getHearingDetails().getHearingType().contains("TRI")) {
-            return "trial";
-        } else if (hearing.getHearingDetails().getHearingType().contains("DIS")) {
-            return "hearing";
-        }
-        return null;
-    }
-
-    private boolean isDisposalHearing(HearingGetResponse hearing) {
-        return hearing.getHearingDetails().getHearingType().contains("DIS");
     }
 }
 
