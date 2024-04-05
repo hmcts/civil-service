@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +37,7 @@ class DashboardControllerTest {
     private static final String CASE_ID = "SomeUniqueIdentifier";
     private static final UUID ID = UUID.randomUUID();
     public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
-    public static final ScenarioRequestParams SCENARIO_REQUEST_PARAMS = new ScenarioRequestParams(Map.of(
+    public static final ScenarioRequestParams SCENARIO_REQUEST_PARAMS = new ScenarioRequestParams(new HashMap<>(Map.of(
         "url",
         "http://testUrl",
         "status",
@@ -47,7 +48,7 @@ class DashboardControllerTest {
         "Tiger",
         "target",
         "Safari"
-    ));
+    )));
 
     @Mock
     private TaskListService taskListService;
@@ -108,7 +109,7 @@ class DashboardControllerTest {
             .thenThrow(new RuntimeException());
 
         //then
-        assertThrows(RuntimeException.class, () ->  dashboardController.getTaskListByCaseIdentifierAndRole(
+        assertThrows(RuntimeException.class, () -> dashboardController.getTaskListByCaseIdentifierAndRole(
             "123",
             "Claimant",
             AUTHORISATION

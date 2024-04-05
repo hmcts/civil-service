@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,11 +31,11 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(
-                       Map.of(
-                       "respondent1ResponseDeadlineEn", responseDeadline,
-                       "respondent1ResponseDeadlineCy", responseDeadline,
-                       "respondent1PartyName", defendantName
-                       )
+                       new HashMap<>(Map.of(
+                           "respondent1ResponseDeadlineEn", responseDeadline,
+                           "respondent1ResponseDeadlineCy", responseDeadline,
+                           "respondent1PartyName", defendantName
+                       ))
                    )
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), caseId
@@ -57,16 +58,20 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[1].taskNameEn")
-                    .value("<a href={VIEW_INFO_ABOUT_CLAIMANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                    .value(
+                        "<a href={VIEW_INFO_ABOUT_CLAIMANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[2].taskNameEn")
-                    .value("<a href={VIEW_INFO_ABOUT_DEFENDANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
+                    .value(
+                        "<a href={VIEW_INFO_ABOUT_DEFENDANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
                 jsonPath("$[2].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[3].taskNameEn")
-                    .value("<a href={VIEW_ORDERS_AND_NOTICES} rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                    .value(
+                        "<a href={VIEW_ORDERS_AND_NOTICES} rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[3].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
 
             );
