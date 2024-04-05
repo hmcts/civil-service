@@ -11,7 +11,7 @@ VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Cla
  */
 INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, title_Cy, description_En, description_Cy
                                                   , notification_role)
-VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
+VALUES ('Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
         'Mediation appointment unsuccessful',
         'Mediation appointment unsuccessful',
         '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
