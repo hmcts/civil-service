@@ -29,6 +29,7 @@ public class DashboardNotificationsParamsMapper {
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
+        params.put("legacyCaseReference", caseData.getLegacyCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
