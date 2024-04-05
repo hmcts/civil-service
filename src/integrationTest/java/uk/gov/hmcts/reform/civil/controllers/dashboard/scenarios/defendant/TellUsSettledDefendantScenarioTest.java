@@ -44,7 +44,7 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
                     "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 March 2024.</p>"),
                 jsonPath("$[0].titleCy").value("The claim is settled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 March 2024.</p>")
+                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 Mawrth 2024.</p>")
             );
     }
 }

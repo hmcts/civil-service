@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,12 +38,12 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
         LocalDate hearingFeeByDate = OffsetDateTime.now().toLocalDate();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("defaultRespondTime", hearingFeeByTime,
-                                  "respondent1ResponseDeadlineEn", hearingFeeByDate,
-                                  "respondent1ResponseDeadlineCy", hearingFeeByDate,
-                                  "daysLeftToRespond", 28,
-                                  "ccdCaseReference", caseId
-                   ))
+                   .params(new HashMap<>(Map.of("defaultRespondTime", hearingFeeByTime,
+                                                "respondent1ResponseDeadlineEn", hearingFeeByDate,
+                                                "respondent1ResponseDeadlineCy", hearingFeeByDate,
+                                                "daysLeftToRespond", 28,
+                                                "ccdCaseReference", caseId
+                   )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.Response.Required", caseId
         )
@@ -53,13 +54,16 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available"),
-                jsonPath("$[1].taskNameEn").value("<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
-                jsonPath("$[3].taskNameEn").value("<a href={VIEW_INFO_ABOUT_DEFENDANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
+                jsonPath("$[3].taskNameEn").value(
+                    "<a href={VIEW_INFO_ABOUT_DEFENDANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
                 jsonPath("$[3].currentStatusEn").value("Available"),
                 jsonPath("$[4].taskNameEn").value("<a>View mediation settlement agreement</a>"),
                 jsonPath("$[4].currentStatusEn").value("Not available yet"),
@@ -75,7 +79,8 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
                 jsonPath("$[10].taskNameEn").value("<a>View the bundle</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
-                jsonPath("$[11].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[11].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[11].currentStatusEn").value("Available"),
                 jsonPath("$[12].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[12].currentStatusEn").value("Not available yet"),

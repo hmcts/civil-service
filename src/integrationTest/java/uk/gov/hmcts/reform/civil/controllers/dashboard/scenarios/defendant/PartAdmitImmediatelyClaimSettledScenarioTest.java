@@ -7,6 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,10 +25,10 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("defendantAdmittedAmount", "£100",
-                                  "respondent1AdmittedAmountPaymentDeadlineEn", "1 January 2024",
-                                  "respondent1AdmittedAmountPaymentDeadlineCy", "1 January 2024"
-                   ))
+                   .params(new HashMap<>(Map.of("defendantAdmittedAmount", "£100",
+                                                "respondent1AdmittedAmountPaymentDeadlineEn", "1 January 2024",
+                                                "respondent1AdmittedAmountPaymentDeadlineCy", "1 January 2024"
+                   )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.PartAdmit.Defendant", caseId
         )

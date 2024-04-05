@@ -7,6 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,9 +25,9 @@ public class ClaimRejectedNotPaidScenarioTest extends BaseIntegrationTest {
         doPost(
             BEARER_TOKEN,
             ScenarioRequestParams.builder()
-                .params(Map.of("applicant1PartyName", "Test Applicant",
-                               "claimSettledAmount", "£1000"
-                ))
+                .params(new HashMap<>(Map.of("applicant1PartyName", "Test Applicant",
+                                             "claimSettledAmount", "£1000"
+                )))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
