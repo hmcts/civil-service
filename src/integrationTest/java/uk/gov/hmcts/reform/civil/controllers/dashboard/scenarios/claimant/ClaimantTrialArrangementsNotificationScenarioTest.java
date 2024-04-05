@@ -43,11 +43,11 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
                 jsonPath("$[0].titleEn").value(
                 "Confirm your trial arrangements"),
                 jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You must <a href=\"{TRIAL_ARRANGEMENTS}\" class=\"govuk-link\">confirm your trial arrangements</a> by 19 April 2024. This means that you’ll need to confirm if the case is ready for trial or not. You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. Refer to the <a href=\"{QUESTIONNAIRE_SUBMITTED}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">questionnaire you submitted</a> if you’re not sure what you previously said.</p>"),
+                "<p class=\"govuk-body\">You must <a href=\"{ADD_TRIAL_ARRANGEMENTS}\" class=\"govuk-link\">confirm your trial arrangements</a> by 19 April 2024. This means that you’ll need to confirm if the case is ready for trial or not. You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. Refer to the <a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">questionnaire you submitted</a> if you’re not sure what you previously said.</p>"),
                 jsonPath("$[0].titleCy").value(
                 "Confirm your trial arrangements"),
                 jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You must <a href=\"{TRIAL_ARRANGEMENTS}\" class=\"govuk-link\">confirm your trial arrangements</a> by 19 April 2024. This means that you’ll need to confirm if the case is ready for trial or not. You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. Refer to the <a href=\"{QUESTIONNAIRE_SUBMITTED}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">questionnaire you submitted</a> if you’re not sure what you previously said.</p>")
+                "<p class=\"govuk-body\">You must <a href=\"{ADD_TRIAL_ARRANGEMENTS}\" class=\"govuk-link\">confirm your trial arrangements</a> by 19 April 2024. This means that you’ll need to confirm if the case is ready for trial or not. You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. Refer to the <a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">questionnaire you submitted</a> if you’re not sure what you previously said.</p>")
             );
     }
 }
