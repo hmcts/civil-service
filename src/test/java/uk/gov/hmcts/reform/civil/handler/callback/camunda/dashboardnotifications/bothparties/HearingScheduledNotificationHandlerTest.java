@@ -41,7 +41,7 @@ public class HearingScheduledNotificationHandlerTest extends BaseCallbackHandler
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledClaimant";
+    public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduled";
 
     HashMap<String, Object> params = new HashMap<>();
 
