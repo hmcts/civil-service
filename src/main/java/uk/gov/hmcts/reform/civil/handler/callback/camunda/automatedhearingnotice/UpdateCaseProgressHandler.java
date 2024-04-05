@@ -18,7 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.isDisposalHearing;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +49,9 @@ public class UpdateCaseProgressHandler extends CallbackHandler {
     private CallbackResponse updateCaseProgress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         HearingNoticeVariables camundaVariables = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
-        boolean isDisposalHearing = isDisposalHearing(camundaVariables.getHearingType());
+        boolean hearingFeeRequired = hearingFeeRequired(camundaVariables.getHearingType());
 
-        if (isDisposalHearing) {
+        if (!hearingFeeRequired) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
                 .build();
