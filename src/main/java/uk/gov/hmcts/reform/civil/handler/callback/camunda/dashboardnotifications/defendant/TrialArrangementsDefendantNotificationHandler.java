@@ -39,4 +39,8 @@ public class TrialArrangementsDefendantNotificationHandler extends DashboardCall
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT.getScenario();
     }
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
+    }
 }
