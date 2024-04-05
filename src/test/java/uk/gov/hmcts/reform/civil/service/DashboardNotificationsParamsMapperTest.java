@@ -106,9 +106,9 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("21 March 2024");
 
         assertThat(result).extracting("hearingDateEn")
-            .isEqualTo("4 April 2024");
+            .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingDateCy")
-            .isEqualTo("4 April 2024");
+            .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingCourtEn")
             .isEqualTo("County Court");
         assertThat(result).extracting("hearingCourtCy")

@@ -137,6 +137,9 @@ public class DashboardNotificationsParamsMapper {
             String date = DateUtils.formatDate(caseData.getHearingDate());
             params.put("hearingDateEn", date);
             params.put("hearingDateCy", date);
+
+        }
+        if (nonNull(caseData.getHearingLocation())) {
             params.put("hearingCourtEn", caseData.getHearingLocation().getValue().getLabel());
             params.put("hearingCourtCy", caseData.getHearingLocation().getValue().getLabel());
         }
