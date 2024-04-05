@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private BundleCreationClaimantNotificationHandler handler;
+    private BundleCreationDefendantNotificationHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
