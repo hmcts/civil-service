@@ -25,6 +25,7 @@ public class TrialArrangementsDefendantNotificationHandler extends DashboardCall
                                                          FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
@@ -39,6 +40,7 @@ public class TrialArrangementsDefendantNotificationHandler extends DashboardCall
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT.getScenario();
     }
+
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented();
