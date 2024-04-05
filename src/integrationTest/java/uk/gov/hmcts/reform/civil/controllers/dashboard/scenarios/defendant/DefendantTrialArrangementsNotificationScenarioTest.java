@@ -34,7 +34,6 @@ public class DefendantTrialArrangementsNotificationScenarioTest extends Dashboar
 
         handler.handle(callbackParams(caseData));
 
-
         //Verify Notification is created for DEFENDANT
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
             .andExpect(status().isOk())

@@ -16,11 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
-
 public class ClaimantTrialArrangementsNotificationScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private TrialArrangementsClaimantNotificationHandler handler;
+
     @Test
     void shouldCreateAddTrialArrangementsForClaimant() throws Exception {
         String caseId = "1234987";
