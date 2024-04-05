@@ -505,6 +505,7 @@ public class SdoGeneratorService {
                 SdoHelper.hasSharedVariable(caseData, "respondent2")
             )
             .respondent2(caseData.getRespondent2())
+            .isCarmEnabledForCase(caseData.getShowCarmFields())
             .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
             .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
             .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
@@ -522,7 +523,8 @@ public class SdoGeneratorService {
             .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
             .caseManagementLocation(
-                locationHelper.getHearingLocation(null, caseData, authorisation));
+                locationHelper.getHearingLocation(null, caseData, authorisation))
+            .smallClaimsMediationSectionStatement(caseData.getSmallClaimsMediationSectionStatement());
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             sdoDocumentFormBuilderDrh.hearingLocation(

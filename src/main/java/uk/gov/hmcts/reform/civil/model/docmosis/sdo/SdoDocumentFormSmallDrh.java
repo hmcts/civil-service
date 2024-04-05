@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
@@ -47,6 +49,7 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private final boolean hasWitnessStatements;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2HearingTrialWindow;
+    private final YesOrNo isCarmEnabledForCase;
 
     private final List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
     private final SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
@@ -60,5 +63,6 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private final String sdoR2SmallClaimsPhysicalTrialBundleTxt;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
+    private final SmallClaimsMediation smallClaimsMediationSectionStatement;
 
 }
