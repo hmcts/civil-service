@@ -7,6 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("applicant1PartyName", "John Doe"))
+                   .params(new HashMap<>(Map.of("applicant1PartyName", "John Doe")))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario(), caseId
         )

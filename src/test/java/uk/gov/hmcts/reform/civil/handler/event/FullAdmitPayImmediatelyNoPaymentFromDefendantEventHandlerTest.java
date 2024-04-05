@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,7 +74,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
-        Map<String, Object> scenarioParams = new HashMap<>();
+        HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
         scenarioParams.put("fullAdmitPayImmediatelyPaymentAmount", "£124.67");
         scenarioParams.put("responseToClaimAdmitPartPaymentDeadline", DateUtils.formatDate(whenWillThisAmountBePaid));

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,9 +37,9 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
         LocalDate hearingFeeByDate = OffsetDateTime.now().toLocalDate();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("hearingFeePayByTime", hearingFeeByTime,
-                                  "hearingFeePayByDate", hearingFeeByDate
-                   ))
+                   .params(new HashMap<>(Map.of("hearingFeePayByTime", hearingFeeByTime,
+                                                "hearingFeePayByDate", hearingFeeByDate
+                   )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_HEARING_FEE_PAYMENT_REQUIRED, caseId
         )
@@ -74,8 +75,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimFee", "£70"
-                   ))
+                   .params(new HashMap<>(Map.of("claimFee", "£70")))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.ClaimFee.Required.Test", caseId
         )

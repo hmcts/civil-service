@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,8 +27,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimFee", "£70"
-                   )).build(),
+                   .params(new HashMap<>(Map.of("claimFee", "£70"))).build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_CLAIM_FEE_REQUIRED, caseId
         )
             .andExpect(status().isOk());

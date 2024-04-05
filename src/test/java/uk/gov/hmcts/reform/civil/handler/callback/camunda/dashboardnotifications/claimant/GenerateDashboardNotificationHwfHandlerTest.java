@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +57,7 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
                 CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claimFee");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
