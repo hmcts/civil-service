@@ -61,7 +61,7 @@ public class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTime() {
+    public void configureDashboardNotificationsForTrialArrangements() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -69,7 +69,7 @@ public class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallba
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().respondent1Represented(YesOrNo.NO)
+            .toBuilder().applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
