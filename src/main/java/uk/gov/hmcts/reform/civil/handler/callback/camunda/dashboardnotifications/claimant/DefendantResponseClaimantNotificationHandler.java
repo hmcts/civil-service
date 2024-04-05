@@ -53,10 +53,6 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     @Override
     public String getScenario(CaseData caseData) {
 
-        if (isFullDefenseMediationRefusedScenario(caseData)) {
-            return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
-        }
-
         if (caseData.isPayByInstallment()) {
             if (caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec()) {
                 return caseData.getRespondent1().isCompanyOROrganisation()
@@ -86,6 +82,10 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
             } else if (caseData.isPartAdmitClaimSpec()) {
                 return SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
             }
+        }
+
+        if (isFullDefenseMediationRefusedScenario(caseData)) {
+            return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
         }
 
         if (caseData.isRespondentResponseFullDefence() && caseData.isClaimBeingDisputed()
