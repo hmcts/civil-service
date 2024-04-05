@@ -390,6 +390,7 @@ public class CaseDataParent implements MappableObject {
     private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatementOther;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
