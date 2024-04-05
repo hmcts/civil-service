@@ -42,20 +42,60 @@ public class HearingScheduledScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 4 April 2024 at "
-                        + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
+                        + "County Court. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 4 April 2024 at "
-                        + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
+                        + "County Court. Please keep your contact details and anyone you wish to rely on in court up" +
+                        " to date. You can update contact details by telephoning the court at 0300 123 7050." +
+                        " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>")
+            );
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
+                        + "County Court. Please keep your contact details and anyone you wish to rely on in court up" +
+                        " to date. You can update contact details by telephoning the court at 0300 123 7050." +
+                        " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
+                jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
+                        + "County Court. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>")
             );
 
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View hearings</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View hearings</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[1].reference").value(caseId.toString()),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[1].taskNameCy").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
+
+            );
+
+        //Verify task Item is created
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
