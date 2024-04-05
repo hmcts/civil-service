@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -13,5 +14,5 @@ public interface NotificationTemplateRepository extends CrudRepository<Notificat
 
     Optional<NotificationTemplateEntity> findById(Long id);
 
-    Optional<NotificationTemplateEntity> findByName(String scenarioReference);
+    Optional<List<NotificationTemplateEntity>> findAllByName(String scenarioReference);
 }

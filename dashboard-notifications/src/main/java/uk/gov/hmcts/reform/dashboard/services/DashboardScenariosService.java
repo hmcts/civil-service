@@ -67,14 +67,14 @@ public class DashboardScenariosService {
 
         scenario.getNotificationsToCreate().forEach((templateName, requestParamsKeys) -> {
 
-            Optional<NotificationTemplateEntity> notificationTemplate = notificationTemplateRepository
-                .findByName(templateName);
+            Optional<List<NotificationTemplateEntity>> notificationTemplateEntityList = notificationTemplateRepository
+                .findAllByName(templateName);
 
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
             List<String> keys =  Arrays.asList(requestParamsKeys);
-            notificationTemplate.ifPresent(template -> {
+            notificationTemplateEntityList.ifPresent(list -> list.forEach(template -> {
                 Map<String, Object> templateParams = scenarioRequestParams.getParams().entrySet().stream()
                     .filter(e -> !keys.isEmpty() && keys.contains(e.getKey()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -108,7 +108,7 @@ public class DashboardScenariosService {
 
                 // insert new record in notifications table
                 dashboardNotificationService.saveOrUpdate(notification);
-            });
+            }));
         });
     }
 
@@ -154,17 +154,17 @@ public class DashboardScenariosService {
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
         Arrays.asList(scenario.getNotificationsToDelete()).forEach((templateName) -> {
 
-            Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
-                .findByName(templateName);
+            Optional<List<NotificationTemplateEntity>> templatesToRemove = notificationTemplateRepository
+                .findAllByName(templateName);
 
-            templateToRemove.ifPresent(template -> {
+            templatesToRemove.ifPresent(list -> list.forEach(template -> {
                 int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
                     template.getName(),
                     uniqueCaseIdentifier,
                     template.getRole()
                 );
                 log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
-            });
+            }));
         });
     }
 }

@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Hearing.Scheduled.BothParties',
         '{"Notice.AAA6.ClaimantIntent.GoToHearing.Claimant", "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant", "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant", "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant", "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant", "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant"}',
-        '{"Notice.AAA6.CP.Hearing.Scheduled.Defendant" : ["hearingDateEn", "hearingDateCy", "hearingCourtEn", "hearingCourtCy"]}');
+        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties" : ["hearingDateEn", "hearingDateCy", "hearingCourtEn", "hearingCourtCy"]}');
 
 /**
  * Add notification template
