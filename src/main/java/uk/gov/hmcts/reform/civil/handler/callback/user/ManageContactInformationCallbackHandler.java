@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividuals;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
@@ -104,7 +105,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
     private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
-        "caseworker-civil-admin");
+        "caseworker-civil-admin", "caseworker-civil-staff");
     private static final List<CaseEvent> EVENTS = List.of(
         MANAGE_CONTACT_INFORMATION
     );
@@ -440,6 +441,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         CaseData current = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, builder.build());
+        //Populate individuals with partyID if they do not exist
+        populatePartyIndividuals(builder);
 
         if (changesEvent == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -448,6 +451,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
 
         YesOrNo submittedByCaseworker = isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString()) ? YES : NO;
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder
                         .businessProcess(BusinessProcess.ready(MANAGE_CONTACT_INFORMATION))
@@ -486,6 +490,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedExperts)
             );
             builder.applicantExperts(updatedApplicantExperts);
+
+            // copy in applicant 2 for single response
+            if (shouldCopyToApplicant2(caseData)) {
+                builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                         .applicant2DQExperts(
+                                             buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts))
+                                         .build());
+            }
+
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getRespondent1DQ().getRespondent1DQExperts(), formData);
@@ -498,6 +511,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedExperts)
             );
             builder.respondent1Experts(updatedRespondent1Experts);
+
+            // copy in respondent2 for 1v2SS single response
+            if (shouldCopyToRespondent2(caseData)) {
+                builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                                          .respondent2DQExperts(
+                                              buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts))
+                                          .build());
+                builder.respondent2Experts(updatedRespondent1Experts);
+            }
         } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getRespondent2DQ().getRespondent2DQExperts(), formData);
@@ -545,6 +567,14 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedWitnesses)
             );
             builder.applicantWitnesses(updatedApplicantWitnesses);
+
+            // copy in applicant 2 for single response
+            if (shouldCopyToApplicant2(caseData)) {
+                builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                         .applicant2DQWitnesses(
+                                             buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses))
+                                         .build());
+            }
         } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getRespondent1DQ().getRespondent1DQWitnesses(), formData);
@@ -557,6 +587,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedWitnesses)
             );
             builder.respondent1Witnesses(updatedRespondent1Witnesses);
+
+            // copy in respondent2 for 1v2SS single response
+            if (shouldCopyToRespondent2(caseData)) {
+                builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                                          .respondent2DQWitnesses(
+                                              buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses))
+                                          .build());
+                builder.respondent2Witnesses(updatedRespondent1Witnesses);
+            }
         } else if (partyId.equals(DEFENDANT_TWO_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getRespondent2DQ().getRespondent2DQWitnesses(), formData);
@@ -577,6 +616,19 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .confirmationHeader(format("# Contact information changed"))
             .confirmationBody(format("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab."))
             .build();
+    }
+
+    private boolean shouldCopyToRespondent2(CaseData caseData) {
+        return caseData.getRespondent2() != null
+            && YES.equals(caseData.getRespondent2SameLegalRepresentative())
+            && YES.equals(caseData.getRespondentResponseIsSame());
+    }
+
+    private boolean shouldCopyToApplicant2(CaseData caseData) {
+        return caseData.getApplicant2() != null
+            && ((YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()));
     }
 
     private boolean isBeforeAwaitingApplicantIntention(CaseData caseData) {

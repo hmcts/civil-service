@@ -18,10 +18,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NOT_ASSIGNED;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
-import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +76,11 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             String recipient = caseData.getRespondent1().getPartyEmail();
 
             if (featureToggleService.isCarmEnabledForCase(caseData)) {
-                sendMailAccordingToReason(caseData);
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+                    addPropertiesCARM(caseData),
+                    String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference()));
             } else {
                 notificationService.sendMail(
                     recipient,
@@ -89,18 +89,6 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference())
                 );
             }
-        }
-    }
-
-    private void sendMailAccordingToReason(CaseData caseData) {
-        if (findMediationUnsuccessfulReason(caseData,
-                                            List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))) {
-            notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
-                addPropertiesCARM(caseData),
-                String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference()));
-
         }
     }
 

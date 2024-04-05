@@ -25,7 +25,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class FeesPaymentController {
 
     public static final String FEES_PAYMENT_REQUEST_URL = "/fees/{feeType}/case/{caseReference}/payment";
-    public static final String FEES_PAYMENT_STATUS_URL = "/fees/{feeType}/payment/{paymentReference}/status";
+    public static final String FEES_PAYMENT_STATUS_URL = "/fees/{feeType}/case/{caseReference}/payment/{paymentReference}/status";
     private final FeesPaymentService feesPaymentService;
 
     @PostMapping(path = FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
@@ -52,10 +52,10 @@ public class FeesPaymentController {
     public ResponseEntity<CardPaymentStatusResponse> getGovPaymentRequestStatus(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
+        @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
-
         return new ResponseEntity<>(
-            feesPaymentService.getGovPaymentRequestStatus(feeType, paymentReference, authorization),
+            feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
             HttpStatus.OK
         );
     }

@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -5793,6 +5794,27 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
+    public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
+            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
+                                             .instalmentAmount("120")
+                                             .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .confirmReferToJudgeDefenceReceived(List.of(ConfirmationToggle.CONFIRM)).build();
+    }
+
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -5816,30 +5838,30 @@ public class CaseDataBuilder {
             .joIsRegisteredWithRTL(YES).build();
     }
 
-    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days() {
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 2))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
             .joJudgmentStatusDetails(judgmentStatusDetails).build();
     }
 
-    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days() {
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 1))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)

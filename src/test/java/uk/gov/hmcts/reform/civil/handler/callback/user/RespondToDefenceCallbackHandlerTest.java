@@ -225,6 +225,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant")
                                                                  .documentType(DEFENDANT_DEFENCE)
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
@@ -245,6 +246,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetRespondent1ClaimResponseDocument_WhenAboutToStartIsInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
                     .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant")
                                                                  .documentType(DEFENDANT_DEFENCE)
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
@@ -259,6 +261,27 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
                 assertThat(response.getErrors()).isNull();
                 assertThat(response.getData()).extracting("respondent1ClaimResponseDocument").isNotNull();
+            }
+
+            @Test
+            void shouldSetRespondent2ClaimResponseDocument_WhenAboutToStartIsInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant 2")
+                                                                 .documentType(DEFENDANT_DEFENCE)
+                                                                 .documentLink(Document.builder()
+                                                                                   .documentUrl("url")
+                                                                                   .documentHash("hash")
+                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentBinaryUrl("binUrl")
+                                                                                   .build()).build()))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+                assertThat(response.getErrors()).isNull();
+                assertThat(response.getData()).extracting("respondent2ClaimResponseDocument").isNotNull();
             }
 
             @Test

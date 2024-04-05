@@ -5,12 +5,15 @@ import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -286,7 +289,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCalculateFee_whenPaymentStatusIsNull() {
+        void shouldCalculateFee_whenPaymentStatusIsNull_allocatedTrackIsDefined() {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
                 .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
             when(paymentsService.createServiceRequest(any(), any()))
@@ -308,13 +311,42 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotCalculateFee_whenHearingTypeIsDisposal() {
+        void shouldCalculateFee_whenPaymentStatusIsNull_responseTrackIsDefined() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
+                .toBuilder()
+                .allocatedTrack(null)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
+            SRPbaDetails expected = SRPbaDetails.builder()
+                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
+                .build();
+
+            assertThat(actual).isEqualTo(expected);
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "AAA7-DIS",
+            "AAA7-DRH"
+        })
+        void shouldNotCalculateFee_whenHearingTypeIs(String hearingType) {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
                 .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
 
             when(camundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-DIS")
+                                .hearingType(hearingType)
                                 .build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);

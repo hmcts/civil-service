@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
@@ -28,9 +27,9 @@ public class FeesPaymentService {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final PaymentsClient paymentsClient;
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
+    private final UpdatePaymentStatusService updatePaymentStatusService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
@@ -68,7 +67,7 @@ public class FeesPaymentService {
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
-        FeeType feeType, String paymentReference, String authorization) {
+        FeeType feeType, String caseReference, String paymentReference, String authorization) {
         log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
@@ -84,6 +83,14 @@ public class FeesPaymentService {
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
                 .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+        }
+
+        try {
+            updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
+
+        } catch (Exception e) {
+
+            log.error("Update payment status failed for claim [{}]", caseReference);
         }
 
         return response.build();
