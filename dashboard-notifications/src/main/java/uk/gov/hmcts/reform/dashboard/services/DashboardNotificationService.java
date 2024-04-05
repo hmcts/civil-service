@@ -7,14 +7,16 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @Slf4j
@@ -22,15 +24,12 @@ import java.util.stream.Collectors;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
-    private final NotificationActionRepository notificationActionRepository;
     private final IdamApi idamApi;
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        NotificationActionRepository notificationActionRepository,
                                         IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
-        this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
     }
 
@@ -80,9 +79,15 @@ public class DashboardNotificationService {
                 .dashboardNotification(notification)
                 .actionPerformed("Click")
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
+                .createdAt(OffsetDateTime.now())
                 .build();
 
-            notificationActionRepository.save(notificationAction);
+            if (nonNull(notification.getNotificationAction())
+                && notification.getNotificationAction().getActionPerformed().equals("Click")) {
+                notificationAction.setId(notification.getNotificationAction().getId());
+            }
+            notification.setNotificationAction(notificationAction);
+            dashboardNotificationsRepository.save(notification);
         });
     }
 

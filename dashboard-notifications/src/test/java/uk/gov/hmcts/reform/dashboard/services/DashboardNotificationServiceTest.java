@@ -120,12 +120,13 @@ public class DashboardNotificationServiceTest {
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(any())
                 .build();
+            notification.setNotificationAction(notificationAction);
 
             //when
             dashboardNotificationService.recordClick(id, authToken);
 
             //verify
-            verify(notificationActionRepository).save(notificationAction);
+            verify(dashboardNotificationsRepository).save(notification);
         }
     }
 }
