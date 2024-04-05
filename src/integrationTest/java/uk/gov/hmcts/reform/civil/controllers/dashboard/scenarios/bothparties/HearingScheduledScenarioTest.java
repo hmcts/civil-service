@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
+package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.bothparties;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.bothparties.HearingScheduledNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -16,10 +16,10 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingScheduledScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private HearingScheduledClaimantNotificationHandler handler;
+    private HearingScheduledNotificationHandler handler;
 
     @Test
     void should_create_hearing_scheduled_scenario() throws Exception {
