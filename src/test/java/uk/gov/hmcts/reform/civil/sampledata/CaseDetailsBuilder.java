@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,7 +26,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 public class CaseDetailsBuilder {
 
     private final ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        .registerModules(new Jdk8Module(), new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private String state;
     private Map<String, Object> data;
