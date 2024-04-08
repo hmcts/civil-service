@@ -28,7 +28,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseInt
             ScenarioRequestParams.builder()
                 .params(new HashMap<>(Map.of(
                     "respondent1SettlementAgreementDeadlineEn", "16 March 2024",
-                    "respondent1SettlementAgreementDeadlineCy", "16 March 2024"
+                    "respondent1SettlementAgreementDeadlineCy", "16 Mawrth 2024"
                 )))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
@@ -54,14 +54,13 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseInt
                             + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
                             + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].descriptionCy")
-                    .value(
-                        "<p class=\"govuk-body\">The claimant has rejected your plan and asked you to sign a settlement agreement.</p>"
-                            + "<p class=\"govuk-body\">The claimant has proposed a new repayment plan and the court has agreed with it, "
-                            + "based on the financial details you provided.</p>"
-                            + "<p class=\"govuk-body\">You must respond by 16 March 2024. "
-                            + "If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
-                            + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
-                            + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
+                    .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to sign a settlement agreement.</p>"
+                               + "<p class=\"govuk-body\">The claimant has proposed a new repayment plan and the court has agreed with it, "
+                               + "based on the financial details you provided.</p>"
+                               + "<p class=\"govuk-body\">You must respond by 16 Mawrth 2024. "
+                               + "If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
+                               + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
             );
     }
 }
