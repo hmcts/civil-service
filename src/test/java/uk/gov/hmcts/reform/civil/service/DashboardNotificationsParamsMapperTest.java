@@ -69,7 +69,7 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(date));
+            .isEqualTo(DateUtils.formatDateInWelsh(date));
 
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
@@ -78,7 +78,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
 
@@ -87,14 +87,14 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
 
         assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
         assertThat(result).extracting("applicant1ClaimSettledDateEn")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("applicant1ClaimSettledDateCy")
-            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
 
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo("21 March 2024");
@@ -155,7 +155,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
         assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
-        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 Mawrth 2023");
     }
 
     @Test
@@ -173,7 +173,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
         assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
-        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 Mawrth 2023");
     }
 
     @Test
@@ -197,7 +197,7 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("applicant1ClaimSettledDateEn").isEqualTo("19 March 2024");
-        assertThat(result).extracting("applicant1ClaimSettledDateCy").isEqualTo("19 March 2024");
+        assertThat(result).extracting("applicant1ClaimSettledDateCy").isEqualTo("19 Mawrth 2024");
     }
 
     @Test
@@ -217,7 +217,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("instalmentTimePeriodEn").isEqualTo("week");
         assertThat(result).extracting("instalmentTimePeriodCy").isEqualTo("week");
         assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
-        assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDate(date));
+        assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDateInWelsh(date));
     }
 
     @Test
