@@ -10,8 +10,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -28,9 +32,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -60,6 +67,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
@@ -82,6 +90,32 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
+                "claimant-judgment-varied-determination-of-means-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            caseData = caseData.toBuilder()
+                .applicant1(Party.builder()
+                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
+                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
+                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
+                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1Represented(YesOrNo.NO)
+                .legacyCaseReference("000DC001")
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantLip@example.com",
+                TEMPLATE_ID,
+                getLipNotificationDataMap(caseData),
                 "claimant-judgment-varied-determination-of-means-000DC001"
             );
         }
@@ -109,5 +143,13 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    public Map<String, String> getLipNotificationDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName()
+        );
     }
 }
