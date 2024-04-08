@@ -13,15 +13,15 @@ VALUES ('Scenario.AAA6.CP.Hearing.Scheduled.Claimant',
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
-                                                  ,notification_role)
+                                                  ,notification_role, time_to_live)
 VALUES ('Notice.AAA6.CP.Hearing.Scheduled.Claimant', 'A hearing has been scheduled', 'A hearing has been scheduled',
         '<p class="govuk-body">Your hearing has been scheduled for ${hearingDateEn} at ${hearingCourtEn} Please keep your contact details and anyone you wish to rely on in court up to date. You can update contact details by telephoning the court at 0300 123 7050. <a href="{VIEW_HEARING_NOTICE_CLICK}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the hearing notice</a>.</p>',
         '<p class="govuk-body">Your hearing has been scheduled for ${hearingDateCy} at ${hearingCourtCy} Please keep your contact details and anyone you wish to rely on in court up to date. You can update contact details by telephoning the court at 0300 123 7050. <a href="{VIEW_HEARING_NOTICE_CLICK}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the hearing notice</a>.</p>',
-        'CLAIMANT'),
+        'CLAIMANT', 'Session'),
        ('Notice.AAA6.CP.Hearing.Scheduled.Defendant', 'A hearing has been scheduled', 'A hearing has been scheduled',
         '<p class="govuk-body">Your hearing has been scheduled for ${hearingDateEn} at ${hearingCourtEn} Please keep your contact details and anyone you wish to rely on in court up to date. You can update contact details by telephoning the court at 0300 123 7050. <a href="{VIEW_HEARING_NOTICE_CLICK}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the hearing notice</a>.</p>',
         '<p class="govuk-body">Your hearing has been scheduled for ${hearingDateCy} at ${hearingCourtCy} Please keep your contact details and anyone you wish to rely on in court up to date. You can update contact details by telephoning the court at 0300 123 7050. <a href="{VIEW_HEARING_NOTICE_CLICK}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the hearing notice</a>.</p>',
-        'DEFENDANT');
+        'DEFENDANT', 'Session');
 
 /**
  * Add task list items
