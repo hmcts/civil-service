@@ -29,4 +29,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={ADD_TRIAL_ARRANGEMENTS} class="govuk-link">Add the trial arrangements</a>',
         'Hearing',
         '<a href={ADD_TRIAL_ARRANGEMENTS} class="govuk-link">Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Required.Claimant', '{0, 1}', 'CLAIMANT', 4);
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Required.Claimant', '{5, 5}', 'CLAIMANT', 4);
