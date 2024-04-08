@@ -98,11 +98,14 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
+import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -148,6 +151,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
@@ -209,6 +214,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.MORE_THAN_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_120;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
@@ -577,6 +584,13 @@ public class CaseDataBuilder {
 
     private Flags caseFlags;
 
+    private MediationContactInformation app1MediationContactInfo;
+    private MediationAvailability app1MediationAvailability;
+    private MediationContactInformation resp1MediationContactInfo;
+    private MediationContactInformation resp2MediationContactInfo;
+    private MediationAvailability resp1MediationAvailability;
+    private MediationAvailability resp2MediationAvailability;
+
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
@@ -930,7 +944,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder respondent1DQWithUnavailableDates() {
         UnavailableDate unavailableDate = UnavailableDate.builder()
             .date(LocalDate.now().plusDays(1))
-            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .unavailableDateType(SINGLE_DATE)
             .build();
         this.respondent1DQ = Respondent1DQ.builder()
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
@@ -981,7 +995,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder applicant1DQWithUnavailableDate() {
         UnavailableDate unavailableDate = UnavailableDate.builder()
             .date(LocalDate.now().plusDays(1))
-            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .unavailableDateType(SINGLE_DATE)
             .build();
         this.applicant1DQ = Applicant1DQ.builder()
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
@@ -6645,6 +6659,202 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addLiPApplicant1MediationInfo(boolean alternateInfo) {
+        if (alternateInfo) {
+            if (this.caseDataLiP != null) {
+                this.caseDataLiP = this.caseDataLiP.toBuilder()
+                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                   .isMediationContactNameCorrect(NO)
+                                                   .alternativeMediationContactPerson("Alt contact person")
+                                                   .isMediationEmailCorrect(NO)
+                                                   .alternativeMediationEmail("altemail@mediation.com")
+                                                   .isMediationPhoneCorrect(NO)
+                                                   .alternativeMediationTelephone("07222222222")
+                                                   .hasUnavailabilityNextThreeMonths(YES)
+                                                   .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                   .build()).build();
+            } else {
+                this.caseDataLiP = CaseDataLiP.builder()
+                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                   .isMediationContactNameCorrect(NO)
+                                                   .alternativeMediationContactPerson("Alt contact person")
+                                                   .isMediationEmailCorrect(NO)
+                                                   .alternativeMediationEmail("altemail@mediation.com")
+                                                   .isMediationPhoneCorrect(NO)
+                                                   .alternativeMediationTelephone("07222222222")
+                                                   .hasUnavailabilityNextThreeMonths(YES)
+                                                   .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                   .build()).build();
+            }
+        } else {
+            if (this.caseDataLiP != null) {
+                this.caseDataLiP = this.caseDataLiP.toBuilder()
+                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                   .isMediationContactNameCorrect(YES)
+                                                   .isMediationEmailCorrect(YES)
+                                                   .isMediationPhoneCorrect(YES)
+                                                   .hasUnavailabilityNextThreeMonths(YES)
+                                                   .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                   .build())
+                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
+                                                             .contactPerson("Lip contact person")
+                                                             .build())
+                    .build();
+            } else {
+                this.caseDataLiP = CaseDataLiP.builder()
+                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                   .isMediationContactNameCorrect(YES)
+                                                   .isMediationEmailCorrect(YES)
+                                                   .isMediationPhoneCorrect(YES)
+                                                   .hasUnavailabilityNextThreeMonths(YES)
+                                                   .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                   .build())
+                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
+                                                             .contactPerson("Lip contact person")
+                                                             .build())
+                    .build();
+            }
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addLiPRespondent1MediationInfo(boolean alternateInfo) {
+        if (alternateInfo) {
+            if (this.caseDataLiP != null) {
+                this.caseDataLiP = this.caseDataLiP.toBuilder()
+                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                             .isMediationContactNameCorrect(NO)
+                                                             .alternativeMediationContactPerson("Alt contact person")
+                                                             .isMediationEmailCorrect(NO)
+                                                             .alternativeMediationEmail("altemail@mediation.com")
+                                                             .isMediationPhoneCorrect(NO)
+                                                             .alternativeMediationTelephone("07222222222")
+                                                             .hasUnavailabilityNextThreeMonths(YES)
+                                                             .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                             .build()).build();
+            } else {
+                this.caseDataLiP = CaseDataLiP.builder()
+                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                             .isMediationContactNameCorrect(NO)
+                                                             .alternativeMediationContactPerson("Alt contact person")
+                                                             .isMediationEmailCorrect(NO)
+                                                             .alternativeMediationEmail("altemail@mediation.com")
+                                                             .isMediationPhoneCorrect(NO)
+                                                             .alternativeMediationTelephone("07222222222")
+                                                             .hasUnavailabilityNextThreeMonths(YES)
+                                                             .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                             .build()).build();
+            }
+        } else {
+            if (this.caseDataLiP != null) {
+                this.caseDataLiP = this.caseDataLiP.toBuilder()
+                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                             .isMediationContactNameCorrect(YES)
+                                                             .isMediationEmailCorrect(YES)
+                                                             .isMediationPhoneCorrect(YES)
+                                                             .hasUnavailabilityNextThreeMonths(YES)
+                                                             .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                             .build())
+                    .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                .respondent1LiPContactPerson("Lip contact person")
+                                                .build())
+                    .build();
+            } else {
+                this.caseDataLiP = CaseDataLiP.builder()
+                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                                                             .isMediationContactNameCorrect(YES)
+                                                             .isMediationEmailCorrect(YES)
+                                                             .isMediationPhoneCorrect(YES)
+                                                             .hasUnavailabilityNextThreeMonths(YES)
+                                                             .unavailableDatesForMediation(getMediationUnavailableDates())
+                                                             .build())
+                    .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                .respondent1LiPContactPerson("Lip contact person")
+                                                .build())
+                    .build();
+            }
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant1MediationInfo() {
+        this.app1MediationContactInfo = MediationContactInformation.builder()
+            .firstName("Contact")
+            .lastName("person")
+            .emailAddress("Contact.person@mediation.com")
+            .telephoneNumber("07888888888")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant1MediationAvailability() {
+        this.app1MediationAvailability = MediationAvailability.builder()
+            .isMediationUnavailablityExists(YES)
+            .unavailableDatesForMediation(getMediationUnavailableDates())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1MediationInfo() {
+        this.resp1MediationContactInfo = MediationContactInformation.builder()
+            .firstName("Contact")
+            .lastName("person")
+            .emailAddress("Contact.person@mediation.com")
+            .telephoneNumber("07888888888")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1MediationAvailability() {
+        this.resp1MediationAvailability = MediationAvailability.builder()
+            .isMediationUnavailablityExists(YES)
+            .unavailableDatesForMediation(getMediationUnavailableDates())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2MediationInfo() {
+        this.resp2MediationContactInfo = MediationContactInformation.builder()
+            .firstName("Contact")
+            .lastName("person")
+            .emailAddress("Contact.person@mediation.com")
+            .telephoneNumber("07888888888")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2MediationAvailability() {
+        this.resp2MediationAvailability = MediationAvailability.builder()
+            .isMediationUnavailablityExists(YES)
+            .unavailableDatesForMediation(getMediationUnavailableDates())
+            .build();
+        return this;
+    }
+
+    private List<Element<UnavailableDate>> getMediationUnavailableDates() {
+        return wrapElements(List.of(
+                UnavailableDate.builder()
+                    .unavailableDateType(SINGLE_DATE)
+                    .date(LocalDate.of(2024, 6, 1))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(SINGLE_DATE)
+                    .date(LocalDate.of(2024, 6, 7))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(DATE_RANGE)
+                    .fromDate(LocalDate.of(2024, 6, 10))
+                    .toDate(LocalDate.of(2024, 6, 15))
+                    .build(),
+                UnavailableDate.builder()
+                    .unavailableDateType(DATE_RANGE)
+                    .fromDate(LocalDate.of(2024, 6, 20))
+                    .toDate(LocalDate.of(2024, 6, 25)).build()));
+    }
+
     public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {
         this.applicant1RequestedPaymentDateForDefendantSpec = repaymentBySetDate;
         return this;
@@ -7073,6 +7283,12 @@ public class CaseDataBuilder {
             .claimIssuedHwfDetails(claimIssuedHwfDetails)
             .hearingHwfDetails(hearingHwfDetails)
             .caseFlags(caseFlags)
+            .app1MediationContactInfo(app1MediationContactInfo)
+            .app1MediationAvailability(app1MediationAvailability)
+            .resp1MediationContactInfo(resp1MediationContactInfo)
+            .resp2MediationContactInfo(resp2MediationContactInfo)
+            .resp1MediationAvailability(resp1MediationAvailability)
+            .resp2MediationAvailability(resp2MediationAvailability)
             .build();
     }
 }

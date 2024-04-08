@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -52,6 +51,16 @@ public class MediationJsonServiceTest {
     private static final String RESPONDENT2_LR_NAME = "Respondent 2 LR Org";
     private static final String RESPONDENT2_LR_TELEPHONE = "0123456789";
     private static final String RESPONDENT2_LR_EMAIL = "respondentsolicitor2@example.com";
+
+    private static final String MEDIATION_CONTACT_NAME = "Contact person";
+    private static final String MEDIATION_CONTACT_EMAIL = "Contact.person@mediation.com";
+    private static final String MEDIATION_CONTACT_NUMBER = "07888888888";
+
+    private static final String MEDIATION_ALT_CONTACT_NAME = "Alt contact person";
+    private static final String MEDIATION_ALT_CONTACT_EMAIL = "altemail@mediation.com";
+    private static final String MEDIATION_ALT_CONTACT_NUMBER = "07222222222";
+
+    private static final String LIP_MEDIATION_CONTACT_NAME = "Lip contact person";
 
     @MockBean
     private OrganisationService organisationService;
@@ -534,18 +543,44 @@ public class MediationJsonServiceTest {
     class Litigants {
 
         @Test
-        void shouldBuildUnrepresentedLitigants_when1v1BothUnrepresented() {
+        void shouldBuildUnrepresentedLitigants_when1v1BothUnrepresentedNoAltMediation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .withApplicant1Flags()
                 .withRespondent1Flags()
                 .applicant1Represented(NO)
                 .respondent1Represented(NO)
+                .addLiPRespondent1MediationInfo(false)
+                .addLiPApplicant1MediationInfo(false)
                 .build();
 
             List<MediationLitigant> expected = new ArrayList<>();
-            expected.add(buildClaimant1(NO));
-            expected.add(buildRespondent1(NO));
+            expected.add(addMediationInfoLip(buildClaimant1(NO),
+                                             caseData.getApplicant1().getPartyPhone(), caseData.getApplicant1().getPartyEmail()));
+            expected.add(addMediationInfoLip(buildRespondent1(NO),
+                                             caseData.getRespondent1().getPartyPhone(), caseData.getRespondent1().getPartyEmail()));
+
+            MediationCase actual = service.generateJsonContent(caseData);
+
+            assertThat(actual.getLitigants().size()).isEqualTo(expected.size());
+            assertThat(actual.getLitigants()).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldBuildUnrepresentedLitigants_when1v1BothUnrepresentedAltMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .withApplicant1Flags()
+                .withRespondent1Flags()
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .addLiPRespondent1MediationInfo(true)
+                .addLiPApplicant1MediationInfo(true)
+                .build();
+
+            List<MediationLitigant> expected = new ArrayList<>();
+            expected.add(addAltMediationInfoLip(buildClaimant1(NO)));
+            expected.add(addAltMediationInfoLip(buildRespondent1(NO)));
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -559,34 +594,15 @@ public class MediationJsonServiceTest {
                 .atStateClaimIssued()
                 .withApplicant1Flags()
                 .withRespondent1Flags()
+                .addApplicant1MediationInfo()
+                .addApplicant1MediationAvailability()
+                .addRespondent1MediationInfo()
+                .addRespondent1MediationAvailability()
                 .build();
 
             List<MediationLitigant> expected = new ArrayList<>();
-            expected.add(buildClaimant1(YES));
-            expected.add(buildRespondent1(YES));
-
-            MediationCase actual = service.generateJsonContent(caseData);
-
-            assertThat(actual.getLitigants().size()).isEqualTo(expected.size());
-            assertThat(actual.getLitigants()).isEqualTo(expected);
-        }
-
-        @Test
-        void shouldBuildLitigants_when1v2BothRespondentsUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .withApplicant1Flags()
-                .withRespondent1Flags()
-                .withRespondent2Flags()
-                .respondent1Represented(NO)
-                .respondent2Represented(NO)
-                .build();
-
-            List<MediationLitigant> expected = new ArrayList<>();
-            expected.add(buildClaimant1(YES));
-            expected.add(buildRespondent1(NO));
-            expected.add(buildRespondent2(NO));
+            expected.add(addMediationInfoRepresented(buildClaimant1(YES)));
+            expected.add(addMediationInfoRepresented(buildRespondent1(YES)));
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -602,12 +618,18 @@ public class MediationJsonServiceTest {
                 .withApplicant1Flags()
                 .withRespondent1Flags()
                 .withRespondent2Flags()
+                .addApplicant1MediationAvailability()
+                .addApplicant1MediationInfo()
+                .addRespondent1MediationInfo()
+                .addRespondent1MediationAvailability()
+                .addRespondent2MediationInfo()
+                .addRespondent2MediationAvailability()
                 .build();
 
             List<MediationLitigant> expected = new ArrayList<>();
-            expected.add(buildClaimant1(YES));
-            expected.add(buildRespondent1(YES));
-            expected.add(buildRespondent2(YES));
+            expected.add(addMediationInfoRepresented(buildClaimant1(YES)));
+            expected.add(addMediationInfoRepresented(buildRespondent1(YES)));
+            expected.add(addMediationInfoRepresented(buildRespondent2(YES)));
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -623,12 +645,18 @@ public class MediationJsonServiceTest {
                 .withApplicant1Flags()
                 .withApplicant2Flags()
                 .withRespondent1Flags()
+                .addApplicant1MediationAvailability()
+                .addApplicant1MediationInfo()
+                .addRespondent1MediationInfo()
+                .addRespondent1MediationAvailability()
+                .addRespondent2MediationInfo()
+                .addRespondent2MediationAvailability()
                 .build();
 
             List<MediationLitigant> expected = new ArrayList<>();
-            expected.add(buildClaimant1(YES));
-            expected.add(buildClaimant2());
-            expected.add(buildRespondent1(YES));
+            expected.add(addMediationInfoRepresented(buildClaimant1(YES)));
+            expected.add(addMediationInfoRepresented(buildClaimant2()));
+            expected.add(addMediationInfoRepresented(buildRespondent1(YES)));
 
             MediationCase actual = service.generateJsonContent(caseData);
 
@@ -667,12 +695,12 @@ public class MediationJsonServiceTest {
                 .paperResponse(PAPER_RESPONSE)
                 .represented(true)
                 .solicitorOrgName(APPLICANT_LR_NAME)
-                .litigantTelephone(APPLICANT_LR_TELEPHONE)
+                .litigantTelephone(null)
                 .litigantEmail(APPLICANT_LR_EMAIL)
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         } else {
             return MediationLitigant.builder()
@@ -688,7 +716,7 @@ public class MediationJsonServiceTest {
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         }
     }
@@ -702,12 +730,12 @@ public class MediationJsonServiceTest {
             .paperResponse(PAPER_RESPONSE)
             .represented(true)
             .solicitorOrgName(APPLICANT_LR_NAME)
-            .litigantTelephone(APPLICANT_LR_TELEPHONE)
+            .litigantTelephone(null)
             .litigantEmail(APPLICANT_LR_EMAIL)
             .mediationContactName(null)
             .mediationContactNumber(null)
             .mediationContactEmail(null)
-            .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+            .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
             .build();
     }
 
@@ -721,12 +749,12 @@ public class MediationJsonServiceTest {
                 .paperResponse(PAPER_RESPONSE)
                 .represented(true)
                 .solicitorOrgName(RESPONDENT1_LR_NAME)
-                .litigantTelephone(RESPONDENT1_LR_TELEPHONE)
+                .litigantTelephone(null)
                 .litigantEmail(RESPONDENT1_LR_EMAIL)
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         } else {
             return MediationLitigant.builder()
@@ -742,7 +770,7 @@ public class MediationJsonServiceTest {
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         }
     }
@@ -757,12 +785,12 @@ public class MediationJsonServiceTest {
                 .paperResponse(PAPER_RESPONSE)
                 .represented(true)
                 .solicitorOrgName(RESPONDENT2_LR_NAME)
-                .litigantTelephone(RESPONDENT2_LR_TELEPHONE)
+                .litigantTelephone(null)
                 .litigantEmail(RESPONDENT2_LR_EMAIL)
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         } else {
             return MediationLitigant.builder()
@@ -778,9 +806,73 @@ public class MediationJsonServiceTest {
                 .mediationContactName(null)
                 .mediationContactNumber(null)
                 .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(UnavailableDate.builder().build()))
+                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         }
+    }
+
+    private MediationLitigant addMediationInfoRepresented(MediationLitigant litigant) {
+        return litigant.toBuilder()
+            .mediationContactName(MEDIATION_CONTACT_NAME)
+            .mediationContactNumber(MEDIATION_CONTACT_NUMBER)
+            .mediationContactEmail(MEDIATION_CONTACT_EMAIL)
+            .dateRangeToAvoid(List.of(MediationUnavailability.builder()
+                                          .date("2024-06-01")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .date("2024-06-07")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-10")
+                                          .toDate("2024-06-15")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-20")
+                                          .toDate("2024-06-25")
+                                          .build())).build();
+    }
+
+    private MediationLitigant addAltMediationInfoLip(MediationLitigant litigant) {
+        return litigant.toBuilder()
+            .mediationContactName(MEDIATION_ALT_CONTACT_NAME)
+            .mediationContactNumber(MEDIATION_ALT_CONTACT_NUMBER)
+            .mediationContactEmail(MEDIATION_ALT_CONTACT_EMAIL)
+            .dateRangeToAvoid(List.of(MediationUnavailability.builder()
+                                          .date("2024-06-01")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .date("2024-06-07")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-10")
+                                          .toDate("2024-06-15")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-20")
+                                          .toDate("2024-06-25")
+                                          .build())).build();
+    }
+
+    private MediationLitigant addMediationInfoLip(MediationLitigant litigant,
+                                                  String number, String email) {
+        return litigant.toBuilder()
+            .mediationContactName(LIP_MEDIATION_CONTACT_NAME)
+            .mediationContactNumber(number)
+            .mediationContactEmail(email)
+            .dateRangeToAvoid(List.of(MediationUnavailability.builder()
+                                          .date("2024-06-01")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .date("2024-06-07")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-10")
+                                          .toDate("2024-06-15")
+                                          .build(),
+                                      MediationUnavailability.builder()
+                                          .fromDate("2024-06-20")
+                                          .toDate("2024-06-25")
+                                          .build())).build();
     }
 }
 

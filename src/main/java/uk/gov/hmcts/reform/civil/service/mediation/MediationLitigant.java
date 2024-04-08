@@ -8,24 +8,23 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediationLitigant {
 
-    private String partyID; //party.getPartyid()
-    private String partyRole; // from flags role on case
+    private String partyID;
+    private String partyRole;
     private Party.Type partyType;
     private String partyName;
-    private String paperResponse; //default to N
+    private String paperResponse;
     private boolean represented;
     private String solicitorOrgName;
     private String litigantEmail;
@@ -33,5 +32,5 @@ public class MediationLitigant {
     private String mediationContactName;
     private String mediationContactNumber;
     private String mediationContactEmail;
-    private List<UnavailableDate> dateRangeToAvoid;
+    private List<MediationUnavailability> dateRangeToAvoid;
 }
