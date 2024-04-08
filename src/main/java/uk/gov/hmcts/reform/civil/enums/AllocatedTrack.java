@@ -25,9 +25,9 @@ public enum AllocatedTrack {
                     return getAllocatedTrackForUnSpecDefault(statementOfValueInPounds);
             }
         } else { //For Spec Claims
-            if (isValueSmallerThan(statementOfValueInPounds, 10000)) {
+            if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10_000)) {
                 return SMALL_CLAIM;
-            } else if (isValueWithinRange(statementOfValueInPounds, 10000, 25000)) {
+            } else if (isValueWithinRange(statementOfValueInPounds, 10_001, 25_000)) {
                 return FAST_CLAIM;
             } else {
                 return MULTI_CLAIM;
