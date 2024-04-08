@@ -31,6 +31,11 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected abstract String getScenario(CaseData caseData);
 
+    /**
+     *
+     * @param caseData case's data
+     * @return true if the scenario/notification should be recorded
+     */
     protected boolean shouldRecordScenario(CaseData caseData) {
         return true;
     }

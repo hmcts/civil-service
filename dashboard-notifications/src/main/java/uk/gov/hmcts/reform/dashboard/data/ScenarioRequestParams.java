@@ -10,6 +10,9 @@ import java.util.HashMap;
 @Builder(toBuilder = true)
 public class ScenarioRequestParams {
 
+    /**
+     * Sonar requests this to be serializable, hence HashMap instead of Map
+     */
     HashMap<String, Object> params;
 
     @JsonCreator
