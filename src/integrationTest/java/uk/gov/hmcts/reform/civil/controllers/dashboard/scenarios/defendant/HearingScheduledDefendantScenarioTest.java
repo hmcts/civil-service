@@ -45,13 +45,13 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
-                        " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
+                        " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
-                        " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>")
+                        " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>")
             );
 
         //Verify task Item is created
