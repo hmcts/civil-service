@@ -42,13 +42,13 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 4 April 2024 at "
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 4 April 2024 at "
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">View the hearing notice</a>.</p>")
