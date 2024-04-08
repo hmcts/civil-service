@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
@@ -131,6 +132,7 @@ import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,6 +152,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -633,35 +639,59 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
-        SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .smallClaimsNumberOfWitnessesToggle(checkList)
-            .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+        if (featureToggleService.isSdoR2Enabled()) {
+            SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = SdoR2SmallClaimsWitnessStatements
+                .builder()
+                .sdoStatementOfWitness("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                                           + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
+                                           + " the hearing.")
+                .isRestrictWitness(NO)
+                .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
+                                                     .noOfWitnessClaimant(2)
+                                                     .noOfWitnessDefendant(2)
+                                                     .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
+                                                     .build())
+                .isRestrictPages(NO)
+                .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                                   .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
+                                                   .noOfPages(12)
+                                                   .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
+                                                   .build())
+                .text(WITNESS_DESCRIPTION_TEXT)
+                .build();
+            updatedData.sdoR2SmallClaimsWitnessStatementOther(tempSdoR2SmallClaimsWitnessStatements).build();
+
+        } else {
+            SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+                .smallClaimsNumberOfWitnessesToggle(checkList)
+                .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                         + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
                         + " the hearing.")
-            .input2("2")
-            .input3("2")
-            .input4("For this limitation, a party is counted as a witness.")
-            .text("A witness statement must: \na) Start with the name of the case and the claim number;"
-                      + "\nb) State the full name and address of the witness; "
-                      + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
-                      + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
-                      + "statement are true. I understand that proceedings for contempt of court may be "
-                      + "brought against anyone who makes, or causes to be made, a false statement in a "
-                      + "document verified by a statement of truth without an honest belief in its truth'."
-                      + "\ne) be signed by the witness and dated."
-                      + "\nf) If a witness is unable to read the statement there must be a certificate that "
-                      + "it has been read or interpreted to the witness by a suitably qualified person and "
-                      + "at the final hearing there must be an independent interpreter who will not be "
-                      + "provided by the Court."
-                      + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                      + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
-                      + "accordance with the paragraphs above."
-                      + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
-                      + "the hearing. If they do not attend, it will be for the court to decide how much "
-                      + "reliance, if any, to place on their evidence.")
-            .build();
+                .input2("2")
+                .input3("2")
+                .input4("For this limitation, a party is counted as a witness.")
+                .text("A witness statement must: \na) Start with the name of the case and the claim number;"
+                          + "\nb) State the full name and address of the witness; "
+                          + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                          + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
+                          + "statement are true. I understand that proceedings for contempt of court may be "
+                          + "brought against anyone who makes, or causes to be made, a false statement in a "
+                          + "document verified by a statement of truth without an honest belief in its truth'."
+                          + "\ne) be signed by the witness and dated."
+                          + "\nf) If a witness is unable to read the statement there must be a certificate that "
+                          + "it has been read or interpreted to the witness by a suitably qualified person and "
+                          + "at the final hearing there must be an independent interpreter who will not be "
+                          + "provided by the Court."
+                          + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
+                          + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
+                          + "accordance with the paragraphs above."
+                          + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
+                          + "the hearing. If they do not attend, it will be for the court to decide how much "
+                          + "reliance, if any, to place on their evidence.")
+                .build();
 
-        updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+            updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+        }
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
@@ -814,14 +844,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                           .isRestrictPages(NO)
                                                           .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness
                                                                                                .builder()
-                                                                                               .partyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT)
+                                                                                               .partyIsCountedAsWitnessTxt(
+                                                                                                   RESTRICT_WITNESS_TEXT)
                                                                                                .build())
                                                           .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                             .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .fontDetails(
+                                                                                                 RESTRICT_NUMBER_PAGES_TEXT2)
                                                                                              .noOfPages(12)
-                                                                                             .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                                             .witnessShouldNotMoreThanTxt(
+                                                                                                 RESTRICT_NUMBER_PAGES_TEXT1)
                                                                                              .build())
-                                                          .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
+                                                          .text(WITNESS_DESCRIPTION_TEXT).build());
         updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
                                                 .trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
                                                 .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
