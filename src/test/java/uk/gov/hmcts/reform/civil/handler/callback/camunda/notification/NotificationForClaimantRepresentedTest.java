@@ -38,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_A
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationForClaimantRepresented.TASK_ID_APPLICANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationForClaimantRepresented.TASK_ID_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationForClaimantRepresented.TASK_ID_APPLICANT_SOLICITOR;
 
 @SpringBootTest(classes = {
     NotificationForClaimantRepresented.class,
@@ -195,5 +198,23 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("applicantsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(APPLICANT_SOLICITOR_TEMPLATE);
         }
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(notificationHandler
+                .camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                        NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build()).build()))
+                .isEqualTo(TASK_ID_APPLICANT);
+
+        assertThat(notificationHandler
+                .camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                        NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED.name()).build()).build()))
+                .isEqualTo(TASK_ID_RESPONDENT);
+
+        assertThat(notificationHandler
+                .camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                        NOTIFY_APPLICANT_LIP_SOLICITOR.name()).build()).build()))
+                .isEqualTo(TASK_ID_APPLICANT_SOLICITOR);
     }
 }
