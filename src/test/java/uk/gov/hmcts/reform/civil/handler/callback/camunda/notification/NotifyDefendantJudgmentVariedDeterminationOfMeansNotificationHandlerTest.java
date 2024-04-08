@@ -57,7 +57,6 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
 
         @BeforeEach
         void setup() {
-
             when(notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(
                 anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
@@ -119,5 +118,4 @@ class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandlerTest e
             DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
         );
     }
-
 }
