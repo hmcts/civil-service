@@ -93,7 +93,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         RespondToClaim respondToClaim = getRespondToClaim(caseData);
         if ((caseData.hasDefendantNotPaid()
             || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && (caseData.isFullDefenceNotPaid() && caseData.isClaimantIntentionNotSettlePartAdmit()))
+            && (caseData.isFullDefenceNotPaid() || caseData.isClaimantIntentionNotSettlePartAdmit())
+            && (caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != YesOrNo.YES))
             && caseData.isMediationRejectedOrFastTrack())) {
             return SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario();
         }
