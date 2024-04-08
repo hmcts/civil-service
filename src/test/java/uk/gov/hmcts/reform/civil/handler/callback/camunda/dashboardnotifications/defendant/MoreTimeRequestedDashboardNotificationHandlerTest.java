@@ -36,8 +36,6 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -69,7 +67,6 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
 
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

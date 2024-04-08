@@ -36,8 +36,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
     @Mock
     private DashboardApiClient dashboardApiClient;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -74,7 +72,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
