@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +46,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     public static final String TASK_ID = "GenerateDashboardNotificationDefendantMediationSuccessful";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -68,58 +65,51 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
             .isEqualTo(TASK_ID);
     }
 
-    @Nested
-    class AboutToSubmitCallback {
+    @Test
+    public void createDashboardNotificationsWhenCarmIsEnabled() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        params.put("ccdCaseReference", "123");
 
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        }
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        @Test
-        public void createDashboardNotificationsWhenCarmIsEnabled() {
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            params.put("ccdCaseReference", "123");
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(dateTime)
+            .build();
 
-            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
 
-            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
-            CaseData caseData = CaseData.builder()
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(1234L)
-                    .respondent1ResponseDeadline(dateTime)
-                    .build();
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
-
-            handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(params).build()
-            );
-        }
-
-        @Test
-        public void createDashboardNotificationsWhenCarmIsDisabled() {
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-
-            CaseData caseData = CaseData.builder()
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(1234L)
-                    .build();
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
-
-            handler.handle(callbackParams);
-            verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-        }
+        handler.handle(callbackParams);
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
     }
+
+    @Test
+    public void createDashboardNotificationsWhenCarmIsDisabled() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
+    }
+
 }

@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,15 +31,16 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     @InjectMocks
     private CCJRequestedDashboardNotificationDefendantHandler handler;
     @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
     private DashboardApiClient dashboardApiClient;
+
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForRespondent1";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -65,7 +65,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)

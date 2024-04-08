@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHB
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_MORE_TIME_REQUESTED_CLAIMANT;
 
 import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -61,7 +60,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
     @Test
     public void configureDashboardNotificationsForDefendantRequestMoreTime() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);

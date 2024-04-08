@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
     private CallbackResponse createDashboardNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        Map<String, Object> params = dashboardNotificationsParamsMapper.mapCaseDataToParams(caseData);
+        HashMap<String, Object> params = dashboardNotificationsParamsMapper.mapCaseDataToParams(caseData);
 
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),

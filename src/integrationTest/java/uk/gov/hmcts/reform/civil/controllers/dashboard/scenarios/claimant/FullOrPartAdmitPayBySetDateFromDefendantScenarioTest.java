@@ -62,7 +62,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
-                     +   DateUtils.formatDate(responseDeadline) + "<br>"
+                     +   DateUtils.formatDateInWelsh(responseDeadline) + "<br>"
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
@@ -114,7 +114,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                jsonPath("$[0].titleCy").value("Response to the claim"),
                jsonPath("$[0].descriptionCy").value(
                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
-                    +   DateUtils.formatDate(admitPaymentDeadline) + "<br>"
+                    +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + "<br>"
                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 

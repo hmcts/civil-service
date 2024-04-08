@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -109,7 +110,7 @@ class DashboardScenariosServiceTest {
             "Auth-token",
             SCENARIO_ISSUE_CLAIM_START,
             "ccd-case-id",
-            new ScenarioRequestParams(Map.of(
+            new ScenarioRequestParams(new HashMap<>(Map.of(
                 "url",
                 "http://testUrl",
                 "status",
@@ -120,7 +121,7 @@ class DashboardScenariosServiceTest {
                 "Tiger",
                 "target",
                 "Safari"
-            ))
+            )))
         );
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);

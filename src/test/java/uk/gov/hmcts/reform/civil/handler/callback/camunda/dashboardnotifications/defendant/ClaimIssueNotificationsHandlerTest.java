@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -43,7 +42,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

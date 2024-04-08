@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -100,7 +99,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DEFENDANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
@@ -115,7 +114,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldCreateNotificationForDefendantWhenClaimantAcceptsRepaymentPlanRaisesCCJ() {
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -147,7 +146,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
         @Test
         public void configureDashboardNotificationsForClaimantResponseCCJ() {
 
-            Map<String, Object> params = new HashMap<>();
+            HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()

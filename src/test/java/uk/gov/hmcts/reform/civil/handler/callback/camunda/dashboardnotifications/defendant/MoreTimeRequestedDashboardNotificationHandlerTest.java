@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,9 +39,12 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     public static final String TASK_ID = "GenerateDashboardNotificationMoreTimeRequestedForRespondent1";
 
-    Map<String, Object> params = new HashMap<>();
+    HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -65,6 +67,7 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
 
         params.put("ccdCaseReference", "123");
 
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 

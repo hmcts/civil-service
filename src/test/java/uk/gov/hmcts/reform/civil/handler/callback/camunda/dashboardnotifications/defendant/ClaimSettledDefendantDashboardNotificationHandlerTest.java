@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,7 +75,7 @@ public class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseC
                                  .applicant1ClaimSettledDate(
                                      LocalDate.now()).build()).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 

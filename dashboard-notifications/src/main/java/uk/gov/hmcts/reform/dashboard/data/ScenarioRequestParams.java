@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.HashMap;
 
 @Data
 @Builder(toBuilder = true)
 public class ScenarioRequestParams {
 
-    Map<String, Object> params;
+    HashMap<String, Object> params;
 
     @JsonCreator
-    public ScenarioRequestParams(Map<String, Object> params) {
+    public ScenarioRequestParams(HashMap<String, Object> params) {
         this.params = params;
     }
 }

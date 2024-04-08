@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,10 +34,13 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
 
     @InjectMocks
     private DefendantSignSettlementAgreementDashboardNotificationHandler handler;
+
     @Mock
     private DashboardApiClient dashboardApiClient;
+
     @Mock
     private FeatureToggleService featureToggleService;
+
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
@@ -62,71 +62,66 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
             .isEqualTo(TASK_ID);
     }
 
-    @Nested
-    class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        }
+    @Test
+    public void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
 
-        @Test
-        public void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
+        HashMap<String, Object> params = new HashMap<>();
 
-            Map<String, Object> params = new HashMap<>();
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
-            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(
+                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
+                ).build()
+            )
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .build();
 
-            CaseData caseData = CaseData.builder()
-                    .caseDataLiP(
-                            CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                            ).build()
-                    )
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(1234L)
-                    .build();
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
+        handler.handle(callbackParams);
 
-            handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(params).build()
-            );
-        }
-
-        @Test
-        public void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
-
-            Map<String, Object> params = new HashMap<>();
-
-            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-            CaseData caseData = CaseData.builder()
-                    .caseDataLiP(
-                            CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
-                            ).build()
-                    )
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(1234L)
-                    .build();
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
-
-            handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(params).build()
-            );
-        }
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
     }
+
+    @Test
+    public void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
+
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(
+                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
+                ).build()
+            )
+            .legacyCaseReference("reference")
+            .ccdCaseReference(12345L)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_ACCEPTED_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
 }

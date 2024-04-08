@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -80,7 +79,7 @@ public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends B
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_CLAIMANT.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
