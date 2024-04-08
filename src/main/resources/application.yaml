@@ -389,6 +389,9 @@ notifications:
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
 
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
+  notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
+  notifyDefendantLipForNoLongerAccessTemplate: "e9c3426a-7888-420f-816e-c74217264111"
+  notifyDefendantLrAfterNoticeOfChangeTemplate: "421711bb-c113-4a2f-8f2a-6d93510c0e8f"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
