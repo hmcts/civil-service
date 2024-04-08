@@ -29,6 +29,7 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS,
                                                            NOTIFY_SOLICITOR2_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
+
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantVariedDeterminationOfMeans1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantVariedDeterminationOfMeans2";
     private static final String REFERENCE_TEMPLATE =
@@ -63,16 +64,17 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
 
     private CallbackResponse notifyDefendantJudgmentVariedDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String recipient = (callbackParams.getRequest().getEventId()
-                .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()))
-            ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+
+        String recipient = callbackParams.getRequest().getEventId()
+                .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
 
         if (nonNull(recipient)) {
             notificationService.sendMail(
                 recipient,
                 getTemplate(),
                 callbackParams.getRequest().getEventId()
-                        .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
+                    .equals(NOTIFY_SOLICITOR1_DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name())
                     ? addProperties(caseData) : addRespondent2Properties(caseData),
                 getReferenceTemplate(caseData)
             );
