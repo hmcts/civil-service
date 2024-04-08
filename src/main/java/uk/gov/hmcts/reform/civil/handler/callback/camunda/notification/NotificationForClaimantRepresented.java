@@ -69,7 +69,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     private CallbackResponse notifyLipAfterNocApproval(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String recipientEmail = getRecipientEmail(caseEvent,caseData);
+        String recipientEmail = getRecipientEmail(caseEvent, caseData);
         boolean isRespondentNotification = isRespondentNotification(caseEvent);
         boolean isApplicantSolicitorNotify = isApplicantSolicitorNotification(caseEvent);
         String templateId = getTemplateID(isRespondentNotification, isApplicantSolicitorNotify, caseData.isBilingual());
@@ -130,23 +130,23 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
         if (isBilingual) {
             return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
         }
-        if(isApplicantSolicitorNotify) {
+        if (isApplicantSolicitorNotify) {
             return notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate();
         }
         return notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate();
     }
 
-    private String getRecipientEmail( CaseEvent event,CaseData caseData) {
-       switch (event) {
+    private String getRecipientEmail(CaseEvent event, CaseData caseData) {
+        switch (event) {
             case NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL:
                 return caseData.getApplicant1Email();
             case NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED:
                 return getRecipientEmailForRespondent(caseData);
-           case NOTIFY_APPLICANT_LIP_SOLICITOR:
+            case NOTIFY_APPLICANT_LIP_SOLICITOR:
                 return getApplicantSolicitorEmail(caseData);
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
-      }
+        }
     }
 
     private boolean isApplicantSolicitorNotification(CaseEvent caseEvent) {
@@ -154,7 +154,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
                 .equals(NOTIFY_APPLICANT_LIP_SOLICITOR.name());
     }
 
-    private String getApplicantSolicitorEmail( CaseData caseData) {
+    private String getApplicantSolicitorEmail(CaseData caseData) {
         if (caseData.getApplicantSolicitor1UserDetails() != null) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         }

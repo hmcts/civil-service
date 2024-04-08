@@ -190,9 +190,7 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
                     emailTemplate.capture(),
-                    notificationDataMap.capture(), reference.capture()
-            );
-
+                    notificationDataMap.capture(), reference.capture());
 
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("applicantsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(APPLICANT_SOLICITOR_TEMPLATE);
