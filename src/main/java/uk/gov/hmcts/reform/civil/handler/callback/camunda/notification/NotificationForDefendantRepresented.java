@@ -134,11 +134,10 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
 
     private Map<String, Object> setNotificationMapping(CaseData caseData, CaseEvent caseEvent) {
         Map<String, Object> mapping = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
 
         switch (caseEvent) {
             case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL:
-                mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate());
+                mapping.put(TEMPLATE_MAP_ID, templateIDForDefendant(caseData));
                 mapping.put(EMAIL_MAP_ID, caseData.getRespondent1Email());
                 mapping.put(PROPERTIES_MAP_ID, addProperties(caseData));
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
@@ -151,7 +150,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
                 if (caseData.getApplicant1Represented() == YesOrNo.NO) {
-                    mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate());
+                    mapping.put(TEMPLATE_MAP_ID, templateIDForClaimant(caseData));
+                    mapping.put(EMAIL_MAP_ID, caseData.getApplicant1Email());
                     mapping.put(PROPERTIES_MAP_ID, addPropertiesClaimant(caseData));
                     mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
                 } else {
@@ -165,6 +165,20 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         }
     }
 
+    private String templateIDForClaimant(CaseData caseData) {
+        if (caseData.isBilingual()) {
+            return "abc";
+        }
+        ;
+        return "";
+    }
+
+    private String templateIDForDefendant(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return "asd";
+        }
+        return "";
+    }
     private String setNotificationCamundaActivity(CaseData caseData, CaseEvent caseEvent) {
         return switch (caseEvent) {
             case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL -> TASK_ID_DEFENDANT;
