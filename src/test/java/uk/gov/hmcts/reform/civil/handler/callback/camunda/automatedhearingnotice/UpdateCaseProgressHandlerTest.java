@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.automatedhearingnotic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,11 +58,15 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
             .build());
     }
 
-    @Test
-    void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitDisposalHearing() {
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS",
+        "AAA7-DRH"
+    })
+    void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmit(String hearingType) {
         when(camundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
-                            .hearingType("AAA7-DISA")
+                            .hearingType(hearingType)
                             .build());
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder()
@@ -75,6 +81,27 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
         assertEquals(result, AboutToStartOrSubmitCallbackResponse.builder()
             .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
             .build());
+    }
+
+    @Test
+    void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitDisputeResolutionHearing() {
+        when(camundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                        .hearingType("AAA7-DRH")
+                        .build());
+        CaseData caseData = CaseData.builder()
+                .businessProcess(BusinessProcess.builder()
+                        .processInstanceId("PROCESS_ID")
+                        .build())
+                .build();
+
+        var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+        var result = handler.handle(params);
+
+        assertEquals(result, AboutToStartOrSubmitCallbackResponse.builder()
+                .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
+                .build());
     }
 
 }

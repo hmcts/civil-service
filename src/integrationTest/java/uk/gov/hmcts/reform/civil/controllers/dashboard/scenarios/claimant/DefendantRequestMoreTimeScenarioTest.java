@@ -41,7 +41,7 @@ public class DefendantRequestMoreTimeScenarioTest extends DashboardBaseIntegrati
                     "<p class=\"govuk-body\">The response deadline for the defendant is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).</p>"),
                 jsonPath("$[0].titleCy").value("More time requested"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The response deadline for the defendant is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).</p>")
+                    "<p class=\"govuk-body\">The response deadline for the defendant is now 4pm on 1 Ebrill 2024 ({daysLeftToRespond} days remaining).</p>")
             );
     }
 }
