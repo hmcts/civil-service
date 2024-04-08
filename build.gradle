@@ -131,13 +131,6 @@ allprojects {
       ) {
         entry 'snakeyaml'
       }
-      // Solves CVE-2022-25647
-      dependencySet(
-        group: 'org.camunda.bpm',
-        version: '7.17.0'
-      ) {
-        entry 'camunda-engine'
-      }
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
@@ -335,7 +328,8 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
   pact               : '3.5.24',
-  springSecurity     : '5.8.7'
+  springSecurity     : '5.8.7',
+  camunda            : '7.20.1'
 ]
 
 ext.libraries = [
@@ -436,9 +430,9 @@ dependencies {
 
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
-  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
+  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: versions.camunda
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: versions.camunda
 
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
