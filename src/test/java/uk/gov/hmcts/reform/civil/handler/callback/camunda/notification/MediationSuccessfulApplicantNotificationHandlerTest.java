@@ -11,12 +11,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
@@ -29,10 +32,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_TWO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -55,8 +60,11 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
     private static final String REFERENCE_NUMBER = "8372942374";
     public static final String TEMPLATE_ID = "template-id";
+    public static final String TEMPLATE_LIP_ID = "template-lip-id";
     public static final String APPLICANT_MAIL = "applicantsolicitor@example.com";
+    public static final String APPLICANT_LIP_MAIL = "applicant@example.com";
     public static final String MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION = "mediation-successful-applicant-notification-" + REFERENCE_NUMBER;
+    public static final String MEDIATION_SUCCESSFUL_APPLICANT_LIP_NOTIFICATION = "mediation-successful-applicant-notification-LIP-" + REFERENCE_NUMBER;
     public static final String NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL = "NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL";
 
     @Nested
@@ -69,6 +77,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate()).thenReturn(TEMPLATE_LIP_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
@@ -89,6 +98,34 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 TEMPLATE_ID,
                 getNotificationDataMapSpec(caseData),
                 "mediation-successful-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvoked() {
+            //Given
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Party applicant1 = PartyBuilder.builder().soleTrader()
+                .partyEmail(APPLICANT_LIP_MAIL)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .setClaimTypeToSpecClaim()
+                .applicant1(applicant1)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                APPLICANT_LIP_MAIL,
+                TEMPLATE_LIP_ID,
+                getNotificationLipDataMapSpec(caseData),
+                MEDIATION_SUCCESSFUL_APPLICANT_LIP_NOTIFICATION
             );
         }
 
@@ -235,6 +272,14 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             );
         }
 
+        @NotNull
+        public Map<String, String> getNotificationLipDataMapSpec(CaseData caseData) {
+            return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     public Map<String, String> lrClaimantProperties(CaseData caseData) {
