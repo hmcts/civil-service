@@ -57,7 +57,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 March 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 March 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 Mawrth 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
         //Verify task Item is created

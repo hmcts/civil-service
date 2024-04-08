@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
@@ -21,14 +23,16 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
 
         UUID caseId = UUID.randomUUID();
 
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(Map.of("applicant1PartyName", "Mr Claim Claimant",
-                                  "admissionPaidAmount", "£3000"))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL,
-               "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
-               caseId
+        doPost(
+            BEARER_TOKEN,
+            ScenarioRequestParams.builder()
+                .params(new HashMap<>(Map.of("applicant1PartyName", "Mr Claim Claimant",
+                                             "admissionPaidAmount", "£3000"
+                )))
+                .build(),
+            DASHBOARD_CREATE_SCENARIO_URL,
+            "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
+            caseId
         )
             .andExpect(status().isOk());
 

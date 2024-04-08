@@ -55,7 +55,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
                     "<p class=\"govuk-body\">You have said you already paid £100 on 21 March 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have said you already paid £100 on 21 March 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.")
+                    "<p class=\"govuk-body\">You have said you already paid £100 on 21 Mawrth 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.")
             );
 
         //Verify task Item is created
@@ -97,7 +97,7 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
                     "<p class=\"govuk-body\">You have said you already paid £200 on 22 March 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have said you already paid £200 on 22 March 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.")
+                    "<p class=\"govuk-body\">You have said you already paid £200 on 22 Mawrth 2024. The claimant can confirm payment and settle, or proceed with the claim. The court will contact you when they respond.</p><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.")
             );
 
         //Verify task Item is created

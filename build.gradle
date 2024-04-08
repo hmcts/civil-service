@@ -486,6 +486,8 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
 
