@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
     NotificationForClaimantRepresented.class,
     JacksonAutoConfiguration.class,
 })
-public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
+class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private NotificationForClaimantRepresented notificationHandler;
