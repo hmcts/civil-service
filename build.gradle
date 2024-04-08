@@ -115,7 +115,7 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.7'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
@@ -335,7 +335,7 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
   pact               : '3.5.24',
-  springSecurity     : '5.8.7'
+  springSecurity     : '5.8.11'
 ]
 
 ext.libraries = [
@@ -447,7 +447,7 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.47.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.2'
