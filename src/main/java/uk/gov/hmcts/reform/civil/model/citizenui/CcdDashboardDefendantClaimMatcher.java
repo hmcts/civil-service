@@ -332,4 +332,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isHwfPaymentOutcome() {
         return false;
     }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return false;
+    }
 }
