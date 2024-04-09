@@ -1734,8 +1734,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @MethodSource("caseDataStream")
         void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // When
@@ -1757,8 +1755,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotAssignCategoryIds_whenDocumentNotExist() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .uploadParticularsOfClaim(NO)
                 .build();
@@ -1772,8 +1768,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotAssignCategoryIds_whenDocumentNotExistAndParticularOfClaimTextExists() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
                 .particularsOfClaimText("Some string").build();
 
