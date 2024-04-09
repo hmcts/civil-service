@@ -147,7 +147,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date_RTL_NO_TO_NO() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoJudgmentStatusDetails(JudgmentStatusDetails.builder()
                                                     .judgmentStatusTypes(JudgmentStatusType.ISSUED)
@@ -193,7 +193,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
@@ -217,7 +217,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotThrowErrorWhenAllDatesAreValid() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().plusDays(2));
 

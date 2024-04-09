@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,7 +20,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
 
     @Test
     void should_create_claim_issue_hwf_part_remission_scenario() throws Exception {
-        Map<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("claimIssueRemissionAmount", "£1000");
         map.put("claimIssueOutStandingAmount", "£25");
         UUID caseId = UUID.randomUUID();

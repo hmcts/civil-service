@@ -540,18 +540,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
-        if (toggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            updatedData.respondent2DocumentGeneration(null);
-            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                updatedData.respondent2DocumentGeneration("userRespondent2");
-            }
+        // casefileview changes need to assign documents into specific folders, this is help determine
+        // which user is "creating" the document and therefore which folder to move the documents
+        // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        updatedData.respondent2DocumentGeneration(null);
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            updatedData.respondent2DocumentGeneration("userRespondent2");
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
@@ -564,16 +562,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
-        if (toggleService.isCaseFileViewEnabled()) {
-            log.info("Null placeholder documents");
-            updatedData.respondent1ClaimResponseDocument(null);
-            updatedData.respondent2ClaimResponseDocument(null);
+        log.info("Null placeholder documents");
+        updatedData.respondent1ClaimResponseDocument(null);
+        updatedData.respondent2ClaimResponseDocument(null);
+        if (caseData.getRespondent1() != null
+            && updatedData.build().getRespondent1DQ() != null) {
             updatedData.respondent1DQ(updatedData.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
-            if (caseData.getRespondent2() != null) {
-                updatedData.respondent2DQ(updatedData.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
-            }
         }
-
+        if (caseData.getRespondent2() != null
+            && updatedData.build().getRespondent2DQ() != null) {
+            updatedData.respondent2DQ(updatedData.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
