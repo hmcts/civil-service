@@ -4,6 +4,8 @@ java:
   devcpuRequests: 500m
   devmemoryRequests: 2048Mi
   devmemoryLimits: 4096Mi
+  autoscaling:
+    enabled: false
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
