@@ -241,6 +241,7 @@ camunda-bpm:
 aac-manage-case-assignment:
   enabled: true
   java:
+    disableKeyVaults: true
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
@@ -256,22 +257,13 @@ aac-manage-case-assignment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
       PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
+      IDAM_CAA_USERNAME: ${IDAM_CAA_USERNAME}
+      IDAM_CAA_PASSWORD: ${IDAM_CAA_PASSWORD}
+      IDAM_CLIENT_SECRET: ${IDAM_MCA_CLIENT_SECRET}
+      MANAGE_CASE_S2S_KEY: ${MANAGE_CASE_S2S_KEY}
+      IDAM_NOC_APPROVER_USERNAME: ${IDAM_NOC_APPROVER_USERNAME}
+      IDAM_NOC_APPROVER_PASSWORD: ${IDAM_NOC_APPROVER_PASSWORD}
+      NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
+      NOTIFY_EMAIL_TEMPLATE_ID: 85f22924-7b45-4fc6-9954-c08a8833f6a0
     autoscaling:
       enabled: false
-    keyVaults:
-      aac:
-        secrets:
-          - name: aac-manage-case-s2s-secret
-            alias: MANAGE_CASE_S2S_KEY
-          - name: idam-mca-client-secret
-            alias: IDAM_CLIENT_SECRET
-          - name: idam-mca-system-user-username
-            alias: IDAM_CAA_USERNAME
-          - name: idam-mca-system-user-password
-            alias: IDAM_CAA_PASSWORD
-          - name: idam-noc-approver-username
-            alias: IDAM_NOC_APPROVER_USERNAME
-          - name: idam-noc-approver-password
-            alias: IDAM_NOC_APPROVER_PASSWORD
-          - name: notify-mca-api-key-secret
-            alias: NOTIFY_MCA_API_KEY
