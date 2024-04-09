@@ -181,15 +181,14 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
 
     private String templateIDForClaimant(CaseData caseData) {
         if (caseData.isBilingual()) {
-            return "abc";
+            return notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
         }
-        ;
         return notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
     }
 
     private String templateIDForDefendant(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
-            return "asd";
+            return notificationsProperties.getNotifyDefendantLipBilingualAfterDefendantNOC();
         }
         return notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate();
     }
