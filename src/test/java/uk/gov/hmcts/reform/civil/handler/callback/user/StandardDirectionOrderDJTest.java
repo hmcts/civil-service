@@ -789,7 +789,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .trialHearingMethodInPersonDJ(options)
                 .disposalHearingMethodInPersonDJ(options)
