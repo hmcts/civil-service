@@ -1,39 +1,33 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingScheduledDefendantNotificationHandler;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
-import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT;
 
 public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
-    @Autowired
-    private HearingScheduledDefendantNotificationHandler handler;
-
     @Test
     void should_create_hearing_scheduled_scenario() throws Exception {
-        String caseId = "503206541655";
+        UUID caseId = UUID.randomUUID();
+        doPost(BEARER_TOKEN,
+               ScenarioRequestParams.builder()
+                   .params(new HashMap<>(Map.of("hearingDateEn", "1 April 2024", "hearingCourtEn", "Court Name",
+                                                "hearingDateCy", "1 April 2024", "hearingCourtCy", "Court Name")))
+                   .build(),
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), caseId
+        )
+            .andExpect(status().isOk());
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(caseId))
-            .hearingDate(LocalDate.of(2024, 4, 1))
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
-            .build();
-
-        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -43,13 +37,13 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
-                        + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
+                        + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
-                        + "County Court Please keep your contact details and anyone you wish to rely on in court up" +
+                        + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>")
             );

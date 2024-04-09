@@ -657,6 +657,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
     private final String freeFormHearingNotes;
+    private final String hearingLocationCourtName;
 
     private CaseDocument finalOrderDocument;
 

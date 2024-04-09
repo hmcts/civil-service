@@ -146,8 +146,8 @@ public class DashboardNotificationsParamsMapper {
 
         }
         if (nonNull(caseData.getHearingLocation())) {
-            params.put("hearingCourtEn", caseData.getHearingLocation().getValue().getLabel());
-            params.put("hearingCourtCy", caseData.getHearingLocation().getValue().getLabel());
+            params.put("hearingCourtEn", caseData.getHearingLocationCourtName());
+            params.put("hearingCourtCy", caseData.getHearingLocationCourtName());
         }
 
         return params;

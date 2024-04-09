@@ -10,6 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -17,10 +20,13 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementHandler.checkLocation;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +38,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService toggleService;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -53,11 +60,34 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
     private CallbackResponse configureScenarioForHearingScheduled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsForDefaultJudgments(authToken));
+        LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
+        if (nonNull(locationRefData)) {
+            caseData = caseData.toBuilder().hearingLocationCourtName(locationRefData.getSiteName()).build();
+        }
 
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                           SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+                                          ScenarioRequestParams.builder().params(
+                                              mapper.mapCaseDataToParams(caseData)).build()
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    public static LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
+                                                      DynamicList hearingLocation) {
+        if (locations.isEmpty() || isNull(hearingLocation)) {
+            return null;
+        }
+        String locationLabel = hearingLocation.getValue().getLabel();
+        var preferredLocation =
+            locations
+                .stream()
+                .filter(locationRefData -> checkLocation(
+                    locationRefData,
+                    locationLabel
+                )).findFirst();
+        return preferredLocation.orElse(null);
     }
 }
