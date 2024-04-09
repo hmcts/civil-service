@@ -14,7 +14,7 @@ serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm toolb
 
 echo "Uploading CCD_DEFINITION_STORE_API_BASE_URL : ${CCD_DEFINITION_STORE_API_BASE_URL}"
 
-uploadResponse=$(curl --insecure --fail -w "\n%{http_code}" --show-error -X POST \
+uploadResponse=$(curl --insecure --fail -w "\n%{http_code}" --show-error --max-time 60 -X POST \
   ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/import \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
