@@ -414,7 +414,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
                                                  .request(CallbackRequest.builder().eventId(
-            "NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
+            "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
             .isEqualTo(TASK_ID_CC_MULTITRACK);
     }
 }

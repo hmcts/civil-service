@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -48,7 +48,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC,
         NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK,
         NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK,
-        NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK);
+        NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK);
 
     public static final String TASK_ID = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1";
     public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
@@ -99,7 +99,17 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
 
+        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            recipient = isCcNotificationMultiTrack(callbackParams)
+                ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                : caseData.getRespondentSolicitor1EmailAddress();
+        }
+
         if (isRespondentSolicitor2Notification(callbackParams)) {
+            recipient = caseData.getRespondentSolicitor2EmailAddress();
+        }
+
+        if (isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
@@ -222,7 +232,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private boolean isCcNotificationMultiTrack(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK.name());
+            .equals(NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK.name());
     }
 
     private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
