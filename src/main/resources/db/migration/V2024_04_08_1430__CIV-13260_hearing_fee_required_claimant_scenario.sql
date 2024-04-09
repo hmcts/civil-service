@@ -12,10 +12,10 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
 VALUES ('Notice.AAA6.CP.HearingFee.Required.Claimant', 'You must pay the hearing fee', 'You must pay the hearing fee',
         '<p class="govuk-body">You must either <a href="{PAY_HEARING_FEE_URL_REDIRECT}" class="govuk-link">pay the hearing fee</a> of ${hearingFee}' ||
         ' or <a href="{APPLY_HELP_WITH_FEES_START_REDIRECT}" class="govuk-link"> apply for help with fees</a>.' ||
-        ' You must do this by  ${hearingDueDateEn}. If you do not take one of these actions, your claim will be struck out.',
+        ' You must do this by ${hearingDueDateEn}. If you do not take one of these actions, your claim will be struck out.',
         '<p class="govuk-body">You must either <a href="{PAY_HEARING_FEE_URL_REDIRECT}" class="govuk-link">pay the hearing fee</a> of ${hearingFee}' ||
         ' or <a href="{APPLY_HELP_WITH_FEES_START_REDIRECT}" class="govuk-link"> apply for help with fees</a>.' ||
-        ' You must do this by  ${hearingDueDateCy}. If you do not take one of these actions, your claim will be struck out.',
+        ' You must do this by ${hearingDueDateCy}. If you do not take one of these actions, your claim will be struck out.',
         'CLAIMANT', 'Session');
 
 /**
