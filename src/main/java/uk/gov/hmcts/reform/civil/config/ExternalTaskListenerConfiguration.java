@@ -20,7 +20,7 @@ public class ExternalTaskListenerConfiguration {
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ExternalTaskListenerConfiguration(@Value("${feign.client.config.default.url}") String baseUrl,
+    public ExternalTaskListenerConfiguration(@Value("${feign.client.config.processInstance.url}") String baseUrl,
                                              AuthTokenGenerator authTokenGenerator) {
         this.baseUrl = baseUrl;
         this.authTokenGenerator = authTokenGenerator;

@@ -468,7 +468,11 @@ spring:
 feign:
   client:
     config:
-      default:
+      processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      message:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       idam-api:
         loggerLevel: full
@@ -615,12 +619,12 @@ docmosis:
 feign:
   client:
     config:
-      remoteRuntimeService:
-        url: http://fake/engine-rest/
-      remoteRepositoryService:
-        url: http://fake/engine-rest/
-      remoteExternalTaskService:
-        url: http://fake/engine-rest/
+      processInstance:
+        url: ${CAMUNDA_URL:http://fake/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://fake/engine-rest/}
+      message:
+        url: ${CAMUNDA_URL:http://fake/engine-rest/}
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key

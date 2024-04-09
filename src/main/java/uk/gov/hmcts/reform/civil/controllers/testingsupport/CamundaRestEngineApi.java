@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "camunda-rest-engine-api", url = "${feign.client.config.default.url}")
+@FeignClient(name = "camunda-rest-engine-api", url = "${feign.client.config.processInstance.url}")
 public interface CamundaRestEngineApi {
 
     @GetMapping("process-instance/{processInstanceId}/activity-instances")
