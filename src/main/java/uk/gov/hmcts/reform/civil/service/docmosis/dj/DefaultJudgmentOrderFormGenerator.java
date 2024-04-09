@@ -154,8 +154,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         if (featureToggleService.isSdoR2Enabled()) {
             djOrderFormBuilder.hasDisposalHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ()));
-            djOrderFormBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null ?
-                                                            caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription() : null);
+            djOrderFormBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null
+                                                              ? caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription() : null);
         }
         return djOrderFormBuilder.build();
     }

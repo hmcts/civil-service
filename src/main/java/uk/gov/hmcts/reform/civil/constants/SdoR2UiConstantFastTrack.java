@@ -82,8 +82,12 @@ public final class SdoR2UiConstantFastTrack {
     public static final String WELSH_LANG_DESCRIPTION =
         """
         If any party is legally represented then when filing any witness evidence, the legal representatives must notify the Court in writing that:
-        a) they have advised their client of the entitlement of any party or witness to give evidence in the Welsh Language in accordance with the Welsh Language Act 1993 (which is not dependant on whether they are fluent in English)
-        b) instructions have been taken as to whether any party or witness will exercise that entitlement, in which case the legal representatives must so inform the Court so that arrangements can be made by the Court for instantaneous translation facilities to be made available without charge
+        a) they have advised their client of the entitlement of any party or witness to give evidence in the Welsh Language in accordance with the Welsh Language Act 1993 \
+        (which is not dependant on whether they are fluent in English)
+        b) instructions have been taken as to whether any party or witness will exercise that entitlement, in which case the legal representatives must so inform the Court \
+        so that arrangements can be made by the Court for instantaneous translation facilities to be made available without charge
 
-        Any unrepresented party or witness for such a party being entitled to give evidence in the Welsh Language in accordance with the principle of the Welsh Language Act 1993 must notify the Court when sending to the Court their witness evidence whether any party or witness will exercise that entitlement whereupon the Court will make arrangements for instantaneous translation facilities to be made available without charge.""";
+        Any unrepresented party or witness for such a party being entitled to give evidence in the Welsh Language in accordance with the principle \
+        of the Welsh Language Act 1993 must notify the Court when sending to the Court their witness evidence whether any party or witness will exercise \
+        that entitlement whereupon the Court will make arrangements for instantaneous translation facilities to be made available without charge.""";
 }

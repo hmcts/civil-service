@@ -691,16 +691,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
                 assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage")
                     .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2DRHUseOfWelshLanguage")
+                assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage")
                     .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2NIHLUseOfWelshLanguage")
+                assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage")
                     .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
             } else {
                 assertThat(response.getData()).extracting("sdoR2FastTrackUseOfWelshLanguage").isNull();
                 assertThat(response.getData()).extracting("sdoR2SmallClaimsUseOfWelshLanguage").isNull();
                 assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage").isNull();
-                assertThat(response.getData()).extracting("sdoR2DRHUseOfWelshLanguage").isNull();
-                assertThat(response.getData()).extracting("sdoR2NIHLUseOfWelshLanguage").isNull();
+                assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage").isNull();
+                assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage").isNull();
             }
         }
     }

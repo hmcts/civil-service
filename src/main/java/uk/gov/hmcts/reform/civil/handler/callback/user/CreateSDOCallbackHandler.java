@@ -864,7 +864,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
-        updatedData.sdoR2DRHUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
     }
 
     private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
@@ -996,7 +996,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
                                                .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
                                                .build());
-        updatedData.sdoR2NIHLUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
 
     }
 

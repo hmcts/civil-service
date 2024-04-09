@@ -200,10 +200,10 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2WelshLanguageUsage sdoR2FastTrackUseOfWelshLanguage;
     private List<OrderDetailsPagesSectionsToggle> sdoR2SmallClaimsUseOfWelshToggle;
     private SdoR2WelshLanguageUsage sdoR2SmallClaimsUseOfWelshLanguage;
-    private List<IncludeInOrderToggle> sdoR2NIHLUseOfWelshIncludeInOrderToggle;
-    private SdoR2WelshLanguageUsage sdoR2NIHLUseOfWelshLanguage;
-    private List<IncludeInOrderToggle> sdoR2DRHUseOfWelshIncludeInOrderToggle;
-    private SdoR2WelshLanguageUsage sdoR2DRHUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2NihlUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2NihlUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2DrhUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2DrhUseOfWelshLanguage;
     private List<OrderDetailsPagesSectionsToggle> sdoR2DisposalHearingUseOfWelshToggle;
     private SdoR2WelshLanguageUsage sdoR2DisposalHearingUseOfWelshLanguage;
     private SdoR2WelshLanguageUsage sdoR2DisposalHearingWelshLanguageDJ;

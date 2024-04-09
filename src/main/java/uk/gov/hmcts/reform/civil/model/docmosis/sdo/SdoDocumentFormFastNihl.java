@@ -88,7 +88,7 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private List<IncludeInOrderToggle> sdoR2SeparatorEvidenceAcousticEngineerToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsToEntExpertToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
-    private final boolean hasNIHLWelshLangToggle;
+    private final boolean hasNihlWelshLangToggle;
 
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
     private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
