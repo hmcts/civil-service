@@ -52,7 +52,7 @@ public enum DashboardClaimStatus {
         Claim::isMediationPending
     ),
     WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD(
-            Claim::isWaitingForClaimantIntentDocUpload
+        Claim::isWaitingForClaimantIntentDocUpload
     ),
     CLAIM_ENDED(
         Claim::hasClaimEnded
