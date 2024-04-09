@@ -2401,6 +2401,45 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPrePopulateOrderDetailsPagesWithUpdatedDisclosureOfDocumentDataForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getHearingCourtLocations(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
+                .isEqualTo("Standard disclosure shall be provided by the parties by uploading to the Digital "
+                               + "Portal their list of documents by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
+                .isEqualTo("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                               + "the other party by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
+                .isEqualTo("Requests will be complied with within 7 days of the receipt of the request.");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
+                .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
+                               + "wish to rely at trial by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+
+        }
+
+        @Test
         void shouldPrePopulateToggleDRHFields() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
