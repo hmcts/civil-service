@@ -10,12 +10,15 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -62,13 +66,13 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
     @Captor
     private ArgumentCaptor<String> reference;
 
-
     private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
     private static final String APPLICANT_EMAIL_ADDRESS = "applicantmail@hmcts.net";
     private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
     private static final String REFERENCE_NUMBER = "83729462374";
     private static final String EMAIL_TEMPLATE = "test-notification-id";
     private static final String CLAIMANT_ORG_NAME = "Org Name";
+    private static final long CCD_CASE_REF = Long.valueOf(1234567890);
 
     @BeforeEach
     void setup() {
@@ -93,6 +97,7 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
             .addRespondent2(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(languagePreference.toString())
+            .ccdCaseReference(CCD_CASE_REF)
             .build();
         if (languagePreference == Language.BOTH) {
             when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC())
@@ -130,6 +135,7 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
+            .ccdCaseReference(CCD_CASE_REF)
             .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
                                                                           .respondent1ResponseLanguage(
                                                                               languagePreference.toString()).build())
@@ -172,6 +178,7 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
             .changeOfRepresentation(ChangeOfRepresentation.builder().organisationToAddID("lr123").build())
             .respondent1Represented(YesOrNo.YES)
             .respondentSolicitor1EmailAddress("LR@gmail.com")
+            .ccdCaseReference(CCD_CASE_REF)
             .build();
 
         when(notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate())
@@ -197,6 +204,54 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
     }
 
+    @Test
+    void notificationForClaimantLRAfterDefendantNOCApproval() {
+        when(notificationsProperties.getNoticeOfChangeOtherParties())
+            .thenReturn(EMAIL_TEMPLATE);
+        when(organisationService.findOrganisationById("lr123")).thenReturn(Optional.ofNullable(Organisation.builder()
+                                                                                                   .name("test org")
+                                                                                                   .build()));
+        when(organisationService.findOrganisationById("OrgId")).thenReturn(Optional.ofNullable(Organisation.builder()
+                                                                                                   .name("test appl org")
+                                                                                                   .build()));
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
+                DEFENDANT_EMAIL_ADDRESS).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ADDRESS).build())
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .organisationToAddID("lr123")
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build())
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .applicant1Represented(YesOrNo.YES)
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.NO)
+            .ccdCaseReference(CCD_CASE_REF)
+            .applicant1OrganisationPolicy(setUpOrganisationPolicy())
+            .issueDate(LocalDate.now())
+            .build();
+
+        //When
+        notificationHandler.handle(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                       .request(CallbackRequest.builder()
+                                                    .eventId(NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED.name()).build())
+                                       .build());
+
+        //Then
+        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                       emailTemplate.capture(),
+                                                       notificationDataMap.capture(), reference.capture()
+        );
+        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_EMAIL_ADDRESS);
+        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+    }
+
+    private OrganisationPolicy setUpOrganisationPolicy() {
+        return OrganisationPolicy.builder().organisation(
+            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("OrgId")
+                .build()).build();
+    }
 
     private static Stream<Object[]> testCases() {
         return Stream.of(

@@ -210,8 +210,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     }
 
     private String setUpClaimNumber(CaseData caseData) {
-        return caseData.getRespondent1Represented() == YesOrNo.NO ?
-            caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString()
+        return caseData.getRespondent1Represented() == YesOrNo.NO
+            ? caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString()
             : caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString() + " " +
             ofNullable(caseData.getSolicitorReferences())
                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
