@@ -404,7 +404,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(4321L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO)
