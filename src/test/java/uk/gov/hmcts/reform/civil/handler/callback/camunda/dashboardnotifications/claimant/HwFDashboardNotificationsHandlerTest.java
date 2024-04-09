@@ -67,7 +67,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
         void setup() {
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
-        
+
         @ParameterizedTest
         @MethodSource("provideHwfEventsForConfigureScenario")
         void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
@@ -116,6 +116,9 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .buildClaimIssuedPaymentCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                           .hwfCaseEvent(hwfEvent)
+                                           .build())
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
