@@ -82,7 +82,11 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"),
-    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant");
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"),
+    SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant"),
+    SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant"),
+    SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant"),
+    SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant");
 
     private final String scenario;
 
