@@ -531,15 +531,15 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoDisposalDocumentWithR2Template() {
-        LocationRefData locationRefData = LocationRefData.builder().build();
-        String locationLabel = "String 1";
-        DynamicList formValue = DynamicList.fromList(
-            Collections.singletonList(locationLabel),
-            Object::toString,
-            locationLabel,
-            false
-        );
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
         CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoDisposal()
             .build()
@@ -549,23 +549,16 @@ public class SdoGeneratorServiceTest {
             .orderType(OrderType.DISPOSAL)
             .claimsTrack(ClaimsTrack.fastTrack)
             .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(formValue)
             .build();
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_DISPOSAL);
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
         verify(documentGeneratorService).generateDocmosisDocument(
             argThat((MappableObject templateData) ->
-                        templateData instanceof SdoDocumentFormFast),
+                        templateData instanceof SdoDocumentFormDisposal),
             eq(SDO_R2_DISPOSAL)
         );
     }
