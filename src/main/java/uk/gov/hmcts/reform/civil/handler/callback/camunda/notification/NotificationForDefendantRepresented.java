@@ -100,7 +100,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID())
+            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            CLAIM_NAME, NocNotificationUtils.getCaseName(caseData)
             );
     }
 
@@ -137,12 +138,12 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         switch (caseEvent) {
             case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, templateIDForDefendant(caseData));
-                mapping.put(EMAIL_MAP_ID, caseData.getRespondent1Email());
+                mapping.put(EMAIL_MAP_ID, caseData.getRespondent1().getPartyEmail());
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
                 return mapping;
             case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate());
-                mapping.put(EMAIL_MAP_ID, caseData.getRespondent1Email());
+                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
@@ -183,14 +184,14 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             return "abc";
         }
         ;
-        return "";
+        return notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
     }
 
     private String templateIDForDefendant(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
             return "asd";
         }
-        return "";
+        return notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate();
     }
     private String setNotificationCamundaActivity(CaseData caseData, CaseEvent caseEvent) {
         return switch (caseEvent) {

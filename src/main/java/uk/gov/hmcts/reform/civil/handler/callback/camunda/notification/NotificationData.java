@@ -108,6 +108,7 @@ public interface NotificationData {
     String CLAIMANT_NAME_TWO = "claimant2Name";
     String LEGAL_REP_NAME = "legalrepname";
     String CLAIM_NUMBER_CASE = "ClaimNumber";
+    String CLAIM_NAME = "ClaimName";
 
     Map<String, String> addProperties(CaseData caseData);
 

@@ -43,7 +43,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
-    private FeatureToggleService featureToggleService;
+    private final FeatureToggleService featureToggleService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
@@ -223,7 +223,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData postDecisionCaseData, String caseRole) {
-        if (postDecisionCaseData.isApplicantLiP()) {
+        if (isApplicant(caseRole)
+            && postDecisionCaseData.isApplicantLiP()) {
             return APPLY_NOC_DECISION_LIP;
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
             && postDecisionCaseData.isRespondent1LiP()
