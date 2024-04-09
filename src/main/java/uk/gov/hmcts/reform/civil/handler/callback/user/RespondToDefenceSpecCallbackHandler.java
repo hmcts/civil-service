@@ -332,11 +332,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            builder.respondent1GeneratedResponseDocument(null);
-            builder.respondent2GeneratedResponseDocument(null);
-            builder.respondent1ClaimResponseDocumentSpec(null);
-        }
+        builder.respondent1GeneratedResponseDocument(null);
+        builder.respondent2GeneratedResponseDocument(null);
+        builder.respondent1ClaimResponseDocumentSpec(null);
 
         //Update the caseManagement location to the flight location if
         //Small claim & Flight Delay &Airline is not OTHER
