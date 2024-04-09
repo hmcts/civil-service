@@ -1279,7 +1279,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateRespondent2Flag_WhenInvoked() {
             // Given
-            given(featureToggleService.isCaseFileViewEnabled()).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1299,7 +1298,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvokedAndNoUser() {
             // Given
-            given(featureToggleService.isCaseFileViewEnabled()).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1319,7 +1317,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvoked() {
             // Given
-            given(featureToggleService.isCaseFileViewEnabled()).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1816,7 +1813,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCategoryId_whenInvoked() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()

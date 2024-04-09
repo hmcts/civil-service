@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,16 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 public class AssignCategoryIdTests {
 
     private AssignCategoryId assignCategoryId;
-
-    private FeatureToggleService featureToggleService;
 
     private CaseDocument testCaseDocument = CaseDocument.builder()
         .createdBy("John")
@@ -70,28 +65,11 @@ public class AssignCategoryIdTests {
 
     @BeforeEach
     void setup() {
-        featureToggleService = mock(FeatureToggleService.class);
-        assignCategoryId = new AssignCategoryId(featureToggleService);
-    }
-
-    @Test
-    void shouldNotAssignCategory_whenInvokedAndToggleFalse() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
-        List<Element<CaseDocument>> documentList = new ArrayList<>();
-        documentList.add(element(testCaseDocument));
-        assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
-        assignCategoryId.assignCategoryIdToCollection(documentList, document -> document.getValue().getDocumentLink(),
-                                                 "testDocumentCollectionID");
-        assignCategoryId.assignCategoryIdToCaseDocument(testCaseDocument, "testCaseDocumentID");
-
-        assertThat(documentList.get(0).getValue().getDocumentLink().getCategoryID()).isNull();
-        assertThat(testDocument.getCategoryID()).isNull();
-        assertThat(testCaseDocument.getDocumentLink().getCategoryID()).isNull();
+        assignCategoryId = new AssignCategoryId();
     }
 
     @Test
     void shouldAssignCaseDocumentCategoryId_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         assignCategoryId.assignCategoryIdToCaseDocument(testCaseDocument, "testCaseDocumentID");
 
         assertThat(testCaseDocument.getDocumentLink().getCategoryID()).isEqualTo("testCaseDocumentID");
@@ -99,7 +77,6 @@ public class AssignCategoryIdTests {
 
     @Test
     void shouldAssignDocumentCategoryId_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
 
         assertThat(testDocument.getCategoryID()).isEqualTo("testDocumentID");
@@ -107,7 +84,6 @@ public class AssignCategoryIdTests {
 
     @Test
     void shouldAssignDocumentIdCollection_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
         assignCategoryId.assignCategoryIdToCollection(documentList, document -> document.getValue().getDocumentLink(),
@@ -118,14 +94,12 @@ public class AssignCategoryIdTests {
 
     @Test
     void shouldCopyDocumentWithCategoryId_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(testCaseDocument, "testDocumentID");
         assertThat(copy.getDocumentLink().getCategoryID()).isEqualTo("testDocumentID");
     }
 
     @Test
     void shouldCopyDocumentsWithCategoryId_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
         List<Element<CaseDocument>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryId(documentList,
@@ -135,60 +109,23 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    void shouldNotCopy_whenInvokedAndToggleFalse() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
-        List<Element<CaseDocument>> documentList = new ArrayList<>();
-        documentList.add(element(testCaseDocument));
-        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(testCaseDocument, "testDocumentID");
-        List<Element<CaseDocument>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryId(documentList,
-                "testDocumentCollectionID");
-
-        assertThat(copyList).isNull();
-        assertThat(copy).isNull();
-    }
-
-    @Test
     void shouldCopyDocumentsWithCategoryIdMediationNonAtt_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<MediationNonAttendanceStatement>> documentList = new ArrayList<>();
         documentList.add(element(testMediationNonAttDocument));
         List<Element<MediationNonAttendanceStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(documentList,
                                                                                                    "testDocumentCollectionID");
 
         assertThat(copyList.get(0).getValue().getDocument().getCategoryID()).isEqualTo("testDocumentCollectionID");
-    }
-
-    @Test
-    void shouldNotCopyCaseDocumentListWithCategoryIdMediationNonAtt_whenInvokedAndToggleFalse() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
-        List<Element<MediationNonAttendanceStatement>> documentList = new ArrayList<>();
-        documentList.add(element(testMediationNonAttDocument));
-        List<Element<MediationNonAttendanceStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(documentList,
-                                                                                                   "testDocumentCollectionID");
-
-        assertThat(copyList).isNull();
     }
 
     @Test
     void shouldCopyCaseDocumentListWithCategoryIdMediationDocRef_whenInvoked() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<MediationDocumentsReferredInStatement>> documentList = new ArrayList<>();
         documentList.add(element(testMediationDocRefDocument));
         List<Element<MediationDocumentsReferredInStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(documentList,
                                                                                                                                      "testDocumentCollectionID");
 
         assertThat(copyList.get(0).getValue().getDocument().getCategoryID()).isEqualTo("testDocumentCollectionID");
-    }
-
-    @Test
-    void shouldNotCopyCaseDocumentListWithCategoryIdMediationDocRef_whenInvokedAndToggleFalse() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
-        List<Element<MediationDocumentsReferredInStatement>> documentList = new ArrayList<>();
-        documentList.add(element(testMediationDocRefDocument));
-        List<Element<MediationDocumentsReferredInStatement>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(documentList,
-                                                                                                                                     "testDocumentCollectionID");
-
-        assertThat(copyList).isNull();
     }
 
 }

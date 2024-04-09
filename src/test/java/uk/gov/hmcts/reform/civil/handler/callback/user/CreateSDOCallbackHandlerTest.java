@@ -2895,7 +2895,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCategoryId_whenInvoked() {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2910,7 +2909,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
