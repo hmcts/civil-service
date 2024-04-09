@@ -101,15 +101,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
-        var caseFileKey = "case-file-view";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
         var caseFileKey = "fast-track-uplifts";
         givenToggle(caseFileKey, toggleStat);
