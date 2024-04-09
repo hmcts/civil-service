@@ -116,7 +116,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
             if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate(),
+                    addTemplate(caseData),
                     addPropertiesLip(caseData),
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference())
                 );
@@ -129,6 +129,12 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 );
             }
         }
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate() :
+            notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate();
     }
 
     private void sendMailAccordingToReason(CaseData caseData) {
