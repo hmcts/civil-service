@@ -187,7 +187,6 @@ class PiPLetterGeneratorTest {
     @Test
     void shouldGenerateAndDownloadLetterSuccessfully() {
         //Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
