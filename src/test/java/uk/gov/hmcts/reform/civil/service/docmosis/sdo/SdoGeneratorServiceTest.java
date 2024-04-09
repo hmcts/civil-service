@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
-import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -90,8 +89,11 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SD
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
 
 @ExtendWith(SpringExtension.class)
@@ -106,6 +108,7 @@ public class SdoGeneratorServiceTest {
     private static String fileNameSmall = null;
     private static String fileNameFast = null;
     private static String fileNameDisposal = null;
+    private static String fileNameSmallDrh = null;
     private static final CaseDocument CASE_DOCUMENT_SMALL = CaseDocumentBuilder.builder()
         .documentName(fileNameSmall)
         .documentType(SDO_ORDER)
@@ -116,6 +119,11 @@ public class SdoGeneratorServiceTest {
         .build();
     private static final CaseDocument CASE_DOCUMENT_DISPOSAL = CaseDocumentBuilder.builder()
         .documentName(fileNameDisposal)
+        .documentType(SDO_ORDER)
+        .build();
+
+    private static final CaseDocument CASE_DOCUMENT_SMALL_DRH = CaseDocumentBuilder.builder()
+        .documentName(fileNameSmallDrh)
         .documentType(SDO_ORDER)
         .build();
 
@@ -142,6 +150,7 @@ public class SdoGeneratorServiceTest {
         fileNameDisposal = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameFast = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameSmall = LocalDate.now() + "_Judgey McJudge" + ".pdf";
+        fileNameSmallDrh = LocalDate.now() + "_Judgey McJudge" + ".pdf";
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
@@ -370,6 +379,69 @@ public class SdoGeneratorServiceTest {
                         templateData instanceof SdoDocumentFormFast
                             && locationRefData.equals(((SdoDocumentFormFast) templateData).getHearingLocation())),
             any(DocmosisTemplates.class)
+        );
+    }
+
+    @Test
+    public void shouldGenerateSdoFastTrackDocumentWithR2Template() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoFastTrackTrial()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormFast),
+            eq(SDO_FAST_R2)
+        );
+    }
+
+    @Test
+    public void shouldGenerateSdoFastTrackDocumentWithR2TemplateAndFastTrackUpLiftsEnabled() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoFastTrackTrial()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormFast),
+            eq(SDO_FAST_FAST_TRACK_INT_R2)
         );
     }
 
@@ -660,5 +732,30 @@ public class SdoGeneratorServiceTest {
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
 
         return updatedData.build();
+    }
+
+    @Test
+    public void shouldGenerateSdoSmallDrhDocument() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL_DRH);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
     }
 }

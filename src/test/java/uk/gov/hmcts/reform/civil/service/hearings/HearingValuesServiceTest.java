@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.FeatureNotActiveException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -75,7 +74,6 @@ import java.time.LocalDate;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
@@ -128,19 +126,6 @@ public class HearingValuesServiceTest {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-    }
-
-    @Test
-    void shouldThrowFeatureNotActiveExceptionWhenHmcToggleIsOff() {
-        when(featureToggleService.isHmcEnabled()).thenReturn(false);
-
-        assertThrows(FeatureNotActiveException.class, () ->
-            hearingValuesService.getValues(1L, "8AB87C89", "auth"));
-        verifyNoInteractions(caseDataService);
-        verifyNoInteractions(categoryService);
-        verifyNoInteractions(caseCategoriesService);
-        verifyNoInteractions(organisationService);
     }
 
     @Test
@@ -629,7 +614,6 @@ public class HearingValuesServiceTest {
     private List<PartyDetailsModel> getExpectedPartyModel() {
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "app-1-party-id",
-            "Mr.",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -644,7 +628,6 @@ public class HearingValuesServiceTest {
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
             "res-1-party-id",
-            "Mr.",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -661,12 +644,11 @@ public class HearingValuesServiceTest {
                        respondentPartyDetails, respondentSolicitorParty);
     }
 
-    private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String title, String firstName, String lastName,
+    private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
                                                                   String partyName, String partyRole,
                                                                   String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .title(title)
             .firstName(firstName)
             .lastName(lastName)
             .interpreterLanguage(null)

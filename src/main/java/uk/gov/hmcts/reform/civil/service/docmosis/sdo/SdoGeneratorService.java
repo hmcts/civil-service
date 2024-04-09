@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFastNihl;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -55,7 +56,10 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
+        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
+            templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
+        } else if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
@@ -65,8 +69,19 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_FAST_TRACK_NIHL;
             templateData = getTemplateDataFastNihl(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
-                ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
+            /*
+             * To keep changes in sync,
+             * Please note that any changes done to SDO_FAST_FAST_TRACK_INT should be also done in R2 template: SDO_FAST_FAST_TRACK_INT_R2
+             * Please note that any changes done to SDO_FAST should be also done in R2 template: SDO_FAST_R2
+             */
+            if (featureToggleService.isSdoR2Enabled()) {
+                docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
+                    ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2 : DocmosisTemplates.SDO_FAST_R2;
+            } else {
+                docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
+                    ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
+            }
+
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
@@ -482,6 +497,58 @@ public class SdoGeneratorService {
                 locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoDocumentFormBuilder
+            .build();
+    }
+
+    private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
+            .writtenByJudge(isJudge)
+            .currentDate(LocalDate.now())
+            .judgeName(judgeName)
+            .caseNumber(caseData.getLegacyCaseReference())
+            .applicant1(caseData.getApplicant1())
+            .hasApplicant2(
+                SdoHelper.hasSharedVariable(caseData, "applicant2")
+            )
+            .applicant2(caseData.getApplicant2())
+            .respondent1(caseData.getRespondent1())
+            .hasRespondent2(
+                SdoHelper.hasSharedVariable(caseData, "respondent2")
+            )
+            .respondent2(caseData.getRespondent2())
+            .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
+            .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
+            .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
+            .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
+            .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
+            .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
+            .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
+            .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
+            .sdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
+            .sdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
+            .sdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
+            .smallClaimsMethod(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData))
+            .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
+            .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
+            .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
+            .caseManagementLocation(
+                locationHelper.getHearingLocation(null, caseData, authorisation));
+
+        if (caseData.getSdoR2SmallClaimsHearing() != null) {
+            sdoDocumentFormBuilderDrh.hearingLocation(
+                locationHelper.getHearingLocation(
+                    Optional.ofNullable(SdoHelper.getHearingLocationDrh(caseData))
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ));
+
+        }
+
+        return sdoDocumentFormBuilderDrh
             .build();
     }
 

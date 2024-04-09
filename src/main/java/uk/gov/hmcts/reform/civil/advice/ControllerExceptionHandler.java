@@ -11,7 +11,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.FeatureNotActiveException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -67,11 +66,5 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> userNotFoundOnCaseException(UserNotFoundOnCaseException userNotFoundOnCaseException) {
         log.error(userNotFoundOnCaseException.getMessage());
         return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(FeatureNotActiveException.class)
-    public ResponseEntity<Object> featureNotActive(FeatureNotActiveException featureNotActiveException) {
-        log.error(featureNotActiveException.getMessage());
-        return new ResponseEntity<>(featureNotActiveException.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 }
