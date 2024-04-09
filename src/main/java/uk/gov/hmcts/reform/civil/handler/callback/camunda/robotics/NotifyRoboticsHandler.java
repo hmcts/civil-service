@@ -49,7 +49,6 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
                 log.info(String.format("Start notify robotics for %s", legacyCaseReference));
                 if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                    log.info(String.format("Robotics Data %s", roboticsCaseDataSpec.toJsonString()));
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
@@ -62,7 +61,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
                 if (errors == null || errors.isEmpty()) {
                     log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
-//                    sendNotifications(callbackParams, caseData, multiPartyScenario);
+                    sendNotifications(callbackParams, caseData, multiPartyScenario);
                 } else {
                     throw new JsonSchemaValidationException(
                         format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
