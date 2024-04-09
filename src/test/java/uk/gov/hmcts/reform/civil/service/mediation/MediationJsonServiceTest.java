@@ -756,12 +756,12 @@ public class MediationJsonServiceTest {
     @Test
     void shouldReturnString_forClaimValue() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
+            .atStateClaimSubmittedSmallClaim()
             .build();
 
         MediationCase mediationCase = service.generateJsonContent(caseData);
 
-        assertThat(mediationCase.getClaimValue()).isEqualTo("100000.00");
+        assertThat(mediationCase.getClaimValue()).isEqualTo("800");
     }
 
     private HearingSupport supportRequired(YesOrNo option) {
