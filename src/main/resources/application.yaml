@@ -264,11 +264,11 @@ notifications:
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
-  hearingListedFeeClaimantLrTemplate: "30ca6b92-4bf8-4bdc-b403-8c8b4d29c44c"
-  hearingListedNoFeeClaimantLrTemplate: "6b4e83be-3ae7-4d83-b777-6bfd0223643d"
+  hearingListedFeeClaimantLrTemplate: "1d2f5dcc-6fa6-4494-9dfa-b96714456827"
+  hearingListedNoFeeClaimantLrTemplate: "98134fe8-e1fd-4e8e-8e74-f977e3220316"
   hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
   hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
-  hearingListedNoFeeDefendantLrTemplate: "259229e7-3f28-42a7-ae6d-2ebd54a7b2f1"
+  hearingListedNoFeeDefendantLrTemplate: "120427c5-dea4-4b76-9fb9-9a298a2d501e"
   hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
@@ -306,6 +306,7 @@ notifications:
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulClaimantLIPTemplate: "159112bd-0026-4ac4-901b-e7fc1614069f"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
@@ -318,6 +319,7 @@ notifications:
   notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
 
   notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyApplicantLiPMediationSuccessfulTemplate: "17495b1f-7afa-4b43-a5ca-0a60ae950423"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"

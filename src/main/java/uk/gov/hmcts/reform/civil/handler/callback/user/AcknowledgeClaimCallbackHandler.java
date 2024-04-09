@@ -180,18 +180,16 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
 
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            caseDataUpdated.respondent2DocumentGeneration(null);
-            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                caseDataUpdated.respondent2DocumentGeneration("userRespondent2");
-            }
+        // casefileview changes need to assign documents into specific folders, this is help determine
+        // which user is "creating" the document and therefore which folder to move the documents
+        // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataUpdated.respondent2DocumentGeneration(null);
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            caseDataUpdated.respondent2DocumentGeneration("userRespondent2");
         }
 
         var respondent1Check = YES;

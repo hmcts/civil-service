@@ -174,4 +174,12 @@ public class NotificationUtils {
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
+
+    public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
+        if (isApplicantLip) {
+            return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
+        } else {
+            return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
+        }
+    }
 }
