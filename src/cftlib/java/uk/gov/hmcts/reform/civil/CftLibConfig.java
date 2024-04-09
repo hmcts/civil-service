@@ -68,7 +68,8 @@ public class CftLibConfig implements CFTLibConfigurer {
             "APP-SOL-UNSPEC-PROFILE",
             "RES-SOL-ONE-SPEC-PROFILE",
             "admin-access",
-            "cui-admin-profile"
+            "cui-admin-profile",
+            "court-officer-order"
         );
 
         var users = Map.of(
