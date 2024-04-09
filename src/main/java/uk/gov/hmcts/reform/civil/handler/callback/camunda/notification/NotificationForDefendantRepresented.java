@@ -45,7 +45,6 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public static final String TASK_ID_CLAIMANT_LR = "NotifyClaimantLrDefendantRepresented";
     private final String TEMPLATE_MAP_ID = "template-id";
     private final String EMAIL_MAP_ID = "email-id";
-    private final String PROPERTIES_MAP_ID = "properties-id";
     private final String REFERENCE_MAP_ID = "reference-id";
     private static final String LITIGANT_IN_PERSON = "LiP";
     private final Map<String, Callback> callbackMap = Map.of(
@@ -72,7 +71,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             notificationService.sendMail(
                 notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
                 notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
-                (Map<String, String>) notificationTemplateMapping.get(PROPERTIES_MAP_ID),
+                setNotificationProperties(caseData, caseEvent),
                 String.format(notificationTemplateMapping.get(REFERENCE_MAP_ID).toString(), caseData.getLegacyCaseReference())
             );
         }
@@ -139,28 +138,41 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, templateIDForDefendant(caseData));
                 mapping.put(EMAIL_MAP_ID, caseData.getRespondent1Email());
-                mapping.put(PROPERTIES_MAP_ID, addProperties(caseData));
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
                 return mapping;
             case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate());
                 mapping.put(EMAIL_MAP_ID, caseData.getRespondent1Email());
-                mapping.put(PROPERTIES_MAP_ID, addPropertiesDefendantLr(caseData));
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
                 if (caseData.getApplicant1Represented() == YesOrNo.NO) {
                     mapping.put(TEMPLATE_MAP_ID, templateIDForClaimant(caseData));
                     mapping.put(EMAIL_MAP_ID, caseData.getApplicant1Email());
-                    mapping.put(PROPERTIES_MAP_ID, addPropertiesClaimant(caseData));
                     mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
                 } else {
                     mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNoticeOfChangeOtherParties());
                     mapping.put(EMAIL_MAP_ID, caseData.getApplicantSolicitor1UserDetails().getEmail());
-                    mapping.put(PROPERTIES_MAP_ID, addPropertiesClaimantLr(caseData));
                     mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 }
                 return mapping;
+            default:
+                return null;
+        }
+    }
+
+    private Map<String, String> setNotificationProperties(CaseData caseData, CaseEvent caseEvent) {
+        switch (caseEvent) {
+            case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL:
+                return addProperties(caseData);
+            case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
+                return addPropertiesDefendantLr(caseData);
+            case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
+                if (caseData.getApplicant1Represented() == YesOrNo.NO) {
+                    return addPropertiesClaimant(caseData);
+                } else {
+                    return addPropertiesClaimantLr(caseData);
+                }
             default:
                 return null;
         }
