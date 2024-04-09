@@ -131,10 +131,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
         // these documents are added servedDocumentFiles, if we do not remove/null the original,
         // case file view will show duplicate documents
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            caseDataBuilder.specClaimTemplateDocumentFiles(null);
-            caseDataBuilder.specClaimDetailsDocumentFiles(null);
-        }
+        caseDataBuilder.specClaimTemplateDocumentFiles(null);
+        caseDataBuilder.specClaimDetailsDocumentFiles(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
