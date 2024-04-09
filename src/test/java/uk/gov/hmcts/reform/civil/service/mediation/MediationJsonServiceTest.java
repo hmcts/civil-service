@@ -665,6 +665,105 @@ public class MediationJsonServiceTest {
         }
     }
 
+    @Nested
+    class CaseNumber {
+
+        @Test
+        void shouldReturnLong_forCCDCaseNumber() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCcdCaseNumber()).isEqualTo(1594901956117591L);
+        }
+
+        @Test
+        void shouldReturnString_forLegacyCaseNumber() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCasemanCaseNumber()).isEqualTo("000DC001");
+        }
+    }
+
+    @Nested
+    class CaseTitle {
+
+        @Test
+        void shouldReturnCaseName_when1v1BothLiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1Represented(NO)
+                .applicant1Represented(NO)
+                .withApplicant1Flags()
+                .withRespondent1Flags()
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .addLiPRespondent1MediationInfo(false)
+                .addLiPApplicant1MediationInfo(false)
+                .buildHmctsInternalCaseName()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+        }
+
+        @Test
+        void shouldReturnCaseName_when1v1BothRepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .buildHmctsInternalCaseName()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+        }
+
+        @Test
+        void shouldReturnCaseName_when1v2Both() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .buildHmctsInternalCaseName()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+        }
+
+        @Test
+        void shouldReturnCaseName_when2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .multiPartyClaimTwoApplicants()
+                .buildHmctsInternalCaseName()
+                .build();
+
+            MediationCase mediationCase = service.generateJsonContent(caseData);
+
+            assertThat(mediationCase.getCaseTitle()).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+        }
+    }
+
+    @Test
+    void shouldReturnString_forClaimValue() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .build();
+
+        MediationCase mediationCase = service.generateJsonContent(caseData);
+
+        assertThat(mediationCase.getClaimValue()).isEqualTo("100000.00");
+    }
+
     private HearingSupport supportRequired(YesOrNo option) {
         return HearingSupport.builder()
             .supportRequirements(option)
