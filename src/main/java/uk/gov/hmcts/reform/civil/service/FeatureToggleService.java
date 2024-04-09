@@ -49,10 +49,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("hmc");
     }
 
-    public boolean isCaseFileViewEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-file-view");
-    }
-
     public boolean isAutomatedHearingNoticeEnabled() {
         return this.featureToggleApi.isFeatureEnabled("ahn");
     }
