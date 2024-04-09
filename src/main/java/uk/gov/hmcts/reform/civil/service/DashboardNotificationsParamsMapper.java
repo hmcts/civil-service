@@ -139,9 +139,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ResponseDeadlineCy", date);
         }
 
-         params.put("sdoDocumentUploadRequestedDate", DateUtils.formatDate(
-             caseData.getCaseDocumentUploadDate()
-         ));
+        Optional.ofNullable(caseData.getCaseDocumentUploadDate())
+            .ifPresent(date -> params.put("sdoDocumentUploadRequestedDate", DateUtils.formatDate(
+                date
+            )));
+
 
         return params;
     }

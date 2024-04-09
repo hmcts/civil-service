@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.HearingDocuments.Upload.Claimant', 'An order has been made', 'An order has been made',
-        '<p class="govuk-body">You can <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">upload and submit documents.</a> to support your claim. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDate}. Any documents submitted after the deadline may not be considered by the judge.</p>',
-        '<p class="govuk-body">You can <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">upload and submit documents.</a> to support your claim. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDate}. Any documents submitted after the deadline may not be considered by the judge.</p>',
+        '<p class="govuk-body">You can <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents.</a> to support your claim. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDate}. Any documents submitted after the deadline may not be considered by the judge.</p>',
+        '<p class="govuk-body">You can <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents.</a> to support your claim. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDate}. Any documents submitted after the deadline may not be considered by the judge.</p>',
         'CLAIMANT');
 
 /**
