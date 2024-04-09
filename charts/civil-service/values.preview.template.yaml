@@ -241,7 +241,7 @@ camunda-bpm:
       CAMUNDA_DB_CONN_OPTIONS: ""
 
 aac-manage-case-assignment:
-  enabled: true
+  enabled: false
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
