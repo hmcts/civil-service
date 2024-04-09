@@ -8,7 +8,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant','{"Notice.AAA6.DefR
         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.NoDefendantResponse.Claimant",
-        "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Claimant"}','{"Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant" : ["respondent1PartyName", "claimantRepaymentPlanDecision"]}');
+        "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Claimant","Notice.AAA7.ClaimantIntent.Settlement.DefendantResponseAccepts.Claimant","Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant"}','{"Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant" : ["respondent1PartyName", "claimantRepaymentPlanDecision"]}');
 
 /**
  * Add notification template
