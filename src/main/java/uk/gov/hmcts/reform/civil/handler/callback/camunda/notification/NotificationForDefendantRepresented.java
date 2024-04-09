@@ -43,9 +43,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public static final String TASK_ID_DEFENDANT_LR = "NotifyDefendantLrAfterNocApproval";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantLipDefendantRepresented";
     public static final String TASK_ID_CLAIMANT_LR = "NotifyClaimantLrDefendantRepresented";
-    private final String TEMPLATE_MAP_ID = "template-id";
-    private final String EMAIL_MAP_ID = "email-id";
-    private final String REFERENCE_MAP_ID = "reference-id";
+    private static final String TEMPLATE_MAP_ID = "templateId";
+    private static final String EMAIL_MAP_ID = "emailId";
+    private static final String REFERENCE_MAP_ID = "referenceId";
     private static final String LITIGANT_IN_PERSON = "LiP";
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyLipAfterNocApproval
@@ -119,7 +119,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME,getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData))
+            OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData))
         );
     }
 
@@ -192,6 +192,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         }
         return notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate();
     }
+
     private String setNotificationCamundaActivity(CaseData caseData, CaseEvent caseEvent) {
         return switch (caseEvent) {
             case NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL -> TASK_ID_DEFENDANT;
