@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL;
@@ -91,15 +93,15 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, setUpClaimNumber(caseData)
         );
     }
 
     public Map<String, String> addPropertiesDefendantLr(CaseData caseData) {
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_CASE, setUpClaimNumber(caseData),
+            CLAIM_NUMBER_INTERIM, setUpClaimNumber(caseData),
             LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             CLAIM_NAME, NocNotificationUtils.getCaseName(caseData)
             );
@@ -205,5 +207,14 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             }
             default -> null;
         };
+    }
+
+    private String setUpClaimNumber(CaseData caseData) {
+        return caseData.getRespondent1Represented() == YesOrNo.NO ?
+            caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString()
+            : caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString() + " " +
+            ofNullable(caseData.getSolicitorReferences())
+                .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .orElse("");
     }
 }
