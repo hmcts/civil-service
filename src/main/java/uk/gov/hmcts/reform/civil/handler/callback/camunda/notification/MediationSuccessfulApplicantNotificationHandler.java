@@ -35,6 +35,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "mediation-successful-applicant-notification-LIP-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyApplicant";
     private final Map<String, Callback> callbacksMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
@@ -81,12 +82,19 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
+            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+                notificationService.sendMail(
+                    caseData.getApplicant1().getPartyEmail(),
+                    notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate(),
+                    addPropertiesLip(caseData),
+                    String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
+            } else {
+                notificationService.sendMail(
+                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                    notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate(),
+                    addProperties(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
 
@@ -138,6 +146,15 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return Map.of(
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+        );
+    }
+
+    public Map<String, String> addPropertiesLip(CaseData caseData) {
+
+        return Map.of(
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
