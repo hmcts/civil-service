@@ -71,6 +71,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -195,6 +196,20 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
     private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2FastTrackUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2FastTrackUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2SmallClaimsUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2SmallClaimsUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2NIHLUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2NIHLUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2DRHUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2DRHUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2DisposalHearingUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingUseOfWelshLanguage;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
+    private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;

@@ -92,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
@@ -525,6 +526,47 @@ public class SdoGeneratorServiceTest {
                             && locationRefData.equals(((SdoDocumentFormDisposal) arg).getHearingLocation())
             ),
             any(DocmosisTemplates.class)
+        );
+    }
+
+    @Test
+    public void shouldGenerateSdoDisposalDocumentWithR2Template() {
+        LocationRefData locationRefData = LocationRefData.builder().build();
+        String locationLabel = "String 1";
+        DynamicList formValue = DynamicList.fromList(
+            Collections.singletonList(locationLabel),
+            Object::toString,
+            locationLabel,
+            false
+        );
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoDisposal()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.YES)
+            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+            .orderType(OrderType.DISPOSAL)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+            .disposalHearingMethodInPerson(formValue)
+            .build();
+
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_DISPOSAL);
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormFast),
+            eq(SDO_R2_DISPOSAL)
         );
     }
 
