@@ -468,12 +468,8 @@ spring:
 feign:
   client:
     config:
-      remoteRuntimeService:
-        url: http://localhost:9404/engine-rest/
-      remoteRepositoryService:
-        url: http://localhost:9404/engine-rest/
-      remoteExternalTaskService:
-        url: http://localhost:9404/engine-rest/
+      default:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       idam-api:
         loggerLevel: full
       core-case-data-api:
