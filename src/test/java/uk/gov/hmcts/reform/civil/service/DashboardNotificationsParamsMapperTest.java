@@ -74,7 +74,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("applicant1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
+            .isEqualTo(DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
