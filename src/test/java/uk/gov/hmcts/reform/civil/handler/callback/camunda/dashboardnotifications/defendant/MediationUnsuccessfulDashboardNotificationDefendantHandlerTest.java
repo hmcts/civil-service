@@ -44,8 +44,6 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
 
     public static final String TASK_ID = "GenerateDashboardNotificationDefendantMediationUnsuccessful";
 
-    Map<String, Object> params = new HashMap<>();
-
     @Nested
     class AboutToSubmitCallback {
 
@@ -68,6 +66,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
 
         @Test
         public void createDashboardNotifications() {
+            HashMap<String, Object> params = new HashMap<>();
             params.put("ccdCaseReference", "123");
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
