@@ -156,6 +156,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                     mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
                 } else {
                     mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNoticeOfChangeOtherParties());
+                    mapping.put(EMAIL_MAP_ID, caseData.getApplicantSolicitor1UserDetails().getEmail());
                     mapping.put(PROPERTIES_MAP_ID, addPropertiesClaimantLr(caseData));
                     mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 }
