@@ -23,4 +23,7 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     scenario_name, task_status_sequence, role, task_order)
 values ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>', 'Hearings',
         'Notice.AAA6.CP.HearingDocuments.Upload.Claimant', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
-        '{2, 2}', 'CLAIMANT', 6);
+        '{5, 5}', 'CLAIMANT', 2),
+       ('<a>View documents</a>', 'Hearings' ,'<a>View documents</a>', 'Hearings',
+        'Notice.AAA6.CP.HearingDocuments.Upload.Claimant', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
+        '{1, 1}', 'CLAIMANT', 3);
