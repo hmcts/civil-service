@@ -817,10 +817,12 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(MEDIATION_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .date("2024-06-01")
+                                          .fromDate("2024-06-01")
+                                          .toDate("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .date("2024-06-07")
+                                          .fromDate("2024-06-07")
+                                          .toDate("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
                                           .fromDate("2024-06-10")
@@ -838,10 +840,12 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(MEDIATION_ALT_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_ALT_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .date("2024-06-01")
+                                          .fromDate("2024-06-01")
+                                          .toDate("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .date("2024-06-07")
+                                          .fromDate("2024-06-07")
+                                          .toDate("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
                                           .fromDate("2024-06-10")
@@ -860,10 +864,12 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(number)
             .mediationContactEmail(email)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .date("2024-06-01")
+                                          .fromDate("2024-06-01")
+                                          .toDate("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .date("2024-06-07")
+                                          .fromDate("2024-06-07")
+                                          .toDate("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
                                           .fromDate("2024-06-10")

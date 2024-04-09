@@ -278,7 +278,8 @@ public class MediationJsonService {
         for (UnavailableDate unavailableDate : unavailableDates) {
             if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
                 toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .date(formatDate(unavailableDate.getDate()))
+                                                  .fromDate(formatDate(unavailableDate.getDate()))
+                                                  .toDate(formatDate(unavailableDate.getDate()))
                                                   .build());
             }
             if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
