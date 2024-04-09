@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -16,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
 class NotificationUtilsTest {
 
@@ -215,5 +220,83 @@ class NotificationUtilsTest {
         );
 
         assertThat(actual).isNull();
+    }
+
+    @Test
+    void shouldReturnDefendantName_For1v2WithBothDefendants() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
+
+        assertThat(actual).isEqualTo("Mr. Sole Trader and Mr. John Rambo");
+    }
+
+    @Test
+    void shouldReturnDefendantName_For1v1WithDefendant1() {
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+        String actual = NotificationUtils.getDefendantNameBasedOnCaseType(caseData);
+
+        assertThat(actual).isEqualTo("Mr. Sole Trader");
+    }
+
+    @Test
+    void shouldReturnApplicantOrgName_whenOrgIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
+                                                                                         .name("org name")
+                                                                                         .build()));
+
+        String actual = NotificationUtils.getApplicantLegalOrganizationName(
+            caseData,
+            organisationService
+        );
+
+        assertThat(actual).isEqualTo("org name");
+    }
+
+    @Test
+    void shouldReturnApplicantOrgNameAsStmtOfTruth_whenOrgIsNotPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
+
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.ofNullable(null));
+
+        String actual = NotificationUtils.getApplicantLegalOrganizationName(
+            caseData,
+            organisationService
+        );
+
+        assertThat(actual).isEqualTo("Signer Name");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnTheCorrectApplicantEmail_ForApplicantLR(boolean isApplicantLip) {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmitted().applicant1(Party.builder().partyEmail(null).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantsolicitor@example.com").build())
+            .build();
+
+        if (isApplicantLip) {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
+        } else {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("applicantsolicitor@example.com");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(Party.builder().partyEmail("lipapplicant@example.com").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
+            .build();
+
+        if (!isApplicantLip) {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
+        } else {
+            assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("lipapplicant@example.com");
+        }
     }
 }

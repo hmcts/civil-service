@@ -156,4 +156,30 @@ public class NotificationUtils {
         }
         return respondentLegalOrganizationName;
     }
+
+    public static String getDefendantNameBasedOnCaseType(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            return getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
+    }
+
+    public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
+        if (isApplicantLip) {
+            return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
+        } else {
+            return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
+        }
+    }
 }
