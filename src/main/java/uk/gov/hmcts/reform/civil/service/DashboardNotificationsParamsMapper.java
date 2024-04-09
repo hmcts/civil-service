@@ -150,6 +150,20 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingCourtCy", caseData.getHearingLocation().getValue().getLabel());
         }
 
+        if (nonNull(caseData.getHearingFee())) {
+            params.put(
+                "hearingFee",
+                "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
+            );
+        }
+
+        if (nonNull(caseData.getHearingDueDate())) {
+            String date = DateUtils.formatDate(caseData.getHearingDueDate());
+            params.put("hearingDueDateEn", date);
+            params.put("hearingDueDateCy", date);
+
+        }
+
         return params;
     }
 
