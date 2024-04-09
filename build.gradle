@@ -74,11 +74,6 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      // Added to bump downstream dependency of camunda-bpm-spring-boot-starter-webapp
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
       //CVE-2023-44487
       dependencySet(group: 'io.netty', version: '4.1.108.Final') {
         entry 'netty-handler'
