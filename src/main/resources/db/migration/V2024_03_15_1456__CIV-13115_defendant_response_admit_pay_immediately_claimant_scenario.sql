@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant"}', '{"Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant": ["defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
+VALUES ('Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant"}', '{"Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant": ["defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
 
 /**
  * Add notification template
