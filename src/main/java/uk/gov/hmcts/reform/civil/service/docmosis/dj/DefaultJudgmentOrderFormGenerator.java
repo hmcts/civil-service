@@ -229,8 +229,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                             ));
         if (featureToggleService.isSdoR2Enabled()) {
             djTrialTemplateBuilder.hasTrialHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2TrialUseOfWelshLangToggleDJ()));
-            djTrialTemplateBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2TrialWelshLanguageDJ() != null ?
-                                                            caseData.getSdoR2TrialWelshLanguageDJ().getDescription() : null);
+            djTrialTemplateBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2TrialWelshLanguageDJ() != null
+                                                                  ? caseData.getSdoR2TrialWelshLanguageDJ().getDescription() : null);
         }
 
         return djTrialTemplateBuilder.build();

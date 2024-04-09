@@ -83,8 +83,7 @@ public class SdoGeneratorService {
             }
 
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
-        }
-        else {
+        } else {
             docmosisTemplate = featureToggleService.isSdoR2Enabled() ? DocmosisTemplates.SDO_R2_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
