@@ -275,10 +275,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .isNull();
-
+            assertThat(response.getData()).doesNotContainKey("businessProcess");
         }
 
         @Test
