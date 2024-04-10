@@ -19,7 +19,7 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
 
     @Test
     void should_create_claimant_requested_judgment_by_admission() throws Exception {
-        String caseId = "1234";
+        String caseId = "4567";
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
