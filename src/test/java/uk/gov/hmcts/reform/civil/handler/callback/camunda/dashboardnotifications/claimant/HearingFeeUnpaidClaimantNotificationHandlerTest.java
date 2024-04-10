@@ -12,13 +12,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -28,29 +31,25 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
+public class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
     @InjectMocks
-    private ClaimantIntentMediationUnsuccessfulHandler handler;
-
+    private HearingFeeUnpaidClaimantNotificationHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
-
+    @Mock
+    private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
 
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
-
-    public static final String TASK_ID = "GenerateDashboardNotificationMediationUnsuccessfulForApplicant1";
+    public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForClaimant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(
-            CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1);
     }
 
     @Test
@@ -58,7 +57,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -74,27 +73,50 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         }
 
         @Test
-        public void createDashboardNotificationsMediationUnsuccess() {
-
+        void shouldRecordScenario_notTrialReady_whenInvoked() {
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("ccdCaseReference", "123455L");
-
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateHearingFeeDueUnpaid()
                 .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(123455L)
                 .build();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
             ).build();
 
             handler.handle(params);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_TrialReady_whenInvoked() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeDueDateEn", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            scenarioParams.put("hearingFeeDueDateCy", DateUtils.formatDate(LocalDate.of(2024, Month.APRIL, 1)));
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyApplicant()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
