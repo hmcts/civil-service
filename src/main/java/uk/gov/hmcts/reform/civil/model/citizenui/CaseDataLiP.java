@@ -49,7 +49,6 @@ public class CaseDataLiP {
     @JsonProperty("applicant1ClaimSettledLink")
     private ClaimSettledLink applicant1ClaimSettledLink;
 
-
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
