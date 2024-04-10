@@ -431,7 +431,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.87'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.20'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
