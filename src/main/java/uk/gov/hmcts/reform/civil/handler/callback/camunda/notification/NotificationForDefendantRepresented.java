@@ -93,15 +93,16 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, setUpClaimNumber(caseData)
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 
     public Map<String, String> addPropertiesDefendantLr(CaseData caseData) {
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_NUMBER_CASE, setUpClaimNumber(caseData),
-            CLAIM_NUMBER_INTERIM, setUpClaimNumber(caseData),
+            CLAIM_NUMBER_CASE, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             CLAIM_NAME, NocNotificationUtils.getCaseName(caseData)
             );
@@ -207,14 +208,5 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             }
             default -> null;
         };
-    }
-
-    private String setUpClaimNumber(CaseData caseData) {
-        return caseData.getRespondent1Represented() == YesOrNo.NO
-            ? caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString()
-            : caseData.getLegacyCaseReference() + " " + caseData.getCcdCaseReference().toString() + " " +
-            ofNullable(caseData.getSolicitorReferences())
-                .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .orElse("");
     }
 }
