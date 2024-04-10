@@ -106,7 +106,9 @@ public class CftLibConfig implements CFTLibConfigurer {
             "data.store.idam.system.user@gmail.com",
             List.of("caseworker"),
             "divorce_as_caseworker_admin@mailinator.com",
-            List.of("caseworker-divorce", "caseworker-divorce-superuser")
+            List.of("caseworker-divorce", "caseworker-divorce-superuser"),
+            "civil-system-update@mailnesia.com",
+            List.of("caseworker-civil-systemupdate")
         );
 
         for (var entry : users.entrySet()) {
