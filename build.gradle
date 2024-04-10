@@ -504,7 +504,7 @@ project.ext {
 
 pact {
   publish {
-    pactDirectory = 'target/pacts'
+    pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
     if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
       excludes = ['civil_service-Idam_api']
@@ -520,7 +520,7 @@ task contractTest(type: Test) {
   description = 'Runs the consumer Pact tests'
   setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
   setClasspath(sourceSets.contractTest.runtimeClasspath)
-  systemProperty 'pact.rootDir', "target/pacts"
+  systemProperty 'pact.rootDir', "pacts"
 }
 
 static def getCheckedOutGitCommitHash() {
