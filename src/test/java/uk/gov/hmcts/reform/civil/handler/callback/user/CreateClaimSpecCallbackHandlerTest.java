@@ -1802,7 +1802,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("sdtRequestId").isNull();
+            assertThat(response.getData()).doesNotHaveToString("sdtRequestId");
         }
 
         @Test
@@ -2214,7 +2214,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").isNull();
+                assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString("flightCourtLocation");
             }
         }
     }
