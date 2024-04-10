@@ -626,7 +626,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                   .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
                                                   .build());
 
-        if(featureToggleService.isSdoR2Enabled()) {
+        if (featureToggleService.isSdoR2Enabled()) {
             updateDisclosureOfDocumentFields(caseDataBuilder);
         }
 
