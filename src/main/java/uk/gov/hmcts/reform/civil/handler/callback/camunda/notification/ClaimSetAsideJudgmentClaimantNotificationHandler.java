@@ -18,8 +18,10 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
     public static final String TASK_ID = "NotifyClaimantSetAsideJudgment";
 
     private static final String REFERENCE_TEMPLATE = "set-aside-judgment-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "set-aside-judgment-applicant-notification-lip-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -53,6 +56,22 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
         return EVENTS;
     }
 
+    private CallbackResponse notifyClaimSetAsideJudgmentToClaimant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        boolean isApplicantLip = caseData.isApplicantLiP();
+        String recipientEmail = getApplicantEmail(caseData, isApplicantLip);
+        if (recipientEmail != null) {
+            notificationService.sendMail(
+                recipientEmail,
+                getTemplate(isApplicantLip),
+                getEmailProperties(caseData),
+                getReferenceTemplate(caseData, isApplicantLip)
+            );
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
@@ -61,28 +80,29 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandler extends CallbackHa
             DEFENDANT_NAME_INTERIM,  getDefendantNameBasedOnCaseType(caseData),
             REASON_FROM_CASEWORKER, caseData.getJoSetAsideJudgmentErrorText()
         );
+
     }
 
-    private CallbackResponse notifyClaimSetAsideJudgmentToClaimant(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                getTemplate(),
-                addProperties(caseData),
-                getReferenceTemplate(caseData)
-            );
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    private String getTemplate(boolean isApplicantLip) {
+        return isApplicantLip ? notificationsProperties.getNotifyUpdateTemplate()
+            : notificationsProperties.getNotifySetAsideJudgmentTemplate();
     }
 
-    private String getTemplate() {
-        return notificationsProperties.getNotifySetAsideJudgmentTemplate();
+    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {
+        return isApplicantLip ? String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference())
+            : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    private Map<String, String> getEmailProperties(CaseData caseData) {
+        return caseData.isApplicantLiP() ? addPropertiesLip(caseData)
+            : addProperties(caseData);
     }
 
+    private Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            PARTY_NAME, caseData.getApplicant1().getPartyName()
+        );
+    }
 }
