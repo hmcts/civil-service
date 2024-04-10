@@ -533,6 +533,9 @@ pact {
     version = project.pactVersion
   }
 }
+pactPublish {
+  pactPublish = project.pact.publish
+}
 
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
