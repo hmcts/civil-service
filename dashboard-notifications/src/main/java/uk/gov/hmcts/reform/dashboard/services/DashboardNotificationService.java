@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
@@ -25,15 +24,13 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
-    private final NotificationActionRepository notificationActionRepository;
+
     private final IdamApi idamApi;
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        NotificationActionRepository notificationActionRepository,
                                         IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
-        this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
     }
 

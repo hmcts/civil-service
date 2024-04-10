@@ -10,12 +10,18 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +49,9 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private LocationRefDataService locationRefDataService;
+
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledClaimant";
 
     HashMap<String, Object> params = new HashMap<>();
@@ -65,13 +74,18 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
 
     @Test
     public void createDashboardNotifications() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
 
+        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
+        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .build();
+            .build().toBuilder().hearingLocation(list).build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

@@ -57,6 +57,7 @@ public class DashboardNotificationsParamsMapperTest {
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .hearingLocationCourtName("County Court")
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -78,7 +79,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("applicant1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
+            .isEqualTo(DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
@@ -231,6 +232,18 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("instalmentTimePeriodCy").isEqualTo("week");
         assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDateInWelsh(date));
+    }
+
+    @Test
+    public void shouldMapParameters_whenHearingDueDate() {
+        LocalDate date = LocalDate.of(2024, Month.MARCH, 22);
+        caseData = caseData.toBuilder().hearingDueDate(date)
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("hearingDueDateEn").isEqualTo("22 March 2024");
+        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 March 2024");
     }
 }
 
