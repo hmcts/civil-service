@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT;
 
 @Service
 public class ClaimantResponseDefendantNotificationHandler extends DashboardCallbackHandler {
@@ -80,6 +81,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             return getJudicialReferralScenarios(caseData);
         } else if (isCaseStateInMediation(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
+        } else if (isClaimantRejectRepaymentPlan(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
         }
         return null;
     }
@@ -167,4 +170,9 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && applicant1Response.hasClaimantRejectedCourtDecision();
     }
 
+    private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
+        return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
+                && caseData.getRespondent1().isCompanyOROrganisation()
+                && caseData.hasApplicantRejectedRepaymentPlan());
+    }
 }
