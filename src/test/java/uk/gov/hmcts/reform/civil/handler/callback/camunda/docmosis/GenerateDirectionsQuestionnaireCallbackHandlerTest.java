@@ -314,7 +314,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -342,7 +341,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument claimantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("claimant")
@@ -373,7 +371,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_when1v1or1v2SameSolicitorUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -402,7 +399,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .respondent2DocumentGeneration("userRespondent2")
@@ -419,7 +415,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
                 .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
                 .respondent2DocumentGeneration("userRespondent2")
@@ -439,8 +434,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenFlagNotUserRespondent2Unspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .build();
@@ -459,7 +452,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .caseAccessCategory(SPEC_CLAIM)
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
@@ -479,7 +471,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -509,7 +500,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_1v2SameSolicitorNotSameResponseSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .caseAccessCategory(SPEC_CLAIM)
