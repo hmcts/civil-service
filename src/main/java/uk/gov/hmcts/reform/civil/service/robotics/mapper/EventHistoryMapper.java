@@ -1180,7 +1180,7 @@ public class EventHistoryMapper {
 
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
-        List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
+        final List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
         CaseCategory claimType = caseData.getCaseAccessCategory();
         if (SPEC_CLAIM.equals(claimType)) {
