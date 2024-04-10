@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -30,6 +31,8 @@ public class DashboardNotificationServiceTest {
 
     @Mock
     private DashboardNotificationsRepository dashboardNotificationsRepository;
+    @Mock
+    private NotificationActionRepository notificationActionRepository;
 
     @Mock
     private IdamApi idamApi;
@@ -117,13 +120,12 @@ public class DashboardNotificationServiceTest {
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(any())
                 .build();
-            notification.setNotificationAction(notificationAction);
 
             //when
             dashboardNotificationService.recordClick(id, authToken);
 
             //verify
-            verify(dashboardNotificationsRepository).save(notification);
+            verify(notificationActionRepository).save(notificationAction);
         }
     }
 }
