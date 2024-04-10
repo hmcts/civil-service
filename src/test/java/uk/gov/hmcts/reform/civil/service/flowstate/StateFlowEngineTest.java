@@ -526,6 +526,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
+                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -543,10 +544,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
@@ -558,6 +560,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
+                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -575,10 +578,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
@@ -877,6 +881,7 @@ class StateFlowEngineTest {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
+                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -894,8 +899,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true)
                 );
             }
 
