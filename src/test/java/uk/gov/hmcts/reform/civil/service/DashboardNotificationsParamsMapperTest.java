@@ -56,7 +56,7 @@ public class DashboardNotificationsParamsMapperTest {
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .hearingLocationCourtName("County Court")
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
