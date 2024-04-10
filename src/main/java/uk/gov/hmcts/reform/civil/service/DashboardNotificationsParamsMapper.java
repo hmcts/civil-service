@@ -29,6 +29,7 @@ public class DashboardNotificationsParamsMapper {
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
+        params.put("legacyCaseReference", caseData.getLegacyCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
@@ -42,7 +43,10 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
-            params.put("respondent1AdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put(
+                "respondent1AdmittedAmountPaymentDeadlineCy",
+                DateUtils.formatDateInWelsh(whenWillThisAmountBePaid)
+            );
         }
         if (nonNull(caseData.getClaimFee())) {
             params.put(
@@ -58,7 +62,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             LocalDate respondentResponseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(respondentResponseDeadline));
-            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(respondentResponseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(respondentResponseDeadline));
         }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
@@ -83,26 +87,28 @@ public class DashboardNotificationsParamsMapper {
         getClaimSettledAmount(caseData).ifPresent(amount -> params.put("claimSettledAmount", amount));
 
         getClaimSettleDate(caseData).ifPresent(date -> {
-            params.put("claimSettledDateEn", date);
-            params.put("claimSettledDateCy", date);
+            params.put("claimSettledDateEn", DateUtils.formatDate(date));
+            params.put("claimSettledDateCy", DateUtils.formatDateInWelsh(date));
         });
 
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
-            params.put("respondent1SettlementAgreementDeadlineEn", date);
-            params.put("respondent1SettlementAgreementDeadlineCy", date);
+            params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
+            params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
             params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
         });
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
         if (nonNull(claimSettleDate)) {
             params.put("applicant1ClaimSettledDateEn", DateUtils.formatDate(claimSettleDate));
-            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDate(claimSettleDate));
+            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDateInWelsh(claimSettleDate));
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
             getInstalmentAmount(caseData).ifPresent(amount -> params.put("instalmentAmount", amount));
-            getInstalmentStartDate(caseData).ifPresent(dateEn -> params.put("instalmentStartDateEn", dateEn));
-            getInstalmentStartDate(caseData).ifPresent(dateCy -> params.put("instalmentStartDateCy", dateCy));
+            getInstalmentStartDate(caseData).ifPresent(date -> {
+                params.put("instalmentStartDateEn", DateUtils.formatDate(date));
+                params.put("instalmentStartDateCy", DateUtils.formatDateInWelsh(date));
+            });
             params.put(
                 "instalmentTimePeriodEn",
                 getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
@@ -122,25 +128,30 @@ public class DashboardNotificationsParamsMapper {
                 caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
             );
             getFirstRepaymentDate(caseData).ifPresent(date -> {
-                params.put("firstRepaymentDateEn", date);
-                params.put("firstRepaymentDateCy", date);
+                params.put("firstRepaymentDateEn", DateUtils.formatDate(date));
+                params.put("firstRepaymentDateCy", DateUtils.formatDateInWelsh(date));
             });
         }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
-            String date = DateUtils.formatDate(caseData.getApplicant1ResponseDeadline());
-            params.put("applicant1ResponseDeadlineEn", date);
-            params.put("applicant1ResponseDeadlineCy", date);
+            LocalDateTime date = caseData.getApplicant1ResponseDeadline();
+            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(date));
+            params.put("applicant1ResponseDeadlineCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
+        }
+
+        if (nonNull(caseData.getHearingDueDate())) {
+            LocalDate date = caseData.getHearingDueDate();
+            params.put("hearingDueDateEn", DateUtils.formatDate(date));
+            params.put("hearingDueDateCy", DateUtils.formatDate(date));
         }
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
         return params;
     }
 
-    private Optional<String> getFirstRepaymentDate(CaseData caseData) {
+    private Optional<LocalDate> getFirstRepaymentDate(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
-            .map(RepaymentPlanLRspec::getFirstRepaymentDate)
-            .map(DateUtils::formatDate);
+            .map(RepaymentPlanLRspec::getFirstRepaymentDate);
     }
 
     private Optional<String> getClaimSettledAmount(CaseData caseData) {
@@ -157,10 +168,9 @@ public class DashboardNotificationsParamsMapper {
         return input.replace(".00", "");
     }
 
-    private Optional<String> getClaimSettleDate(CaseData caseData) {
+    private Optional<LocalDate> getClaimSettleDate(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData))
-            .map(RespondToClaim::getWhenWasThisAmountPaid)
-            .map(DateUtils::formatDate);
+            .map(RespondToClaim::getWhenWasThisAmountPaid);
     }
 
     private RespondToClaim getRespondToClaim(CaseData caseData) {
@@ -174,10 +184,9 @@ public class DashboardNotificationsParamsMapper {
         return respondToClaim;
     }
 
-    private Optional<String> getRespondToSettlementAgreementDeadline(CaseData caseData) {
+    private Optional<LocalDate> getRespondToSettlementAgreementDeadline(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
-            .map(LocalDateTime::toLocalDate)
-            .map(DateUtils::formatDate);
+            .map(LocalDateTime::toLocalDate);
     }
 
     private Optional<String> getAlreadyPaidAmount(CaseData caseData) {
@@ -208,9 +217,8 @@ public class DashboardNotificationsParamsMapper {
         };
     }
 
-    private Optional<String> getInstalmentStartDate(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-            .map(DateUtils::formatDate);
+    private Optional<LocalDate> getInstalmentStartDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate());
     }
 
     private Optional<String> getInstalmentAmount(CaseData caseData) {
