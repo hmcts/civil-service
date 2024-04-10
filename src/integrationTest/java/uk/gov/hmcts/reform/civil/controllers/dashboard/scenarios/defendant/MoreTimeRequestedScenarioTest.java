@@ -42,7 +42,7 @@ public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest 
                     "<p class=\"govuk-body\">The response deadline for you is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"),
                 jsonPath("$[0].titleCy").value("More time requested"),
                 jsonPath("$[0].descriptionCy").value(
-                                "<p class=\"govuk-body\">The response deadline for you is now 4pm on 1 April 2024 ({daysLeftToRespond} days remaining).<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
+                                "<p class=\"govuk-body\">The response deadline for you is now 4pm on 1 Ebrill 2024 ({daysLeftToRespond} days remaining).<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
 
     }
 

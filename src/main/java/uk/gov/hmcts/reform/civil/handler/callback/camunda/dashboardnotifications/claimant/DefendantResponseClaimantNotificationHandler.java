@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 
 @Service
@@ -53,6 +54,14 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     @Override
     public String getScenario(CaseData caseData) {
 
+        if (caseData.isRespondentResponseFullDefence()) {
+            if (caseData.hasDefendantNotAgreedToFreeMediation()) {
+                return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
+            } else if (caseData.isFastTrackClaim()) {
+                return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();
+            }
+        }
+
         if (caseData.isPayByInstallment()) {
             if (caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec()) {
                 return caseData.getRespondent1().isCompanyOROrganisation()
@@ -84,10 +93,6 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
             }
         }
 
-        if (isFullDefenseMediationRefusedScenario(caseData)) {
-            return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
-        }
-
         if (caseData.isRespondentResponseFullDefence() && caseData.isClaimBeingDisputed()
             && caseData.hasDefendantAgreedToFreeMediation()) {
             return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario();
@@ -96,7 +101,4 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
         return null;
     }
 
-    private boolean isFullDefenseMediationRefusedScenario(CaseData caseData) {
-        return caseData.isRespondentResponseFullDefence() && caseData.hasDefendantNotAgreedToFreeMediation();
-    }
 }
