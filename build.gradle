@@ -163,7 +163,7 @@ allprojects {
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
       //Solves CVE-2023-6481
-      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+      dependencySet(group: 'ch.qos.logback', version: '1.5.4') {
         entry 'logback-core'
         entry 'logback-classic'
       }
