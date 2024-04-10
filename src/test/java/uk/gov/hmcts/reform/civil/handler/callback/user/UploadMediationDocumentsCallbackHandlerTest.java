@@ -332,10 +332,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        }
 
         private static final UploadMediationDocumentsForm EXPECTED_FORM =
             UploadMediationDocumentsForm.builder().build();

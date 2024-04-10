@@ -24,6 +24,7 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
+  
     private final IdamApi idamApi;
 
     @Autowired
