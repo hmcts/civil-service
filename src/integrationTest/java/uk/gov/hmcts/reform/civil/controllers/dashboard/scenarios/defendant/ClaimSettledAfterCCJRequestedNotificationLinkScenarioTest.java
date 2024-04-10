@@ -58,7 +58,7 @@ public class ClaimSettledAfterCCJRequestedNotificationLinkScenarioTest extends D
                 ),
                 jsonPath("$[0].titleCy").value("Claim is settled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mr. John Rambo confirmed you settled on 10 April 2024. This claim is now settled. " +
+                    "<p class=\"govuk-body\">Mr. John Rambo confirmed you settled on 10 Ebrill 2024. This claim is now settled. " +
                         "If you need proof that the County Court Judgment (CCJ) is paid you can " +
                         "<a href=\"{APPLY_FOR_CERTIFICATE}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">contact us to get a certificate of satisfaction</a>. " +
                         "This costs £15.</p><p class=\"govuk-body\">If you paid within 28 days of the judgment being issued, we'll tell the Registry Trust to remove your CCJ " +

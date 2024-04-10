@@ -52,7 +52,7 @@ public class ClaimSettledAfterCCJRequestedNotificationLinkScenarioTest extends D
                 ),
                 jsonPath("$[0].titleCy").value("Claim is settled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mr. Sole Trader paid you on 10 April 2024.</p>" +
+                    "<p class=\"govuk-body\">Mr. Sole Trader paid you on 10 Ebrill 2024.</p>" +
                         "<p class=\"govuk-body\">If the defendant paid you within 28 days of the judgment being issued then the defendant's County Court Judgment " +
                         "will be cancelled.</p><p class=\"govuk-body\">If the defendant paid you after this, then the judgment will be marked as paid.</p>"
                 )
