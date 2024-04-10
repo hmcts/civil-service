@@ -32,7 +32,6 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
         )
             .andExpect(status().isOk());
 
-
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
             .andExpect(status().isOk())
