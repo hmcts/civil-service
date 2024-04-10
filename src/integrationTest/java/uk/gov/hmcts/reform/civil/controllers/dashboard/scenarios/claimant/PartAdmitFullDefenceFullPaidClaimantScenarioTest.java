@@ -60,7 +60,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                         "on " + DateUtils.formatDate(paymentDate) + ".</p><p class=\"govuk-body\">You can confirm " +
                         "payment and settle, or proceed with the claim.</p><p class=\"govuk-body\">You need to respond " +
                         "by 4pm on " + DateUtils.formatDate(deadline) + " or the claim will not continue.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View and respond</a>"
+                        "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
                 )
             );
 
@@ -110,7 +110,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                         "on " + DateUtils.formatDate(paymentDate) + ".</p><p class=\"govuk-body\">You can confirm " +
                         "payment and settle, or proceed with the claim.</p><p class=\"govuk-body\">You need to respond " +
                         "by 4pm on " + DateUtils.formatDate(deadline) + " or the claim will not continue.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View and respond</a>"
+                        "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
                 )
             );
 

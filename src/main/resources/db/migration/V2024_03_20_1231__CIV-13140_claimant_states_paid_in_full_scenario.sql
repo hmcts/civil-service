@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has said they already paid ${claimSettledAmount} on ${claimSettledDateEn}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body">You need to respond by ${defaultRespondTime} on ${applicant1ResponseDeadlineEn} or the claim will not continue.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View and respond</a>',
-        '<p class="govuk-body">The defendant has said they already paid ${claimSettledAmount} on ${claimSettledDateCy}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body">You need to respond by ${defaultRespondTime} on ${applicant1ResponseDeadlineCy} or the claim will not continue.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View and respond</a>',
+        '<p class="govuk-body">The defendant has said they already paid ${claimSettledAmount} on ${claimSettledDateEn}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body">You need to respond by ${defaultRespondTime} on ${applicant1ResponseDeadlineEn} or the claim will not continue.</p><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>',
+        '<p class="govuk-body">The defendant has said they already paid ${claimSettledAmount} on ${claimSettledDateCy}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body">You need to respond by ${defaultRespondTime} on ${applicant1ResponseDeadlineCy} or the claim will not continue.</p><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>',
         'CLAIMANT');
 
 /**
