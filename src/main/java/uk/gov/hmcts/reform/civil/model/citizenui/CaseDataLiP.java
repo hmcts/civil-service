@@ -46,6 +46,9 @@ public class CaseDataLiP {
     private YesOrNo applicant1SettleClaim;
     @JsonProperty("applicant1ClaimSettledDate")
     private LocalDate applicant1ClaimSettledDate;
+    @JsonProperty("applicant1ClaimSettledLink")
+    private ClaimSettledLink applicant1ClaimSettledLink;
+
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
@@ -81,5 +84,10 @@ public class CaseDataLiP {
     @JsonIgnore
     public boolean isDefendantSignedSettlementNotAgreed() {
         return YesOrNo.NO.equals(respondentSignSettlementAgreement);
+    }
+
+    @JsonIgnore
+    public boolean isApplicant1ClaimSettledLinkNotification() {
+        return ClaimSettledLink.NOTIFICATION.equals(applicant1ClaimSettledLink);
     }
 }

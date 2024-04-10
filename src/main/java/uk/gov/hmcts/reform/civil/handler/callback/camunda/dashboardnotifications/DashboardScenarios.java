@@ -78,7 +78,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant"),
     SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant");
+    SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_INFORMS_PAID_POST_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantInformsClaimPaid.PostCCJ.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_INFORMS_PAID_POST_CCJ_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantInformsClaimPaid.PostCCJ.Defendant");
 
     private final String scenario;
 
