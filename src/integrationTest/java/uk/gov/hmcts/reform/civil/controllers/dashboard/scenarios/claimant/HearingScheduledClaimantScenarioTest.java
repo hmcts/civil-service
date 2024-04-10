@@ -111,11 +111,12 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.ACTION_NEEDED.getName()),
                 jsonPath("$[0].taskNameCy").value(
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
-
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getName()),
+                jsonPath("$[0].hintTextEn").value("Deadline is 12am on 1 April 2024"),
+                jsonPath("$[0].hintTextCy").value("Deadline is 12am on 1 April 2024")
             );
     }
 }
