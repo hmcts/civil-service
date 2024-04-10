@@ -27,7 +27,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .ccdCaseReference(Long.valueOf(323491))
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
             .build();
