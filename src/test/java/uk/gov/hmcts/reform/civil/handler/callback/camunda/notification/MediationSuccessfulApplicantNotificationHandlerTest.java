@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -86,7 +85,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyApplicant_whenInvoked() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1Represented(YES)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -106,6 +104,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
             //Given
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -113,6 +112,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
                 .setClaimTypeToSpecClaim()
                 .applicant1(applicant1)
                 .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

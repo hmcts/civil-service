@@ -146,6 +146,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldSendNotificationToClaimantLip_whenEventIsCalled() {
             //Given
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)
@@ -155,6 +156,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();

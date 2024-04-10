@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
 import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,13 +20,14 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,13 +48,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantResponseDefendantNotificationHandler handler;
-
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Mock
     private DashboardApiClient dashboardApiClient;
 
@@ -80,10 +84,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForClaimantResponse() {
 
-        Map<String, Object> params = new HashMap<>();
-
+        HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -110,10 +113,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForClaimantResponseForPartAdmitImmediately() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -141,10 +144,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForDefendantNoMediationFullDefenceClaimantProceed() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -171,10 +174,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -198,7 +201,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
-            .getScenario(),
+                .getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -207,10 +210,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -240,10 +243,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForDefendantPartAdmitHearing() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(1234L)
@@ -270,10 +273,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForDefendantFullDefenceClaimantProceed() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -299,10 +302,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -333,10 +336,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -358,7 +361,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
-                        .getScenario(),
+                    .getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
         );
@@ -366,10 +369,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
     @Test
     public void configureDashboardNotificationsForDefendantPartAdmitNotPaidAmount() {
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -395,10 +398,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
     @Test
     public void configureDashboardNotificationsForDefendantFullDefenceNotPaidAmount() {
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -426,10 +429,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     @Test
     public void configureDashboardNotificationsForDefendantFullDefenceClaimantRejectMediation() {
 
-        Map<String, Object> params = new HashMap<>();
-
+        HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -459,10 +461,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
     @Test
     public void configureDashboardNotificationsForDefendantMediation() {
-        Map<String, Object> params = new HashMap<>();
+        HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -479,6 +481,38 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    void shouldCreateNotificationForDefendantWhenClaimantRejectsRepaymentAndCourtPlan() {
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1236345L)
+            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                                         .claimantResponseOnCourtDecision(
+                                                                             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
+                                                                         .build())
+                             .build())
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );

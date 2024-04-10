@@ -20,7 +20,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_TWO;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
@@ -114,19 +113,19 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 sendMailAccordingToReason(caseData);
             }
         } else {
-            if (YES.equals(caseData.getApplicant1Represented())) {
-                notificationService.sendMail(
-                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                    notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate(),
-                    addProperties(caseData),
-                    String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR, caseData.getLegacyCaseReference())
-                );
-            } else {
+            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate(),
                     addPropertiesLip(caseData),
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference())
+                );
+            } else {
+                notificationService.sendMail(
+                    caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                    notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate(),
+                    addProperties(caseData),
+                    String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR, caseData.getLegacyCaseReference())
                 );
             }
         }
