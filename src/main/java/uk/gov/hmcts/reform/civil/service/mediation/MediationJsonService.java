@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Slf4j
@@ -69,7 +71,7 @@ public class MediationJsonService {
     }
 
     private boolean buildCaseFlags(CaseData caseData) {
-        return checkForActiveCaseLevelFlags(caseData) || checkApplicant1DQRequirements(caseData)
+        return checkForActiveCaseFlags(caseData) || checkApplicant1DQRequirements(caseData)
             || checkRespondent1DQRequirements(caseData) || checkRespondent2DQRequirements(caseData)
             || checkApplicant2DQRequirements(caseData);
     }
@@ -142,10 +144,11 @@ public class MediationJsonService {
         return languageFlags;
     }
 
-    private boolean checkForActiveCaseLevelFlags(CaseData caseData) {
+    private boolean checkForActiveCaseFlags(CaseData caseData) {
         List<FlagDetail> allActiveCaseLevelFlags = getAllActiveCaseLevelFlags(caseData);
+        List<PartyFlags> allActivePartyLevelFlags = getAllActiveFlags(caseData);
 
-        return !allActiveCaseLevelFlags.isEmpty();
+        return !allActiveCaseLevelFlags.isEmpty() || !allActivePartyLevelFlags.isEmpty();
     }
 
     private void buildLitigantFields(CaseData caseData, List<MediationLitigant> litigantList) {
