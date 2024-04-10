@@ -71,6 +71,8 @@ class ClaimantMediationUnsuccessfulDashboardNotificationHandlerTest extends Base
     @Test
     public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
         params.put("ccdCaseReference", "123");
         MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
 
@@ -102,6 +104,7 @@ class ClaimantMediationUnsuccessfulDashboardNotificationHandlerTest extends Base
     @Test
     public void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
