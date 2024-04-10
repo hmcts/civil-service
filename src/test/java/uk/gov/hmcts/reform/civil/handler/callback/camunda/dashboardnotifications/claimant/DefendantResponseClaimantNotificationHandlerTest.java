@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -251,10 +252,9 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         public void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartialClaimant() {
             //given
             HashMap<String, Object> params = new HashMap<>();
-
+            String caseId = "12345674";
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            String caseId = "12345674";
             LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -285,13 +285,10 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         @Test
         public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallmentsClaimant() {
-
-            Map<String, Object> params = new HashMap<>();
+            //given
+            HashMap<String, Object> params = new HashMap<>();
             String caseId = "12345675";
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
