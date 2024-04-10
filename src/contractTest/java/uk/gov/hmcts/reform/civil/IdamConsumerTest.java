@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil;
 
 import au.com.dius.pact.consumer.MockServer;
-import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.dsl.PactDslJsonArray;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
-import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.model.RequestResponsePact;
+import au.com.dius.pact.consumer.junit.PactVerification;
+import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.annotations.Pact;
 import io.restassured.RestAssured;
 import org.apache.http.HttpHeaders;
 import org.json.JSONArray;
@@ -25,7 +24,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 public class IdamConsumerTest {
 
@@ -51,7 +49,7 @@ public class IdamConsumerTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "executeGetUserDetailsAndGet200")
+    @PactVerification(fragment = "executeGetUserDetailsAndGet200")
     public void shouldGetUserDetails_WhenGetWithAccessToken(MockServer mockServer) throws JSONException {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
@@ -102,7 +100,7 @@ public class IdamConsumerTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "executeGetIdamAccessTokenAndGet200")
+    @PactVerification(fragment = "executeGetIdamAccessTokenAndGet200")
     public void shouldReceiveAccessTokenAnd200_WhenPostToTokenEndpoint(MockServer mockServer) throws JSONException {
         String responseBody = RestAssured
             .given()

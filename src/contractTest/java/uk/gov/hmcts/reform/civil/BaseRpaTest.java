@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil;
 import au.com.dius.pact.consumer.ConsumerPactBuilder;
 import au.com.dius.pact.consumer.PactTestRun;
 import au.com.dius.pact.consumer.PactVerificationResult;
-import au.com.dius.pact.model.MockProviderConfig;
-import au.com.dius.pact.model.RequestResponsePact;
+import au.com.dius.pact.consumer.model.MockProviderConfig;
+import au.com.dius.pact.core.model.RequestResponsePact;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -70,7 +70,7 @@ public abstract class BaseRpaTest {
         // @formatter:on
     }
 
-    protected PactVerificationResult runPactTest(RequestResponsePact pact, PactTestRun pactTestRun) {
+    protected PactVerificationResult runPactTest(RequestResponsePact pact, PactTestRun<?> pactTestRun) {
         MockProviderConfig config = MockProviderConfig.createDefault();
         PactVerificationResult result = runConsumerTest(pact, config, pactTestRun);
 
@@ -80,7 +80,7 @@ public abstract class BaseRpaTest {
         return result;
     }
 
-    protected PactTestRun preparePactTestRun(final String body, final Map<String, String> headers) {
+    protected PactTestRun<?> preparePactTestRun(final String body, final Map<String, String> headers) {
         // @formatter:off
         return (mockServer, context) -> RestAssured
             .given()

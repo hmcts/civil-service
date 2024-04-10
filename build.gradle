@@ -7,7 +7,7 @@ plugins {
   id 'org.owasp.dependencycheck' version '9.1.0'
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '5.0.0.4638'
-  id 'au.com.dius.pact' version '4.3.15'
+  id 'au.com.dius.pact' version '4.6.8'
   id "io.freefair.lombok" version "8.6"
   id "org.flywaydb.flyway" version "10.11.0"
 }
@@ -236,14 +236,6 @@ task integration(type: Test) {
   testLogging.showStandardStreams = false
 }
 
-task contract(type: Test) {
-  useJUnitPlatform()
-  description = "Runs pact contract tests"
-  group = "Delivery pipeline"
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-}
-
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
   getMainClass().set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
@@ -334,7 +326,7 @@ def versions = [
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
-  pact               : '3.6.15',
+  pact               : '4.6.8',
   springSecurity     : '5.8.11'
 ]
 
@@ -471,8 +463,8 @@ dependencies {
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.1:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pact
+  contractTestImplementation group: 'au.com.dius.pact', name: 'consumer', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
@@ -506,17 +498,6 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runAndPublishConsumerPactTests(type: Test){
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-
-}
-
-runAndPublishConsumerPactTests.dependsOn contract
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
@@ -534,8 +515,24 @@ pact {
   }
 }
 
-def getCheckedOutGitCommitHash() {
+task contractTest(type: Test) {
+  group = 'Delivery pipeline'
+  description = 'Runs the consumer Pact tests'
+  setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
+  setClasspath(sourceSets.contractTest.runtimeClasspath)
+  systemProperty 'pact.rootDir', "target/pacts"
+}
+
+static def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
+task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contractTest)
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
 }
 
 task loadEnvSecrets() {
