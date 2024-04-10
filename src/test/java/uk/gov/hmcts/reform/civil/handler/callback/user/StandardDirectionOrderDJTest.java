@@ -549,6 +549,41 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPrePopulateDisclosureOfDocumentsForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
+                .isEqualTo("Standard disclosure shall be provided by "
+                               + "the parties by uploading to the digital "
+                               + "portal their lists of documents by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")
+                .isEqualTo("Any request to inspect a document, or for a copy of a "
+                               + "document, shall be made directly to the other party by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
+                .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
+                .isEqualTo("Each party must upload to the Digital Portal"
+                               + " copies of those documents on which they wish to rely"
+                               + " at trial");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
+                .isEqualTo("by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+        }
+
+        @Test
         void shouldPrePopulateDJTrialHearingToggle() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()

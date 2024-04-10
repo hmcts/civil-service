@@ -626,9 +626,35 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                   .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
                                                   .build());
 
+        if(featureToggleService.isSdoR2Enabled()) {
+            updateDisclosureOfDocumentFields(caseDataBuilder);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateDisclosureOfDocumentFields(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        caseDataBuilder
+            .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
+                                                     .builder()
+                                                     .input1("Standard disclosure shall be provided by "
+                                                                 + "the parties by uploading to the digital "
+                                                                 + "portal their lists of documents by 4pm on")
+                                                     .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                                                     .input2("Any request to inspect a document, or for a copy of a "
+                                                                 + "document, shall be made directly to the other"
+                                                                 + " party by 4pm on")
+                                                     .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)))
+                                                     .input3("Requests will be complied with within 7 days of the"
+                                                                 + " receipt of the request")
+                                                     .input4("Each party must upload to the Digital Portal"
+                                                                 + " copies of those documents on which they wish to rely"
+                                                                 + " at trial")
+                                                     .input5("by 4pm on")
+                                                     .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                                                     .build());
     }
 
     private DynamicList getLocationList(CallbackParams callbackParams,
