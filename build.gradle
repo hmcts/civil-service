@@ -32,7 +32,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.4'
+    toolVersion = '10.15.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -113,7 +113,7 @@ allprojects {
         entry 'guava'
       }
       // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.16.0'
+      dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
 
@@ -134,7 +134,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.693'
+        version: '1.12.698'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -425,7 +425,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.87'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.20'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
@@ -460,7 +460,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.1:all'
