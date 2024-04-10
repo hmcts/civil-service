@@ -14,31 +14,29 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,7 +119,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -138,7 +136,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant - max limit";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -155,7 +153,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant - minimal limit";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -176,7 +174,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -193,7 +191,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant - minimal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -210,7 +208,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented defendant - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -231,7 +229,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim against unrepresented and unregistered defendant";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -254,7 +252,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with part admission";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -273,7 +271,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with part admission - minimal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -292,7 +290,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with part admission - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -313,7 +311,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with full admission";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -330,7 +328,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with full admission - minimal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -347,7 +345,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with full admission - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -369,7 +367,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with counter claim";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -387,7 +385,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with counter claim - minimal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -405,7 +403,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for defendant responded with counter claim - maximal data";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -428,7 +426,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 String description = "Robotics case data for applicant responded with confirms not to proceeds";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -445,7 +443,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 String description = "Robotics case data for applicant responded with not to proceeds - minimal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -462,7 +460,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 String description = "Robotics case data for applicant responded with not to proceeds - maximal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
         }
 
@@ -484,7 +482,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "against both defendants";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
         }
 
@@ -506,7 +504,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 String description = "Robotics case data when both applicants responded with confirms not to proceed";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
         }
 
@@ -534,7 +532,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 String description = "Robotics case data for applicant responded with confirms to proceeds";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -552,7 +550,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "with confirms to proceeds - minimal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -570,7 +568,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "with confirms to proceeds - maximal data";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
         }
 
@@ -593,7 +591,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "against both defendants (1v2)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -612,7 +610,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "against first defendants (1v2)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -631,7 +629,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "against second defendants (1v2)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
         }
@@ -656,7 +654,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "to proceeds (2v1)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -677,7 +675,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "to proceeds (2v1)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
 
             @Test
@@ -698,7 +696,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     + "to proceeds (2v1)";
                 PactVerificationResult result = getPactVerificationResult(payload, description);
 
-                assertEquals(new PactVerificationResult.Ok(), result);
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
             }
         }
     }
@@ -719,7 +717,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after claim issue";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -735,7 +733,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after claim notified";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -751,7 +749,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after claim details notified";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -768,7 +766,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after claim details notified extension";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -785,7 +783,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after notification acknowledged";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -802,7 +800,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after notification acknowledge extension";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -819,7 +817,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim taken offline after full defence";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -839,7 +837,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Claim dismissed passed deadline after claim notification";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -856,7 +854,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Claim dismissed passed deadline after notification then time extension";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -873,7 +871,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Claim dismissed passed deadline after notification acknowledged";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -890,7 +888,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Claim dismissed passed deadline after notification acknowledged then time extension";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -912,7 +910,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Claim taken offline passed applicant deadline after full defence response";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 
@@ -933,7 +931,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim issued in CCD";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -950,7 +948,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim issued in CCD - max limit";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
 
         @Test
@@ -967,7 +965,7 @@ class RpaConsumerTest extends BaseRpaTest {
             String description = "Robotics case data for claim issued in CCD - min limit";
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
-            assertEquals(new PactVerificationResult.Ok(), result);
+            assertEquals(PactVerificationResult.Ok.INSTANCE, result);
         }
     }
 }
