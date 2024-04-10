@@ -21,12 +21,12 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     @Test
     void should_create_mediation_unsuccessful_scenario() throws Exception {
 
-        String caseId = "323491";
+        String caseId = "32341";
         Party respondent1 = new Party();
         respondent1.toBuilder().partyName("John Doe").build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
-            .ccdCaseReference(Long.valueOf(323491))
+            .ccdCaseReference(Long.valueOf(32341))
             .respondent1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
