@@ -108,7 +108,7 @@ public class CftLibConfig implements CFTLibConfigurer {
             "divorce_as_caseworker_admin@mailinator.com",
             List.of("caseworker-divorce", "caseworker-divorce-superuser"),
             "civil-system-update@mailnesia.com",
-            List.of("caseworker-civil-systemupdate")
+            List.of("caseworker","caseworker-civil","caseworker-civil-systemupdate")
         );
 
         for (var entry : users.entrySet()) {

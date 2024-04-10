@@ -137,7 +137,7 @@ idam:
     microservice: civil_service
     totp_secret: ${CIVIL_CLIENT_TOTP_SECRET}
   client:
-    id: civil
+    id: civil-service
     secret: ${CIVIL_CLIENT_SECRET}
 
 document_management:
