@@ -40,12 +40,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 jsonPath("$[0].titleEn").value("An order has been made"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The judge has made an order on your claim. "
-                        + "<a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\""
+                        + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
                         + " class=\"govuk-link\">View the order</a>.</p>"),
                 jsonPath("$[0].titleCy").value("An order has been made"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">The judge has made an order on your claim. "
-                        + "<a href=\"{VIEW_ORDERS_AND_NOTICES}\" rel=\"noopener noreferrer\" target=\"_blank\""
+                        + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
                         + " class=\"govuk-link\">View the order</a>.</p>")
             );
 
