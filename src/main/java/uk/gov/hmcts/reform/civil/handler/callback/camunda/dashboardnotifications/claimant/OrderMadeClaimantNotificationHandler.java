@@ -24,8 +24,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 public class OrderMadeClaimantNotificationHandler extends DashboardCallbackHandler {
-
-
+    
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
