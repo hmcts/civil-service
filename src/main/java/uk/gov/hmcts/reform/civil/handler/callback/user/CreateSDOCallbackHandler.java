@@ -414,7 +414,30 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
 
-        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
+        if (featureToggleService.isSdoR2Enabled()) {
+            SdoR2WitnessOfFact tempSdoR2WitnessOfFact = SdoR2WitnessOfFact.builder()
+                .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
+                .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                          .isRestrictWitness(NO)
+                                          .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder()
+                                                  .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
+                                                  .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
+                                          .build()).build())
+                .sdoRestrictPages(SdoR2RestrictPages.builder()
+                                      .isRestrictPages(NO)
+                                      .restrictNoOfPagesDetails(
+                                          SdoR2RestrictNoOfPagesDetails.builder()
+                                              .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                              .noOfPages(12)
+                                              .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
+                                              .build()).build())
+                .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
+                .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
+                .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
+                .build();
+            updatedData.sdoR2FastTrackWitnessOfFact(tempSdoR2WitnessOfFact).build();
+        } else {
+            FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
             .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
@@ -427,7 +450,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
             .build();
 
-        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+            updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+        }
 
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
             .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
