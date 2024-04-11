@@ -728,6 +728,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPaidFullAmount() {
+        RespondToClaim respondToClaim = null;
+        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            respondToClaim = getRespondToClaim();
+        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+            respondToClaim = getRespondToAdmittedClaim();
+        }
+
+        return Optional.ofNullable(respondToClaim)
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
+            .orElse(false);
+    }
+
+    @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
             .equals(getDefenceRouteRequired());
@@ -1194,6 +1209,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondentSignedSettlementAgreement() {
         return getCaseDataLiP() != null && YesOrNo.YES.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
+    }
+
+    @JsonIgnore
+    public boolean isRespondentRejectedSettlementAgreement() {
+        return getCaseDataLiP() != null && YesOrNo.NO.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
     }
 
     @JsonIgnore
