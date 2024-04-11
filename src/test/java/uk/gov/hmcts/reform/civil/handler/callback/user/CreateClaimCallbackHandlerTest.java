@@ -1147,7 +1147,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
-                .extracting("Organisation").extracting("OrganisationID").isNull();
+                .extracting("Organisation").doesNotHaveToString("OrganisationID");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
             assertThat(response.getData()).extracting("respondent2OrganisationIDCopy").isEqualTo("org1");
         }
@@ -1319,7 +1319,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
-                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued").isNull();
+                assertThat(response.getData()).doesNotHaveToString("defendant2LIPAtClaimIssued");
             }
 
             @Test
@@ -1518,7 +1518,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
-                    .extracting("applicantPreferredCourtLocationList").isNull();
+                    .doesNotHaveToString("applicantPreferredCourtLocationList");
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
@@ -1664,8 +1664,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
             }
 
             @Test
@@ -1686,8 +1685,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent1OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
@@ -1696,8 +1694,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
             }
         }
 
@@ -1762,7 +1759,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // Then
-            assertThat(response.getData()).extracting("servedDocumentFiles").isNull();
+            assertThat(response.getData()).doesNotContainKey("servedDocumentFiles");
         }
 
         @Test
