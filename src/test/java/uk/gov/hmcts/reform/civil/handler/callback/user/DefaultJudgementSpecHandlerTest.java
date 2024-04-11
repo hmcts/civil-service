@@ -355,8 +355,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .contains("registrationType=R")
                 .contains("judgmentDateTime=2023-02-20T11:11:11");
             assertThat(response.getData())
-                .extracting("registrationTypeRespondentTwo")
-                .isNull();
+                .doesNotContainKey("registrationTypeRespondentTwo");
         }
 
         @Test
@@ -382,8 +381,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .contains("registrationType=R")
                 .contains("judgmentDateTime=2023-02-20T11:11:11");
             assertThat(response.getData())
-                .extracting("registrationTypeRespondentTwo")
-                .isNull();
+                .doesNotContainKey("registrationTypeRespondentTwo");
         }
 
         @Test
@@ -403,12 +401,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("registrationTypeRespondentOne")
-                .isNull();
-            assertThat(response.getData())
-                .extracting("registrationTypeRespondentTwo")
-                .isNull();
+            assertThat(response.getData()).doesNotContainKey("registrationTypeRespondentOne");
+            assertThat(response.getData()).doesNotContainKey("registrationTypeRespondentTwo");
         }
 
         @Test
