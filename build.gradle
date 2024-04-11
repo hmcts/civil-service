@@ -392,10 +392,12 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   implementation('com.github.hmcts:fees-java-client:0.0.6') {
     exclude group: 'java-logging', module: ' java-logging'
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
   }
 
   implementation('com.github.hmcts:payments-java-client:1.6.7') {
     exclude group: 'java-logging', module: ' java-logging'
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
