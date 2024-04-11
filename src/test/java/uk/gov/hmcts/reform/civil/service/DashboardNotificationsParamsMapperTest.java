@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -56,6 +57,8 @@ public class DashboardNotificationsParamsMapperTest {
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
+            .hearingDueDate(LocalDate.of(2024, 4, 1))
+            .hearingFee(new Fee(new BigDecimal(10000), "Test","Test"))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
             .build();
@@ -114,6 +117,12 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("County Court");
         assertThat(result).extracting("hearingCourtCy")
             .isEqualTo("County Court");
+        assertThat(result).extracting("hearingDueDateEn")
+            .isEqualTo("1 April 2024");
+        assertThat(result).extracting("hearingDueDateCy")
+            .isEqualTo("1 April 2024");
+        assertThat(result).extracting("hearingFee")
+            .isEqualTo("£100");
     }
 
     @Test
@@ -244,7 +253,7 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("hearingDueDateEn").isEqualTo("22 March 2024");
-        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 Mawrth 2024");
+        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 March 2024");
     }
 
     @Test
