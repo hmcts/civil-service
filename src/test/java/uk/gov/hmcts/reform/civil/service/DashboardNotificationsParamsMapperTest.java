@@ -58,7 +58,7 @@ public class DashboardNotificationsParamsMapperTest {
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
-            .hearingFee(new Fee(new BigDecimal(10000), "Test","Test"))
+            .hearingFee(new Fee(new BigDecimal(10000), "Test", "Test"))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
             .build();
