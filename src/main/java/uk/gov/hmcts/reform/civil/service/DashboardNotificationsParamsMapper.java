@@ -3,9 +3,12 @@ package uk.gov.hmcts.reform.civil.service;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -152,13 +155,27 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
         }
 
-        Optional.ofNullable(caseData.getCaseDocumentUploadDate())
-            .ifPresent(date -> params.put("sdoDocumentUploadRequestedDate", DateUtils.formatDate(
-                date
-            )));
+        Optional<LocalDate> hearingDocumentDeadline = getHearingDocumentDeadline(caseData);
+        hearingDocumentDeadline.ifPresent(date -> {
+            params.put("sdoDocumentUploadRequestedDateEn", DateUtils.formatDate(date));
+            params.put("sdoDocumentUploadRequestedDateCy", DateUtils.formatDateInWelsh(date));
+        });
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
         return params;
+    }
+
+    private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            // TODO currently, user can edit the date description
+            return Optional.empty();
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            return Optional.ofNullable(caseData.getFastTrackDisclosureOfDocuments())
+                .map(FastTrackDisclosureOfDocuments::getDate3);
+        } else {
+            return Optional.ofNullable(caseData.getDisposalHearingDisclosureOfDocuments())
+                .map(DisposalHearingDisclosureOfDocuments::getDate2);
+        }
     }
 
     private Optional<LocalDate> getFirstRepaymentDate(CaseData caseData) {
