@@ -54,7 +54,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO);
+                .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name()).build()
             ).build();
