@@ -91,7 +91,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant"),
-    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant");
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant"),
+    SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT(
+        "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant"
+    );
 
     private final String scenario;
 

@@ -25,7 +25,6 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "14323241";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
-        String dateString = DateUtils.formatDate(hearingDueDate);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -42,10 +41,14 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim has been struck out"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by " + dateString + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
+                        + DateUtils.formatDate(hearingDueDate)
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
                 jsonPath("$[0].titleCy").value("The claim has been struck out"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by " + dateString + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>")
+                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
+                        + DateUtils.formatDateInWelsh(hearingDueDate)
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -66,7 +69,6 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "14323242";
         LocalDate hearingDueDate = LocalDate.now().minusDays(1);
-        String dateString = DateUtils.formatDate(hearingDueDate);
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -83,10 +85,14 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim has been struck out"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by " + dateString + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
+                        + DateUtils.formatDate(hearingDueDate)
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
                 jsonPath("$[0].titleCy").value("The claim has been struck out"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by " + dateString + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>")
+                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
+                        + DateUtils.formatDateInWelsh(hearingDueDate)
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
