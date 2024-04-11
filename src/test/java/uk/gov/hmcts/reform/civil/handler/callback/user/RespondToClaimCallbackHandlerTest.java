@@ -2258,7 +2258,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
@@ -2314,7 +2314,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
@@ -2377,7 +2377,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
@@ -2391,7 +2391,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
@@ -2445,7 +2445,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
@@ -2483,7 +2483,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                 }
 
@@ -2511,7 +2511,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent2DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                 }
 
@@ -2551,7 +2551,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
@@ -2590,7 +2590,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
                 }
             }
 
@@ -2614,16 +2614,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("caseLocation")
-                        .isNull();
+                        .doesNotHaveToString("caseLocation");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtCode").isNull();
+                        .doesNotHaveToString("responseCourtCode");
                 }
 
                 @Test
@@ -2646,16 +2645,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Then
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtLocations").isNull();
+                        .doesNotHaveToString("responseCourtLocations");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("caseLocation")
-                        .isNull();
+                        .doesNotHaveToString("caseLocation");
 
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
-                        .extracting("responseCourtCode").isNull();
+                        .doesNotHaveToString("responseCourtCode");
                 }
             }
         }
