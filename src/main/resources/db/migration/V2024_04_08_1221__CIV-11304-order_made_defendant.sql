@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.OrderMade.Defendant', '{}', '{"Notice.AAA6.CP.OrderMade.Defendant" : []}');
+VALUES ('Scenario.AAA6.CP.OrderMade.Defendant', '{}', '{"Notice.AAA6.CP.OrderMade.Defendant" : ["orderDocument"]}');
 
 /**
  * Add notification template

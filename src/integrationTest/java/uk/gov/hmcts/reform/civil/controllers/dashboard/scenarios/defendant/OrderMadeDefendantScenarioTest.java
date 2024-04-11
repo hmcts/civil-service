@@ -3,15 +3,24 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.OrderMadeDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
+
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
@@ -28,9 +37,11 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .finalOrderDocument(
+                CaseDocument.builder().documentLink(DocumentBuilder.builder().documentName("name").build()).build())
             .build();
 
-        handler.handle(callbackParams(caseData));
+        handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -62,4 +73,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
     }
 
+    private static CallbackParams callbackParamsTest(CaseData caseData) {
+        return CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(
+                CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name()).build())
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
+    }
 }

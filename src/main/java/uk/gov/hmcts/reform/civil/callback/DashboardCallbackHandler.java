@@ -18,8 +18,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @RequiredArgsConstructor
 public abstract class DashboardCallbackHandler extends CallbackHandler {
 
-    private final DashboardApiClient dashboardApiClient;
-    private final DashboardNotificationsParamsMapper mapper;
+    protected final DashboardApiClient dashboardApiClient;
+    protected final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
 
     @Override
