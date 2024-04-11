@@ -121,23 +121,23 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
-        assertThat(result).extracting("respondent1ResponseDeadlineEn").isNull();
-        assertThat(result).extracting("respondent1ResponseDeadlineCy").isNull();
+        assertThat(result).doesNotContainKey("respondent1ResponseDeadlineEn");
+        assertThat(result).doesNotContainKey("respondent1ResponseDeadlineCy");
 
-        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+        assertThat(result).doesNotContainKey("defendantAdmittedAmount");
 
-        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+        assertThat(result).doesNotContainKey("defendantAdmittedAmount");
 
-        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
-        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
+        assertThat(result).doesNotContainKey("respondent1AdmittedAmountPaymentDeadlineEn");
+        assertThat(result).doesNotContainKey("respondent1AdmittedAmountPaymentDeadlineCy");
 
-        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn").isNull();
-        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy").isNull();
+        assertThat(result).doesNotContainKey("respondent1SettlementAgreementDeadlineEn");
+        assertThat(result).doesNotContainKey("respondent1SettlementAgreementDeadlineCy");
 
-        assertThat(result).extracting("claimFee").isNull();
+        assertThat(result).doesNotContainKey("claimFee");
 
-        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
-        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
+        assertThat(result).doesNotContainKey("applicant1ResponseDeadlineEn");
+        assertThat(result).doesNotContainKey("applicant1ResponseDeadlineEn");
     }
 
     @Test
