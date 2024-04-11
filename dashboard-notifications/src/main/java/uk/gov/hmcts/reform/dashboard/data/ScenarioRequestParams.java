@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.dashboard.data;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Data;
-
 import java.util.HashMap;
 
 @Data
@@ -12,8 +11,10 @@ public class ScenarioRequestParams {
 
     /**
      * HashMap.
-     * @param params request params for the scenario
-     * @return Sonar requests this to be serializable, hence HashMap instead of Map
+     * We will use the params to mapping the data.
+     *
+     * @param params variables
+     * @return Sonar requests this to be serializable, hence HashMap instead of Map.
      */
     HashMap<String, Object> params;
 
