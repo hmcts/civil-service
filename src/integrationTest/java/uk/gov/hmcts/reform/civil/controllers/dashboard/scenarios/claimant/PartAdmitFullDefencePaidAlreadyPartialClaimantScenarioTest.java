@@ -59,7 +59,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
                     "<p class=\"govuk-body\">The defendant has said they already paid £10 on " +
                         DateUtils.formatDate(paymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You can confirm payment and settle, or proceed with the claim.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>.</p>"
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a></p>"
                 )
             );
 
@@ -104,7 +104,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
                     "<p class=\"govuk-body\">The defendant has said they already paid £10 on " +
                         DateUtils.formatDate(paymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You can confirm payment and settle, or proceed with the claim.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>.</p>"
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a></p>"
                 )
             );
 
