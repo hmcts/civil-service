@@ -414,15 +414,31 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
 
+        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
+            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                        + "list of documents by 4pm on")
+            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                        + "the other party by 4pm on")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+            .input3("Requests will be complied with within 7 days of the receipt of the request.")
+            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                        + " rely at trial by 4pm on")
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .build();
+
+        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+
         if (featureToggleService.isSdoR2Enabled()) {
             SdoR2WitnessOfFact tempSdoR2WitnessOfFact = SdoR2WitnessOfFact.builder()
                 .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
                 .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
                                           .isRestrictWitness(NO)
-                                          .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder()
+                                          .restrictNoOfWitnessDetails(
+                                              SdoR2RestrictNoOfWitnessDetails.builder()
                                                   .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
                                                   .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                          .build()).build())
+                                                  .build()).build())
                 .sdoRestrictPages(SdoR2RestrictPages.builder()
                                       .isRestrictPages(NO)
                                       .restrictNoOfPagesDetails(
@@ -437,39 +453,24 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .build();
             updatedData.sdoR2FastTrackWitnessOfFact(tempSdoR2WitnessOfFact).build();
         } else {
-            FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
-                        + "list of documents by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
-                        + "the other party by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input3("Requests will be complied with within 7 days of the receipt of the request.")
-            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
-                        + " rely at trial by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+            FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+                .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
+                            + "fact on whom they intend to rely.")
+                .input2("3")
+                .input3("3")
+                .input4("For this limitation, a party is counted as a witness.")
+                .input5("Each witness statement should be no more than")
+                .input6("10")
+                .input7("A4 pages. Statements should be double spaced using a font size of 12.")
+                .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
+                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
+                            + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
+                            + "permitted except with permission from the Court.")
+                .build();
 
-            updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+            updatedData.fastTrackWitnessOfFact(tempFastTrackWitnessOfFact).build();
         }
-
-        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                        + "fact on whom they intend to rely.")
-            .input2("3")
-            .input3("3")
-            .input4("For this limitation, a party is counted as a witness.")
-            .input5("Each witness statement should be no more than")
-            .input6("10")
-            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
-            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
-                        + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
-                        + "permitted except with permission from the Court.")
-            .build();
-
-        updatedData.fastTrackWitnessOfFact(tempFastTrackWitnessOfFact).build();
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
             .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
@@ -885,17 +886,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                           .isRestrictPages(NO)
                                                           .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness
                                                                                                .builder()
-                                                                                               .partyIsCountedAsWitnessTxt(
-                                                                                                   RESTRICT_WITNESS_TEXT)
+                                                                                               .partyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT)
                                                                                                .build())
                                                           .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                             .fontDetails(
-                                                                                                 RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
                                                                                              .noOfPages(12)
-                                                                                             .witnessShouldNotMoreThanTxt(
-                                                                                                 RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                                             .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
                                                                                              .build())
-                                                          .text(WITNESS_DESCRIPTION_TEXT).build());
+                                                          .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
         updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
                                                 .trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
                                                 .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
