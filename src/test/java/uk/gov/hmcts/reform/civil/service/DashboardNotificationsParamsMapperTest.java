@@ -8,11 +8,12 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -56,6 +57,8 @@ public class DashboardNotificationsParamsMapperTest {
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
+            .hearingDueDate(LocalDate.of(2024, 4, 1))
+            .hearingFee(new Fee(new BigDecimal(10000), "Test", "Test"))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
             .build();
@@ -114,6 +117,12 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("County Court");
         assertThat(result).extracting("hearingCourtCy")
             .isEqualTo("County Court");
+        assertThat(result).extracting("hearingDueDateEn")
+            .isEqualTo("1 April 2024");
+        assertThat(result).extracting("hearingDueDateCy")
+            .isEqualTo("1 Ebrill 2024");
+        assertThat(result).extracting("hearingFee")
+            .isEqualTo("£100");
     }
 
     @Test
@@ -136,22 +145,23 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineEn", null);
-        assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);;
+        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);
 
-        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);;
+        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);
 
-        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("claimFee", null);;
+        assertThat(result).doesNotContainEntry("claimFee", null);
 
-        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);;
+        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
+
     }
 
     @Test

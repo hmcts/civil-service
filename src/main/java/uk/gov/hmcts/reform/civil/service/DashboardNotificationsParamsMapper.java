@@ -160,7 +160,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
             params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
         }
-
+        if (nonNull(caseData.getHearingFee())) {
+            params.put(
+                "hearingFee",
+                "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
+            );
+        }
         return params;
     }
 
