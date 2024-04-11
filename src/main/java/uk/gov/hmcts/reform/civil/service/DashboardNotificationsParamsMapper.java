@@ -161,7 +161,6 @@ public class DashboardNotificationsParamsMapper {
             params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
         }
 
-
         return params;
     }
 
