@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
@@ -26,7 +26,9 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -40,6 +42,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -47,10 +50,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -223,33 +226,33 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-                    .toBuilder()
-                    .legacyCaseReference("reference")
-                    .applicant1Represented(YesOrNo.NO)
-                    .respondent1(Party.builder()
-                            .companyName("Company one")
-                            .type(Party.Type.COMPANY).build())
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                            .builder()
-                            .whenWillThisAmountBePaid(LocalDate.now())
-                            .build())
-                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                    .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-                    .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-                    .build();
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(Party.builder()
+                                 .companyName("Company one")
+                                 .type(Party.Type.COMPANY).build())
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
+                                                   .builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now())
+                                                   .build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
             // When
             handler.handle(callbackParams);
 
             // Then
             verify(dashboardApiClient).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
 
@@ -261,33 +264,70 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                    .toBuilder()
-                    .legacyCaseReference("reference")
-                    .applicant1Represented(YesOrNo.NO)
-                    .respondent1(Party.builder()
-                            .companyName("Org one")
-                            .type(Party.Type.ORGANISATION).build())
-                    .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(LocalDate.now())
-                            .paymentAmount(new BigDecimal(1000))
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                            .build())
-                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                    .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-                    .build();
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(Party.builder()
+                                 .companyName("Org one")
+                                 .type(Party.Type.ORGANISATION).build())
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now())
+                                              .paymentAmount(new BigDecimal(1000))
+                                              .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                              .build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+                .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
             // When
             handler.handle(callbackParams);
 
             // Then
             verify(dashboardApiClient).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldCreateDashboardNotificationsWhenClaimantRejectedCourtDecision() {
+            // Given
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                            .claimantResponseOnCourtDecision(
+                                                                ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
+                                                            .build()
+                                 )
+                                 .build())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            // When
+            handler.handle(callbackParams);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
     }
