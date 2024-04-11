@@ -34,6 +34,13 @@ public class DashboardNotificationsParamsMapper {
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
+        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+            LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
+            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
+            params.put("applicant1ResponseDeadlineCy",
+                       DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+        }
+
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
@@ -142,7 +149,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getHearingDueDate())) {
             LocalDate date = caseData.getHearingDueDate();
             params.put("hearingDueDateEn", DateUtils.formatDate(date));
-            params.put("hearingDueDateCy", DateUtils.formatDate(date));
+            params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
         }
 
         if (nonNull(caseData.getHearingDate())) {
@@ -169,6 +176,8 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingDueDateCy", date);
 
         }
+
+        params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
 
         return params;
     }
