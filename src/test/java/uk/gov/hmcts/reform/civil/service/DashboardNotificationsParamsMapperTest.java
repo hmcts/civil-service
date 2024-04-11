@@ -103,6 +103,44 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
+    public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
+
+        caseData = caseData.toBuilder()
+            .respondent1ResponseDeadline(null)
+            .respondToAdmittedClaimOwingAmountPounds(null)
+            .respondToClaimAdmitPartLRspec(null)
+            .respondent1ResponseDeadline(null)
+            .claimFee(null)
+            .respondent1RespondToSettlementAgreementDeadline(null)
+            .applicant1ResponseDeadline(null)
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("ccdCaseReference").isEqualTo(1594901956117591L);
+
+        assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
+
+        assertThat(result).extracting("respondent1ResponseDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1ResponseDeadlineCy").isNull();
+
+        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+
+        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
+
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy").isNull();
+
+        assertThat(result).extracting("claimFee").isNull();
+
+        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
+        assertThat(result).extracting("applicant1ResponseDeadlineEn").isNull();
+    }
+
+    @Test
     public void shouldMapCaseSettleAmountAndCaseSettledDateWheResponseTypeIsFullDefence() {
 
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
