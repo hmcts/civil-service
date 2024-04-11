@@ -789,6 +789,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isSdoR2Enabled()) {
+            updateExpertEvidenceFields(updatedData);
             populateDRHFields(callbackParams, updatedData, preferredCourt);
             prePopulateNihlFields(callbackParams, caseData, updatedData);
             List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
@@ -798,6 +799,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
+            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim")
+            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
+                        + "and uploaded to the Digital Portal by 4pm on")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input3("The answers to the questions shall be answered by the Expert by")
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .input4("and uploaded to the Digital Portal by")
+            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .build();
+
+        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
     }
 
     private void populateDRHFields(CallbackParams callbackParams,
