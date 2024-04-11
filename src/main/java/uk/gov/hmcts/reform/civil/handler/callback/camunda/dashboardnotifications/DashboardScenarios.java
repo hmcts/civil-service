@@ -83,7 +83,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT(
         "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.ClaimantDisagreesCourtPlan.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant"),
@@ -93,9 +93,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant"),
     SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT(
-        "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant"
-    ),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant");
+        "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant");
 
     private final String scenario;
 
