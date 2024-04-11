@@ -24,7 +24,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
     @Test
     void shouldCreateUploadDocumentCaseProgresionScenario() throws Exception {
 
-        String caseId = "1234518843299";
+        String caseId = "12345188432991";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
