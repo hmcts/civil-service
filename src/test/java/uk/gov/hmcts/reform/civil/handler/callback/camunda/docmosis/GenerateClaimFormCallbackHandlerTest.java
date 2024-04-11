@@ -183,7 +183,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateClaimForm_andAssignCategoryId() {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
