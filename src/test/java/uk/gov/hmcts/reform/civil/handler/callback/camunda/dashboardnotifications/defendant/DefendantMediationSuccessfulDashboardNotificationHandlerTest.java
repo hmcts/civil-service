@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -79,6 +81,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(dateTime)
+            .respondent1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -98,10 +101,12 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
     public void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-
+        params.put("ccdCaseReference", "567");
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
+            .ccdCaseReference(567L)
+            .respondent1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -109,7 +114,12 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
     }
 
 }
