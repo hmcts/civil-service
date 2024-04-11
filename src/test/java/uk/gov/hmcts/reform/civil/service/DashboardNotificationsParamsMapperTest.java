@@ -10,10 +10,10 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -112,7 +112,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("hearingDateEn")
             .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingDateCy")
-            .isEqualTo("1 April 2024");
+            .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingCourtEn")
             .isEqualTo("County Court");
         assertThat(result).extracting("hearingCourtCy")
@@ -145,22 +145,22 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineEn", null);
-        assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1ResponseDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);;
+        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);
 
-        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);;
+        assertThat(result).doesNotContainEntry("defendantAdmittedAmount", null);
 
-        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("respondent1AdmittedAmountPaymentDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineCy", null);;
+        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("respondent1SettlementAgreementDeadlineCy", null);
 
-        assertThat(result).doesNotContainEntry("claimFee", null);;
+        assertThat(result).doesNotContainEntry("claimFee", null);
 
-        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);;
-        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);;
+        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
+        assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
 
     }
 
