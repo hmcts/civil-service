@@ -28,7 +28,7 @@ public class TrialArrangementsNotifyOtherPartyDefendantScenarioTest extends Dash
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1Represented(YesOrNo.NO)
             .build();
 
         handler.handle(callbackParams(caseData));
