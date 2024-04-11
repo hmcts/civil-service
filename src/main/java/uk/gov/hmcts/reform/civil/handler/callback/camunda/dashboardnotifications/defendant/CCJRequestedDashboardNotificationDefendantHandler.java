@@ -14,6 +14,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT;
 
 @Service
 public class CCJRequestedDashboardNotificationDefendantHandler extends DashboardCallbackHandler {
@@ -39,9 +40,19 @@ public class CCJRequestedDashboardNotificationDefendantHandler extends Dashboard
 
     @Override
     public String getScenario(CaseData caseData) {
+
         if (respondentRejectedSettlementAgreementOrNotRespondedByDeadline(caseData)) {
             return SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT
                 .getScenario();
+        }
+        /* Assumption has been made that claimant will raise CCJ only if settlement agreement is broken
+         * 1. Defendant fails to respond to the SA by deadline
+         * 2. Defendant rejects the SA
+         * 3. Defendant accepts the SA and then breaks the terms of the agreement
+         *
+         */
+        if (!caseData.isJudgementDateNotPermitted()) {
+            return SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT.getScenario();
         }
         return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario();
     }

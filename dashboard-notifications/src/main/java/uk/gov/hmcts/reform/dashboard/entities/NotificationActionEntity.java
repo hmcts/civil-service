@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,6 +48,7 @@ public class NotificationActionEntity implements Serializable {
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
 
+    @ToString.Exclude
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "dashboard_notifications_id", referencedColumnName = "id")
     @Schema(name = "dashboard_notifications_id")
