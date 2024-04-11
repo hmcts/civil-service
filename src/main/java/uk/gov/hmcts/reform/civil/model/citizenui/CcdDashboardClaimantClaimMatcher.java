@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private final FeatureToggleService featureToggleService;
+    private FeatureToggleService featureToggleService;
 
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
         super(caseData);
@@ -344,5 +344,13 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isHwfPaymentOutcome() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence()
+                && caseData.getApplicant1ResponseDate() != null
+                && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+                && caseData.isBilingual();
     }
 }
