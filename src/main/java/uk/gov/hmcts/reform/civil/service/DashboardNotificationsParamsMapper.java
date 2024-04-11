@@ -155,6 +155,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingCourtCy", caseData.getHearingLocationCourtName());
         }
 
+        if (nonNull(caseData.getHearingFee())) {
+            params.put(
+                "hearingFee",
+                "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
+            );
+        }
         return params;
     }
 

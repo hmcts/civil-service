@@ -44,6 +44,6 @@ public class TrialArrangementsNotifyOtherPartyDefendantNotificationHandler exten
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented();
+        return caseData.isRespondent1NotRepresented();
     }
 }

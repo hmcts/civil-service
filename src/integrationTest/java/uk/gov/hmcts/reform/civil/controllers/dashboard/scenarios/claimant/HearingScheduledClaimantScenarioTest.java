@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -70,6 +71,52 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
 
+            );
+    }
+
+    @Test
+    void should_create_hearing_fee_required_scenario() throws Exception {
+        String caseId = "503206541654";
+
+        doPost(BEARER_TOKEN,
+               ScenarioRequestParams.builder()
+                   .params(new HashMap<>(Map.of("hearingDueDateEn", "1 April 2024", "hearingDueDateCy", "1 April 2024",
+                                                "hearingFee", "£200")))
+                   .build(),
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), caseId
+        ).andExpect(status().isOk());
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+
+                jsonPath("$[0].titleEn").value("You must pay the hearing fee"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
+                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
+                        "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out."),
+                jsonPath("$[0].titleCy").value("You must pay the hearing fee"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
+                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
+                        "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out.")
+            );
+
+        //Verify task Item is created
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.ACTION_NEEDED.getName()),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getName()),
+                jsonPath("$[0].hintTextEn").value("Deadline is 12am on 1 April 2024"),
+                jsonPath("$[0].hintTextCy").value("Deadline is 12am on 1 April 2024")
             );
     }
 }
