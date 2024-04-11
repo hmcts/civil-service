@@ -27,7 +27,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
             .build();
 
         handler.handle(callbackParams(caseData));

@@ -40,4 +40,9 @@ public class OrderMadeDefendantNotificationHandler extends DashboardCallbackHand
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
     }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
+    }
 }
