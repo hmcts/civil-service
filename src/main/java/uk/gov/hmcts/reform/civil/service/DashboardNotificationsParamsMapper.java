@@ -170,13 +170,6 @@ public class DashboardNotificationsParamsMapper {
             );
         }
 
-        if (nonNull(caseData.getHearingDueDate())) {
-            String date = DateUtils.formatDate(caseData.getHearingDueDate());
-            params.put("hearingDueDateEn", date);
-            params.put("hearingDueDateCy", date);
-
-        }
-
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
 
         return params;
