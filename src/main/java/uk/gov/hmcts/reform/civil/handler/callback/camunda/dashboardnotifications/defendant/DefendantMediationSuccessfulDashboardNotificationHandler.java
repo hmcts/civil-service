@@ -13,6 +13,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_MEDIATION_SUCCESSFUL_FOR_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT;
 
 @Service
 public class DefendantMediationSuccessfulDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -39,11 +40,14 @@ public class DefendantMediationSuccessfulDashboardNotificationHandler extends Da
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario();
+        if (getFeatureToggleService().isCarmEnabledForCase(caseData)) {
+            return SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL.getScenario();
+        }
+        return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT.getScenario();
     }
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return getFeatureToggleService().isCarmEnabledForCase(caseData);
+        return caseData.isRespondent1NotRepresented();
     }
 }
