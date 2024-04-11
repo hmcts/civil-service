@@ -23,7 +23,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
     @Test
     void should_create_defendant_response_deadline_scenario() throws Exception {
 
-        String caseId = "1234";
+        String caseId = "123477";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
