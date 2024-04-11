@@ -96,7 +96,9 @@ public enum DashboardScenarios {
         "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_CLAIMANT("Scenario.AAA6.ClaimantIntent.MediationSuccessful.Claimant");
+    SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_CLAIMANT("Scenario.AAA6.ClaimantIntent.MediationSuccessful.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT("Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT("Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant");
 
     private final String scenario;
 

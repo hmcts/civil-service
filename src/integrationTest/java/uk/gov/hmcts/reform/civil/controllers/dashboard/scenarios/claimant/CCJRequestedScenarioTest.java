@@ -23,7 +23,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
 
-        String caseId = "1234";
+        String caseId = "12345678";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         String defendantName = "Mr. Sole Trader";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
