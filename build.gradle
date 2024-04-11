@@ -358,7 +358,6 @@ configurations.all {
 }
 
 dependencies {
-
   implementation 'com.github.hmcts:civil-commons:1.0.76'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
