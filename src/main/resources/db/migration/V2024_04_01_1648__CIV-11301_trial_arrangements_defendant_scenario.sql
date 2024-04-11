@@ -25,8 +25,8 @@ VALUES ('Notice.AAA6.CP.Trial.Arrangements.Required.Defendant', 'Confirm your tr
  * Add task list items
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role, task_order)
+                                    scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
 values ('<a href={ADD_TRIAL_ARRANGEMENTS} class="govuk-link">Add the trial arrangements</a>',
         'Hearing',
         '<a href={ADD_TRIAL_ARRANGEMENTS} class="govuk-link">Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Required.Defendant', '{5, 5}', 'DEFENDANT', 4);
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Required.Defendant', '{5, 5}', 'DEFENDANT', 4, 'Deadline is 12am on ${hearingDueDateEn}', 'Deadline is 12am on ${hearingDueDateCy}');
