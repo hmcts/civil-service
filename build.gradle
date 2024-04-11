@@ -147,13 +147,6 @@ allprojects {
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
-      // Solves CVE-2020-17521
-      dependencySet(
-        group: 'org.codehaus.groovy',
-        version: '2.4.21'
-      ) {
-        entry 'groovy-all'
-      }
 
       dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.87') {
         entry 'tomcat-embed-core'
