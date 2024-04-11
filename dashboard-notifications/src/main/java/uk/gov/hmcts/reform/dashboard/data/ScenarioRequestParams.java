@@ -11,7 +11,9 @@ import java.util.HashMap;
 public class ScenarioRequestParams {
 
     /**
-     * Sonar requests this to be serializable, hence HashMap instead of Map
+     * HashMap.
+     * @param params
+     * @return Sonar requests this to be serializable, hence HashMap instead of Map
      */
     HashMap<String, Object> params;
 
