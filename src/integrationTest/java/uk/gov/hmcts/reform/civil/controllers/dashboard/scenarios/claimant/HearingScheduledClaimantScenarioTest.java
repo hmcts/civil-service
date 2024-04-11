@@ -95,12 +95,12 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("You must pay the hearing fee"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
-                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START_REDIRECT}\" class=\"govuk-link\"> apply for help with fees</a>. " +
+                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
                         "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out."),
                 jsonPath("$[0].titleCy").value("You must pay the hearing fee"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
-                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START_REDIRECT}\" class=\"govuk-link\"> apply for help with fees</a>. " +
+                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
                         "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out.")
             );
 
