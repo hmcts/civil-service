@@ -12,7 +12,7 @@ public class ScenarioRequestParams {
 
     /**
      * HashMap.
-     * @param params
+     * @param params request params for the scenario
      * @return Sonar requests this to be serializable, hence HashMap instead of Map
      */
     HashMap<String, Object> params;
