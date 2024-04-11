@@ -21,22 +21,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.*;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -48,78 +33,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
+import uk.gov.hmcts.reform.civil.model.sdo.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -539,7 +453,49 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
+        if (featureToggleService.isSdoR2Enabled()) {
+            List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
+            SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
+                .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                            + "a) the need to hire a replacement vehicle; and\n"
+                            + "b) impecuniosity")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                            + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                            + "save with permission of the Trial Judge.")
+                .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                            + "later than 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+                .build();
 
+            SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
+                .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                            + "disclosure as ordered earlier in this Order must include:\n"
+                            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                            + "commencement of hire until the earlier of:\n "
+                            + "     i) 3 months after cessation of hire\n"
+                            + "     ii) the repair or replacement of the claimant's vehicle\n"
+                            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                            + "prior to the commencement of hire until the earlier of:\n"
+                            + "     i) 3 months after cessation of hire\n"
+                            + "     ii) the repair or replacement of the claimant's vehicle\n"
+                            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+                .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                            + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+                            + "one witness to provide evidence of basic hire rates available within the claimant's "
+                            + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                            + "is available.")
+                .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+                .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+                .detailsShowToggle(addOrRemoveToggleList)
+                .fastTrackCreditHireOptional(tempSdoR2FastTrackCreditHireDetails)
+                .build();
+
+            updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
+        }
         FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
             .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
