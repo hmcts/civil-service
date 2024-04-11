@@ -120,7 +120,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("hearingDueDateEn")
             .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingDueDateCy")
-            .isEqualTo("1 April 2024");
+            .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");
     }
@@ -253,7 +253,7 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("hearingDueDateEn").isEqualTo("22 March 2024");
-        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 March 2024");
+        assertThat(result).extracting("hearingDueDateCy").isEqualTo("22 Mawrth 2024");
     }
 
     @Test
