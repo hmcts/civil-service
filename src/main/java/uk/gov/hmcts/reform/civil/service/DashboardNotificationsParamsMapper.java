@@ -155,6 +155,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingCourtCy", caseData.getHearingLocationCourtName());
         }
 
+        if (nonNull(caseData.getHearingDate())) {
+            LocalDate date = caseData.getHearingDate().minusWeeks(3);
+            params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
+            params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
+        }
         if (nonNull(caseData.getHearingFee())) {
             params.put(
                 "hearingFee",
