@@ -260,7 +260,6 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void shouldAssignCategoryId_whenInvoked() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),

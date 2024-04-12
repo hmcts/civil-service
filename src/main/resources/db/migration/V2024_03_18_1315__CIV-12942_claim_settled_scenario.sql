@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant',
         '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.ClaimIssue.HWF.Requested", "Notice.AAA6.ClaimIssue.HWF.FullRemission", "Notice.AAA6.ClaimIssue.HWF.PhonePayment",
-        "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant", "Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+        "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant", "Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant", "Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant", "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Claimant",
         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant", "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant",
         "Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant", "Notice.AAA6.DefResponse.Full Defence.AlreadyPaid.Claimant", "Notice.AAA6.DefResponse.Full Defence. FullDispute.RefusedMediation.Claimant",

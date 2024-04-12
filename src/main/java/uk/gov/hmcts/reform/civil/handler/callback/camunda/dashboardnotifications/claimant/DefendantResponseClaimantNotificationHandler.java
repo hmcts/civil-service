@@ -19,7 +19,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 
 @Service
@@ -51,12 +53,13 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (caseData.isPaidLessThanClaimAmount()) {
-            return SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
-        }
 
-        if (isFullDefenseMediationRefusedScenario(caseData)) {
-            return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
+        if (caseData.isRespondentResponseFullDefence()) {
+            if (caseData.hasDefendantNotAgreedToFreeMediation()) {
+                return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
+            } else if (caseData.isFastTrackClaim()) {
+                return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();
+            }
         }
 
         if (caseData.isPayByInstallment()) {
@@ -67,12 +70,19 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
 
             }
         }
+
         if (caseData.isPayBySetDate()) {
             if (caseData.getRespondent1().isCompanyOROrganisation()) {
                 return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario();
             } else if (caseData.getRespondent1().isIndividualORSoleTrader()) {
                 return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario();
             }
+        }
+
+        if (caseData.isPaidLessThanClaimAmount()) {
+            return SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
+        } else if (caseData.isPaidFullAmount()) {
+            return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario();
         }
 
         if (caseData.isPayImmediately()) {
@@ -91,7 +101,4 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
         return null;
     }
 
-    private boolean isFullDefenseMediationRefusedScenario(CaseData caseData) {
-        return caseData.isRespondentResponseFullDefence() && caseData.hasDefendantNotAgreedToFreeMediation();
-    }
 }

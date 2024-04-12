@@ -76,7 +76,6 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String template;
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
@@ -108,11 +107,10 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            template = getSpecTemplate(callbackParams, caseData);
-        } else {
-            template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
-        }
+
+        String template = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? getSpecTemplate(callbackParams, caseData)
+            : notificationsProperties.getClaimantSolicitorConfirmsToProceed();
 
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 

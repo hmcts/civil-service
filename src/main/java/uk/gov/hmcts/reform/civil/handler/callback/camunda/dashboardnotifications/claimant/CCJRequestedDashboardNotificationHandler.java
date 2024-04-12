@@ -5,7 +5,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
 
 @Service
 public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -21,8 +24,8 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
     public static final String TASK_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForApplicant1";
 
     public CCJRequestedDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                                    DashboardNotificationsParamsMapper mapper,
-                                                                    FeatureToggleService featureToggleService) {
+                                                    DashboardNotificationsParamsMapper mapper,
+                                                    FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 
@@ -38,6 +41,17 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
 
     @Override
     public String getScenario(CaseData caseData) {
+
+        if (hasSsaTermsBroken(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
+        }
+
         return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario();
+    }
+
+    private boolean hasSsaTermsBroken(CaseData caseData) {
+        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+        return (caseDataLiP != null && YesOrNo.NO == caseDataLiP.getRespondentSignSettlementAgreement()) || caseData.isSettlementAgreementDeadlineExpired()
+            || !caseData.isJudgementDateNotPermitted();
     }
 }
