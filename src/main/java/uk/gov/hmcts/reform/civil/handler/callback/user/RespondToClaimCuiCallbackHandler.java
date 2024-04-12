@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CU
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -68,12 +69,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(builder);
-            addEventAndDateAddedToRespondentWitnesses(builder);
-        }
-
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
 
         CaseData updatedData = builder.build();
@@ -82,6 +77,11 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
         if (!responseLanguageIsBilingual) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(builder);
+            addEventAndDateAddedToRespondentWitnesses(builder);
         }
 
         return responseBuilder.build();
