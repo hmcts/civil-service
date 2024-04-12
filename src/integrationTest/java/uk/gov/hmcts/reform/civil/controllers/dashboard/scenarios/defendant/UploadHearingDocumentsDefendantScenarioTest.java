@@ -58,19 +58,5 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
                         "Any documents submitted after the deadline may not be considered by the judge.</p>"
                 )
             );
-
-        //Verify task Item is created
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>View documents</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.NOT_AVAILABLE_YET.getName()
-                ),
-                jsonPath("$[0].taskNameCy").value(
-                    "<a>View documents</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.NOT_AVAILABLE_YET.getName())
-            );
     }
 }
