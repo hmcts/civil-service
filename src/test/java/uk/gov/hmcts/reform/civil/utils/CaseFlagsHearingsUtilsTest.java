@@ -187,6 +187,37 @@ public class CaseFlagsHearingsUtilsTest {
         }
     }
 
+    @Nested
+    class CaseLevelFlags {
+
+        @Test
+        void shouldReturnAllActiveCaseLevelFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .withCaseLevelFlags()
+                .build();
+
+            List<FlagDetail> actual = CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags(caseData);
+
+            assertThat(actual.size()).isEqualTo(1);
+            assertThat(actual).containsOnly(FlagDetail.builder()
+                                                .flagCode("123")
+                                                .status("Active")
+                                                .build());
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenNoActiveCaseLevelFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            List<FlagDetail> actual = CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags(caseData);
+
+            assertThat(actual.size()).isEqualTo(0);
+        }
+    }
+
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Defendant 1", details, caseData.getRespondent1().getPartyID());
     }

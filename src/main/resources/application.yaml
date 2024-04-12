@@ -564,6 +564,7 @@ mediation:
   emails:
     sender: hmcts.civil@gmail.com
     recipient: civilmoneyclaimsdemo@gmail.com
+    jsonRecipient: civilmoneyclaimsdemo@gmail.com
 
 
 ---
