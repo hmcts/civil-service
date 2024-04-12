@@ -60,7 +60,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
             templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_R2;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
@@ -323,6 +323,10 @@ public class SdoGeneratorService {
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact());
+        }
+
         return sdoDocumentFormBuilder.build();
     }
 
@@ -481,7 +485,8 @@ public class SdoGeneratorService {
             sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(
                     SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
                 )
-                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay());
+                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
         }
 
         sdoDocumentFormBuilder.hearingLocation(

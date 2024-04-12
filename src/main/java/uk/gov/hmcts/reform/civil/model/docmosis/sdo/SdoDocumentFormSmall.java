@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -72,6 +73,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
+    private final SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
 
     private final boolean hasNewDirections;
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
