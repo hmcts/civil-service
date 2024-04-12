@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.sdo;
+package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +12,14 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdoR2FastTrackCreditHireDetails {
+public class SdoDJR2TrialCreditHireDetails {
 
     private String input2;
-    private String input3;
-    private String input4;
     @Future(message = "The date entered must be in the future")
     private LocalDate date1;
+    private String input3;
+    private String input4;
+    private String input5;
     @Future(message = "The date entered must be in the future")
     private LocalDate date2;
 }

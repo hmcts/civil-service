@@ -491,7 +491,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
                 .input8("This witness statement is limited to 10 pages per party, including any appendices.")
                 .detailsShowToggle(addOrRemoveToggleList)
-                .fastTrackCreditHireOptional(tempSdoR2FastTrackCreditHireDetails)
+                .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
                 .build();
 
             updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();

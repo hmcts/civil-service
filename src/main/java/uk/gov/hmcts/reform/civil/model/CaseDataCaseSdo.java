@@ -26,30 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvidenceDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialEmployersLiability;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -253,4 +230,7 @@ public class CaseDataCaseSdo implements MappableObject {
     private final YesOrNo setFastTrackFlag;
     private final String eventDescriptionRTJ;
     private final String additionalInformationRTJ;
+
+    //default judgement SDO R2 fields for trial
+    private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
 }
