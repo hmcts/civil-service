@@ -330,7 +330,6 @@ jacocoTestReport.dependsOn {
 def versions = [
   junit              : '5.10.2',
   junitPlatform      : '1.10.2',
-  reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
@@ -379,8 +378,6 @@ dependencies {
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
