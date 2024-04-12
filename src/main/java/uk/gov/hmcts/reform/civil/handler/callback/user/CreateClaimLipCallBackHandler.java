@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 
 @Slf4j
 @Service
@@ -75,7 +76,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.submittedDate(time.now());
         // Add back Pip in post to temporary pass the email event
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
@@ -87,6 +89,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         }
         setUpHelpWithFees(caseDataBuilder);
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
+        caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
+        caseDataBuilder.caseNamePublic(buildCaseName(caseData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
