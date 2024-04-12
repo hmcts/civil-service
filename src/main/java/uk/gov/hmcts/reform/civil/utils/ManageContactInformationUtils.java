@@ -69,7 +69,9 @@ public class ManageContactInformationUtils {
 
     public static void addApplicant1Options(List<DynamicListElement> list, CaseData caseData, boolean isAdmin) {
         addApplicant1PartyOptions(list, caseData);
-        addApplicantLegalRepIndividuals(list, false);
+        if (YES.equals(caseData.getApplicant1Represented())) {
+            addApplicantLegalRepIndividuals(list, false);
+        }
         addApplicant1ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
