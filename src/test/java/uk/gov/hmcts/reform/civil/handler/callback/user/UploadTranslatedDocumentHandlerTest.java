@@ -95,7 +95,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).extracting("translatedDocument").isNull();
+            assertThat(response.getData()).doesNotHaveToString("translatedDocument");
         }
     }
 
