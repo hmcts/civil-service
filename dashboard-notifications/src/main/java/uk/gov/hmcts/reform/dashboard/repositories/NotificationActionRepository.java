@@ -7,5 +7,6 @@ import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 
 @Repository
 public interface NotificationActionRepository extends CrudRepository<NotificationActionEntity, Long> {
-    int deleteByDashboardNotificationAndActionPerformed(DashboardNotificationsEntity entity, String action);
+
+    void deleteByDashboardNotificationAndActionPerformed(DashboardNotificationsEntity entity, String action);
 }
