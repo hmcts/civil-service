@@ -46,23 +46,12 @@ public class OrderMadeDefendantNotificationHandler extends DashboardCallbackHand
         return EVENTS;
     }
 
+    @Override
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        HashMap<String, Object> params = mapper.mapCaseDataToParams(caseData);
+        HashMap<String, Object> paramsMap = getMapWithDocumentInfo(caseData, caseEvent);
 
-        switch (caseEvent) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT:
-                params.put("orderDocument", caseData.getFinalOrderDocument().getDocumentLink());
-                break;
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT:
-                if (caseData.getSDODocument().isPresent()) {
-                    params.put("orderDocument", caseData.getSDODocument().get().getValue().getDocumentLink());
-                }
-                break;
-            default:
-                params.put("orderDocument", caseData.getOrderSDODocumentDJ());
-        }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
@@ -70,7 +59,7 @@ public class OrderMadeDefendantNotificationHandler extends DashboardCallbackHand
                 caseData.getCcdCaseReference().toString(),
                 scenario,
                 authToken,
-                ScenarioRequestParams.builder().params(params).build()
+                ScenarioRequestParams.builder().params(paramsMap).build()
             );
         }
 
@@ -85,5 +74,29 @@ public class OrderMadeDefendantNotificationHandler extends DashboardCallbackHand
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented();
+    }
+
+    private HashMap<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        HashMap<String, Object> params = new HashMap<>();
+
+        switch (caseEvent) {
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT -> {
+                params.put("orderDocument", caseData.getFinalOrderDocument().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            }
+            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT -> {
+                if (caseData.getSDODocument().isPresent()) {
+                    params.put(
+                        "orderDocument",
+                        caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
+                    );
+                }
+                return params;
+            }
+            default -> {
+                params.put("orderDocument", caseData.getOrderSDODocumentDJ().getDocumentBinaryUrl());
+                return params;
+            }
+        }
     }
 }
