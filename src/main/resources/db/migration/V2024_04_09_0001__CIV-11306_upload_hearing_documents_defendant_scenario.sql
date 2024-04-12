@@ -22,8 +22,8 @@ VALUES ('Notice.AAA6.CP.HearingDocuments.Upload.Defendant', 'An order has been m
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
 values ('<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>', 'Hearings',
-        'Notice.AAA6.CP.HearingDocuments.Upload.Defendant', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
+        'Hearing.Document.Upload', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
         '{5, 5}', 'DEFENDANT', 2),
        ('<a>View documents</a>', 'Hearings' ,'<a>View documents</a>', 'Hearings',
-  'Notice.AAA6.CP.HearingDocuments.Upload.Defendant', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
+  'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
   '{1, 1}', 'DEFENDANT', 3);
