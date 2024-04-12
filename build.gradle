@@ -105,9 +105,9 @@ allprojects {
         entry 'okio-jvm'
       }
 
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.77'
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78'
       // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.15'
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.16'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
       dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
@@ -141,7 +141,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.698'
+        version: '1.12.700'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -330,7 +330,6 @@ jacocoTestReport.dependsOn {
 def versions = [
   junit              : '5.10.2',
   junitPlatform      : '1.10.2',
-  reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
@@ -358,7 +357,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.75'
+  implementation 'com.github.hmcts:civil-commons:1.0.76'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -379,8 +378,6 @@ dependencies {
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
@@ -404,7 +401,7 @@ dependencies {
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.0.0-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.0.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
@@ -438,7 +435,7 @@ dependencies {
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.20.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.21.0'
 
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
@@ -449,7 +446,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.47.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.48.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.2'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 

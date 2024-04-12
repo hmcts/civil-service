@@ -33,17 +33,17 @@ public abstract class ElasticSearchService {
         return caseDetails;
     }
 
-    public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate) {
+    public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate, boolean carmEnabled) {
 
         if (claimMovedDate == null) {
             claimMovedDate = LocalDate.now().minusDays(1);
         }
-        SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate));
+        SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate, carmEnabled));
         int pages = calculatePages(searchResult);
         List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
 
         for (int i = 1; i < pages; i++) {
-            SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT, claimMovedDate));
+            SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT, claimMovedDate, carmEnabled));
             caseDetails.addAll(result.getCases());
         }
 
@@ -52,7 +52,7 @@ public abstract class ElasticSearchService {
 
     abstract Query query(int startIndex);
 
-    abstract Query queryInMediationCases(int startIndex, LocalDate claimMovedDate);
+    abstract Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled);
 
     private int calculatePages(SearchResult searchResult) {
         return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
