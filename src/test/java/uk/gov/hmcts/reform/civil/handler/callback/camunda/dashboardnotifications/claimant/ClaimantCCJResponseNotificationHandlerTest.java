@@ -15,12 +15,17 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantCCJResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,8 +35,10 @@ public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHand
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+
     @Mock
     private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private ClaimantCCJResponseNotificationHandler handler;
 
@@ -39,14 +46,33 @@ public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHand
     class AboutToSubmitCallback {
 
         @Test
-        void shouldNotRecordScenario_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_CLAIMANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
-            ).build();
+        void shouldCreateDashboardNotificationsWhenClaimantFormalizePlanByCCJ() {
+            // Given
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-            handler.handle(params);
-            verifyNoInteractions(dashboardApiClient);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+            // When
+            handler.handle(callbackParams);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
         }
     }
 
