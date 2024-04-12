@@ -8,12 +8,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.OrderMadeClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.util.Map;
@@ -38,7 +38,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .finalOrderDocument(
-                CaseDocument.builder().documentLink(DocumentBuilder.builder().documentName("name").build()).build())
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())
             .build();
 
         handler.handle(callbackParamsTest(caseData));
