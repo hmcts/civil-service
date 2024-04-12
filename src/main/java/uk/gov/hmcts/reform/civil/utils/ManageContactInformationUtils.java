@@ -343,7 +343,7 @@ public class ManageContactInformationUtils {
             }
         } else {
             // applicant 2 org individuals
-            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_ONE);
+            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_TWO);
         }
     }
 
