@@ -963,7 +963,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("sdoOrderDocument").isNull();
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
         }
     }
 
@@ -2332,7 +2332,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).extracting("smallClaimsMediationSectionToggle").isNull();
+            assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionToggle");
 
             assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionStatement");
 
@@ -2396,8 +2396,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input1")
                 .isEqualTo("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                                + " Digital Portal with the particulars of claim");
-            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date1")
-                .isNull();
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").doesNotHaveToString("date1");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
                 .isEqualTo("Any questions which are to be addressed to an expert must be sent to the expert directly "
                                + "and uploaded to the Digital Portal by 4pm on");

@@ -82,7 +82,7 @@ public abstract class BaseRpaTest {
 
     protected PactTestRun preparePactTestRun(final String body, final Map<String, String> headers) {
         // @formatter:off
-        return mockServer -> RestAssured
+        return (mockServer) -> RestAssured
             .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
