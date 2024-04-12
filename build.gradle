@@ -124,13 +124,7 @@ allprojects {
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.12'
 
-      // solves CVE-2022-25857
-      dependencySet(
-        group: 'org.yaml',
-        version: '2.2'
-      ) {
-        entry 'snakeyaml'
-      }
+
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
