@@ -605,6 +605,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String respondent2DocumentGeneration;
     private final String hearingHelpFeesReferenceNumber;
 
+    private final String hearingLocationCourtName;
     // bulk claims
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
@@ -726,6 +727,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasDefendantPayedTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
             .equals(getDefenceRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isPaidFullAmount() {
+        RespondToClaim respondToClaim = null;
+        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            respondToClaim = getRespondToClaim();
+        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+            respondToClaim = getRespondToAdmittedClaim();
+        }
+
+        return Optional.ofNullable(respondToClaim)
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
+            .orElse(false);
     }
 
     @JsonIgnore
@@ -1195,6 +1211,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondentSignedSettlementAgreement() {
         return getCaseDataLiP() != null && YesOrNo.YES.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
+    }
+
+    @JsonIgnore
+    public boolean isRespondentRejectedSettlementAgreement() {
+        return getCaseDataLiP() != null && YesOrNo.NO.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
     }
 
     @JsonIgnore

@@ -87,6 +87,7 @@ public class DashboardNotificationService {
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
+
             if (nonNull(notification.getNotificationAction())
                 && notification.getNotificationAction().getActionPerformed().equals("Click")) {
                 notificationAction.setId(notification.getNotificationAction().getId());
