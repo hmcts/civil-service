@@ -76,15 +76,6 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>View the bundle</a>',
   'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 12),
 
-('<a>View orders and notices</a>',
-  'Orders and notices from the court',
-  '<a>View orders and notices</a>',
-  'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
-('<a>View orders and notices</a>',
-  'Orders and notices from the court',
-  '<a>View orders and notices</a>',
-  'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 13),
-
 ('<a>View the judgment</a>',
   'Judgments from the court',
   '<a>View the judgment</a>',
