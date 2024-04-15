@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
-import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -30,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandler {
 
-    private final CaseStateSearchService caseSearchService;
+    private final MediationCasesSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
     private final SendGridClient sendGridClient;
@@ -39,6 +40,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private static final String filename = "ocmc_mediation_data.csv";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private final FeatureToggleService toggleService;
+    private final RuntimeService runtimeService;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -50,13 +52,15 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         } else {
             claimMovedDate = LocalDate.now().minusDays(1);
         }
-        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate);
+        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, false);
         inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .toList();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
+        runtimeService.setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled",
+                                   toggleService.isFeatureEnabled("carm"));
         try {
             if (!inMediationCases.isEmpty()) {
                 inMediationCases.forEach(caseData ->
