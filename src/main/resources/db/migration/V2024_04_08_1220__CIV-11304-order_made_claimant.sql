@@ -13,12 +13,3 @@ VALUES ('Notice.AAA6.CP.OrderMade.Claimant', 'An order has been made', 'An order
         '<p class="govuk-body">The judge has made an order on your claim. <a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a>.</p>',
         '<p class="govuk-body">The judge has made an order on your claim. <a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a>.</p>',
         'CLAIMANT', 'Session');
-
-/**
- * Add task list items
- */
-INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
-        '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.CP.OrderMade.Claimant', '{3, 3}', 'CLAIMANT', 10);

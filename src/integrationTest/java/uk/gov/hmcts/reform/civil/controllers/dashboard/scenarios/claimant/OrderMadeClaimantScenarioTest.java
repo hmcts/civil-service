@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.util.Map;
 
@@ -59,18 +58,6 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
                         + " class=\"govuk-link\">View the order</a>.</p>")
             );
-
-        //Verify task Item is created
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
     }
 
     private static CallbackParams callbackParamsTest(CaseData caseData) {
