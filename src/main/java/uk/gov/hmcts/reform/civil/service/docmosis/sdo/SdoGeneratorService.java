@@ -497,13 +497,12 @@ public class SdoGeneratorService {
                     SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
                 )
                 .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
-                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
                 .smallClaimsWelshLanguageToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null
                                               ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
 
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+                .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
         }
 
         sdoDocumentFormBuilder.hearingLocation(
