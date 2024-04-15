@@ -24,7 +24,7 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
-
+  
     private final IdamApi idamApi;
 
     @Autowired
@@ -82,6 +82,7 @@ public class DashboardNotificationService {
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
+
             if (nonNull(notification.getNotificationAction())
                 && notification.getNotificationAction().getActionPerformed().equals("Click")) {
                 notificationAction.setId(notification.getNotificationAction().getId());
