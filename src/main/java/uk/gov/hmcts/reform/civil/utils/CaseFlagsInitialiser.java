@@ -44,8 +44,7 @@ public class CaseFlagsInitialiser {
                 initialiseRespondentLitigationFriendFlags(dataBuilder, caseData);
                 break;
             }
-            case DEFENDANT_RESPONSE_SPEC:
-            case DEFENDANT_RESPONSE: {
+            case DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE, DEFENDANT_RESPONSE_CUI: {
                 addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
                 break;
             }

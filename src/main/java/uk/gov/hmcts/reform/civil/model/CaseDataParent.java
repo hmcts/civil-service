@@ -47,6 +47,13 @@ import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.*;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -172,6 +179,20 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
     private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2FastTrackUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2FastTrackUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2SmallClaimsUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2SmallClaimsUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2NihlUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2NihlUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2DrhUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2DrhUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2DisposalHearingUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingUseOfWelshLanguage;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
+    private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
