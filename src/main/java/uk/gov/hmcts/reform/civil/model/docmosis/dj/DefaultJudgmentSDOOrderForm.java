@@ -130,4 +130,9 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private String trialHearingTimeEstimateDJ;
     private final boolean writtenByJudge;
 
+    //sdoR2 fields
+    private final boolean hasDisposalHearingWelshSectionDJ;
+    private final boolean hasTrialHearingWelshSectionDJ;
+    private final String welshLanguageDescriptionDJ;
+
 }
