@@ -94,6 +94,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
@@ -802,6 +803,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private void populateDRHFields(CallbackParams callbackParams,
                                    CaseData.CaseDataBuilder<?, ?> updatedData, Optional<RequestedCourt> preferredCourt) {
+        CaseData caseData = callbackParams.getCaseData();
         DynamicList courtList = getCourtLocationForSdoR2(callbackParams, updatedData, preferredCourt.orElse(null));
         courtList.setValue(courtList.getListItems().get(0));
         updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
@@ -843,6 +845,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+            updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+                                                                 .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
+                                                                 .build());
+        }
     }
 
     private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
@@ -1644,5 +1652,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
         updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
+        if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
+            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+        }
     }
 }

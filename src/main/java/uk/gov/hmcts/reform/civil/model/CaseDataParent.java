@@ -151,6 +151,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
@@ -394,6 +395,8 @@ public class CaseDataParent implements MappableObject {
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsMediation sdoR2SmallClaimsMediationSectionStatement;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsMediationSectionToggle;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
     private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
 

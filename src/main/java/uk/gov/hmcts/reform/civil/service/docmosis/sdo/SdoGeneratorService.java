@@ -490,6 +490,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -505,7 +506,6 @@ public class SdoGeneratorService {
                 SdoHelper.hasSharedVariable(caseData, "respondent2")
             )
             .respondent2(caseData.getRespondent2())
-            .isCarmEnabledForCase(caseData.getShowCarmFields())
             .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
             .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
             .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
@@ -522,9 +522,13 @@ public class SdoGeneratorService {
             .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
             .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
+            .carmEnabled(carmEnabled)
+            .sdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
             .caseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation))
-            .smallClaimsMediationSectionStatement(caseData.getSmallClaimsMediationSectionStatement());
+            .sdoR2SmallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSectionDRH(caseData, carmEnabled)
+            );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             sdoDocumentFormBuilderDrh.hearingLocation(
