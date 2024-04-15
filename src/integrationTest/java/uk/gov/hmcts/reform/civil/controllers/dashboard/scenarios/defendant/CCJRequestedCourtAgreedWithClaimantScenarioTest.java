@@ -76,7 +76,7 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                     "<p class=\"govuk-body\">The claimant rejected your "
                         + "<a href=\"{CCJ_REPAYMENT_PLAN_DEFENDANT_URL}\" class=\"govuk-link\">repayment plan</a> "
                         + "and has proposed a new plan, which the court agreed with, based on the financial details you"
-                        + " provided.</p> <p class=\"govuk-body\">When we’ve processed the request, we’ll post a copy "
+                        + " provided.</p> <p class=\"govuk-body\">When we've processed the request, we'll post a copy "
                         + "of the judgment to you.</p><p class=\"govuk-body\">If you pay the debt within one month of"
                         + " the date of judgment, the County Court Judgment (CCJ) is removed from the public register."
                         + " You can pay £15 to <a href={APPLY_FOR_CERTIFICATE} class=\"govuk-link\" target=\"_blank\""

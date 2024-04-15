@@ -13,13 +13,13 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.Trial.Arrangements.Required.Defendant', 'Confirm your trial arrangements', 'Confirm your trial arrangements',
         '<p class="govuk-body">You must <a href="{ADD_TRIAL_ARRANGEMENTS}" class="govuk-link">confirm your trial arrangements</a> by {HEARING_DUE_DATE}. ' ||
-        'This means that you’ll need to confirm if the case is ready for trial or not. ' ||
-        'You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. ' ||
-        'Refer to the <a href="{VIEW_DEFENDANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">questionnaire you submitted</a> if you’re not sure what you previously said.</p>',
+        'This means that you''ll need to confirm if the case is ready for trial or not. ' ||
+        'You''ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. ' ||
+        'Refer to the <a href="{VIEW_DEFENDANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">questionnaire you submitted</a> if you''re not sure what you previously said.</p>',
         '<p class="govuk-body">You must <a href="{ADD_TRIAL_ARRANGEMENTS}" class="govuk-link">confirm your trial arrangements</a> by {HEARING_DUE_DATE}. ' ||
-        'This means that you’ll need to confirm if the case is ready for trial or not. ' ||
-        'You’ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. ' ||
-        'Refer to the <a href="{VIEW_DEFENDANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">questionnaire you submitted</a> if you’re not sure what you previously said.</p>', 'DEFENDANT');
+        'This means that you''ll need to confirm if the case is ready for trial or not. ' ||
+        'You''ll also need to confirm whether circumstances have changed since you completed the directions questionnaire. ' ||
+        'Refer to the <a href="{VIEW_DEFENDANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">questionnaire you submitted</a> if you''re not sure what you previously said.</p>', 'DEFENDANT');
 
 /**
  * Add task list items

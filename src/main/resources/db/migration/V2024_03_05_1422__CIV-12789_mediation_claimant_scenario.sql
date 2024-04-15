@@ -10,7 +10,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.Claimant', '{"Notice.AAA6.DefRes
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimantIntent.Mediation.Claimant', 'You’ve rejected the defendant’s response' , 'You’ve rejected the defendant’s response',
-        '<p class="govuk-body">You’ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p><p class="govuk-body"><a href="https://www.gov.uk/guidance/small-claims-mediation-service"  rel="noopener noreferrer" class="govuk-link"> Find out more about how mediation works (opens in new tab)</a>.</p>',
-        '<p class="govuk-body">You’ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p><p class="govuk-body"><a href="https://www.gov.uk/guidance/small-claims-mediation-service"  rel="noopener noreferrer" class="govuk-link"> Find out more about how mediation works (opens in new tab)</a>.</p>',
+VALUES ('Notice.AAA6.ClaimantIntent.Mediation.Claimant', 'You''ve rejected the defendant''s response' , 'You''ve rejected the defendant''s response',
+        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p><p class="govuk-body"><a href="https://www.gov.uk/guidance/small-claims-mediation-service"  rel="noopener noreferrer" class="govuk-link"> Find out more about how mediation works (opens in new tab)</a>.</p>',
+        '<p class="govuk-body">You''ve both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p><p class="govuk-body"><a href="https://www.gov.uk/guidance/small-claims-mediation-service"  rel="noopener noreferrer" class="govuk-link"> Find out more about how mediation works (opens in new tab)</a>.</p>',
         'CLAIMANT');

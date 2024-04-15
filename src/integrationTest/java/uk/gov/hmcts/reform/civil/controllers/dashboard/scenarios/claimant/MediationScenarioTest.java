@@ -35,16 +35,16 @@ public class MediationScenarioTest extends BaseIntegrationTest {
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("You’ve rejected the defendant’s response"),
+                jsonPath("$[0].titleEn").value("You've rejected the defendant's response"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You’ve both agreed to try mediation. Your mediation appointment will be arranged "
+                        "<p class=\"govuk-body\">You've both agreed to try mediation. Your mediation appointment will be arranged "
                             + "within 28 days.</p><p class=\"govuk-body\"><a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\""
                             + "  rel=\"noopener noreferrer\" class=\"govuk-link\"> Find out more about how mediation"
                             + " works (opens in new tab)</a>.</p>"),
-                jsonPath("$[0].titleCy").value("You’ve rejected the defendant’s response"),
+                jsonPath("$[0].titleCy").value("You've rejected the defendant's response"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You’ve both agreed to try mediation. Your mediation appointment will be"
+                    .value("<p class=\"govuk-body\">You've both agreed to try mediation. Your mediation appointment will be"
                                + " arranged within 28 days.</p>"
                                + "<p class=\"govuk-body\"><a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\""
                                + "  rel=\"noopener noreferrer\" class=\"govuk-link\"> Find out more about how mediation"
