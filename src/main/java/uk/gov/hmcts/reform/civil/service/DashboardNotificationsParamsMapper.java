@@ -34,6 +34,13 @@ public class DashboardNotificationsParamsMapper {
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
+        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+            LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
+            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
+            params.put("applicant1ResponseDeadlineCy",
+                       DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+        }
+
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put(
                 "defendantAdmittedAmount",
@@ -54,11 +61,7 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getClaimFee().toPounds().toPlainString())
             );
         }
-        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
-            LocalDate applicantResponseDeadline = caseData.getApplicant1ResponseDeadline().toLocalDate();
-            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicantResponseDeadline));
-            params.put("applicant1ResponseDeadlineCy", DateUtils.formatDate(applicantResponseDeadline));
-        }
+
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             LocalDate respondentResponseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(respondentResponseDeadline));
@@ -133,18 +136,36 @@ public class DashboardNotificationsParamsMapper {
             });
         }
 
-        if (nonNull(caseData.getApplicant1ResponseDeadline())) {
-            LocalDateTime date = caseData.getApplicant1ResponseDeadline();
-            params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(date));
-            params.put("applicant1ResponseDeadlineCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
-        }
-
         if (nonNull(caseData.getHearingDueDate())) {
             LocalDate date = caseData.getHearingDueDate();
             params.put("hearingDueDateEn", DateUtils.formatDate(date));
-            params.put("hearingDueDateCy", DateUtils.formatDate(date));
+            params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
         }
 
+        params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
+
+        if (nonNull(caseData.getHearingDate())) {
+            LocalDate date = caseData.getHearingDate();
+            params.put("hearingDateEn", DateUtils.formatDate(date));
+            params.put("hearingDateCy", DateUtils.formatDateInWelsh(date));
+        }
+
+        if (nonNull(caseData.getHearingLocation())) {
+            params.put("hearingCourtEn", caseData.getHearingLocationCourtName());
+            params.put("hearingCourtCy", caseData.getHearingLocationCourtName());
+        }
+
+        if (nonNull(caseData.getHearingDate())) {
+            LocalDate date = caseData.getHearingDate().minusWeeks(3);
+            params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
+            params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
+        }
+        if (nonNull(caseData.getHearingFee())) {
+            params.put(
+                "hearingFee",
+                "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
+            );
+        }
         return params;
     }
 

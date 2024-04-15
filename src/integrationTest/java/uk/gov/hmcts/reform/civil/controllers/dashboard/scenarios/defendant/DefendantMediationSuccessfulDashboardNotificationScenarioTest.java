@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantMediationSuccessfulDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -27,6 +28,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
