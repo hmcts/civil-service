@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -104,5 +106,13 @@ public class FeatureToggleService {
         return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
+    }
+
+    public boolean isDashboardEnabledForCase(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = LocalDateTime.of(caseData.getIssueDate(), LocalTime.MIDNIGHT).atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case",
+                                                        epoch, false
+        );
     }
 }

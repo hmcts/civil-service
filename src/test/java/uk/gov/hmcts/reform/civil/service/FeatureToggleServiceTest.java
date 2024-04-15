@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -181,6 +182,17 @@ class FeatureToggleServiceTest {
         }
 
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldReturnCorrectValue_whenIsDashboardEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+
+        when(featureToggleApi.isFeatureEnabledForDate(eq("is-dashboard-enabled-for-case"), anyLong(), eq(false)))
+            .thenReturn(true);
+
+        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isTrue();
     }
 
     private void givenToggle(String feature, boolean state) {
