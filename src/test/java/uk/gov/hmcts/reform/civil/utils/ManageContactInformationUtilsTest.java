@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -212,6 +214,30 @@ class ManageContactInformationUtilsTest {
         addApplicantOptions2v1(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicants2v1Options(true, true));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimants2v1AsAdmin_secondClaimantAsCompany() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .multiPartyClaimTwoApplicants()
+                .applicant2(PartyBuilder.builder().company().build())
+                .atStateApplicantRespondToDefenceAndProceed().build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicantOptions2v1(options, caseData, true);
+
+        List<DynamicListElement> expected = new ArrayList<>();
+        expected.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2", "CLAIMANT 2: Company ltd"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2_ORGANISATION_INDIVIDUALS", "CLAIMANT 2: Individuals attending for the organisation"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANTS: Individuals attending for the legal representative"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANTS: Witnesses"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANTS: Experts"));
+
+        assertThat(options).isEqualTo(expected);
     }
 
     @Test
