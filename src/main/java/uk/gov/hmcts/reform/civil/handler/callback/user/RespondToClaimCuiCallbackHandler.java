@@ -64,24 +64,23 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
-
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(builder);
+            addEventAndDateAddedToRespondentWitnesses(builder);
+        }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
 
+        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
         if (!responseLanguageIsBilingual) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
-        }
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToRespondentExperts(builder);
-            addEventAndDateAddedToRespondentWitnesses(builder);
         }
 
         return responseBuilder.build();

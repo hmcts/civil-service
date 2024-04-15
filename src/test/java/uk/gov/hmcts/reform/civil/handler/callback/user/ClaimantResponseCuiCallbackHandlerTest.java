@@ -389,11 +389,12 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAddEventAndDateAddedToCLaimantExpertsAndWitness() {
+        void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ResponseDate(LocalDateTime.now())
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
