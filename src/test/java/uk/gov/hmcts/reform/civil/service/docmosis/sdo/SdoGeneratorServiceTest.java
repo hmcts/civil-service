@@ -92,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_R2;
@@ -525,6 +526,40 @@ public class SdoGeneratorServiceTest {
                             && locationRefData.equals(((SdoDocumentFormDisposal) arg).getHearingLocation())
             ),
             any(DocmosisTemplates.class)
+        );
+    }
+
+    @Test
+    public void shouldGenerateSdoDisposalDocumentWithR2Template() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoDisposal()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.YES)
+            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+            .orderType(OrderType.DISPOSAL)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormDisposal),
+            eq(SDO_R2_DISPOSAL)
         );
     }
 

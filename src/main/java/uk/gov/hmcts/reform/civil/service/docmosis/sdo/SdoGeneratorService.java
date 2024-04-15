@@ -84,7 +84,7 @@ public class SdoGeneratorService {
 
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
-            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate = featureToggleService.isSdoR2Enabled() ? DocmosisTemplates.SDO_R2_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
 
@@ -205,7 +205,12 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-
+        if (featureToggleService.isSdoR2Enabled()) {
+            sdoDocumentBuilder
+                .hasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
+                .welshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
+                                              ? caseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription() : null);
+        }
         return sdoDocumentBuilder.build();
     }
 
@@ -322,11 +327,14 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-
         if (featureToggleService.isSdoR2Enabled()) {
+            sdoDocumentFormBuilder.fastTrackWelshLanguageToggle(
+                    SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
+                .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
+                                              ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+
             sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact());
         }
-
         return sdoDocumentFormBuilder.build();
     }
 
@@ -392,7 +400,10 @@ public class SdoGeneratorService {
                 && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
-            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData));
+            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
+            .hasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
+            .welshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
+                                          ? caseData.getSdoR2NihlUseOfWelshLanguage().getDescription() : null);
 
         if (caseData.getSdoR2Trial() != null) {
             sdoNihlDocumentFormBuilder
@@ -486,6 +497,12 @@ public class SdoGeneratorService {
                     SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
                 )
                 .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+                .smallClaimsWelshLanguageToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
+                .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null
+                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
+
             .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
         }
 
@@ -525,6 +542,7 @@ public class SdoGeneratorService {
             .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
             .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
             .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
+            .hasDRHWelshLangToggle(caseData.getSdoR2DrhUseOfWelshIncludeInOrderToggle() != null)
             .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
             .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
             .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
@@ -537,6 +555,8 @@ public class SdoGeneratorService {
             .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
             .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
+            .welshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
+                                          ? caseData.getSdoR2DrhUseOfWelshLanguage().getDescription() : null)
             .caseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation));
 
