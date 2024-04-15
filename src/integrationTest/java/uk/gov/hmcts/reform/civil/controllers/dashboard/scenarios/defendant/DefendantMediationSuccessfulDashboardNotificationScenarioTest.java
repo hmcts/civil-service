@@ -4,10 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantMediationSuccessfulDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -16,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class DefendantMediationSuccessfulDashboardNotificationScenarioTest extends DashboardBaseIntegrationTest {
 
+    public static final String DEFENDANT = "DEFENDANT";
     @Autowired
     private DefendantMediationSuccessfulDashboardNotificationHandler handler;
 
@@ -31,12 +37,14 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
             .respondent1Represented(YesOrNo.NO)
             .build();
 
+        List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(DEFENDANT, caseId);
+
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
@@ -55,5 +63,12 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
                             + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
             );
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, DEFENDANT)
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
     }
 }

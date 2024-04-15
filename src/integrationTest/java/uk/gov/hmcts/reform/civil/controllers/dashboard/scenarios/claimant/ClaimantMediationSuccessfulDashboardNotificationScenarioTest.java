@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantMediationSuccessfulDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -30,7 +31,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
     public static final String CLAIMANT = "CLAIMANT";
     @Test
     void should_create_mediation_scenario_for_carm_claimant() throws Exception {
-        //given
+
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -38,12 +39,11 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
         List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(CLAIMANT, caseId);
+
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
-        //When
         handler.handle(callbackParams(caseData));
 
-        //then
         // Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
             .andExpect(status().isOk())
@@ -68,9 +68,9 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, CLAIMANT)
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        List<TaskList> response = Arrays.asList(objectMapper.readValue(result, TaskList[].class));
-        assertThat(response.size()).isEqualTo(taskListExpected.size());
-        evaluateTasklist(response, taskListExpected);
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
     }
 
     @Test
@@ -101,9 +101,5 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                     .value(
                         "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement (PDF).</a></p>")
             );
-    }
-    private static void evaluateTasklist(List<TaskList> response, List<TaskList> taskListExpected) {
-        assertThat(response).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "createdAt", "updatedAt", "messageParams").isEqualTo(
-            taskListExpected);
     }
 }
