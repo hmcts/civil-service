@@ -842,7 +842,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private void populateDRHFields(CallbackParams callbackParams,
                                    CaseData.CaseDataBuilder<?, ?> updatedData, Optional<RequestedCourt> preferredCourt) {
-        CaseData caseData = callbackParams.getCaseData();
         DynamicList courtList = getCourtLocationForSdoR2(callbackParams, updatedData, preferredCourt.orElse(null));
         courtList.setValue(courtList.getListItems().get(0));
         updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
@@ -885,6 +884,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
         updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+
+        CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
             updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
