@@ -78,8 +78,7 @@ allprojects {
      dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
-      // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
+
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
 
@@ -119,8 +118,6 @@ allprojects {
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
       }
-      // Solves CVE-2023-24998
-      dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
 
       //Solves CVE-2023-6481
       dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
@@ -374,7 +371,6 @@ dependencies {
 
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
-  // CVE-2021-22112 - Privilege Escalation
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
