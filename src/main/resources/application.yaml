@@ -50,6 +50,8 @@ spring:
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
+    table: schema_version
+    baseline-on-migrate: true
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -601,6 +603,7 @@ spring:
     enabled: true
     baselineOnMigrate: true
     placeholder-replacement: false
+    table: schema_version
 
   main:
     lazy-initialization: true
