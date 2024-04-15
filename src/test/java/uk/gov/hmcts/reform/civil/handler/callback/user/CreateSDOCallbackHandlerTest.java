@@ -167,6 +167,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.STATE
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -667,6 +668,41 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLossToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2SeparatorUploadOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2TrialToggle").asString().isEqualTo("[INCLUDE]");
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldPopulateWelshSectionForSDOR2(boolean valid) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO).build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(valid);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            if (valid) {
+                assertThat(response.getData()).extracting("sdoR2FastTrackUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2SmallClaimsUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            } else {
+                assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage()).isNull();
+            }
         }
     }
 
