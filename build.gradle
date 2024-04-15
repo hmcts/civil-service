@@ -134,7 +134,7 @@ allprojects {
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
-        version: '7.17.0'
+        version: '7.21.0'
       ) {
         entry 'camunda-engine'
       }
