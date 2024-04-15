@@ -1227,9 +1227,18 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 // If a document already exists in the collection, it cannot be re-added.
                 boolean containsValue = additionalBundleDocs.stream()
                     .map(Element::getValue)
-                    .map(UploadEvidenceDocumentType::getDocumentUpload)
+                    .map(upload -> upload != null ? upload.getDocumentUpload() : null)
+                    .filter(docUpload -> docUpload != null)
                     .map(Document::getDocumentUrl)
                     .anyMatch(docUrl -> docUrl.equals(documentToAdd.getDocumentUrl()));
+                // When a bundle is created, applicantDocsUploadedAfterBundle and respondentDocsUploadedAfterBundle
+                // are assigned as empty lists, in actuality they contain a single element (default builder) we remove
+                // this as it is not required.
+                additionalBundleDocs.removeIf(element -> {
+                    UploadEvidenceDocumentType upload = element.getValue();
+                    return upload == null || upload.getDocumentUpload() == null
+                        || upload.getDocumentUpload().getDocumentUrl() == null;
+                });
                 if (!containsValue) {
                     var newDocument = UploadEvidenceDocumentType.builder()
                         .typeOfDocument(documentTypeDisplayName)
