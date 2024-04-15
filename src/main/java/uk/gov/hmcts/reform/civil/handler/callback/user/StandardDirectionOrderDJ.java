@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -56,6 +57,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTi
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -625,6 +627,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                               + "in response completed by 4pm on")
                                                   .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
                                                   .build());
+        if (featureToggleService.isSdoR2Enabled()) {
+            caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
+                SdoR2WelshLanguageUsage.builder()
+                    .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+            caseDataBuilder.sdoR2TrialWelshLanguageDJ(
+                SdoR2WelshLanguageUsage.builder()
+                    .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        }
 
         if (featureToggleService.isSdoR2Enabled()) {
             updateDisclosureOfDocumentFields(caseDataBuilder);
