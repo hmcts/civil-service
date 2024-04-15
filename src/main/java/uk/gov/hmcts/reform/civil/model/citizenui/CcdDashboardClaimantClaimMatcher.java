@@ -347,4 +347,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwfPaymentOutcome() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
     }
+
+    public boolean isSettled() {
+        return super.isSettled()
+            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled());
+    }
 }

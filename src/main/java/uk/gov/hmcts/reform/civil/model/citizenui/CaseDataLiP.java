@@ -79,4 +79,9 @@ public class CaseDataLiP {
     public boolean isDefendantSignedSettlementNotAgreed() {
         return YesOrNo.NO.equals(respondentSignSettlementAgreement);
     }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return YesOrNo.YES.equals(applicant1SettleClaim);
+    }
 }
