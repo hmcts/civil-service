@@ -49,6 +49,7 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private final boolean hasWitnessStatements;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2HearingTrialWindow;
+    private final boolean hasDRHWelshLangToggle;
     private final boolean sdoR2SmallClaimsMediationSectionToggle;
     private final boolean carmEnabled;
 
@@ -64,5 +65,6 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private final String sdoR2SmallClaimsPhysicalTrialBundleTxt;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
+    private final String welshLanguageDescription;
     private final String sdoR2SmallClaimMediationSectionInput;
 }

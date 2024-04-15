@@ -418,6 +418,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsAddNewDirections() != null;
             case "smallClaimsMediationSectionToggle":
                 return caseData.getSmallClaimsMediationSectionStatement() != null;
+            case "sdoR2SmallClaimsUseOfWelshToggle":
+                return caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null;
             default:
                 return false;
         }
@@ -485,6 +487,8 @@ public class SdoHelper {
             case "fastTrackTrialDateToToggle":
                 return caseData.getFastTrackHearingTime() != null
                     && caseData.getFastTrackHearingTime().getDateToToggle() != null;
+            case "sdoR2FastTrackUseOfWelshToggle":
+                return caseData.getSdoR2FastTrackUseOfWelshToggle() != null;
             default:
                 return false;
         }

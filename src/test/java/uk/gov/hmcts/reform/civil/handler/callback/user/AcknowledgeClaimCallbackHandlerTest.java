@@ -248,7 +248,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateRespondent2Flag_WhenInvoked() {
             // Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
@@ -269,7 +268,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvoked() {
             // Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -293,7 +291,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvokedNoUser() {
             // Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
             given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);

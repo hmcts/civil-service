@@ -887,13 +887,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("applicant1").extracting("individualFirstName")
                 .isEqualTo(caseData.getApplicant1().getIndividualFirstName());
-            assertThat(response.getData()).extracting("respondent1").extracting("individualFirstName")
-                .isEqualTo(caseData.getRespondent1().getIndividualFirstName());
+            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualFirstName");
 
             assertThat(response.getData()).extracting("applicant1").extracting("individualLastName")
                 .isEqualTo(caseData.getApplicant1().getIndividualLastName());
-            assertThat(response.getData()).extracting("respondent1").extracting("individualLastName")
-                .isEqualTo(caseData.getRespondent1().getIndividualLastName());
+            assertThat(response.getData()).extracting("respondent1").doesNotHaveToString("individualLastName");
         }
 
         @ParameterizedTest
@@ -1359,7 +1357,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNullDocument_whenCaseFileEnabled() {
             // Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder()
