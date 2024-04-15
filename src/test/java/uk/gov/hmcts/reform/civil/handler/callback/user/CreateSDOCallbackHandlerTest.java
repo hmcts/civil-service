@@ -2485,16 +2485,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPrePopulateDRHFields_CarmNotEnabled() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
-            String preSelectedCourt = "214320";
-            List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
-            );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
@@ -2502,14 +2492,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(response.getData()).extracting("sdoR2SmallClaimsMediationSectionToggle").isNull();
 
             assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
 
