@@ -2509,7 +2509,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).extracting("ssdoR2SmallClaimsMediationSectionToggle").isNull();
+            assertThat(response.getData()).extracting("sdoR2SmallClaimsMediationSectionToggle").isNull();
 
             assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
 
