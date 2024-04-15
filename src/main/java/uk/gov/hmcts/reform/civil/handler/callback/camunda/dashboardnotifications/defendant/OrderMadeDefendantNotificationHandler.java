@@ -81,20 +81,22 @@ public class OrderMadeDefendantNotificationHandler extends DashboardCallbackHand
 
         switch (caseEvent) {
             case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT -> {
-                params.put("orderDocument", caseData.getFinalOrderDocument().getDocumentLink().getDocumentBinaryUrl());
+                params.put("orderDocument", caseData.getFinalOrderDocumentCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
                 return params;
             }
             case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT -> {
+                params.put("orderDocument", caseData.getOrderSDODocumentDJCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            }
+            default -> {
                 if (caseData.getSDODocument().isPresent()) {
                     params.put(
                         "orderDocument",
                         caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
                     );
                 }
-                return params;
-            }
-            default -> {
-                params.put("orderDocument", caseData.getOrderSDODocumentDJ().getDocumentBinaryUrl());
                 return params;
             }
         }
