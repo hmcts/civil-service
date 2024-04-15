@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,10 +43,12 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -98,8 +101,8 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(1234L)
             .ccdState(CaseState.CASE_SETTLED)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -130,7 +133,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -159,8 +162,8 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(1234L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -194,8 +197,8 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
                                                         .build())
                              .build())
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -228,8 +231,8 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                                                         .claimantCourtDecision(RepaymentDecisionType
                                                                                    .IN_FAVOUR_OF_DEFENDANT).build())
                              .build())
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -257,9 +260,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 .legacyCaseReference("reference")
                 .ccdCaseReference(1234L)
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
-                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
-                .responseClaimMediationSpecRequired(YesOrNo.NO)
-                .respondent1Represented(YesOrNo.NO)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .responseClaimMediationSpecRequired(NO)
+                .respondent1Represented(NO)
                 .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -288,7 +291,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(1234L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -319,9 +322,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(NO)
+            .specRespondent1Represented(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -353,9 +356,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .specRespondent1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(NO)
+            .specRespondent1Represented(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -383,9 +386,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+            .responseClaimMediationSpecRequired(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -413,10 +416,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(4321L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .applicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1FullDefenceConfirmAmountPaidSpec(NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .responseClaimMediationSpecRequired(NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -443,9 +446,9 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                 ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
@@ -476,7 +479,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .ccdState(CaseState.IN_MEDIATION)
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -508,7 +511,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                                                                              ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                                          .build())
                              .build())
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -536,17 +539,17 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .legacyCaseReference("reference")
                 .ccdCaseReference(87654231L)
-                .respondent1Represented(YesOrNo.NO)
+                .respondent1Represented(NO)
                 .applicant1(Party.builder()
                         .organisationName("Applicant Org")
                         .type(Party.Type.ORGANISATION).build())
                 .respondent1(Party.builder()
                         .organisationName("Org one")
                         .type(Party.Type.ORGANISATION).build())
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -575,14 +578,14 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .legacyCaseReference("reference")
                 .ccdCaseReference(78034251L)
-                .respondent1Represented(YesOrNo.NO)
+                .respondent1Represented(NO)
                 .applicant1(Party.builder()
                         .companyName("COMPANY")
                         .type(Party.Type.COMPANY).build())
                 .respondent1(Party.builder()
                         .companyName("COMPANY one")
                         .type(Party.Type.COMPANY).build())
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .respondent1RepaymentPlan(RepaymentPlanLRspec
                         .builder()
                         .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
@@ -591,7 +594,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                         .build())
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -606,6 +609,34 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    void shouldCreateNotificationForDefendantWhenClaimantProceedsCarm() {
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(CaseState.IN_MEDIATION)
+            .respondent1Represented(NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
         );
     }
 }
