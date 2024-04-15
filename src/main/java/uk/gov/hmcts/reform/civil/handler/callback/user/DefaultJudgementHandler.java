@@ -287,7 +287,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return preferredLocation.orElse(null);
     }
 
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+    public static Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
         String locationLabel = location.getSiteName()
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
