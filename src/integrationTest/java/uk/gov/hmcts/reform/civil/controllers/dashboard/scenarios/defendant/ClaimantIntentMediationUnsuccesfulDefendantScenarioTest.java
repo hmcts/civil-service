@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.util.List;
+
 public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -24,6 +25,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
 
     @Test
     void should_create_mediation_unsuccessful_scenario() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         String caseId = "32341";
         Party respondent1 = new Party();
@@ -35,9 +37,6 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
             .build();
-
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -56,6 +55,8 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
 
     @Test
     void should_create_mediation_unsuccessful_scenario_for_carm() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
         String caseId = "32341";
         Party respondent1 = new Party();
         respondent1.toBuilder().partyName("John Doe").build();
@@ -70,8 +71,6 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -81,10 +80,12 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> "
+                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
                 jsonPath("$[0].titleCy").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> "
+                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
 
     }
 }

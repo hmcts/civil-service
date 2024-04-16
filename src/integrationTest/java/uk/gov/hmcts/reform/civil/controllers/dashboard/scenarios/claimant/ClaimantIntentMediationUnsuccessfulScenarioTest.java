@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+
 public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -24,6 +25,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
 
     @Test
     void shouldCreateMediationUnsuccessful() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         String caseId = "323491";
         Party respondent1 = new Party();
@@ -35,8 +37,6 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
             .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
             .build();
-
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         handler.handle(callbackParams(caseData));
 
@@ -58,6 +58,8 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
 
     @Test
     void shouldCreateMediationUnsuccessfulForCarm() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
         String caseId = "323491";
         Party respondent1 = new Party();
         MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
@@ -73,7 +75,6 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
             .build();
 
         handler.handle(callbackParams(caseData));
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
