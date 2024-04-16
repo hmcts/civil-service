@@ -11,12 +11,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,11 +20,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extends DashboardBaseIntegrationTest {
 
-
     @Autowired
     private ClaimantMediationSuccessfulDashboardNotificationHandler handler;
 
     public static final String CLAIMANT = "CLAIMANT";
+
     @Test
     void should_create_mediation_scenario_for_carm_claimant() throws Exception {
 
@@ -38,7 +34,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
-        List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(CLAIMANT, caseId);
+        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(CLAIMANT, caseId);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 

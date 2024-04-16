@@ -6,6 +6,13 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import java.util.List;
 
 public class MockTaskList {
+
+    // Private constructor to prevent instantiation
+    private MockTaskList() {
+        // throw an AssertionError if the constructor is accidentally invoked from within the class
+        throw new AssertionError("Utility class should not be instantiated");
+    }
+
     public static List<TaskList> getMediationTaskListMock(String role, String reference) {
         return List.of(
             TaskList.builder()
@@ -141,4 +148,5 @@ public class MockTaskList {
                 .taskOrder(14)
                 .build()
         );
-    }}
+    }
+}
