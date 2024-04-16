@@ -23,7 +23,7 @@ def versions = [
   lombok             : '1.18.32',
   pact               : '3.5.24',
   springSecurity     : '5.8.11',
-  camunda            : '7.20.0',
+  camunda            : '7.19.0',
   jackson            : '2.17.0'
 ]
 
@@ -125,11 +125,11 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.22'
 
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
