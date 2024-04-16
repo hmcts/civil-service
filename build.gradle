@@ -22,7 +22,7 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
   pact               : '3.5.24',
-  springSecurity     : '5.8.11',
+  springSecurity     : '5.8.12',
   camunda            : '7.19.0',
   jackson            : '2.17.0'
 ]
@@ -134,7 +134,7 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
@@ -338,6 +338,16 @@ jacocoTestReport {
 jacocoTestReport.dependsOn {
   subprojects*.test
 }
+
+def versions = [
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
+  springBoot         : springBoot.class.package.implementationVersion,
+  springStatemachine : '4.0.0',
+  lombok             : '1.18.32',
+  pact               : '3.5.24',
+  springSecurity     : '5.8.12'
+]
 
 ext.libraries = [
   junit5: [
