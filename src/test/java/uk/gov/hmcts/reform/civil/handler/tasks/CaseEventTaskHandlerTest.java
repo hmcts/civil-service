@@ -4,6 +4,7 @@ import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -223,7 +224,8 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.startUpdate(any(), any()))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
-            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+            doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
+                .when(externalTaskService).complete(mockTask);
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
