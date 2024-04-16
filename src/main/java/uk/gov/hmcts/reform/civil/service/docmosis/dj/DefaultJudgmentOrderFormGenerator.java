@@ -183,7 +183,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .sdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
             .sdoDJR2TrialCreditHireDetailsAddSection(
-                (nonNull(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle())
+                (nonNull(caseData.getSdoDJR2TrialCreditHire()) &&
+                    nonNull(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle())
                     && caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle()
                     .equals(List.of(AddOrRemoveToggle.ADD))))
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
