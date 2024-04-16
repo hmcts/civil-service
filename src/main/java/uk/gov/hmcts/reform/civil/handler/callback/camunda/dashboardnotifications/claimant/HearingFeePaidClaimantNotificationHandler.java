@@ -21,6 +21,7 @@ public class HearingFeePaidClaimantNotificationHandler extends DashboardCallback
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT);
     public static final String TASK_ID = "GenerateDashboardNotificationHearingFeePaidClaimant";
+
     public HearingFeePaidClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                        DashboardNotificationsParamsMapper mapper,
                                                        FeatureToggleService featureToggleService) {
