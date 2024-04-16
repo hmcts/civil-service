@@ -46,6 +46,7 @@ public class OrderMadeClaimantNotificationHandler extends DashboardCallbackHandl
         return EVENTS;
     }
 
+    @Override
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
