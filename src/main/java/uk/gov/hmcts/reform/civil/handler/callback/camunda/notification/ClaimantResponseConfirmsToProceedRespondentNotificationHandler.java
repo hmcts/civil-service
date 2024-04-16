@@ -136,6 +136,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+        
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = getSpecTemplate(callbackParams, caseData);
         } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
