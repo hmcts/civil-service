@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,8 +38,8 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .finalOrderDocument(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())
+            .finalOrderDocumentCollection(List.of(ElementUtils.element(
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
         handler.handle(callbackParamsTest(caseData));
