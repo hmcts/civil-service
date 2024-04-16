@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHireDetails;
 
 import javax.validation.constraints.Future;
 import java.time.LocalDate;

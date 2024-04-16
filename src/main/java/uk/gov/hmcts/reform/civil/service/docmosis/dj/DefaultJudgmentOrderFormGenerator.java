@@ -38,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_TRIAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
@@ -183,9 +182,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHire(caseData.getTrialCreditHire())
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .sdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
-            .sdoDJR2TrialCreditHireDetailsAddSection(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle()
-                                                         .equals(List.of(AddOrRemoveToggle.ADD)))
-            .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
+            .sdoDJR2TrialCreditHireDetailsAddSection(
+                (nonNull(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle())
+                    && caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle()
+                    .equals(List.of(AddOrRemoveToggle.ADD))))
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
             .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .trialHearingTrialDJAddSection(
