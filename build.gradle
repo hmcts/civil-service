@@ -15,6 +15,18 @@ plugins {
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
+def versions = [
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
+  springBoot         : springBoot.class.package.implementationVersion,
+  springStatemachine : '4.0.0',
+  lombok             : '1.18.32',
+  pact               : '3.5.24',
+  springSecurity     : '5.8.11',
+  camunda            : '7.20.0',
+  jackson            : '2.17.0'
+]
+
 allprojects {
   java {
     toolchain {
@@ -117,9 +129,9 @@ allprojects {
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.0'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.13'
@@ -320,17 +332,6 @@ jacocoTestReport.dependsOn {
   subprojects*.test
 }
 
-def versions = [
-  junit              : '5.10.2',
-  junitPlatform      : '1.10.2',
-  springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '4.0.0',
-  lombok             : '1.18.32',
-  pact               : '3.5.24',
-  springSecurity     : '5.8.11',
-  camunda            : '7.20.0'
-]
-
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
@@ -425,7 +426,8 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
