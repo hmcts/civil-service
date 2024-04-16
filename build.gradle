@@ -75,7 +75,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2023-44487
-      dependencySet(group: 'io.netty', version: '4.1.108.Final') {
+      dependencySet(group: 'io.netty', version: '4.1.109.Final') {
         entry 'netty-handler'
         entry 'netty-handler-proxy'
         entry 'netty-transport-native-epoll'
@@ -112,17 +112,24 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
+
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
+
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.0'
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.12'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.13'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -155,7 +162,7 @@ allprojects {
         entry 'groovy-all'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.87') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.20') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -304,7 +311,7 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -334,7 +341,7 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.32',
   pact               : '3.5.24',
-  springSecurity     : '5.8.11'
+  springSecurity     : '5.8.12'
 ]
 
 ext.libraries = [
@@ -431,6 +438,7 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'

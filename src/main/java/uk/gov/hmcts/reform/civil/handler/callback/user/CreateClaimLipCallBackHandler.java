@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
 @Service
@@ -47,6 +49,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final HelpWithFeesForTabService helpWithFeesForTabService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -91,6 +94,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(caseDataBuilder);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
