@@ -8,5 +8,6 @@ public enum FastTrack {
     fastClaimHousingDisrepair,
     fastClaimPersonalInjury,
     fastClaimRoadTrafficAccident,
-    fastClaimNoiseInducedHearingLoss
+    fastClaimNoiseInducedHearingLoss,
+
 }
