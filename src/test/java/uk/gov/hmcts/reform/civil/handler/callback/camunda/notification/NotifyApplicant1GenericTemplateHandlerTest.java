@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 class NotifyApplicant1GenericTemplateHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
+    public static final String BILINGUAL_TEMPLATE_ID = "bilingual-template-id";
 
     @MockBean
     private NotificationService notificationService;
@@ -39,14 +40,8 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     @Autowired
     NotifyApplicant1GenericTemplateHandler handler;
 
-    @BeforeEach
-    void setup() {
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
-            TEMPLATE_ID);
-    }
-
     @Test
-    void shouldSendGenericEmailWhenAllDataIsCorrect() {
+    void shouldSendGenericEmailWhenAllDataIsCorrectAndNotBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
@@ -55,6 +50,9 @@ class NotifyApplicant1GenericTemplateHandlerTest {
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).build()).build();
 
+        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
+            TEMPLATE_ID);
+
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
         handler.handle(params);
@@ -62,6 +60,33 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         verify(notificationService).sendMail(
             "claimant@hmcts.net",
             TEMPLATE_ID,
+            getNotificationDataMap(caseData),
+            "generic-notification-lip-000DC001"
+        );
+
+    }
+
+    @Test
+    void shouldSendGenericEmailWhenAllDataIsCorrectAndBilingual() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                             .type(Party.Type.INDIVIDUAL).build()).build();
+        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+
+        when(notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()).thenReturn(
+            BILINGUAL_TEMPLATE_ID);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+        handler.handle(params);
+
+        verify(notificationService).sendMail(
+            "claimant@hmcts.net",
+            BILINGUAL_TEMPLATE_ID,
             getNotificationDataMap(caseData),
             "generic-notification-lip-000DC001"
         );

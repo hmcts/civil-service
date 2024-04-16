@@ -53,7 +53,7 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
             getRecipientEmail(caseData),
-            getNotificationTemplate(),
+            getNotificationTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -68,8 +68,8 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
         );
     }
 
-    private String getNotificationTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+    private String getNotificationTemplate(CaseData caseData) {
+        return caseData.isBilingual() ? notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual() : notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     private String getRecipientEmail(CaseData caseData) {

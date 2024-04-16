@@ -18,9 +18,11 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +54,8 @@ public class HearingFeePaidClaimantNotificationHandler extends CallbackHandler {
     private CallbackResponse configureScenarioForHearingFeePaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (caseData.isHWFTypeHearing() && caseData.hearingFeeFullRemissionNotGrantedHWF()) {
+        if (caseData.isApplicant1NotRepresented() && ((nonNull(caseData.getHearingFeePaymentDetails()) && caseData.getHearingFeePaymentDetails().getStatus() == SUCCESS)
+            || (caseData.isHWFTypeHearing() && caseData.hearingFeeFullRemissionNotGrantedHWF()))) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT.getScenario(),
