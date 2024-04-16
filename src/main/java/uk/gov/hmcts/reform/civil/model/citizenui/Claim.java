@@ -107,6 +107,10 @@ public interface Claim {
     boolean isHwfInvalidRefNumber();
 
     boolean isHwfPaymentOutcome();
+
+    boolean isWaitingForClaimantIntentDocUpload();
+
     boolean isClaimSubmittedNotPaidOrFailedNotHwF();
+
     boolean isClaimSubmittedWaitingTranslatedDocuments();
 }

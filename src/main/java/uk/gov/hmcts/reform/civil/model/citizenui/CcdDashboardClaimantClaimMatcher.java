@@ -98,9 +98,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn())
-            || (null != caseData.getCcjPaymentDetails()
+        return (null != caseData.getCcjPaymentDetails()
             && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
@@ -229,9 +227,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
             && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
             || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -297,7 +295,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return  caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
@@ -345,6 +343,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isHwfPaymentOutcome() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence()
+                && caseData.getApplicant1ResponseDate() != null
+                && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+                && caseData.isBilingual();
     }
 
     @Override

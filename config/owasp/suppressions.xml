@@ -3,6 +3,5 @@
   <suppress until="2025-04-04">
     <cve>CVE-2021-42306</cve>
     <cve>CVE-2023-36052</cve>
-    <cve>CVE-2023-34042</cve>
   </suppress>
 </suppressions>

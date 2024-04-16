@@ -496,6 +496,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return false;
+    }
+
+    @Override
     public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
         return false;
     }
