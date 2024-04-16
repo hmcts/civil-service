@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
