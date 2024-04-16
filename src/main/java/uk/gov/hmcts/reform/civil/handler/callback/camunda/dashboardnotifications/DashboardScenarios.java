@@ -106,7 +106,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT("Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Defendant"),
-    SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant");
+    SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
+    SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
+    SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant");
+
     private final String scenario;
 
     DashboardScenarios(String scenario) {

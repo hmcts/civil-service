@@ -11,11 +11,11 @@ VALUES ('Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{"Notice.AAA6.De
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.CCJ.Requested.Claimant', 'County Court Judgment (CCJ) requested', 'County Court Judgment (CCJ) requested',
-        '<p class="govuk-body">We’ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.</p>'
+        '<p class="govuk-body">We''ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.</p>'
         '<p class="govuk-body">Your online account will not be updated, and ${respondent1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.</p>'
         '<p class="govuk-body">If a postal response is received before the judgment is issued, your request will be rejected.</p>'
         '<p class="govuk-body"><a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>',
-        '<p class="govuk-body">We’ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.</p>'
+        '<p class="govuk-body">We''ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.</p>'
         '<p class="govuk-body">Your online account will not be updated, and ${respondent1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.</p>'
         '<p class="govuk-body">If a postal response is received before the judgment is issued, your request will be rejected.</p>'
         '<p class="govuk-body"><a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>',
@@ -33,4 +33,4 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
        ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}>View information about the defendant</a>',
         'The response', 'Response.Defendant.Info', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 4),
        ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES_URL}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 10);
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 13);
