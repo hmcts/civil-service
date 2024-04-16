@@ -501,11 +501,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isClaimSubmittedPaymentFailedNotHwF() {
-        return false;
-    }
-
-    @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return false;
     }
