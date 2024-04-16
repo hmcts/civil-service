@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -306,7 +307,31 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isPaymentPlanRejected() {
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && caseData.hasApplicantRejectedRepaymentPlan());
+            && caseData.hasApplicantRejectedRepaymentPlan()
+            && !isIndividualORSoleTrader());
+    }
+
+    @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+                && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+                && caseData.hasApplicantRejectedRepaymentPlan()
+                && isIndividualORSoleTrader()
+                && isCourtDecisionRejected());
+    }
+
+    private boolean isCourtDecisionRejected() {
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1LiPResponse)
+                .orElse(null);
+
+        return applicant1Response != null
+                && applicant1Response.hasClaimantRejectedCourtDecision();
+    }
+
+    private boolean isIndividualORSoleTrader() {
+        return nonNull(caseData.getRespondent1()) ?
+                caseData.getRespondent1().isIndividualORSoleTrader() : false;
     }
 
     @Override
