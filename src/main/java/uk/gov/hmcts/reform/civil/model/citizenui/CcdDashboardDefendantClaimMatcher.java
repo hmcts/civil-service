@@ -332,4 +332,14 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isHwfPaymentOutcome() {
         return false;
     }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
 }
