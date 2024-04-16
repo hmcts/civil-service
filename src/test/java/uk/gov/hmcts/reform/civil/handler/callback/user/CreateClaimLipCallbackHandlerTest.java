@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
@@ -116,6 +117,31 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
+            when(toggleService.isHmcEnabled()).thenReturn(false);
+        }
+
+        @Test
+        void shouldInitializePartyID_whenInvoked() {
+            when(toggleService.isHmcEnabled()).thenReturn(true);
+            caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(Party.builder()
+                                 .type(Party.Type.ORGANISATION)
+                                 .partyName("Test Inc")
+                                 .partyEmail("claimant@email.com").build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
+            assertThat(updatedData.getApplicant1().getPartyID()).isNotNull();
         }
 
         @Test

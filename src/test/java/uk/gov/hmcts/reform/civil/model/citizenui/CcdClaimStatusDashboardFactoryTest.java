@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -595,5 +596,19 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME);
+    }
+
+    @Test
+    void givenBilingualLanguageIsWelsh_ClaimantIntentDocUploadPending_thenReturnDocUploadStatus() {
+        CaseData caseData = CaseData.builder()
+                .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD);
     }
 }
