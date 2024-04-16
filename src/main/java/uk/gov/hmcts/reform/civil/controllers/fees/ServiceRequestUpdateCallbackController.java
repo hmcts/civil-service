@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
@@ -26,7 +26,7 @@ public class ServiceRequestUpdateCallbackController {
 
     private final AuthorisationService authorisationService;
 
-    @PutMapping(path = "/service-request-update", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @PutMapping(path = "/service-request-update", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Ways to pay will call this API and send the status of payment with other details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Callback processed."),
