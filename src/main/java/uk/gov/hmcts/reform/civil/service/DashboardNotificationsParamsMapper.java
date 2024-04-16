@@ -166,6 +166,19 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
             );
         }
+        if (caseData.getHearingRemissionAmount() != null) {
+            params.put(
+                "hearingFeeRemissionAmount",
+                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                    caseData.getHearingRemissionAmount()).toPlainString())
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "hearingFeeOutStandingAmount",
+                "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
+            );
+        }
         return params;
     }
 

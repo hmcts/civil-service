@@ -31,6 +31,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_NO_REMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +46,22 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     public static final String TASK_ID = "Claimant1HwFDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-    private final Map<CaseEvent, String> dashboardScenarios = Map.of(
+    private final Map<CaseEvent, String> dashboardScenariosClaimIssue = Map.of(
         NO_REMISSION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_NO_REMISSION.getScenario(),
         INVALID_HWF_REFERENCE, SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
         MORE_INFORMATION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario(),
         UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED.getScenario(),
         PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario(),
         FULL_REMISSION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_FULL_REMISSION.getScenario()
+    );
+
+    private final Map<CaseEvent, String> dashboardScenariosHearingFee = Map.of(
+        NO_REMISSION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION.getScenario(),
+        INVALID_HWF_REFERENCE, SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF.getScenario(),
+        MORE_INFORMATION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED.getScenario(),
+        UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED.getScenario(),
+        PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION.getScenario(),
+        FULL_REMISSION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION.getScenario()
     );
 
     @Override
@@ -71,7 +86,14 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (caseData.isHWFTypeClaimIssued() && caseData.getHwFEvent() != null) {
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              dashboardScenarios.get(caseData.getHwFEvent()), authToken,
+                                              dashboardScenariosClaimIssue.get(caseData.getHwFEvent()), authToken,
+                                              ScenarioRequestParams.builder()
+                                                  .params(mapper.mapCaseDataToParams(caseData))
+                                                  .build()
+            );
+        } else if (caseData.isHWFTypeHearing() && caseData.getHwFEvent() != null) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              dashboardScenariosHearingFee.get(caseData.getHwFEvent()), authToken,
                                               ScenarioRequestParams.builder()
                                                   .params(mapper.mapCaseDataToParams(caseData))
                                                   .build()

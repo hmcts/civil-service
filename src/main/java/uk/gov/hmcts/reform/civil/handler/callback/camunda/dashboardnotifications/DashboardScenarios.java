@@ -106,7 +106,17 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT("Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Defendant"),
-    SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant");
+    SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
+
+    SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF("Scenario.AAA6.CP.HearingFee.HWF.InvalidRef"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED("Scenario.AAA6.CP.HearingFee.HWF.InfoRequired"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED("Scenario.AAA6.CP.HearingFee.HWF.Updated"),
+
+    SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.PartRemission"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.Rejected"),
+
+    SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission");
+
     private final String scenario;
 
     DashboardScenarios(String scenario) {
