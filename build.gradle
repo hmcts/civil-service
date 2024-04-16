@@ -15,6 +15,18 @@ plugins {
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
+def versions = [
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
+  springBoot         : springBoot.class.package.implementationVersion,
+  springStatemachine : '4.0.0',
+  lombok             : '1.18.32',
+  pact               : '3.5.24',
+  springSecurity     : '5.8.12',
+  camunda            : '7.19.0',
+  jackson            : '2.17.0'
+]
+
 allprojects {
   java {
     toolchain {
@@ -113,20 +125,20 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.22'
 
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.0'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.13'
@@ -137,13 +149,6 @@ allprojects {
         version: '2.2'
       ) {
         entry 'snakeyaml'
-      }
-      // Solves CVE-2022-25647
-      dependencySet(
-        group: 'org.camunda.bpm',
-        version: '7.17.0'
-      ) {
-        entry 'camunda-engine'
       }
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
@@ -311,7 +316,7 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -333,16 +338,6 @@ jacocoTestReport {
 jacocoTestReport.dependsOn {
   subprojects*.test
 }
-
-def versions = [
-  junit              : '5.10.2',
-  junitPlatform      : '1.10.2',
-  springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '4.0.0',
-  lombok             : '1.18.32',
-  pact               : '3.5.24',
-  springSecurity     : '5.8.11'
-]
 
 ext.libraries = [
   junit5: [
@@ -439,11 +434,11 @@ dependencies {
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
-  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.21.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
+  implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: versions.camunda
 
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
