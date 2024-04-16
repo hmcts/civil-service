@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,12 +27,13 @@ public class DefendantResponseDeadlineCheckCallbackHandler extends CallbackHandl
 
     private static final List<CaseEvent> EVENTS = List.of(DEFENDANT_RESPONSE_DEADLINE_CHECK);
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::setRespondentResponseDeadlineChecked,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+        return featureToggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::setRespondentResponseDeadlineChecked)
+            : Map.of(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
