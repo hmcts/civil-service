@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -17,13 +18,13 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
 
     @Test
-    void should_create_hearing_fee_hwf_full_remission_scenario() throws Exception {
+    void should_create_hearing_fee_hwf_partial_remission_scenario() throws Exception {
         String caseId = "12345";
 
         //Given
@@ -32,7 +33,11 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
+                                   .remissionAmount(new BigDecimal(10000))
+                                   .outstandingFeeInPounds(new BigDecimal(355))
+                                   .build())
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -43,13 +48,13 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>"),
+                "<p class=\"govuk-body\">You'll get help with the hearing fee. You'll receive £100 towards it. You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>")
+                "<p class=\"govuk-body\">You'll get help with the hearing fee. You'll receive £100 towards it. You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -57,7 +62,7 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value("<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusEn").value("Done")
+                jsonPath("$[0].currentStatusEn").value("Action needed")
             );
     }
 }

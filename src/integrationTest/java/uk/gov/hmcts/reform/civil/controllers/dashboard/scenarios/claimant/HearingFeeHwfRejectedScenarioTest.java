@@ -13,17 +13,18 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
 
     @Test
-    void should_create_hearing_fee_hwf_full_remission_scenario() throws Exception {
+    void should_create_hearing_fee_hwf_rejected_scenario() throws Exception {
         String caseId = "12345";
 
         //Given
@@ -32,7 +33,8 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.NO_REMISSION_HWF).build())
+            .hearingDueDate(LocalDate.of(2024, 4, 4))
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -43,21 +45,21 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been rejected"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>"),
+                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.</p><p class=\"govuk-body\">You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 April 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been rejected"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>")
+                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.</p><p class=\"govuk-body\">You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 Ebrill 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusEn").value("Done")
+                jsonPath("$[0].taskNameEn").value("<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
+                jsonPath("$[0].currentStatusEn").value("Action needed")
             );
     }
 }

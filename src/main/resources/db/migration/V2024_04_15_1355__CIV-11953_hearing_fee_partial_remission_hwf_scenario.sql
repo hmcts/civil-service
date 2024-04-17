@@ -21,6 +21,6 @@ VALUES ('Notice.AAA6.CP.HearingFee.HWF.PartRemission',
  * Add task list items
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role, task_order)
+                                    scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
 values ('<a>Pay the hearing fee</a>', 'Hearings' ,'<a>Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.PartRemission', '{5, 5}', 'CLAIMANT', 8);
+        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.PartRemission', '{5, 5}', 'CLAIMANT', 8, NULL, NULL);

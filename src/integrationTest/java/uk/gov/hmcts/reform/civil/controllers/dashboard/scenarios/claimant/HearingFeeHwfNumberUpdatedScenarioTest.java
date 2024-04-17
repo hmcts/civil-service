@@ -17,13 +17,13 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingFeeHwfNumberUpdatedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
 
     @Test
-    void should_create_hearing_fee_hwf_full_remission_scenario() throws Exception {
+    void should_create_hearing_fee_hwf_number__scenario() throws Exception {
         String caseId = "12345";
 
         //Given
@@ -32,7 +32,7 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER).build())
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -43,13 +43,13 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been updated"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>"),
+                "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update from us within 5 to 10 working days.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been approved"),
+                "Your help with fees application has been updated"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>")
+                "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update from us within 5 to 10 working days.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -57,7 +57,7 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value("<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusEn").value("Done")
+                jsonPath("$[0].currentStatusEn").value("In progress")
             );
     }
 }
