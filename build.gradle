@@ -92,11 +92,11 @@ allprojects {
       }
    
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.22'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.22'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.22'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.22'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.22'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.23'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
@@ -118,7 +118,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.701'
+        version: '1.12.702'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -384,8 +384,8 @@ dependencies {
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.87'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.88'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.20'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
