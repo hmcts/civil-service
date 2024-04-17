@@ -91,7 +91,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString()
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
@@ -107,7 +108,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         return Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
@@ -141,7 +143,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 return mapping;
             case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate());
-                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
+                mapping.put(EMAIL_MAP_ID, "civilmoneyclaimsdemo@gmail.com");
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
