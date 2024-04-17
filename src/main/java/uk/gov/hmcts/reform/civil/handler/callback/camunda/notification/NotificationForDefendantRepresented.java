@@ -141,8 +141,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 return mapping;
             case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate());
-//                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
-                mapping.put(EMAIL_MAP_ID, "civilmoneyclaimsdemo@gmail.com");
+                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
