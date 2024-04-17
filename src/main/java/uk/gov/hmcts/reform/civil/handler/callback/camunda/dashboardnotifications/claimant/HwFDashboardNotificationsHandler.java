@@ -84,20 +84,22 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     private CallbackResponse configureScenarioForHwfEvents(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (caseData.isHWFTypeClaimIssued() && caseData.getHwFEvent() != null) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              dashboardScenariosClaimIssue.get(caseData.getHwFEvent()), authToken,
-                                              ScenarioRequestParams.builder()
-                                                  .params(mapper.mapCaseDataToParams(caseData))
-                                                  .build()
-            );
-        } else if (caseData.isHWFTypeHearing() && caseData.getHwFEvent() != null) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              dashboardScenariosHearingFee.get(caseData.getHwFEvent()), authToken,
-                                              ScenarioRequestParams.builder()
-                                                  .params(mapper.mapCaseDataToParams(caseData))
-                                                  .build()
-            );
+        if(caseData.isApplicantNotRepresented() && caseData.getHwFEvent() != null) {
+            if (caseData.isHWFTypeClaimIssued()) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  dashboardScenariosClaimIssue.get(caseData.getHwFEvent()), authToken,
+                                                  ScenarioRequestParams.builder()
+                                                      .params(mapper.mapCaseDataToParams(caseData))
+                                                      .build()
+                );
+            } else if (caseData.isHWFTypeHearing()) {
+                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                                  dashboardScenariosHearingFee.get(caseData.getHwFEvent()), authToken,
+                                                  ScenarioRequestParams.builder()
+                                                      .params(mapper.mapCaseDataToParams(caseData))
+                                                      .build()
+                );
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

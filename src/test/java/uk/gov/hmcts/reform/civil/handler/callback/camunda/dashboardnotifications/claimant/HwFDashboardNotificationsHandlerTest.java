@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -77,6 +78,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .hwfCaseEvent(hwfEvent)
                                            .build())
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -117,6 +119,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .hearingHwfDetails(HelpWithFeesDetails.builder()
                                            .hwfCaseEvent(hwfEvent)
                                            .build())
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -147,10 +150,78 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
         @ParameterizedTest
         @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
-        void shouldNotConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+        void shouldNotConfigureScenariosForHwfEventsWhenFeeTypeNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(null)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                       .hwfCaseEvent(hwfEvent)
+                                       .build())
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(dashboardApiClient, times(0)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldNotConfigureScenariosForHwfEventsWhenHwfDetailsNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(null)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(dashboardApiClient, times(0)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldNotConfigureScenariosForHwfEventsWhenRepresented(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                .hwfCaseEvent(hwfEvent)
+                                .build())
+                .applicant1Represented(YesOrNo.YES)
+                .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
