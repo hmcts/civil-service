@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
@@ -194,14 +193,14 @@ public class SdoHelper {
 
     public static String getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
-            if (SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+            if ("Telephone"
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
                 return "by telephone";
-            } else if (SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+            } else if ("Video"
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
                 return "by video";
-            } else if (SmallClaimsSdoR2HearingMethod.IN_PERSON
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+            } else if ("In Person"
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
                 return "in person";
             }
         }
@@ -663,7 +662,7 @@ public class SdoHelper {
 
         if (caseData.getSdoR2Trial() != null) {
             if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
-                return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
+                return caseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel();
             } else {
                 return "";
             }

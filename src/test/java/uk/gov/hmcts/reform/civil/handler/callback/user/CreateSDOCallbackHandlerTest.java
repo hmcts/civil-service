@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
@@ -176,7 +175,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
-import static uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod.fastTrackMethodInPerson;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
@@ -483,6 +481,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
@@ -548,7 +549,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("lengthList").asString().isEqualTo(FIVE_HOURS.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("methodOfHearing").asString().isEqualTo(fastTrackMethodInPerson.toString());
+                .extracting("methodOfHearing").extracting("value").extracting("label").asString().isEqualTo("In Person");
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
@@ -2462,7 +2463,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsWitnessStatements()
                            .getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
             assertThat(data.getSdoR2SmallClaimsHearing().getTrialOnOptions()).isEqualTo(HearingOnRadioOptions.OPEN_DATE);
-            assertThat(data.getSdoR2SmallClaimsHearing().getMethodOfHearing()).isEqualTo(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING);
+            DynamicList hearingMethodValuesDRH = data.getSdoR2SmallClaimsHearing().getMethodOfHearing();
+            List<String> hearingMethodValuesDRHActual = hearingMethodValuesDRH.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+            assertThat(hearingMethodValuesDRHActual).containsOnly("In Person");
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
             assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
