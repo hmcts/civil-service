@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -21,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL;
@@ -100,11 +98,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     public Map<String, String> addPropertiesDefendantLr(CaseData caseData) {
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_NUMBER_CASE, caseData.getLegacyCaseReference(),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            CLAIM_NAME, NocNotificationUtils.getCaseName(caseData)
+            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID())
             );
     }
 
@@ -146,7 +141,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 return mapping;
             case NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL:
                 mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNotifyDefendantLrAfterNoticeOfChangeTemplate());
-                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
+//                mapping.put(EMAIL_MAP_ID, caseData.getRespondentSolicitor1EmailAddress());
+                mapping.put(EMAIL_MAP_ID, "civilmoneyclaimsdemo@gmail.com");
                 mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
                 return mapping;
             case NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED:
