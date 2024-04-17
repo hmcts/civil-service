@@ -11,14 +11,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,9 +35,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -53,12 +50,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
-public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
+@Slf4j
+public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE);
+    private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE_SPEC);
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final DeadlineExtensionValidator validator;
@@ -70,10 +67,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
-    public static final String ERROR_EXTENSION_DATE_SUBMITTED =
+    public static final String  ERROR_EXTENSION_DATE_ALREADY_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
-    public static final String ERROR_DEADLINE_PAST =
-        "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
+    public static final String ERROR_EXTENSION_DEADLINE_BEEN_PASSED =
+        "You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed";
+    public static final String  ERROR_DEADLINE_CANT_BE_MORE_THAN_56 =
+        "Date must be from claim issue date plus a maximum of between 29 and 56 days.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin", "caseworker-civil-staff");
 
@@ -82,6 +81,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateIsRespondent1Flag,
             callbackKey(MID, "extension-date"), this::validateExtensionDate,
+            callbackKey(MID, "response-deadline-extension"), this::validateProposedDeadlineAdmin,
             callbackKey(ABOUT_TO_SUBMIT), this::setResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -89,87 +89,45 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
+        if (toggleService.isPinInPostEnabled()) {
+            return List.of(EXTEND_RESPONSE_DEADLINE, INFORM_AGREED_EXTENSION_DATE_SPEC);
+        }
         return EVENTS;
     }
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
-
-        if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP) && solicitorRepresentsOnlyRespondent2(callbackParams)) {
-            currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
-        }
-
-        if ((caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now()))
-            || (currentResponseDeadline != null && currentResponseDeadline.toLocalDate().isBefore(LocalDate.now()))) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_DEADLINE_PAST))
-                .build();
-        }
-
         var isRespondent1 = YES;
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
+        }
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDate issueDate = caseData.getIssueDate();
+
+        if (LocalDate.now().isAfter(issueDate.plusDays(28))  && !isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_EXTENSION_DEADLINE_BEEN_PASSED))
+                .build();
         }
 
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1TimeExtensionDate() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))
+                .errors(List.of(ERROR_EXTENSION_DATE_ALREADY_SUBMITTED))
                 .build();
         }
-        // Show error message if defendant tries to extend date again ONE_V_TWO_TWO_LEGAL_REP
         if ((!solicitorRepresentsOnlyRespondent2(callbackParams) && caseData.getRespondent1TimeExtensionDate() != null)
             || (solicitorRepresentsOnlyRespondent2(callbackParams)
             && caseData.getRespondent2TimeExtensionDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))
+                .errors(List.of(ERROR_EXTENSION_DATE_ALREADY_SUBMITTED))
                 .build();
         }
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().isRespondent1(isRespondent1);
-        if (caseData.getCaseAccessCategory() == CaseCategory.UNSPEC_CLAIM) {
-            setMaxAllowedDate(callbackParams, caseData, builder);
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toBuilder().isRespondent1(isRespondent1).build().toMap(objectMapper))
             .build();
-    }
-
-    /**
-     * Sets the agreed deadline extension to be the maximum allowed.
-     *
-     * @param callbackParams callback parameters
-     * @param caseData       original case data
-     * @param builder        builder for new case data
-     */
-    private void setMaxAllowedDate(CallbackParams callbackParams,
-                                   CaseData caseData,
-                                   CaseData.CaseDataBuilder<?, ?> builder) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORONE
-        )) {
-            builder.respondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
-                caseData.getRespondent1AcknowledgeNotificationDate()
-            ));
-        }
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORTWO
-        )) {
-            builder.respondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
-                caseData.getRespondent2AcknowledgeNotificationDate()
-            ));
-        }
     }
 
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
@@ -184,17 +142,29 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP) && solicitorRepresentsOnlyRespondent2(callbackParams)) {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
         }
-        //TODO: update to get correct deadline as a part of CMC-1346
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
+
+        LocalDate issueDate = caseData.getIssueDate();
+
+        if (currentResponseDeadline.toLocalDate().isAfter(issueDate.plusDays(56))) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
-                .build();
-        } else {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
+                .errors(List.of(ERROR_DEADLINE_CANT_BE_MORE_THAN_56))
                 .build();
         }
+
+        var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
+            .build();
+    }
+
+    private CallbackResponse validateProposedDeadlineAdmin(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+
+        LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
+            .build();
     }
 
     private CallbackResponse setResponseDeadline(CallbackParams callbackParams) {
@@ -202,12 +172,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
             : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-        log.info("Setting response deadline  Respondent2 Present ({}) AgreedExtensionDate({})",
-                 solicitorRepresentsOnlyRespondent2(callbackParams), agreedExtension
-        );
-        if (agreedExtension == null) {
-            throw new IllegalArgumentException("Agreed extension date cannot be null");
-        }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
@@ -217,28 +181,20 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
 
             caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
                 .respondent1TimeExtensionDate(time.now())
                 .respondent1ResponseDeadline(newDeadline)
                 .respondent2TimeExtensionDate(time.now())
                 .respondent2ResponseDeadline(newDeadline)
-                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
-                .nextDeadline(newDeadline.toLocalDate());
+                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
+                .respondent2ResponseDeadline(newDeadline);
         } else {
-            caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
-                .respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline)
-                // null safe - so will work on 1v1 and multiparty scenarios
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
+            caseDataBuilder.respondent1TimeExtensionDate(time.now())
+                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
+                .respondent1ResponseDeadline(newDeadline);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -249,19 +205,13 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String body;
-        LocalDateTime responseDeadline = !solicitorRepresentsOnlyRespondent2(callbackParams)
-            ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            body = format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
-                formatLocalDateTime(responseDeadline, DATE_TIME_AT)
-            ) + exitSurveyContentService.respondentSurvey();
-        } else {
-            body = format(
-                "<br />You must respond to the claimant by %s",
-                formatLocalDateTime(responseDeadline, DATE_TIME_AT)
-            ) + exitSurveyContentService.respondentSurvey();
-        }
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+
+        body = format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
+            formatLocalDateTime(responseDeadline, DATE_TIME_AT)
+        ) + exitSurveyContentService.respondentSurvey();
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Extension deadline submitted")
             .confirmationBody(body)
@@ -278,5 +228,10 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             userInfo.getUid(),
             RESPONDENTSOLICITORTWO
         );
+    }
+
+    private boolean isAdmin(String userAuthToken) {
+        return userService.getUserInfo(userAuthToken).getRoles()
+            .stream().anyMatch(ADMIN_ROLES::contains);
     }
 }
