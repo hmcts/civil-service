@@ -167,6 +167,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.STATE
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -668,6 +669,41 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2SeparatorUploadOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2TrialToggle").asString().isEqualTo("[INCLUDE]");
         }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldPopulateWelshSectionForSDOR2(boolean valid) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO).build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(valid);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            if (valid) {
+                assertThat(response.getData()).extracting("sdoR2FastTrackUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2SmallClaimsUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage")
+                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            } else {
+                assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage()).isNull();
+                assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage()).isNull();
+            }
+        }
     }
 
     @Nested
@@ -927,7 +963,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("sdoOrderDocument").isNull();
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
         }
     }
 
@@ -2296,7 +2332,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).extracting("smallClaimsMediationSectionToggle").isNull();
+            assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionToggle");
 
             assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionStatement");
 
@@ -2360,8 +2396,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input1")
                 .isEqualTo("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                                + " Digital Portal with the particulars of claim");
-            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date1")
-                .isNull();
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").doesNotHaveToString("date1");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
                 .isEqualTo("Any questions which are to be addressed to an expert must be sent to the expert directly "
                                + "and uploaded to the Digital Portal by 4pm on");
@@ -2438,6 +2473,45 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt()).isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getDate()).isEqualTo(LocalDate.now().plusDays(7));
+        }
+
+        @Test
+        void shouldPrePopulateOrderDetailsPagesWithUpdatedDisclosureOfDocumentDataForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getHearingCourtLocations(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
+                .isEqualTo("Standard disclosure shall be provided by the parties by uploading to the Digital "
+                               + "Portal their list of documents by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
+                .isEqualTo("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                               + "the other party by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
+                .isEqualTo("Requests will be complied with within 7 days of the receipt of the request.");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
+                .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
+                               + "wish to rely at trial by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+
         }
 
         @Test

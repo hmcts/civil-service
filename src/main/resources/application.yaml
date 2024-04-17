@@ -356,6 +356,7 @@ notifications:
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
+  noticeOfChangeApplicantLipSolicitorTemplate: "a03fa4a8-373e-4892-89bc-45506331eb17"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
   notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
@@ -457,6 +458,23 @@ async:
     corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
     maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
+
+feign:
+  client:
+    config:
+      processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      message:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      idam-api:
+        loggerLevel: full
+      core-case-data-api:
+        loggerLevel: full
+      document-management-metadata-download-api:
+        loggerLevel: full
+
 ---
 
 spring:
@@ -470,21 +488,6 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://localhost:9404/engine-rest/
-      remoteRepositoryService:
-        url: http://localhost:9404/engine-rest/
-      remoteExternalTaskService:
-        url: http://localhost:9404/engine-rest/
-      idam-api:
-        loggerLevel: full
-      core-case-data-api:
-        loggerLevel: full
-      document-management-metadata-download-api:
-        loggerLevel: full
 fees:
   api:
     url: http://localhost:8765
@@ -566,6 +569,7 @@ mediation:
   emails:
     sender: hmcts.civil@gmail.com
     recipient: civilmoneyclaimsdemo@gmail.com
+    jsonRecipient: civilmoneyclaimsdemo@gmail.com
 
 
 ---
@@ -620,16 +624,6 @@ docmosis:
   tornado:
     url: http://fake-docmosis-api
     key: fake-key
-
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://fake/engine-rest/
-      remoteRepositoryService:
-        url: http://fake/engine-rest/
-      remoteExternalTaskService:
-        url: http://fake/engine-rest/
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
