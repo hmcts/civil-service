@@ -529,6 +529,9 @@ task runOtherServices(type: Exec) {
   environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
 
   commandLine './bin/add-services.sh'
+  doLast() {
+    importBpmnDiagrams
+  }
 }
 
 task importBpmnDiagrams(type: Exec) {

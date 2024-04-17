@@ -1,0 +1,20 @@
+{
+  "organisationEntityResponse": {
+    "name": "Civil - Organisation 1",
+    "organisationIdentifier": "Q1KOKP2",
+    "status": "ACTIVE",
+    "sraId": null,
+    "sraRegulated": false,
+    "companyNumber": null,
+    "companyUrl": null,
+    "superUser": {
+      "firstName": "civil",
+      "lastName": "organisation 1",
+      "email": "hmcts.civil+organisation.1.superuser@gmail.com"
+    },
+    "paymentAccount": [
+      "PBA0078095",
+      "PBA0088192"
+    ]
+  }
+}
