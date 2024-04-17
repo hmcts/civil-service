@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -50,11 +49,15 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>"),
+                "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. " +
+                    "You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
+                    "If you do not pay, your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>")
+                "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. " +
+                    "You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
+                    "If you do not pay, your claim will be struck out.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")

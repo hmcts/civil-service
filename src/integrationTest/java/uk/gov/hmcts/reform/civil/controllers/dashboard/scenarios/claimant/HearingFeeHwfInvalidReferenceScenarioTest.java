@@ -45,11 +45,15 @@ public class HearingFeeHwfInvalidReferenceScenarioTest extends DashboardBaseInte
             jsonPath("$[0].titleEn").value(
                 "You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You've applied for help with the hearing fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next. If you've already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+                "<p class=\"govuk-body\">You've applied for help with the hearing fee, but the reference number is invalid.<br>" +
+                    "You've been sent an email with instructions on what to do next. If you've already read the email and taken action, " +
+                    "you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value(
                 "You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You've applied for help with the hearing fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next. If you've already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">You've applied for help with the hearing fee, but the reference number is invalid.<br>" +
+                    "You've been sent an email with instructions on what to do next. If you've already read the email and taken action, " +
+                    "you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
