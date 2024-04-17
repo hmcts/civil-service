@@ -41,7 +41,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("County Court Judgment (CCJ) requested"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">We’ll process your request and post a copy of the judgment to you and "
+                    "<p class=\"govuk-body\">We'll process your request and post a copy of the judgment to you and "
                         + defendantName
                         + ". We aim to do this as soon as possible.</p>"
                         + "<p class=\"govuk-body\">Your online account will not be updated, and "
