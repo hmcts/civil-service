@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,7 +104,7 @@ class EvidenceUploadCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(1000L)
+            eq(300000L)
         );
     }
 
@@ -112,7 +113,8 @@ class EvidenceUploadCheckHandlerTest {
         //Given: exception thrown on task complete
         String errorMessage = "there was an error";
 
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+        doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
+            .when(externalTaskService).complete(mockTask);
 
         // When: handler is called
         handler.execute(mockTask, externalTaskService);
