@@ -292,6 +292,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isPartialAdmissionAccepted() {
+        if (!featureToggleService.isLipVLipEnabled()) {
+            return false;
+        }
         return  caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
@@ -340,13 +343,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        if (!featureToggleService.isLipVLipEnabled()) {
+            return false;
+        }
         return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-    }
-
-    @Override
-    public boolean isSettled() {
-        return super.isSettled()
-            || (caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui());
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {

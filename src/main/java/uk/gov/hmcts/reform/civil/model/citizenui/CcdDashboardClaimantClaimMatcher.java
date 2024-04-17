@@ -354,8 +354,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isSettled() {
         return super.isSettled()
-            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled())
-            || (caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui());
+            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled());
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
