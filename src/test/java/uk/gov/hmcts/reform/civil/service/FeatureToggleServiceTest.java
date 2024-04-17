@@ -183,6 +183,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
+        var caseFileKey = "multi-or-intermediate-track";
+        givenToggle(caseFileKey, toggleStat);
+        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);

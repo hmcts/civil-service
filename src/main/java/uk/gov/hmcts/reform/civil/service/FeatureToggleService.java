@@ -105,4 +105,8 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
     }
+
+    public boolean isMultiOrIntermediateTrackEnabled() {
+        return featureToggleApi.isFeatureEnabled("multi-or-intermediate-track");
+    }
 }

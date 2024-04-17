@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
@@ -87,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -1064,6 +1066,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("allocatedTrack", MULTI_CLAIM.name());
+        }
+
+        @Test
+        void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // claim amount is 100000.00, so track is intermediate, as this is the upper limit
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
+        }
+
+        @Test
+        void shouldSetMultiAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // claim amount is 100000.01, so track is multi
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            CaseData caseDataUpdated = CaseDataBuilder.builder().atStateClaimDraft()
+                .claimValue(ClaimValue.builder()
+                           .statementOfValueInPennies(BigDecimal.valueOf(10000001))
+                           .build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(V_1, caseDataUpdated, ABOUT_TO_SUBMIT));
+            assertThat(response.getData()).containsEntry("allocatedTrack", MULTI_CLAIM.name());
         }
 
         @Test
