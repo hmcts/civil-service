@@ -495,6 +495,11 @@ public class CmcClaim implements Claim {
         return false;
     }
 
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return false;
+    }
+
     private boolean isThroughAdmissions(Settlement settlement) {
         List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {

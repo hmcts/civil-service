@@ -543,4 +543,10 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
             .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
     }
 
+    @JsonIgnore
+    public boolean isApplicant1ClaimSettledCui() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::isApplicant1ClaimSettledCui).isPresent();
+    }
+
 }

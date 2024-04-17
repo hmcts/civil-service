@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.extern.slf4j.Slf4j;
@@ -290,7 +292,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return false;
+        return  caseData.isPartAdmitClaimSpec()
+            && caseData.isPartAdmitClaimNotSettled()
+            && caseData.isPayImmediately()
+            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
     }
 
     @Override
@@ -331,5 +336,16 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isHwfPaymentOutcome() {
         return false;
+    }
+
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    @Override
+    public boolean isSettled() {
+        return super.isSettled()
+            || (caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui());
     }
 }

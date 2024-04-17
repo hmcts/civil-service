@@ -109,6 +109,9 @@ public enum DashboardClaimStatus {
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+      Claim::defendantRespondedWithPreferredLanguageWelsh
+    ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
     ),

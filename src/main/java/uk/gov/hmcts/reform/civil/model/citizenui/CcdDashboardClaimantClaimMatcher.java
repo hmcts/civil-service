@@ -348,8 +348,15 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
     }
 
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    @Override
     public boolean isSettled() {
         return super.isSettled()
-            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled());
+            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled())
+            || (caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui());
     }
 }
