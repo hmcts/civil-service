@@ -148,7 +148,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -168,7 +167,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -188,7 +186,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -207,7 +204,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -226,7 +222,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -246,7 +241,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -270,7 +264,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -288,7 +281,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
@@ -311,7 +303,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
@@ -333,7 +324,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
@@ -356,7 +346,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 

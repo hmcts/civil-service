@@ -332,11 +332,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            builder.respondent1GeneratedResponseDocument(null);
-            builder.respondent2GeneratedResponseDocument(null);
-            builder.respondent1ClaimResponseDocumentSpec(null);
-        }
+        builder.respondent1GeneratedResponseDocument(null);
+        builder.respondent2GeneratedResponseDocument(null);
+        builder.respondent1ClaimResponseDocumentSpec(null);
 
         //Update the caseManagement location to the flight location if
         //Small claim & Flight Delay &Airline is not OTHER
@@ -438,10 +436,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
-        if (V_2.equals(callbackParams.getVersion())
+        if ((V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
-            && caseData.hasClaimantAgreedToFreeMediation()) {
+            && caseData.hasClaimantAgreedToFreeMediation())
+            || (featureToggleService.isCarmEnabledForCase(caseData)
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
 

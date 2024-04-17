@@ -44,6 +44,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_DISPOSAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_TRIAL;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -207,6 +209,50 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedTrialSDOInPersonHearing()
             .atStateClaimIssuedTrialLocationInPerson()
             .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenSdoR2Enabled() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOInPersonHearing()
+            .atStateClaimIssuedTrialLocationInPerson()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentDisposalOrderFormGenerator_whenSdoR2Enabled() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_DISPOSAL);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedDisposalHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedDisposalSDOVideoCall()
+            .atStateClaimIssuedDisposalHearingInPersonDJ()
+            .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 

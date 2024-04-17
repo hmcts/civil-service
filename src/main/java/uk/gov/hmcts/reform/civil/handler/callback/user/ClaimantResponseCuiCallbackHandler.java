@@ -31,6 +31,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 
 @Slf4j
@@ -88,7 +91,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
-        if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()) {
+        if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()
+            || (featureToggleService.isCarmEnabledForCase(caseData)
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
