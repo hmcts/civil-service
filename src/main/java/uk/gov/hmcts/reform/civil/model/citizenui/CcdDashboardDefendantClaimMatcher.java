@@ -348,4 +348,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return super.isSettled()
             || (caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui());
     }
+
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return false;
+    }
 }
