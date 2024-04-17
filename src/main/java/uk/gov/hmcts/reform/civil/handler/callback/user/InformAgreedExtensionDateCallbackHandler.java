@@ -74,6 +74,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         "This action cannot currently be performed because it has already been completed";
     public static final String ERROR_DEADLINE_PAST =
         "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
+    private static final List<String> ADMIN_ROLES = List.of(
+        "caseworker-civil-admin", "caseworker-civil-staff");
 
     @Override
     protected Map<String, Callback> callbacks() {
