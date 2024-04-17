@@ -43,7 +43,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
             && caseData.isBilingual()
-            && caseData.getIssueDate() != null;
+            && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
     @Override
