@@ -644,6 +644,38 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100000, so track is intermediate, as this is the upper limit
+            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+        }
+
+        @Test
+        public void shouldSetMultiAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100001, so track is multi
+            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100001))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.MULTI_CLAIM.name());
+        }
+
+        @Test
         public void testValidateLengthOfUnemploymentWithError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
