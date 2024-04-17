@@ -32,6 +32,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return caseData.isApplicantNotRepresented()
+            && !caseData.isHWFTypeClaimIssued()
+            && ((caseData.getClaimIssuedPaymentDetails() == null && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED)
+            || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && caseData.isBilingual()
+            && caseData.getIssueDate() != null;
+    }
+
+    @Override
     public boolean hasResponsePending() {
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse();
     }
@@ -353,20 +368,5 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
                 && caseData.getApplicant1ResponseDate() != null
                 && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
                 && caseData.isBilingual();
-    }
-
-    @Override
-    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
-        return caseData.isApplicantNotRepresented()
-            && !caseData.isHWFTypeClaimIssued()
-            && ((caseData.getClaimIssuedPaymentDetails() == null && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED)
-                || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
-    }
-
-    @Override
-    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
-        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
-            && caseData.isBilingual()
-            && caseData.getIssueDate() != null;
     }
 }

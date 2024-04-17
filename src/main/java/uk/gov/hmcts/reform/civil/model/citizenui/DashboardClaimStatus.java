@@ -124,6 +124,12 @@ public enum DashboardClaimStatus {
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
     ),
+    CLAIM_SUBMITTED_NOT_PAID_OR_FAILED(
+        Claim::isClaimSubmittedNotPaidOrFailedNotHwF
+    ),
+    CLAIM_SUBMITTED_WAITING_TRANSLATED_DOCUMENTS(
+        Claim::isClaimSubmittedWaitingTranslatedDocuments
+    ),
     NO_RESPONSE(
         Claim::hasResponsePending
     ),
@@ -156,12 +162,6 @@ public enum DashboardClaimStatus {
     ),
     RESPONSE_BY_POST(
         Claim::isPaperResponse
-    ),
-    CLAIM_SUBMITTED_NOT_PAID_OR_FAILED(
-        Claim::isClaimSubmittedNotPaidOrFailedNotHwF
-    ),
-    CLAIM_SUBMITTED_WAITING_TRANSLATED_DOCUMENTS(
-        Claim::isClaimSubmittedWaitingTranslatedDocuments
     ),
     NO_STATUS(c -> false);
 
