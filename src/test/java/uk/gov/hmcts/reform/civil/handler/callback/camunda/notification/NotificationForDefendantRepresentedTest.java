@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
@@ -245,6 +247,44 @@ public class NotificationForDefendantRepresentedTest extends BaseCallbackHandler
         );
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenDefendantRequested() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL").build())
+            .build();
+        assertThat(notificationHandler.camundaActivityId(params)).isEqualTo("NotifyDefendantLipAfterNocApproval");
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenDefendantLrRequested() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL").build())
+            .build();
+        assertThat(notificationHandler.camundaActivityId(params)).isEqualTo("NotifyDefendantLrAfterNocApproval");
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenClaimantRequested() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO).build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED").build())
+            .build();
+        assertThat(notificationHandler.camundaActivityId(params)).isEqualTo("NotifyClaimantLipDefendantRepresented");
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenClaimantLrRequested() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO).build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED").build())
+            .build();
+        assertThat(notificationHandler.camundaActivityId(params)).isEqualTo("NotifyClaimantLrDefendantRepresented");
     }
 
     private OrganisationPolicy setUpOrganisationPolicy() {

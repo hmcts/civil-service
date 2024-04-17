@@ -67,7 +67,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
         Map<String, Object> notificationTemplateMapping = setNotificationMapping(caseData, caseEvent);
-        if (notificationTemplateMapping != null && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
+        if (!notificationTemplateMapping.isEmpty() && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
             notificationService.sendMail(
                 notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
                 notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
@@ -158,7 +158,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 }
                 return mapping;
             default:
-                return null;
+                return mapping;
         }
     }
 
@@ -175,7 +175,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                     return addPropertiesClaimantLr(caseData);
                 }
             default:
-                return null;
+                return new HashMap<>();
         }
     }
 
