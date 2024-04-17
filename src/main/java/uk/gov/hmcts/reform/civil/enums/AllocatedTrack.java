@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.enums;
 
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
 import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS;
@@ -7,7 +9,21 @@ import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_H
 public enum AllocatedTrack {
     SMALL_CLAIM,
     FAST_CLAIM,
-    MULTI_CLAIM;
+    MULTI_CLAIM,
+    INTERMEDIATE_CLAIM;
+
+    public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,
+                                                             FeatureToggleService featureToggleService) {
+        Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
+        System.out.println("statement vlue " + statementOfValueInPounds);
+        System.out.println("use new overloaded method  " + intermediateOrMultiTrackValue);
+        System.out.println("toggle is " + featureToggleService.isMultiOrIntermediateTrackEnabled());
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled() && intermediateOrMultiTrackValue.equals(true)) {
+            System.out.println("toggle is active and over 25k");
+            return isIntermediateOrMultiTrack(statementOfValueInPounds) ? INTERMEDIATE_CLAIM : MULTI_CLAIM;
+        }
+        return getAllocatedTrack(statementOfValueInPounds, claimType, personalInjuryType);
+    }
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType) {
         //The FLIGHT_DELAY ClaimType is only applicable for SPEC cases at the moment.
@@ -74,6 +90,10 @@ public enum AllocatedTrack {
         return value.compareTo(BigDecimal.valueOf(comparisionValue)) < 0;
     }
 
+    private static boolean isValueGreaterThan(BigDecimal value, int comparisionValue) {
+        return value.compareTo(BigDecimal.valueOf(comparisionValue)) > 0;
+    }
+
     private static boolean isValueSmallerThanOrEqualTo(BigDecimal value, int comparisionValue) {
         return value.compareTo(BigDecimal.valueOf(comparisionValue)) <= 0;
     }
@@ -97,5 +117,9 @@ public enum AllocatedTrack {
             default:
                 throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
         }
+    }
+
+    private static boolean isIntermediateOrMultiTrack(BigDecimal statementOfValueInPounds) {
+        return isValueSmallerThanOrEqualTo(statementOfValueInPounds, 100000);
     }
 }

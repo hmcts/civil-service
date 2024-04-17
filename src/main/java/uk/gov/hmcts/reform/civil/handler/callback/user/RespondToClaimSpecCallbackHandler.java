@@ -1118,7 +1118,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return AllocatedTrack.getAllocatedTrack(
             caseData.getTotalClaimAmount(),
             null,
-            null
+            null,
+            toggleService
         );
     }
 
