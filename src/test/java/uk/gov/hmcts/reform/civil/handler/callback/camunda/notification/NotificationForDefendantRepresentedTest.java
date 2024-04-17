@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AFTE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL;
 
 @ExtendWith(MockitoExtension.class)
-public class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
+class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
 
     private NotificationForDefendantRepresented notificationHandler;
 
