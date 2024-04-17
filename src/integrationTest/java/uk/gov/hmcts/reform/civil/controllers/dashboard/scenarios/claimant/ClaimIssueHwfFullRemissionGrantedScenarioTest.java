@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -34,6 +35,7 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
             .hwfFeeType(FeeType.CLAIMISSUED)
+            .applicant1Represented(YesOrNo.NO)
             .build();
 
         //When
