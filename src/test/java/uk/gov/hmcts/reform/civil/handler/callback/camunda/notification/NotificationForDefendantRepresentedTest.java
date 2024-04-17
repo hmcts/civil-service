@@ -280,7 +280,7 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnCorrectActivityId_whenClaimantLrRequested() {
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1Represented(YesOrNo.NO).build();
+            .applicant1Represented(YesOrNo.YES).build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED").build())
             .build();
