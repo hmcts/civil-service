@@ -46,7 +46,7 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
     class AboutToSubmitCallback {
 
         @Test
-        void shouldUpdateBusinessProcess() {
+        void shouldUpdateBusinessProcessAndClaimSettledViaCui() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
@@ -62,6 +62,9 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            assertThat(response.getData())
+                .extracting("applicant1ClaimSettledCui")
+                .isEqualTo("Yes");
         }
     }
 
