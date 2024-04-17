@@ -12,8 +12,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.CP.HearingFee.HWF.Rejected', 'Your help with fees application has been rejected',
         'Your help with fees application has been rejected',
-        '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.</p><p class="govuk-body">You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateEn}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
-        '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.</p><p class="govuk-body">You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateCy}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
+        '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateEn}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
+        '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateCy}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
         'CLAIMANT');
 
 /**

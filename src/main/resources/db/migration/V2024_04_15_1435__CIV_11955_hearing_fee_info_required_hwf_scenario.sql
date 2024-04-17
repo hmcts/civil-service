@@ -13,8 +13,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.CP.HearingFee.HWF.InfoRequired',
         'Your help with fees application needs more information',
         'Your help with fees application needs more information',
-        '<p class="govuk-body">We need more information on your application for help with the hearing fee.<br>You''ve been sent an email with further details.<br>If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
-        '<p class="govuk-body">We need more information on your application for help with the hearing fee.<br>You''ve been sent an email with further details.<br>If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">We need more information on your application for help with the hearing fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">We need more information on your application for help with the hearing fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
         'CLAIMANT');
 
 /**

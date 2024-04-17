@@ -47,11 +47,11 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been rejected"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.</p><p class=\"govuk-body\">You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 April 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>"),
+                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 April 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been rejected"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.</p><p class=\"govuk-body\">You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 Ebrill 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>")
+                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 Ebrill 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
