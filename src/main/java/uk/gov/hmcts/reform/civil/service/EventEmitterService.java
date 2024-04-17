@@ -26,7 +26,6 @@ public class EventEmitterService {
         var camundaEvent = businessProcess.getCamundaEvent();
         log.info(format("Emitting %s camunda event for case: %d", camundaEvent, caseId));
 
-        boolean nullTenantAttempt = false;
         try {
             runtimeService.createMessageCorrelation(camundaEvent)
                 .tenantId(TENANT_ID)
@@ -37,28 +36,11 @@ public class EventEmitterService {
             }
             log.info("Camunda event emitted successfully with tenant");
         } catch (RemoteProcessEngineException ex) {
-            nullTenantAttempt = true;
+            log.error("Process not present within the" + TENANT_ID + " tenant");
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",
                              camundaEvent, caseId, TENANT_ID, e.getMessage()
             ));
-        }
-
-        if (nullTenantAttempt) {
-            try {
-                runtimeService.createMessageCorrelation(camundaEvent)
-                    .setVariable("caseId", caseId)
-                    .withoutTenantId()
-                    .correlateStartMessage();
-                if (dispatchProcess) {
-                    applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
-                }
-                log.info("Camunda event emitted successfully without tenant");
-            } catch (Exception e) {
-                log.error(format("Emitting %s camunda event failed for case: %d, message: %s",
-                                 camundaEvent, caseId, e.getMessage()
-                ));
-            }
         }
     }
 }
