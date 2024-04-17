@@ -15,6 +15,18 @@ plugins {
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
+def versions = [
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
+  springBoot         : springBoot.class.package.implementationVersion,
+  springStatemachine : '4.0.0',
+  lombok             : '1.18.32',
+  pact               : '3.5.24',
+  springSecurity     : '5.8.12',
+  camunda            : '7.19.0',
+  jackson            : '2.17.0'
+]
+
 allprojects {
   java {
     toolchain {
@@ -74,55 +86,27 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      //CVE-2023-44487
-      dependencySet(group: 'io.netty', version: '4.1.108.Final') {
-        entry 'netty-handler'
-        entry 'netty-handler-proxy'
-        entry 'netty-transport-native-epoll'
-        entry 'netty-transport-native-kqueue'
-        entry 'netty-codec-http'
-        entry 'netty-codec-http2'
-        entry 'netty-codec'
-        entry 'netty-codec-dns'
-        entry 'netty-transport'
-        entry 'netty-transport-native-unix-common'
-        entry 'netty-transport-classes-epoll'
-        entry 'netty-transport-classes-kqueue'
-        entry 'netty-buffer'
-        entry 'netty-resolver'
-        entry 'netty-resolver-dns-classes-macos'
-        entry 'netty-resolver-dns-native-macos'
-        entry 'netty-resolver-dns'
-        entry 'netty-common'
-        entry 'netty-codec-socks'
-      }
-      //CVE-2022-40152
-      dependencySet(group: 'com.fasterxml.woodstox', version: '6.6.2') {
-        entry 'woodstox-core'
-      }
-      //CVE-2023-3635
-      dependencySet(group: 'com.squareup.okio', version: '3.9.0') {
-        entry 'okio-jvm'
-      }
-
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.78'
-      // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.16'
-      // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
+      //CVE-2018-10237 - Unbounded memory allocation
+     dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
         entry 'guava'
       }
-      // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.11'
+   
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.17.0'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.17.0'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.23'
+
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
+
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.12'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.13'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -131,42 +115,28 @@ allprojects {
       ) {
         entry 'snakeyaml'
       }
-      // Solves CVE-2022-25647
-      dependencySet(
-        group: 'org.camunda.bpm',
-        version: '7.17.0'
-      ) {
-        entry 'camunda-engine'
-      }
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.700'
+        version: '1.12.702'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
-      // Solves CVE-2020-17521
-      dependencySet(
-        group: 'org.codehaus.groovy',
-        version: '2.4.21'
-      ) {
-        entry 'groovy-all'
-      }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.87') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.20') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
       }
-      // Solves CVE-2023-24998
-      dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+
       //Solves CVE-2023-6481
       dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
         entry 'logback-core'
         entry 'logback-classic'
       }
+
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
@@ -304,7 +274,7 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -326,16 +296,6 @@ jacocoTestReport {
 jacocoTestReport.dependsOn {
   subprojects*.test
 }
-
-def versions = [
-  junit              : '5.10.2',
-  junitPlatform      : '1.10.2',
-  springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '4.0.0',
-  lombok             : '1.18.32',
-  pact               : '3.5.24',
-  springSecurity     : '5.8.11'
-]
 
 ext.libraries = [
   junit5: [
@@ -413,7 +373,6 @@ dependencies {
 
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
-  // CVE-2021-22112 - Privilege Escalation
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
@@ -431,11 +390,12 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
-  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.21.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
+  implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: versions.camunda
 
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 

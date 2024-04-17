@@ -35,6 +35,8 @@ import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposalHearingMethodInPerson;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_DISPOSAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_TRIAL;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
@@ -150,6 +152,11 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         djOrderFormBuilder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            djOrderFormBuilder.hasDisposalHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ()));
+            djOrderFormBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null
+                                                              ? caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription() : null);
+        }
         return djOrderFormBuilder.build();
     }
 
@@ -220,17 +227,22 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 caseData,
                                 authorisation
                             ));
+        if (featureToggleService.isSdoR2Enabled()) {
+            djTrialTemplateBuilder.hasTrialHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2TrialUseOfWelshLangToggleDJ()));
+            djTrialTemplateBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2TrialWelshLanguageDJ() != null
+                                                                  ? caseData.getSdoR2TrialWelshLanguageDJ().getDescription() : null);
+        }
 
         return djTrialTemplateBuilder.build();
 
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
-        return DJ_SDO_DISPOSAL;
+        return featureToggleService.isSdoR2Enabled() ? DJ_SDO_R2_DISPOSAL : DJ_SDO_DISPOSAL;
     }
 
     private DocmosisTemplates getDocmosisTemplateTrial() {
-        return DJ_SDO_TRIAL;
+        return featureToggleService.isSdoR2Enabled() ? DJ_SDO_R2_TRIAL : DJ_SDO_TRIAL;
     }
 
     private String checkDefendantRequested(final CaseData caseData) {
