@@ -58,6 +58,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
                         claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .hwfCaseEvent(FULL_REMISSION_HWF)
                             .build()
                     ),
                     () -> updatedData.claimIssuedHwfDetails(
@@ -72,6 +73,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     hearingHwfDetails -> updatedData.hearingHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .hwfCaseEvent(FULL_REMISSION_HWF)
                             .build()
                     ),
                     () -> updatedData.hearingHwfDetails(
