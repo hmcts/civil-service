@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static java.lang.String.format;
@@ -31,12 +29,7 @@ public class EventEmitterService {
                 .tenantId(TENANT_ID)
                 .setVariable("caseId", caseId)
                 .correlateStartMessage();
-            if (dispatchProcess) {
-                applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
-            }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (RemoteProcessEngineException ex) {
-            log.error("Process not present within the" + TENANT_ID + " tenant");
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",
                              camundaEvent, caseId, TENANT_ID, e.getMessage()
