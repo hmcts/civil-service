@@ -80,10 +80,10 @@ public class HwFDashboardNotificationsHandler extends DashboardCallbackHandler {
 
     @Override
     public String getScenario(CaseData caseData) {
-        if(caseData.getHwFEvent() != null){
+        if (caseData.getHwFEvent() != null) {
             if (caseData.isHWFTypeClaimIssued()) {
                 return dashboardScenariosClaimIssue.get(caseData.getHwFEvent());
-            } else if (caseData.isHWFTypeHearing() ) {
+            } else if (caseData.isHWFTypeHearing()) {
                 return dashboardScenariosHearingFee.get(caseData.getHwFEvent());
             }
         }
