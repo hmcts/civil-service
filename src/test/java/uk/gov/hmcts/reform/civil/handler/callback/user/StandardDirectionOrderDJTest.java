@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
@@ -549,6 +551,41 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPrePopulateDisclosureOfDocumentsForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
+                .isEqualTo("Standard disclosure shall be provided by "
+                               + "the parties by uploading to the digital "
+                               + "portal their lists of documents by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")
+                .isEqualTo("Any request to inspect a document, or for a copy of a "
+                               + "document, shall be made directly to the other party by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
+                .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
+                .isEqualTo("Each party must upload to the Digital Portal"
+                               + " copies of those documents on which they wish to rely"
+                               + " at trial");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
+                .isEqualTo("by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+        }
+
+        @Test
         void shouldPrePopulateDJTrialHearingToggle() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -641,6 +678,40 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
             System.out.println(responseCaseData);
             return responseCaseData.getHearingMethodValuesTrialHearingDJ();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldPopulateWelshSectionForSDOR2DJ(boolean valid) {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(valid);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            if (valid) {
+                assertThat(response.getData()).extracting("sdoR2DisposalHearingWelshLanguageDJ")
+                    .extracting("description").isEqualTo(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+                assertThat(response.getData()).extracting("sdoR2TrialWelshLanguageDJ")
+                    .extracting("description").isEqualTo(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+            } else {
+                assertThat(response.getData()).extracting("sdoR2DisposalHearingWelshLanguageDJ").isNull();
+                assertThat(response.getData()).extracting("sdoR2TrialWelshLanguageDJ").isNull();
+            }
         }
     }
 
@@ -789,7 +860,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .trialHearingMethodInPersonDJ(options)
                 .disposalHearingMethodInPersonDJ(options)

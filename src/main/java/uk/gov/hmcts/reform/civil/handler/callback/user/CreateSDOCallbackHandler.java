@@ -120,6 +120,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -789,15 +790,53 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isSdoR2Enabled()) {
+            updateExpertEvidenceFields(updatedData);
+            updateDisclosureOfDocumentFields(updatedData);
             populateDRHFields(callbackParams, updatedData, preferredCourt);
             prePopulateNihlFields(callbackParams, caseData, updatedData);
             List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
             setCheckListNihl(updatedData, includeInOrderToggle);
+            updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+            updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+            updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
+            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim")
+            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
+                        + "and uploaded to the Digital Portal by 4pm on")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input3("The answers to the questions shall be answered by the Expert by")
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .input4("and uploaded to the Digital Portal by")
+            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .build();
+
+        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
+    }
+
+    private void updateDisclosureOfDocumentFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
+            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                        + "list of documents by 4pm on")
+            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                        + "the other party by 4pm on")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)))
+            .input3("Requests will be complied with within 7 days of the receipt of the request.")
+            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                        + " rely at trial by 4pm on")
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .build();
+
+        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
     }
 
     private void populateDRHFields(CallbackParams callbackParams,
@@ -843,6 +882,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
+        updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
     }
 
     private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
@@ -974,6 +1014,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
                                                .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
                                                .build());
+        updatedData.sdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
 
     }
 

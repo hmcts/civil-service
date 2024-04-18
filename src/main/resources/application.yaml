@@ -264,11 +264,11 @@ notifications:
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
-  hearingListedFeeClaimantLrTemplate: "30ca6b92-4bf8-4bdc-b403-8c8b4d29c44c"
-  hearingListedNoFeeClaimantLrTemplate: "6b4e83be-3ae7-4d83-b777-6bfd0223643d"
+  hearingListedFeeClaimantLrTemplate: "1d2f5dcc-6fa6-4494-9dfa-b96714456827"
+  hearingListedNoFeeClaimantLrTemplate: "98134fe8-e1fd-4e8e-8e74-f977e3220316"
   hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
   hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
-  hearingListedNoFeeDefendantLrTemplate: "259229e7-3f28-42a7-ae6d-2ebd54a7b2f1"
+  hearingListedNoFeeDefendantLrTemplate: "120427c5-dea4-4b76-9fb9-9a298a2d501e"
   hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
@@ -306,6 +306,7 @@ notifications:
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulClaimantLIPTemplate: "159112bd-0026-4ac4-901b-e7fc1614069f"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
@@ -318,12 +319,14 @@ notifications:
   notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
 
   notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyApplicantLiPMediationSuccessfulTemplate: "17495b1f-7afa-4b43-a5ca-0a60ae950423"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
@@ -353,6 +356,7 @@ notifications:
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
+  noticeOfChangeApplicantLipSolicitorTemplate: "a03fa4a8-373e-4892-89bc-45506331eb17"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
   notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
@@ -378,12 +382,15 @@ notifications:
   notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
   notifyApplicantLRMediationTemplate: "55fd5423-e044-42d0-8296-e9755a002480"
 
+  notifyClaimantJudgmentVariedDeterminationOfMeansTemplate: "16711810-3629-4f8f-a55d-3a7dbab47ed9"
+  notifyDefendantJudgmentVariedDeterminationOfMeansTemplate: "6e13b9af-2dbe-49dd-be89-71464ed551d2"
+
   notifyLipSuccessfulMediation: "ed3810ae-3c12-4cc1-bc3f-8aff560fa6b2"
   notifyOneVTwoClaimantSuccessfulMediation: "18b7f7f0-a1f6-4c9f-9b1f-09a4f1450f4d"
   notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
-  
+
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
 
 sendgrid:
@@ -446,6 +453,23 @@ async:
     corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
     maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
+
+feign:
+  client:
+    config:
+      processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      message:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      idam-api:
+        loggerLevel: full
+      core-case-data-api:
+        loggerLevel: full
+      document-management-metadata-download-api:
+        loggerLevel: full
+
 ---
 
 spring:
@@ -459,21 +483,6 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://localhost:9404/engine-rest/
-      remoteRepositoryService:
-        url: http://localhost:9404/engine-rest/
-      remoteExternalTaskService:
-        url: http://localhost:9404/engine-rest/
-      idam-api:
-        loggerLevel: full
-      core-case-data-api:
-        loggerLevel: full
-      document-management-metadata-download-api:
-        loggerLevel: full
 fees:
   api:
     url: http://localhost:8765
@@ -555,6 +564,7 @@ mediation:
   emails:
     sender: hmcts.civil@gmail.com
     recipient: civilmoneyclaimsdemo@gmail.com
+    jsonRecipient: civilmoneyclaimsdemo@gmail.com
 
 
 ---
@@ -609,16 +619,6 @@ docmosis:
   tornado:
     url: http://fake-docmosis-api
     key: fake-key
-
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://fake/engine-rest/
-      remoteRepositoryService:
-        url: http://fake/engine-rest/
-      remoteExternalTaskService:
-        url: http://fake/engine-rest/
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
