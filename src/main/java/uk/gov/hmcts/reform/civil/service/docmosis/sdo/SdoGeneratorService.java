@@ -257,7 +257,6 @@ public class SdoGeneratorService {
             )
             .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
-            .fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
             .fastTrackTrialBundleTypeText(
@@ -334,6 +333,8 @@ public class SdoGeneratorService {
                                               ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
 
             sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact());
+        } else {
+            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact());
         }
         return sdoDocumentFormBuilder.build();
     }
@@ -464,7 +465,6 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
             )
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
             .hasNewDirections(
@@ -503,6 +503,8 @@ public class SdoGeneratorService {
                                               ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
 
                 .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+        } else {
+            sdoDocumentFormBuilder.smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement());
         }
 
         sdoDocumentFormBuilder.hearingLocation(
