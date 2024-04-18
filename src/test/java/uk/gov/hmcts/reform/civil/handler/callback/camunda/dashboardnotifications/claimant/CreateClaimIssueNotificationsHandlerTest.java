@@ -42,7 +42,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -50,7 +50,7 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
