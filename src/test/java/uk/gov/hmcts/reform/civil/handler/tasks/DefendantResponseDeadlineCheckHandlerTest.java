@@ -78,6 +78,27 @@ class DefendantResponseDeadlineCheckHandlerTest {
     }
 
     @Test
+    void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
+        String errorMessage = "there was an error";
+
+        when(mockTask.getRetries()).thenReturn(null);
+        when(searchService.getCases()).thenAnswer(invocation -> {
+            throw new Exception(errorMessage);
+        });
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService).handleFailure(
+            eq(mockTask),
+            eq(errorMessage),
+            anyString(),
+            eq(2),
+            eq(1000L)
+        );
+    }
+
+    @Test
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
         String errorMessage = "there was an error";
 
