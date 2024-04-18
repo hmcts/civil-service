@@ -664,16 +664,16 @@ public class SdoHelper {
 
         if (caseData.getSdoR2Trial() != null) {
             if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
-                    if (SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing
-                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
-                        return "by telephone";
-                    } else if (SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing
-                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
-                        return "by video";
-                    } else if (SdoR2FastTrackMethod.fastTrackMethodInPerson
-                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
-                        return "in person";
-                    }
+                if (SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "by telephone";
+                } else if (SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "by video";
+                } else if (SdoR2FastTrackMethod.fastTrackMethodInPerson
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "in person";
+                }
                 return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
             }
         }
