@@ -65,7 +65,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         completeTask(externalTask, externalTaskService);
     }
 
-    //Total possible waiting time 16 minutes
+    //Total possible waiting time 16 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
     @Retryable(value = CompleteTaskException.class, maxAttempts = 3, backoff = @Backoff(delay = 60000, multiplier = 15))
     default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
@@ -117,7 +117,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             e.getMessage(),
             getStackTrace(e),
             remainingRetries - 1,
-            //Total possible waiting time 15 minutes
+            //Total possible waiting time 15 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
             calculateExponentialRetryTimeout(300000, maxRetries, remainingRetries)
         );
     }
