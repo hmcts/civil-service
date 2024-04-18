@@ -455,6 +455,8 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
+        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        fastTrackList.add(FastTrack.fastClaimCreditHire);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -462,6 +464,7 @@ public class SdoGeneratorServiceTest {
             .atStateSdoFastTrackCreditHire()
             .build()
             .toBuilder()
+            .trialAdditionalDirectionsForFastTrack(fastTrackList)
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();

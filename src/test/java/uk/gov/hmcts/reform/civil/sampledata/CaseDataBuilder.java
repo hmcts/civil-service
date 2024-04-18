@@ -7277,6 +7277,7 @@ public class CaseDataBuilder {
             .resp2MediationContactInfo(resp2MediationContactInfo)
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
+            .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
             .build();
     }
 }
