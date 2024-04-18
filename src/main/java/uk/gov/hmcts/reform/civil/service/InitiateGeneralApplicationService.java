@@ -122,7 +122,6 @@ public class InitiateGeneralApplicationService {
 
     private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
                                                 CaseData caseData, UserDetails userDetails, String authToken) {
-        CaseCategory caseType;
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -141,11 +140,10 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseType = CaseCategory.SPEC_CLAIM;
-        } else {
-            caseType = CaseCategory.UNSPEC_CLAIM;
-        }
+
+        final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? CaseCategory.SPEC_CLAIM
+            : CaseCategory.UNSPEC_CLAIM;
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())

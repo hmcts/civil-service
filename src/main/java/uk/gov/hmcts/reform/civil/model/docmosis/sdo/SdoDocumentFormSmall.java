@@ -72,7 +72,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
-
+    private final String welshLanguageDescription;
     private final boolean hasNewDirections;
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
@@ -89,6 +89,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final boolean smallClaimsMediationSectionToggle;
     private final boolean carmEnabled;
     private final String smallClaimMediationSectionInput;
+    private final boolean smallClaimsWelshLanguageToggle;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {
