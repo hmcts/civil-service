@@ -39,6 +39,10 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         "notify-lip-after-defendant-noc-approval-%s";
     private static final String REFERENCE_TEMPLATE_LR =
         "notify-lr-after-defendant-noc-approval-%s";
+    private static final String REFERENCE_TEMPLATE_CLAIMANT_LIP =
+        "notify-claimant-lip-after-defendant-noc-approval-%s";
+    private static final String REFERENCE_TEMPLATE_CLAIMANT_LR =
+        "notify-claimant-lr-after-defendant-noc-approval-%s";
     public static final String TASK_ID_DEFENDANT = "NotifyDefendantLipAfterNocApproval";
     public static final String TASK_ID_DEFENDANT_LR = "NotifyDefendantLrAfterNocApproval";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantLipDefendantRepresented";
@@ -150,11 +154,11 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
                 if (caseData.getApplicant1Represented() == YesOrNo.NO) {
                     mapping.put(TEMPLATE_MAP_ID, templateIDForClaimant(caseData));
                     mapping.put(EMAIL_MAP_ID, caseData.getApplicant1Email());
-                    mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LIP);
+                    mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_CLAIMANT_LIP);
                 } else {
                     mapping.put(TEMPLATE_MAP_ID, notificationsProperties.getNoticeOfChangeOtherParties());
                     mapping.put(EMAIL_MAP_ID, caseData.getApplicantSolicitor1UserDetails().getEmail());
-                    mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_LR);
+                    mapping.put(REFERENCE_MAP_ID, REFERENCE_TEMPLATE_CLAIMANT_LR);
                 }
                 return mapping;
             default:
