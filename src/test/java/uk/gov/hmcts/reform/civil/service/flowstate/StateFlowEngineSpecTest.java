@@ -211,7 +211,7 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(3);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(4);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
@@ -226,7 +226,7 @@ class StateFlowEngineSpecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(4);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(5);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
