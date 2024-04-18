@@ -483,7 +483,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
-            Category category = Category.builder().categoryKey("HearingChannel").key(HearingSubChannel.INTER.name()).valueEn(HearingMethod.IN_PERSON.getLabel()).activeFlag("Y").build();
+            Category category = Category.builder().categoryKey("HearingChannel").key(HearingSubChannel.INTER.name())
+                .valueEn(HearingMethod.IN_PERSON.getLabel()).activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
