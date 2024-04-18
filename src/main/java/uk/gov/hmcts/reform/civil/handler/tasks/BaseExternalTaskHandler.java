@@ -117,7 +117,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             getStackTrace(e),
             remainingRetries - 1,
             //Total possible waiting time 15 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
-            calculateExponentialRetryTimeout(300000, maxRetries, remainingRetries)
+            calculateExponentialRetryTimeout(5 * 60 * 1000, maxRetries, remainingRetries)
         );
     }
 

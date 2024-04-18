@@ -95,7 +95,7 @@ class BundleCreationTriggerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
-        verify(externalTaskService).complete(mockTask, mockTask.getAllVariables());
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

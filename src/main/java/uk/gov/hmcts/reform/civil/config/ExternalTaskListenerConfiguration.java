@@ -33,7 +33,7 @@ public class ExternalTaskListenerConfiguration {
             .asyncResponseTimeout(29000)
             .maxTasks(1)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
-            .lockDuration(1980000) //wait for 33min to finish task before it gets picked by other client
+            .lockDuration(33L * 60L * 1000L) //wait for 33min to finish task before it gets picked by other client
             .baseUrl(baseUrl)
             .build();
     }
