@@ -7339,4 +7339,10 @@ public class CaseDataBuilder {
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
             .build();
     }
+
+    public CaseDataBuilder atStateLipClaimSettled() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        ccdState = CaseState.CASE_SETTLED;
+        return this;
+    }
 }
