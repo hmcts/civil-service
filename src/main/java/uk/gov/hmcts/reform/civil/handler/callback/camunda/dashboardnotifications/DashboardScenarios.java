@@ -71,6 +71,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC("Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC("Scenario.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant"),
+    SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE("Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE("Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT(
         "Scenario.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant"),
     SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT("Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant"),
