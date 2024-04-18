@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant',
         '{"Notice.AAA6.ClaimIssue.Response.Required", "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant"}',
-        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant" : []}');
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant" : ["applicant1PartyName"]}');
 
 /**
  * Add notification template
@@ -13,10 +13,10 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant',
         'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>'
+        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation.<br>'
         'The court will contact you when they respond.<br>'
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
-        '<p class="govuk-body">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>'
+        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation.<br>'
         'The court will contact you when they respond.<br>'
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
         'DEFENDANT');
