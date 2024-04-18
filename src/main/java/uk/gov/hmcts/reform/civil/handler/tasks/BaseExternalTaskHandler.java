@@ -38,12 +38,14 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
+        boolean handleTaskSucceeded = false;
 
         try {
             log.info("External task '{}' started with processInstanceId '{}'",
                      topicName, processInstanceId
             );
             handleTask(externalTask);
+            handleTaskSucceeded = true;
         } catch (BpmnError e) {
             log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
                       topicName, processInstanceId, e
@@ -61,7 +63,9 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             handleFailure(externalTask, externalTaskService, e);
         }
 
-        completeTask(externalTask, externalTaskService);
+        if (handleTaskSucceeded) {
+            completeTask(externalTask, externalTaskService);
+        }
     }
 
     //Total possible waiting time 16 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration

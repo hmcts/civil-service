@@ -760,7 +760,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
@@ -780,7 +780,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
@@ -800,7 +800,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
