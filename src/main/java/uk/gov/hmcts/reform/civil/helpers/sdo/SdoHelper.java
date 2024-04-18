@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
@@ -663,9 +664,17 @@ public class SdoHelper {
 
         if (caseData.getSdoR2Trial() != null) {
             if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
+                    if (SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing
+                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                        return "by telephone";
+                    } else if (SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing
+                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                        return "by video";
+                    } else if (SdoR2FastTrackMethod.fastTrackMethodInPerson
+                        .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                        return "in person";
+                    }
                 return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
-            } else {
-                return "";
             }
         }
         return "";
