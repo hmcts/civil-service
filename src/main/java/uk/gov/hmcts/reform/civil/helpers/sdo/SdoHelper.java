@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
@@ -40,6 +41,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SdoHelper {
 
     public static final String EMPTY_STRING = "";
+    public static final String BY_TELEPHONE = "by telephone";
+    public static final String BY_VIDEO = "by video";
+    public static final String IN_PERSON = "in person";
 
     private SdoHelper() {
         // Utility class, no instances
@@ -193,15 +197,15 @@ public class SdoHelper {
 
     public static String getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
-            if ("Telephone"
+            if (HearingMethod.TELEPHONE.getLabel()
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
-                return "by telephone";
-            } else if ("Video"
+                return BY_TELEPHONE;
+            } else if (HearingMethod.VIDEO.getLabel()
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
-                return "by video";
-            } else if ("In Person"
+                return BY_VIDEO;
+            } else if (HearingMethod.IN_PERSON.getLabel()
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
-                return "in person";
+                return IN_PERSON;
             }
         }
         return "";
