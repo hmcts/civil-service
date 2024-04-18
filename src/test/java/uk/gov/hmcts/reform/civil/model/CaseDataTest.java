@@ -1094,6 +1094,54 @@ public class CaseDataTest {
             assertFalse(isHWFTypeClaimIssued);
         }
     }
+
+    @Nested
+    class AlreadyPaidAmountCheck {
+        @Test
+        void shouldReturnTrueIfPaidLessFullDefence() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(new BigDecimal(1000))
+                                    .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfPaidLessPartAdmit() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .respondToAdmittedClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(new BigDecimal(1000))
+                                    .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnFalseIfFullAdmission() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertFalse(isPaidLessThanClaimAmount);
+        }
+    }
 }
 
 
