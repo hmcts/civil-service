@@ -46,7 +46,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">John Doe said they will pay you £500 immediately. Funds must clear your account by 19th March 2024.</p> <p class=\"govuk-body\">If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment</a>.</p>")
+                    "<p class=\"govuk-body\">John Doe has said that they will pay you £500 immediately in full and final settlement of your claim and you have accepted this offer. Funds must be received in your account by 19th March 2024.</p> <p class=\"govuk-body\">If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>")
             );
     }
 }

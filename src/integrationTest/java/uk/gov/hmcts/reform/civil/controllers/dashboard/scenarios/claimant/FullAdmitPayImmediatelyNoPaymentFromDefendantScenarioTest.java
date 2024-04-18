@@ -44,16 +44,12 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You have accepted Dave Indent's plan to pay £{fullAdmitPayImmediatelyPaymentAmount} "
-                    + "immediately. Funds must clear your account by " + respondent1AdmittedAmountPaymentDeadline + ".</p><p class=\"govuk-body\">If you don't receive"
-                    + " the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  "
-                    + "rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.</p>"),
+                "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately. Funds must be received in your account by 2024-04-18.</p>" +
+                    "<p class=\"govuk-body\">If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>"),
             jsonPath("$[0].titleCy").value("Immediate payment"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You have accepted Dave Indent's plan to pay £{fullAdmitPayImmediatelyPaymentAmount} "
-                    + "immediately. Funds must clear your account by " + respondent1AdmittedAmountPaymentDeadline + ".</p><p class=\"govuk-body\">If you don't receive "
-                    + "the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" "
-                    + " rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.</p>")
+                "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately. Funds must be received in your account by 2024-04-18.</p>" +
+                    "<p class=\"govuk-body\">If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>")
 
         );
     }
