@@ -47,10 +47,16 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have accepted the ${respondent1PartyName} offer and asked them to sign a settlement agreement.</p><p class=\"govuk-body\">The defendant must respond by 2024-04-18.</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, you can request a County Court Judgment(CCJ).</p>"),
+                    "<p class=\"govuk-body\">You have accepted the ${respondent1PartyName} offer and asked " +
+                        "them to sign a settlement agreement.</p><p class=\"govuk-body\">The defendant " +
+                        "must respond by 2024-04-18.</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, " +
+                        "you can request a County Court Judgment(CCJ).</p>"),
                 jsonPath("$[0].titleCy").value("Settlement agreement"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have accepted the ${respondent1PartyName} offer and asked them to sign a settlement agreement.</p><p class=\"govuk-body\">The defendant must respond by 2024-04-18.</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, you can request a County Court Judgment(CCJ).</p>")
+                    "<p class=\"govuk-body\">You have accepted the ${respondent1PartyName} offer" +
+                        " and asked them to sign a settlement agreement.</p><p class=\"govuk-body\">The defendant must " +
+                        "respond by 2024-04-18.</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, " +
+                        "you can request a County Court Judgment(CCJ).</p>")
             );
     }
 }
