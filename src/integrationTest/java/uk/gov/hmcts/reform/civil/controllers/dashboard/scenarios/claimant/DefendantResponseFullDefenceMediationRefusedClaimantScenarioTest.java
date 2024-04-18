@@ -17,6 +17,7 @@ import java.util.Random;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest extends DashboardBaseIntegrationTest {
@@ -33,6 +34,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .responseClaimTrack(SMALL_CLAIM.name())
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
                     .individualFirstName("James")
                     .individualLastName("John")
