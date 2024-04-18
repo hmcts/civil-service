@@ -64,7 +64,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         }
     }
 
-    @Retryable(value = CompleteTaskException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))
+    @Retryable(value = CompleteTaskException.class, maxAttempts = 3, backoff = @Backoff(delay = 60000, multiplier = 15))
     default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
@@ -118,7 +118,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             e.getMessage(),
             getStackTrace(e),
             remainingRetries - 1,
-            calculateExponentialRetryTimeout(1000, maxRetries, remainingRetries)
+            calculateExponentialRetryTimeout(300000, maxRetries, remainingRetries)
         );
     }
 
