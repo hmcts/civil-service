@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
 
 import java.util.HashMap;
 
