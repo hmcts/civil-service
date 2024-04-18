@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 
 import java.util.Arrays;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
 /**
