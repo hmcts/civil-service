@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -227,9 +228,11 @@ class CaseEventTaskHandlerTest {
             doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
                 .when(externalTaskService).complete(mockTask);
 
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
+            assertThrows(
+                CompleteTaskException.class,
+                () -> caseEventTaskHandler.execute(mockTask, externalTaskService));
 
-            verify(externalTaskService).handleFailure(
+            verify(externalTaskService, never()).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
