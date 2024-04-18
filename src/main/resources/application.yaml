@@ -49,6 +49,8 @@ spring:
             client-secret: internal
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
+    placeholder-replacement: false
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -184,6 +186,11 @@ reference:
 aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
+
+
+dashboard:
+  api:
+    url: http://localhost:4000
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -453,6 +460,23 @@ async:
     corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
     maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
+
+feign:
+  client:
+    config:
+      processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      message:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      idam-api:
+        loggerLevel: full
+      core-case-data-api:
+        loggerLevel: full
+      document-management-metadata-download-api:
+        loggerLevel: full
+
 ---
 
 spring:
@@ -466,21 +490,6 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://localhost:9404/engine-rest/
-      remoteRepositoryService:
-        url: http://localhost:9404/engine-rest/
-      remoteExternalTaskService:
-        url: http://localhost:9404/engine-rest/
-      idam-api:
-        loggerLevel: full
-      core-case-data-api:
-        loggerLevel: full
-      document-management-metadata-download-api:
-        loggerLevel: full
 fees:
   api:
     url: http://localhost:8765
@@ -571,6 +580,29 @@ spring:
   config:
     activate:
       on-profile: integration-test
+  datasource:
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:11.4://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
+    hikari:
+      minimum-idle: 1
+      connectionTimeout: 10000
+      idleTimeout: 30000
+      maxLifetime: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      naming:
+        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    placeholder-replacement: false
 
   main:
     lazy-initialization: true
@@ -617,16 +649,6 @@ docmosis:
   tornado:
     url: http://fake-docmosis-api
     key: fake-key
-
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://fake/engine-rest/
-      remoteRepositoryService:
-        url: http://fake/engine-rest/
-      remoteExternalTaskService:
-        url: http://fake/engine-rest/
 
 notifications:
   govNotifyApiKey: some-gov-uk-notify-api-key
