@@ -20,7 +20,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected final DashboardApiClient dashboardApiClient;
     protected final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
+    protected final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
