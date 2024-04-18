@@ -411,7 +411,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "to medical notes are to be made by reference to"
                                + " the pages in that bundle");
 
-            if(featureToggleService.isSdoR2Enabled()) {
+            if (featureToggleService.isSdoR2Enabled()) {
                 assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input1")
                     .isEqualTo("If impecuniosity is alleged by the claimant and not admitted "
                                    + "by the defendant, the claimant's "
@@ -469,7 +469,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                    + "(to include any appendices).");
                 assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("detailsShowToggle")
                     .isEqualTo(List.of(AddOrRemoveToggle.ADD));
-            }else{
+            } else {
                 assertThat(response.getData()).extracting("trialCreditHire").extracting("input1")
                     .isEqualTo("If impecuniosity is alleged by the claimant and not admitted "
                                    + "by the defendant, the claimant's "

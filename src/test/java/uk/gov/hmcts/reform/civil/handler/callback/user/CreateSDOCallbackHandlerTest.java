@@ -33,7 +33,21 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.*;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
@@ -2055,7 +2069,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "in a separate paginated bundle by the claimant's solicitors and kept up to date. "
                                + "All references to medical notes are to be made by reference "
                                + "to the pages in that bundle.");
-            if(featureToggleService.isSdoR2Enabled()){
+            if (featureToggleService.isSdoR2Enabled()) {
                 assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
                     .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
                                    + "claimant's disclosure as ordered earlier in this Order must include:\n"
@@ -2102,7 +2116,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
                 assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("detailsShowToggle")
                     .isEqualTo(List.of(AddOrRemoveToggle.ADD));
-            }else{
+            } else {
                 assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
                     .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
                                    + "claimant's disclosure as ordered earlier in this Order must include:\n"
