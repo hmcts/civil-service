@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil;
 
-import org.camunda.bpm.extension.rest.EnableCamundaRestClient;
+import org.camunda.community.rest.EnableCamundaRestClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

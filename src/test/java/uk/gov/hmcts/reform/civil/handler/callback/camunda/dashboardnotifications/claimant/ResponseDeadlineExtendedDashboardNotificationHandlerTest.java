@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,10 +32,10 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
 
     @InjectMocks
     private ResponseDeadlineExtendedDashboardNotificationHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
@@ -62,6 +63,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().respondent1Represented(YesOrNo.NO)
