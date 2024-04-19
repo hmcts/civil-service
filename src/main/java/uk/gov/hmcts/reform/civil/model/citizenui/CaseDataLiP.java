@@ -44,9 +44,6 @@ public class CaseDataLiP {
     @JsonProperty("applicant1SettleClaim")
     private YesOrNo applicant1SettleClaim;
 
-    @JsonProperty("applicant1ClaimSettledCui")
-    private YesOrNo applicant1ClaimSettledCui;
-
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
@@ -86,10 +83,5 @@ public class CaseDataLiP {
     @JsonIgnore
     public boolean hasClaimantAgreedClaimSettled() {
         return YesOrNo.YES.equals(applicant1SettleClaim);
-    }
-
-    @JsonIgnore
-    public boolean isApplicant1ClaimSettledCui() {
-        return YesOrNo.YES.equals(applicant1ClaimSettledCui);
     }
 }

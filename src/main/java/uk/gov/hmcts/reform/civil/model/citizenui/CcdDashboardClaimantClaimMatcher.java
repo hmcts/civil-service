@@ -351,12 +351,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 
-    @Override
-    public boolean isSettled() {
-        return super.isSettled()
-            || (caseData.hasDefendantPaidTheAmountClaimed() && caseData.hasClaimantAgreedClaimSettled());
-    }
-
     public boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence()
                 && caseData.getApplicant1ResponseDate() != null

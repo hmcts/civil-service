@@ -29,9 +29,6 @@ public abstract class CcdDashboardClaimMatcher {
     }
 
     public boolean isSettled() {
-        return !caseData.isRespondentResponseFullDefence() && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant()) && Objects.isNull(caseData.getCcjPaymentDetails()) && !caseData.hasApplicantRejectedRepaymentPlan()
-            || caseData.isPartAdmitClaimSettled()
-            || caseData.getCcdState() == CaseState.CASE_SETTLED && caseData.isApplicant1ClaimSettledCui();
+        return caseData.getCcdState() == CaseState.CASE_SETTLED;
     }
 }
