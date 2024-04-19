@@ -161,6 +161,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
         assertThat(result).doesNotContainEntry("applicant1ResponseDeadlineEn", null);
+
     }
 
     @Test
