@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
@@ -88,6 +89,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
+    private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -293,13 +295,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             return new ArrayList<>(List.of(
                 LocationRefData.builder()
                     .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                    .courtLocationCode("court1").build(),
+                    .regionId("region 1").courtLocationCode("court1").build(),
                 LocationRefData.builder()
                     .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                    .courtLocationCode("court2").build(),
+                    .regionId("region 2").courtLocationCode("court2").build(),
                 LocationRefData.builder()
                     .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                    .courtLocationCode("court3").build()
+                    .regionId("region 3").courtLocationCode("court3").build(),
+                LocationRefData.builder()
+                    .epimmsId("4444").siteName(LIVERPOOL_SITE_NAME).courtAddress("Adr 3").postcode("CCC 333")
+                    .regionId("region 4").courtLocationCode("court4").build()
             ));
         }
 
@@ -386,6 +391,30 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+        @Test
+        void shouldUpdateCaseManagementLocationForFlightDelayClaim() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("CLAIMANT_NAME")
+                                 .build())
+                .build();
+            caseData = caseData.toBuilder()
+                .isFlightDelayClaim(YES)
+                .flightDelayDetails(FlightDelayDetails.builder()
+                                        .nameOfAirline("OTHER")
+                                        .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("4444");
+            assertThat(updatedCaseData.getCaseManagementLocation().getRegion()).isEqualTo("region 4");
+            assertThat(updatedCaseData.getLocationName()).isEqualTo(LIVERPOOL_SITE_NAME);
+        }
     }
 
     @Test
