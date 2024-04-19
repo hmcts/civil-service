@@ -51,5 +51,13 @@ public class HelpWithFeeDashboardNoticeHandlerIntegrationTest  extends Dashboard
                     "<p class=\"govuk-body\">You’ve applied for help with the hearing fee. You’ll receive an update in 5 to 10 working days.</p>"
                 )
             );
+
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value("<a>Pay the hearing fee</a>"),
+                jsonPath("$[0].currentStatusEn").value("In progress")
+            );
     }
 }
