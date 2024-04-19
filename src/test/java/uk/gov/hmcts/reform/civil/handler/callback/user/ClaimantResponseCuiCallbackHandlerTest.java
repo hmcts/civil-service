@@ -303,7 +303,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
                     .regionId("region 3").courtLocationCode("court3").build(),
                 LocationRefData.builder()
-                    .epimmsId("4444").siteName(LIVERPOOL_SITE_NAME).courtAddress("Adr 3").postcode("CCC 333")
+                    .epimmsId("444").siteName(LIVERPOOL_SITE_NAME).courtAddress("Adr 3").postcode("CCC 333")
                     .regionId("region 4").courtLocationCode("court4").build()
             ));
         }
@@ -392,15 +392,38 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCaseManagementLocationForFlightDelayClaim() {
+        void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .build();
+            caseData = caseData.toBuilder()
+                .isFlightDelayClaim(YES)
+                .flightDelayDetails(FlightDelayDetails.builder()
+                    .nameOfAirline("Sri Lankan")
+                    .flightCourtLocation(CaseLocationCivil.builder()
+                                             .baseLocation("111")
+                                             .region("region 1")
+                                             .build())
+                    .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("111");
+            assertThat(updatedCaseData.getCaseManagementLocation().getRegion()).isEqualTo("region 1");
+            assertThat(updatedCaseData.getLocationName()).isEqualTo("Site 1");
+        }
+
+        @Test
+        void shouldUpdateCaseManagementLocationForFlightDelayClaimOtherAirline() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .build();
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
@@ -411,7 +434,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
-            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("4444");
+            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("444");
             assertThat(updatedCaseData.getCaseManagementLocation().getRegion()).isEqualTo("region 4");
             assertThat(updatedCaseData.getLocationName()).isEqualTo(LIVERPOOL_SITE_NAME);
         }
