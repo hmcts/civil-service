@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -70,20 +73,22 @@ class ManageContactInformationUtilsTest {
     void shouldAddCorrectOptions_forClaimant1AsLegalRep() {
         CaseData caseDataWithExpertsAndWitnesses = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .addApplicant1ExpertsAndWitnesses().build();
 
         CaseData caseDataWithoutExpertsAndWitnesses = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed().build();
 
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseDataWithExpertsAndWitnesses, false);
-        assertThat(options).isEqualTo(expectedApplicant1Options(true, false));
+        assertThat(options).isEqualTo(expectedApplicant1Options(true, false, false));
 
         List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addApplicant1Options(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
-        assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicant1Options(false, false));
+        assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicant1Options(false, false, false));
     }
 
     @Test
@@ -116,18 +121,20 @@ class ManageContactInformationUtilsTest {
     void shouldAddCorrectOptions_forClaimant1AsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed().build();
 
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1Options(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1Options(true, true, false));
     }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1OrganisationAsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .applicant1(Party.builder()
                             .organisationName("Test Inc")
@@ -138,13 +145,32 @@ class ManageContactInformationUtilsTest {
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, false));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1LipAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1Represented(NO)
+                .applicant1(Party.builder()
+                        .organisationName("Test Inc")
+                        .type(ORGANISATION)
+                        .build())
+                .build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, true));
     }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1CompanyAsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .applicant1(Party.builder()
                             .companyName("Test Inc")
@@ -155,7 +181,25 @@ class ManageContactInformationUtilsTest {
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, false));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1LipCompanyAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .applicant1Represented(NO)
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1(Party.builder()
+                        .companyName("Test Inc")
+                        .type(COMPANY)
+                        .build())
+                .build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, true));
     }
 
     @Test
@@ -170,6 +214,30 @@ class ManageContactInformationUtilsTest {
         addApplicantOptions2v1(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicants2v1Options(true, true));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimants2v1AsAdmin_secondClaimantAsCompany() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .multiPartyClaimTwoApplicants()
+                .applicant2(PartyBuilder.builder().company().build())
+                .atStateApplicantRespondToDefenceAndProceed().build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicantOptions2v1(options, caseData, true);
+
+        List<DynamicListElement> expected = new ArrayList<>();
+        expected.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2", "CLAIMANT 2: Company ltd"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2_ORGANISATION_INDIVIDUALS", "CLAIMANT 2: Individuals attending for the organisation"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANTS: Individuals attending for the legal representative"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANTS: Witnesses"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANTS: Experts"));
+
+        assertThat(options).isEqualTo(expected);
     }
 
     @Test
@@ -522,11 +590,13 @@ class ManageContactInformationUtilsTest {
         }
     }
 
-    private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+    private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin, boolean isLip) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
         list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        if (!isLip) {
+            list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        }
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
@@ -534,11 +604,13 @@ class ManageContactInformationUtilsTest {
         return list;
     }
 
-    private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
+    private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin, boolean isLip) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Test Inc"));
         list.add(dynamicElementFromCode("CLAIMANT_1_ORGANISATION_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the organisation"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        if (!isLip) {
+            list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        }
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
