@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantIntentMediationUnsuccessfulHandler;
@@ -11,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+
 import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -90,7 +94,6 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
                         + "class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
-
     }
 
     @Test
@@ -98,6 +101,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "323491";
+        final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListMock("CLAIMANT", caseId);
         Party respondent1 = new Party();
         MediationUnsuccessfulReason reason = NOT_CONTACTABLE_CLAIMANT_ONE;
         respondent1.toBuilder().partyName("John Doe").build();
@@ -131,5 +135,12 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
                         + "attend your appointment.</a></p>"));
 
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
     }
 }

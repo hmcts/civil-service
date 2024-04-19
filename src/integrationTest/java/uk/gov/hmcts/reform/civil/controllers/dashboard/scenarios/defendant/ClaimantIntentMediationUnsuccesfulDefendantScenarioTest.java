@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
+import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.MediationUnsuccessfulDashboardNotificationDefendantHandler;
@@ -18,6 +20,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+
 import java.util.List;
 
 public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends DashboardBaseIntegrationTest {
@@ -96,6 +100,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "32341";
+        final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListMock("DEFENDANT", caseId);
         Party respondent1 = new Party();
         respondent1.toBuilder().partyName("John Doe").build();
         MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
@@ -128,5 +133,13 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                         + "a penalty against you. Your case will not be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
                         + "attend your appointment.</a></p>"));
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
     }
 }
