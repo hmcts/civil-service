@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -31,6 +34,7 @@ public class UpdateCaseManagementDetailsService {
     private final LocationHelper locationHelper;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
     public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -40,13 +44,17 @@ public class UpdateCaseManagementDetailsService {
         updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
-        locationHelper.getCaseManagementLocation(caseData)
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
+        if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
+            updateFlightDelayCaseManagementLocation(caseData, builder, availableLocations);
+        } else {
+            locationHelper.getCaseManagementLocation(caseData)
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                        CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+        }
 
         builder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
@@ -57,6 +65,40 @@ public class UpdateCaseManagementDetailsService {
         builder.caseManagementCategory(
             CaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
+    }
+
+    private void updateFlightDelayCaseManagementLocation(CaseData caseData, CaseData.CaseDataBuilder<?,?> builder,
+                                                         List<LocationRefData> availableLocations) {
+        Optional.ofNullable(caseData.getFlightDelayDetails())
+            .map(FlightDelayDetails::getNameOfAirline)
+            .map(airline -> mapToLocation(airline, caseData.getFlightDelayDetails(), availableLocations))
+            .ifPresent(caseLocationCivil -> setCaseManagementLocation(builder, caseLocationCivil, availableLocations));
+    }
+
+    public void setCaseManagementLocation(CaseData.CaseDataBuilder<?,?> builder, CaseLocationCivil caseLocationCivil,
+                                          List<LocationRefData> availableLocations) {
+        builder.caseManagementLocation(caseLocationCivil);
+        availableLocations.stream()
+            .filter(locationRefData -> locationRefData.getRegionId().equals(caseLocationCivil.getRegion())
+                && locationRefData.getEpimmsId().equals(caseLocationCivil.getBaseLocation()))
+            .findFirst()
+            .map(LocationRefData::getSiteName)
+            .ifPresent(builder::locationName);
+    }
+
+    private CaseLocationCivil mapToLocation(String airlineName, FlightDelayDetails flightDelayDetails, List<LocationRefData> availableLocations) {
+        if ("OTHER".equals(airlineName)) {
+            return availableLocations.stream()
+                .filter(locationRefData -> LIVERPOOL_SITE_NAME.equals(locationRefData.getSiteName()))
+                .findFirst()
+                .map(locationRefData -> CaseLocationCivil.builder()
+                    .region(locationRefData.getRegionId())
+                    .baseLocation(locationRefData.getEpimmsId())
+                    .build())
+                .orElse(null);
+        } else {
+            return flightDelayDetails.getFlightCourtLocation();
+        }
     }
 
     private void updateApplicant1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
