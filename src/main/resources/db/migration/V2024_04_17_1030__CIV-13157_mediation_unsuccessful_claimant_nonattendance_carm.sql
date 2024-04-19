@@ -19,6 +19,27 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant'
         'CLAIMANT');
 
 /**
+ * Add task list items claimant
+ */
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role, task_order)
+
+values ('<a>View mediation settlement agreement</a>',
+        'Mediation',
+        '<a>View mediation settlement agreement</a>',
+        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant', '{2, 2}', 'CLAIMANT', 5),
+
+       ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+        'Mediation',
+        '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant', '{5, 5}', 'CLAIMANT', 6),
+
+       ('<a>View mediation documents</a>',
+        'Mediation',
+        '<a>View mediation documents</a>',
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant', '{1, 1}', 'CLAIMANT', 7);
+
+/**
  * Add scenario for defendant
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
@@ -37,4 +58,25 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendan
         '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
         '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
         'DEFENDANT');
+
+/**
+ * Add task list items defendant
+ */
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role, task_order)
+
+values ('<a>View mediation settlement agreement</a>',
+        'Mediation',
+        '<a>View mediation settlement agreement</a>',
+        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant', '{2, 2}', 'DEFENDANT', 5),
+
+       ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+        'Mediation',
+        '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant', '{5, 5}', 'DEFENDANT', 6),
+
+       ('<a>View mediation documents</a>',
+        'Mediation',
+        '<a>View mediation documents</a>',
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant', '{1, 1}', 'DEFENDANT', 7);
 
