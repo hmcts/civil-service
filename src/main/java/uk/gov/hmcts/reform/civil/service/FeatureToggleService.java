@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -110,7 +111,14 @@ public class FeatureToggleService {
                                                         epoch, false);
     }
 
-    public boolean isMultiOrIntermediateTrackEnabled() {
-        return featureToggleApi.isFeatureEnabled("multi-or-intermediate-track");
+    public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 }

@@ -1072,7 +1072,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.00, so track is intermediate, as this is the upper limit
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
         }
@@ -1081,7 +1081,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.01, so track is multi
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseDataUpdated = CaseDataBuilder.builder().atStateClaimDraft()
                 .claimValue(ClaimValue.builder()
                            .statementOfValueInPennies(BigDecimal.valueOf(10000001))

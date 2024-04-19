@@ -647,7 +647,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100000, so track is intermediate, as this is the upper limit
-            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                 .totalClaimAmount(BigDecimal.valueOf(100000))
                 .build();
@@ -663,7 +663,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100001, so track is multi
-            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                 .totalClaimAmount(BigDecimal.valueOf(100001))
                 .build();
