@@ -42,19 +42,21 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("An order has been made"),
+                jsonPath("$[0].titleEn").value("Upload documents"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" class=\"govuk-link\">" +
-                        "upload and submit documents.</a> to support your defence. Follow the instructions set out in the directions order. " +
-                        "You must submit all documents by ${sdoDocumentUploadRequestedDate}. " +
-                        "Any documents submitted after the deadline may not be considered by the judge.</p>"
+                    "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
+                        "class=\"govuk-link\">upload and submit documents.</a> to support your defence. Follow the " +
+                        "instructions set out in the directions order. You must submit all documents by " +
+                        "${sdoDocumentUploadRequestedDateEn}. Any documents submitted after the deadline may not be " +
+                        "considered by the judge.</p>"
                 ),
-                jsonPath("$[0].titleCy").value("An order has been made"),
+                jsonPath("$[0].titleCy").value("Upload documents"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" class=\"govuk-link\">" +
-                        "upload and submit documents.</a> to support your defence. Follow the instructions set out in the directions order. " +
-                        "You must submit all documents by ${sdoDocumentUploadRequestedDate}. " +
-                        "Any documents submitted after the deadline may not be considered by the judge.</p>"
+                    "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
+                        "class=\"govuk-link\">upload and submit documents.</a> to support your defence. Follow the " +
+                        "instructions set out in the directions order. You must submit all documents by " +
+                        "${sdoDocumentUploadRequestedDateCy}. Any documents submitted after the deadline may not be " +
+                        "considered by the judge.</p>"
                 )
             );
     }
