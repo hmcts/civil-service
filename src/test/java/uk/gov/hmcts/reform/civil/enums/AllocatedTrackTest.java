@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
@@ -205,9 +206,9 @@ class AllocatedTrackTest {
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver25000LessThan100000AndUnspecified(ClaimType claimType) {
             FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null, toggleService)).isEqualTo(INTERMEDIATE_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null, toggleService)).isNotEqualTo(INTERMEDIATE_CLAIM);
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null, toggleService, any())).isEqualTo(INTERMEDIATE_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null, toggleService, any())).isNotEqualTo(INTERMEDIATE_CLAIM);
 
         }
 
@@ -218,9 +219,9 @@ class AllocatedTrackTest {
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver100000AndUnspecified(ClaimType claimType) {
             FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled()).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null, toggleService)).isEqualTo(MULTI_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null, toggleService)).isNotEqualTo(MULTI_CLAIM);
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null, toggleService, any())).isEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null, toggleService, any())).isNotEqualTo(MULTI_CLAIM);
         }
     }
 }
