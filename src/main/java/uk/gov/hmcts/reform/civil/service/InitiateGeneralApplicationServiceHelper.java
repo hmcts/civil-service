@@ -187,7 +187,11 @@ public class InitiateGeneralApplicationServiceHelper {
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         } else {
             /*
+            *
             * General application for Lip
+            * Scenario 1 V 1
+            * Populate GA Respondent details from Civil Claim Respondent1 field as
+            * respondent is unrepresented
             *
             * */
             if (generalApplication.getIsGaRespondentOneLip().equals(YES)) {

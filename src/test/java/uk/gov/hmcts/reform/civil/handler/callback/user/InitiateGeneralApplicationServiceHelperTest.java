@@ -37,8 +37,10 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -93,6 +95,12 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(List.of(
+                                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                                    .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build())).build());
     }
 
     public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
@@ -154,7 +162,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         GeneralApplication result = helper
             .setRespondentDetailsIfPresent(
                 CaseData.builder(),
-                GeneralApplication.builder().build(),
+                GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
             );
@@ -184,7 +192,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThrows(IllegalArgumentException.class, () -> helper
             .setRespondentDetailsIfPresent(CaseData.builder(),
-                GeneralApplication.builder().build(),
+                GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
             ));
@@ -198,7 +206,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             IllegalArgumentException.class,
             () -> helper
                 .setRespondentDetailsIfPresent(CaseData.builder(),
-                    GeneralApplication.builder().build(),
+                    GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
                     CaseData.builder().ccdCaseReference(1234L).build(),
                     getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
                 )
@@ -214,7 +222,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             () -> helper
                 .setRespondentDetailsIfPresent(
                     CaseData.builder(),
-                    GeneralApplication.builder().build(),
+                    GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                         .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
@@ -233,7 +241,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             () -> helper
                 .setRespondentDetailsIfPresent(
                     CaseData.builder(),
-                    GeneralApplication.builder().build(),
+                    GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
                         .addRespondent2(YesOrNo.YES)
@@ -254,7 +262,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             CaseData.builder(),
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .organisation(Organisation.builder().organisationID("100").build())
@@ -294,7 +302,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             CaseData.builder(),
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .organisation(Organisation.builder().organisationID("100").build())
@@ -336,7 +344,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             CaseData.builder(),
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .organisation(Organisation.builder().organisationID("100").build())
@@ -389,7 +397,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             cdBuilder,
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder().organisationID("345").build())
@@ -439,7 +447,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             cdBuilder,
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .organisation(Organisation.builder().organisationID("345").build())
@@ -492,7 +500,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             cdBuilder,
-            GeneralApplication.builder().build(),
+            GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.NO).build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .addRespondent2(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
@@ -547,6 +555,50 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
         assertThat(result.getLitigiousPartyID()).isEqualTo("003");
+    }
+
+    /*
+    * Scenario 1V1 LR vs LIP
+    * Civil Claim Claimant Initiates GA
+    * */
+    @Test
+    void shouldReturnsRespondent1_LIP_As_GaRespondentSolicitor() {
+
+        CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+        caseDataBuilder.isGaRespondentOneLip(YesOrNo.YES)
+            .addRespondent2(YesOrNo.NO)
+            .addApplicant2(YesOrNo.NO)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder().organisationID("200").build())
+                                              .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                              .build())
+            .ccdCaseReference(12L)
+            .respondent1(Party.builder()
+                             .partyID("party")
+                             .partyEmail("party@gmail.com")
+                             .individualFirstName("party").build()).build();
+
+        GeneralApplication result = helper
+            .setRespondentDetailsIfPresent(
+                CaseData.builder(),
+                GeneralApplication.builder().isGaRespondentOneLip(YesOrNo.YES).build(),
+                caseDataBuilder.build(),
+                getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+            );
+
+        assertThat(result).isNotNull();
+        assertThat(result.getGeneralAppRespondentSolicitors()).isNotNull();
+        assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(1);
+
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getOrganisationIdentifier()).isNull();
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getEmail()).isEqualTo("party@gmail.com");
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getForename()).isEqualTo("party");
+        assertFalse(result.getGeneralAppRespondentSolicitors().get(0).getValue().getSurname().isPresent());
+
+        assertThat(result.getGeneralAppRespondentSolicitors()
+                       .stream().filter(e -> STRING_NUM_CONSTANT
+                .equals(e.getValue().getId())).count()).isEqualTo(0);
+
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
