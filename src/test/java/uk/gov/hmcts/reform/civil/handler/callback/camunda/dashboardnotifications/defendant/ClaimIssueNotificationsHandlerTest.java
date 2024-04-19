@@ -33,14 +33,12 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
     @InjectMocks
     private ClaimIssueNotificationsHandler handler;
-
     @Mock
     private DashboardApiClient dashboardApiClient;
-
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
     @Mock
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
 
@@ -70,7 +68,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
         params.put("respondent1ResponseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
