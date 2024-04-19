@@ -67,16 +67,16 @@ public class UpdateCaseManagementDetailsService {
 
     }
 
-    private void updateFlightDelayCaseManagementLocation(CaseData caseData, CaseData.CaseDataBuilder<?,?> builder,
-                                                         List<LocationRefData> availableLocations) {
+    private void updateFlightDelayCaseManagementLocation(
+        CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getFlightDelayDetails())
             .map(FlightDelayDetails::getNameOfAirline)
             .map(airline -> mapToLocation(airline, caseData.getFlightDelayDetails(), availableLocations))
             .ifPresent(caseLocationCivil -> setCaseManagementLocation(builder, caseLocationCivil, availableLocations));
     }
 
-    public void setCaseManagementLocation(CaseData.CaseDataBuilder<?,?> builder, CaseLocationCivil caseLocationCivil,
-                                          List<LocationRefData> availableLocations) {
+    public void setCaseManagementLocation(
+        CaseData.CaseDataBuilder<?, ?> builder, CaseLocationCivil caseLocationCivil, List<LocationRefData> availableLocations) {
         builder.caseManagementLocation(caseLocationCivil);
         availableLocations.stream()
             .filter(locationRefData -> locationRefData.getRegionId().equals(caseLocationCivil.getRegion())
