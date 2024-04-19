@@ -6,7 +6,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.
         '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant", "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Claimant",
         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant",
         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant"}',
-        '{"Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant": ["claimantSettlementAgreement", "respondent1SettlementAgreementDeadlineEn", "respondent1SettlementAgreementDeadlineCy"]}');
+        '{"Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant": ["claimantSettlementAgreement", "respondent1SettlementAgreementDeadlineEn", "respondent1SettlementAgreementDeadlineCy","respondent1PartyName"]}');
 
 /**
  * Add notification template
