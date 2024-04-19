@@ -111,7 +111,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant");
 
-
     private final String scenario;
 
     DashboardScenarios(String scenario) {
