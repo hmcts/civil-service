@@ -105,10 +105,6 @@ public class SdoHelper {
 
     public static String getPhysicalTrialTextNihl(CaseData caseData) {
         if (caseData.getSdoR2Trial() != null
-            && PhysicalTrialBundleOptions.NONE.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
-            return "None";
-
-        } else if (caseData.getSdoR2Trial() != null
             && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
             return caseData.getSdoR2Trial().getPhysicalBundlePartyTxt();
         }
