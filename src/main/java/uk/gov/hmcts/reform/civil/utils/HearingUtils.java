@@ -150,4 +150,5 @@ public class HearingUtils {
         return hearingTypesExcludedFromFee.stream().filter(
             type -> getType(hearingType).equals(type)).count() < 1;
     }
+
 }
