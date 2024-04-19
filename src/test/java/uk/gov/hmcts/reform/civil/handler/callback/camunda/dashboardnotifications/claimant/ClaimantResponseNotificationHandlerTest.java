@@ -50,6 +50,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
@@ -81,6 +82,9 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Given
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            if (dashboardScenarios.equals(SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM)) {
+                when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            }
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             caseData = caseData.toBuilder().ccdState(caseState).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -124,7 +128,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                     CaseState.JUDICIAL_REFERRAL,
                     DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING
                 ),
-                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION)
+                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION),
+                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM)
             );
         }
 
