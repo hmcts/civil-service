@@ -23,7 +23,7 @@ def versions = [
   lombok             : '1.18.32',
   pact               : '3.5.24',
   springSecurity     : '5.8.12',
-  camunda            : '7.19.0',
+  camunda            : '7.21.0',
   jackson            : '2.17.0',
   testcontainers     : '1.17.6'
 ]
