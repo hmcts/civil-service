@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.Objects;
-
 @AllArgsConstructor
 public abstract class CcdDashboardClaimMatcher {
 
