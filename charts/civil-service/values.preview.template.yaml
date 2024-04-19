@@ -49,7 +49,7 @@ java:
           alias: azure.application-insights.instrumentation-key
         - name: docmosis-api-key
           alias: docmosis.tornado.key
-        - name: gov-notify-api-key
+        - name: gov-notify-pretends-api-key
           alias: GOV_NOTIFY_API_KEY
         - name: sendgrid-api-key
           alias: SENDGRID_API_KEY
