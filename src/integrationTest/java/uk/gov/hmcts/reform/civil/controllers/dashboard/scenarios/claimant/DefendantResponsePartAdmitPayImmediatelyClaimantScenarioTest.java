@@ -30,7 +30,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
     @Test
     void should_create_part_admit_defendant_response_scenario() throws Exception {
 
-        String caseId = generateRandomCaseId();
+        String caseId = "11234949494";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -69,15 +69,5 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
                     "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">View the response to the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
             );
-    }
-
-    private String generateRandomCaseId() {
-        Random random = new Random();
-        StringBuilder randomNumber = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            int digit = random.nextInt(10);
-            randomNumber.append(digit);
-        }
-        return randomNumber.toString();
     }
 }
