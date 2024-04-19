@@ -166,6 +166,7 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
             );
         }
+
         if (caseData.getHearingRemissionAmount() != null) {
             params.put(
                 "hearingFeeRemissionAmount",
@@ -179,6 +180,7 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
             );
         }
+
         return params;
     }
 

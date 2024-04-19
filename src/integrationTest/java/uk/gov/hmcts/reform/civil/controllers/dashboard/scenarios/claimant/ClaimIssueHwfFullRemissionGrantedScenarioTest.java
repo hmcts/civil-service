@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+=======
+>>>>>>> d320f9135806b6cc8f77de13d9e90150a2187424
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
