@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DefendantMediationSuccessfulDashboardNotificationScenarioTest extends DashboardBaseIntegrationTest {
 
     public static final String DEFENDANT = "DEFENDANT";
+
     @Autowired
     private DefendantMediationSuccessfulDashboardNotificationHandler handler;
 
@@ -44,6 +45,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
             .andExpect(status().isOk())
             .andExpectAll(
@@ -63,6 +65,7 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
                             + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
             );
+
         //Verify dashboard information
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, DEFENDANT)
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();

@@ -26,7 +26,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
     public static final String CLAIMANT = "CLAIMANT";
 
     @Test
-    void should_create_mediation_scenario_for_carm_claimant() throws Exception {
+    void should_create_mediation_scenario_for_carm() throws Exception {
 
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
@@ -40,8 +40,8 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
 
         handler.handle(callbackParams(caseData));
 
-        // Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
@@ -60,6 +60,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                             + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
             );
+
         //Verify dashboard information
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, CLAIMANT)
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
