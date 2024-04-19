@@ -54,6 +54,7 @@ public class HwFDashboardNotificationsHandler extends DashboardCallbackHandler {
         PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION.getScenario(),
         FULL_REMISSION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION.getScenario()
     );
+
     public HwFDashboardNotificationsHandler(DashboardApiClient dashboardApiClient,
                                             DashboardNotificationsParamsMapper mapper,
                                             FeatureToggleService featureToggleService) {
