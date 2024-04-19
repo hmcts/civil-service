@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
@@ -98,21 +99,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isEarlyAdoptersEnabled()
-            && (Objects.isNull(caseData.getCaseManagementLocation())
-                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))
-                )) {
-            errors.add(NOT_IN_EA_REGION);
-        }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
-        if (caseContainsLiP(caseData)) {
-            errors.add(LR_VS_LIP);
-        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (caseContainsLiP(caseData)) {
+            if (!featureToggleService.isGaForLipsEnabled()) {
+                errors.add(LR_VS_LIP);
+            }
+        }
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails

@@ -183,12 +183,29 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
 
             });
-            applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
-            applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
-            applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
+
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
+        } else {
+            /*
+            * General application for Lip
+            *
+            * */
+            if (generalApplication.getIsGaRespondentOneLip().equals(YES)) {
+                applicationBuilder
+                    .generalAppRespondentSolicitors(List.of(
+                        element(GASolicitorDetailsGAspec
+                                    .builder()
+                                    .email(caseData.getRespondent1().getPartyEmail())
+                                    .id(caseData.getRespondent1().getPartyID())
+                                    .forename(caseData.getRespondent1().getIndividualFirstName())
+                                    .surname(Optional.ofNullable(caseData.getRespondent1().getIndividualLastName()))
+                                    .build())));
+            }
         }
 
+        applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
+        applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
+        applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
         boolean isGAApplicantSameAsParentCaseClaimant = isGAApplicantSameAsPCClaimant(caseData,
                                                                                       applicantBuilder.build()
                                                                                           .getOrganisationIdentifier());

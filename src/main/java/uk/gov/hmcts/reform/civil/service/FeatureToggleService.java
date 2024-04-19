@@ -101,4 +101,8 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
     }
+
+    public boolean isGaForLipsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("GaForLips");
+    }
 }
