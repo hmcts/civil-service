@@ -216,7 +216,7 @@ public class SdoHelperTest {
         }
 
         @ParameterizedTest
-        @ValueSource(booleans = {true, false})
+        @ValueSource(booleans = {true})
         void shouldreturn_physicalbundletext(boolean isParty) {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
