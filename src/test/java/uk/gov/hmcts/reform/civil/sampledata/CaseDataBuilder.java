@@ -7291,4 +7291,10 @@ public class CaseDataBuilder {
             .resp2MediationAvailability(resp2MediationAvailability)
             .build();
     }
+
+    public CaseDataBuilder atStateLipClaimSettled() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        ccdState = CaseState.CASE_SETTLED;
+        return this;
+    }
 }
