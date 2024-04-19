@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dashboard.data;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.Data;
+
 import java.util.HashMap;
 
 @Data
@@ -10,7 +11,6 @@ import java.util.HashMap;
 public class ScenarioRequestParams {
 
     /**
-     * HashMap.
      * We will use the params to mapping the data.
      *
      * @param params variables
