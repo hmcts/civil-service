@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.enums;
 
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS;
 
+@Slf4j
 public enum AllocatedTrack {
     SMALL_CLAIM,
     FAST_CLAIM,
@@ -13,13 +16,10 @@ public enum AllocatedTrack {
     INTERMEDIATE_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,
-                                                             FeatureToggleService featureToggleService) {
+                                                             FeatureToggleService featureToggleService, CaseData caseData) {
         Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
-        System.out.println("statement vlue " + statementOfValueInPounds);
-        System.out.println("use new overloaded method  " + intermediateOrMultiTrackValue);
-        System.out.println("toggle is " + featureToggleService.isMultiOrIntermediateTrackEnabled());
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled() && intermediateOrMultiTrackValue.equals(true)) {
-            System.out.println("toggle is active and over 25k");
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && intermediateOrMultiTrackValue.equals(true)) {
+            log.info("isMultiOrIntermediateTrackEnabled toggle is on, claim value {}", statementOfValueInPounds );
             return isIntermediateOrMultiTrack(statementOfValueInPounds) ? INTERMEDIATE_CLAIM : MULTI_CLAIM;
         }
         return getAllocatedTrack(statementOfValueInPounds, claimType, personalInjuryType);
