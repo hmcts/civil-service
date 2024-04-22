@@ -215,18 +215,30 @@ public class SdoHelperTest {
             assertThat(SdoHelper.getHearingLocationNihl(caseData)).isNotNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true})
-        void shouldreturn_physicalbundletext(boolean isParty) {
+        @Test
+        void shouldreturn_physicalbundletextWhenBundleOptionIsParty() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
                 .sdoR2Trial(SdoR2Trial.builder()
                                 .physicalBundlePartyTxt("Test")
-                                .physicalBundleOptions(isParty ? PhysicalTrialBundleOptions.PARTY : PhysicalTrialBundleOptions.NONE).build())
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY).build())
                 .build();
             assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
+        }
+
+        @Test
+        void shouldreturn_emptyPhysicalbundletextWhenBundleOptionIsNone() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .physicalBundlePartyTxt("Test")
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.NONE).build())
+                .build();
+            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isEmpty();
         }
 
         @ParameterizedTest
