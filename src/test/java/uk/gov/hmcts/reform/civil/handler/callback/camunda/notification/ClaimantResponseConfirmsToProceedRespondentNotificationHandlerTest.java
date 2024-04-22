@@ -36,6 +36,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_CC_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_RESPONDENT_SOL2_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -73,6 +76,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
+            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
         }
 
         @Test
@@ -321,6 +325,27 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             );
         }
 
+        @Test
+        void shouldNotifyRespondent_whenMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                "offline-template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
@@ -360,15 +385,36 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+        CaseData caseData = CaseDataBuilder.builder().build();
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                 .request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
 
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                 .request(CallbackRequest.builder().eventId(
                 "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build())
                                                  .build())).isEqualTo(Task_ID_RESPONDENT_SOL2);
 
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                 .request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC").build()).build())).isEqualTo(
             TASK_ID_CC);
+
+        CaseData caseDataMultitrack = CaseDataBuilder.builder().setMultiTrackClaim().build();
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                 .request(CallbackRequest.builder().eventId(
+            "NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
+            .isEqualTo(TASK_ID_MULTITRACK);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                 .request(CallbackRequest.builder().eventId(
+            "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
+            .isEqualTo(TASK_ID_RESPONDENT_SOL2_MULTITRACK);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                 .request(CallbackRequest.builder().eventId(
+            "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
+            .isEqualTo(TASK_ID_CC_MULTITRACK);
     }
 }

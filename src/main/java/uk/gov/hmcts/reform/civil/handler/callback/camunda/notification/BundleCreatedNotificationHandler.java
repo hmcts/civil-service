@@ -94,6 +94,9 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
 
     private String getReceipientEmail(CaseData caseData, String taskId) {
         if (taskId.equals(TASK_ID_APPLICANT)) {
+            if (isApplicant1Lip(caseData)) {
+                return caseData.getApplicant1().getPartyEmail();
+            }
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
             if (isRespondent1Lip(caseData)) {
@@ -130,9 +133,13 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         return (YesOrNo.NO.equals(caseData.getRespondent1Represented()));
     }
 
+    private boolean isApplicant1Lip(CaseData caseData) {
+        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
+    }
+
     private boolean isLip(CaseData caseData, String taskId) {
         if (taskId.equals(TASK_ID_APPLICANT)) {
-            return false;
+            return isApplicant1Lip(caseData);
         } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
             return isRespondent1Lip(caseData);
         } else {
