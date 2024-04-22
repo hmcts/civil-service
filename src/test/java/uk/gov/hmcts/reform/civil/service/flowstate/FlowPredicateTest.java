@@ -1991,7 +1991,11 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissed()
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .build();
             assertTrue(caseDismissedAfterDetailNotified.test(caseData));
         }
 
@@ -2026,16 +2030,37 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
 
         @Test
@@ -2060,6 +2085,16 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(2))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
                 .build();
             assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
