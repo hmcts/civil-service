@@ -185,7 +185,7 @@ public class HearingsPartyMapperTest {
             "claimant",
             "individual",
             "claimant individual",
-            CLAIMANT_ROLE,
+            LEGAL_REP_ROLE,
             "abc@def.ghi",
             "07777777777"
         );
@@ -269,7 +269,7 @@ public class HearingsPartyMapperTest {
                 "respondent1",
                 "individual",
                 "respondent1 individual",
-                DEFENDANT_ROLE,
+                LEGAL_REP_ROLE,
                 "abc@def.ghi",
                 "07777777777"
         );
@@ -279,7 +279,7 @@ public class HearingsPartyMapperTest {
             "respondent2",
             "individual",
             "respondent2 individual",
-            DEFENDANT_ROLE,
+            LEGAL_REP_ROLE,
             "abc@def.ghi",
             "07777777777"
         );
