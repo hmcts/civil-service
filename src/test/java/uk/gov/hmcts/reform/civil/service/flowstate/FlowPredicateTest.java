@@ -2028,6 +2028,17 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged_1v2_BothDefendants()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
@@ -2076,6 +2087,16 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtensionRep1_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionRespondent1_1v2DS()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtensionRep2_1v2DS() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtensionRespondent2_1v2DS()
@@ -2086,10 +2107,31 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtensionRep2_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionRespondent2_1v2DS()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
         void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .takenOfflineByStaffDate(null)
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
                 .build();
             assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
