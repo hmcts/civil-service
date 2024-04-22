@@ -199,6 +199,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1LitigationFriend()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
+                .applicant1Represented(YES)
                 .respondent1(Party.builder()
                                  .type(COMPANY)
                                  .companyName("Test Inc")
@@ -233,6 +234,48 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldReturnExpectedList_WhenInvokedFor1v1AsAdmin_lipClaimant() {
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("random role"));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .addRespondent1LitigationFriend()
+                    .addApplicant1LitigationFriend()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .addApplicant1ExpertsAndWitnesses()
+                    .applicant1Represented(NO)
+                    .respondent1(Party.builder()
+                            .type(COMPANY)
+                            .companyName("Test Inc")
+                            .build())
+                    .build()
+                    .toBuilder()
+                    .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
+                    .ccdCaseReference(123L).build();
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            List<String> expected = List.of(
+                    "CLAIMANT 1: Mr. John Rambo",
+                    "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
+                    "CLAIMANT 1: Witnesses",
+                    "CLAIMANT 1: Experts",
+                    "DEFENDANT 1: Test Inc",
+                    "DEFENDANT 1: Individuals attending for the organisation",
+                    "DEFENDANT 1: Individuals attending for the legal representative",
+                    "DEFENDANT 1: Witnesses",
+                    "DEFENDANT 1: Experts"
+            );
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
         void shouldReturnExpectedList_WhenInvokedFor1v1AsApplicantSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
@@ -242,6 +285,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1LitigationFriend()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
+                .applicant1Represented(YES)
                 .respondent1(Party.builder()
                                  .type(COMPANY)
                                  .companyName("Test Inc")
@@ -445,6 +489,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1ExpertsAndWitnesses()
+                .applicant1Represented(YES)
                 .respondent1(Party.builder()
                                  .type(COMPANY)
                                  .companyName("Test Inc")
@@ -486,6 +531,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "[APPLICANTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
+                .applicant1Represented(YES)
                 .addApplicant1LitigationFriend()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -584,6 +630,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
+                .applicant1Represented(YES)
                 .build()
                 .toBuilder()
                 .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
@@ -629,6 +676,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addApplicant1LitigationFriend()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1Represented(YES)
                 .respondent2Responds(RespondentResponseType.FULL_DEFENCE)
                 .respondent2DQ()
                 .respondent2Represented(YES)
