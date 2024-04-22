@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -599,6 +600,32 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         ReflectionUtils.invokeMethod(ReflectionUtils.getRequiredMethod(target.getClass(),
                                                                        method, argument.getClass()), target, argument);
         return target;
+    }
+
+    @Test
+    void shouldAddApplicantEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded_onNewCreatedBundle() {
+        List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle = new ArrayList<>();
+        UploadEvidenceDocumentType document = new UploadEvidenceDocumentType();
+        document.setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+        applicantDocsUploadedAfterBundle.add(ElementUtils.element(document));
+        // Given caseBundles with bundle created date is before witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            // populate applicantDocsUploadedAfterBundle with a default built element after a new bundle, it only
+            // contains createdDatetime and no document, so will be removed from final list
+            .applicantDocsUploadedAfterBundle(applicantDocsUploadedAfterBundle)
+            // added after trial bundle, so will  be added
+            .documentWitnessStatement(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .documentExpertReport(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then applicant docs uploaded after bundle should return size 2, 2 new docs and 1 being removed.
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle()).hasSize(2);
     }
 
     @Test
