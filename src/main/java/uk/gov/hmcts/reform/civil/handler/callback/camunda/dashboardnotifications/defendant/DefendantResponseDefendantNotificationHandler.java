@@ -59,7 +59,7 @@ public class DefendantResponseDefendantNotificationHandler extends DashboardCall
             return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario();
         }
 
-        if ((caseData.isRespondentResponseFullDefence() && caseData.hasDefendantPayedTheAmountClaimed())
+        if ((caseData.isRespondentResponseFullDefence() && caseData.hasDefendantPaidTheAmountClaimed())
             || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitAlreadyPaid())) {
             return SCENARIO_AAA6_DEFENDANT_ALREADY_PAID.getScenario();
         }
