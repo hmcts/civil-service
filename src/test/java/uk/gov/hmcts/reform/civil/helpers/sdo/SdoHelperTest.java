@@ -325,7 +325,7 @@ public class SdoHelperTest {
             if (method == SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing) {
                 assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
             } else if (method == SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video");
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
             } else if (method == SdoR2FastTrackMethod.fastTrackMethodInPerson) {
                 assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
             }
