@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -111,7 +112,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         }
         caseDataBuilder.isFlightDelayClaim(YesOrNo.YES);
         String airlineName = "Sri Lankan";
-        caseDataBuilder.flightDelayDetails(FlightDelayDetails.builder()
+        caseDataBuilder
+            .claimType(ClaimType.FLIGHT_DELAY)
+            .flightDelayDetails(FlightDelayDetails.builder()
                                                .nameOfAirline(airlineName)
                                                .flightNumber("ABC123")
                                                .flightCourtLocation(getAirlineCaseLocation(airlineName, callbackParams)).build()).build();
