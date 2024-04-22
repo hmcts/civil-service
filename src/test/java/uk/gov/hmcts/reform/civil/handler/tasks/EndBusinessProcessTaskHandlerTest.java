@@ -28,11 +28,13 @@ import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
+import static uk.gov.hmcts.reform.civil.handler.tasks.EndBusinessProcessTaskHandler.NOT_RETRYABLE_MESSAGE;
 
 @SpringBootTest(classes = {
     EndBusinessProcessTaskHandler.class,
@@ -50,9 +52,6 @@ class EndBusinessProcessTaskHandlerTest {
 
     @Mock
     private ExternalTaskService externalTaskService;
-
-    @Mock
-    private BaseExternalTaskHandler baseExternalTaskHandler;
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -88,14 +87,16 @@ class EndBusinessProcessTaskHandlerTest {
 
         CaseDataContent caseDataContentWithFinishedStatus = getCaseDataContent(caseDetails, startEventResponse);
 
-        assertThrows(
-            NotRetryableException.class,
-            () -> handler.execute(mockExternalTask, externalTaskService));
+        handler.execute(mockExternalTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService, never()).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
-        verify(baseExternalTaskHandler).handleFailureNotRetryable(mockExternalTask, externalTaskService,
-                                                                  any(NotRetryableException.class)
+        verify(externalTaskService).handleFailure(
+            eq(mockExternalTask),
+            eq(NOT_RETRYABLE_MESSAGE),
+            anyString(),
+            eq(0),
+            eq(1000L)
         );
     }
 

@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
 @RequiredArgsConstructor
 public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
+    public static final String NOT_RETRYABLE_MESSAGE = "Stopping multiple calls, END_BUSINESS_PROCESS already performed.";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -40,7 +41,7 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
         BusinessProcess businessProcess = data.getBusinessProcess();
         switch (businessProcess.getStatusOrDefault()) {
             case FINISHED:
-                throw new NotRetryableException("Stopping multiple calls, END_BUSINESS_PROCESS already performed.");
+                throw new NotRetryableException(NOT_RETRYABLE_MESSAGE);
             default:
                 coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         }
