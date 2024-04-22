@@ -44,19 +44,23 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">Mr Claim Claimant wants to proceed to court.</p>"
+                    .value("<p class=\"govuk-body\">Mr Claim Claimant wants to proceed with the claim.</p>"
                                + "<p class=\"govuk-body\">They rejected your admission of £3000 although they accept you have already paid it.</p>"
-                               + "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a><br>"
+                               +
+                               "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>"
+                               +
+                               "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
                                + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\"  rel=\"noopener noreferrer\" "
-                               + "class=\"govuk-link\">View the claimant's hearing requirements</a></p>"),
+                               + "class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">Mr Claim Claimant wants to proceed to court.</p>"
+                    .value("<p class=\"govuk-body\">Mr Claim Claimant wants to proceed with the claim.</p>"
                                + "<p class=\"govuk-body\">They rejected your admission of £3000 although they accept you have already paid it.</p>"
-                               + "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a><br>"
+                               +
+                               "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>"
+                               +
+                               "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
                                + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\"  rel=\"noopener noreferrer\" "
-                               + "class=\"govuk-link\">View the claimant's hearing requirements</a></p>")
+                               + "class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>")
             );
     }
 }

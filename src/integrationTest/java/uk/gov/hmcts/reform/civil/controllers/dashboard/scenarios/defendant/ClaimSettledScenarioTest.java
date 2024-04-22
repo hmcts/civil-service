@@ -25,9 +25,11 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("claimSettledAmount", "£3000",
+                   .params(new HashMap<>(Map.of("applicant1PartyName", "mr claimant",
+                                                "claimSettledAmount", "£3000",
                                                 "claimSettledDateEn", "16th March 2024",
                                                 "claimSettledDateCy", "16th March 2024"
+
                    )))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.ClaimSettled.Defendant", caseId
@@ -42,7 +44,7 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">The claimant has confirmed that you paid £3000 on 16th March 2024.</p>")
+                        "<p class=\"govuk-body\">mr claimant has confirmed that you paid £3000 on 16th March 2024.</p>")
             );
     }
 }

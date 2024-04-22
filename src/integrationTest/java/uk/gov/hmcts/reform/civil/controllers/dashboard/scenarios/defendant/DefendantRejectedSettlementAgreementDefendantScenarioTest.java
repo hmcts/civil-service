@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
+import org.elasticsearch.core.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,8 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends B
         UUID caseId = UUID.randomUUID();
         doPost(
             BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build(),
+            ScenarioRequestParams.builder().params(new HashMap<>(Map.of("applicant1PartyName", "mr claimant")))
+                .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT.getScenario(),
             caseId
@@ -34,8 +36,8 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends B
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You have rejected the settlement agreement.</p> " +
-                    "<p class=\"govuk-body\">The claimant can request a County Court Judgment (CCJ), " +
+
+                "<p class=\"govuk-body\">mr claimant can request a County Court Judgment (CCJ), " +
                     "which would order you to repay the money in line with the agreement. " +
                     "The court believes you can afford this.</p> " +
                     "<p class=\"govuk-body\">If the claimant requests a CCJ then you can ask a judge " +
