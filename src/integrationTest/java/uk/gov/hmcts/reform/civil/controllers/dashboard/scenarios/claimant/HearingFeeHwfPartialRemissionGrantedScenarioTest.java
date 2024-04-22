@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +38,7 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
                                    .remissionAmount(new BigDecimal(10000))
                                    .outstandingFeeInPounds(new BigDecimal(355))
                                    .build())
+            .hearingDueDate(LocalDate.of(2024, 4, 4))
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -50,13 +52,13 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. " +
-                    "You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
+                    "You must still pay the remaining fee of £355 by 4 April 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
                     "If you do not pay, your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">You'll get help with the hearing fee. £100 will be covered by fee remission. " +
-                    "You must still pay the remaining fee of £355. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
+                    "You must still pay the remaining fee of £355 by 4 Ebrill 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. " +
                     "If you do not pay, your claim will be struck out.</p>")
         );
 

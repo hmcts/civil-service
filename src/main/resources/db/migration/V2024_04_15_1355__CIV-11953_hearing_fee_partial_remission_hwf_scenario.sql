@@ -13,8 +13,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.CP.HearingFee.HWF.PartRemission',
         'Your help with fees application has been reviewed',
         'Your help with fees application has been reviewed',
-        '<p class="govuk-body">You''ll get help with the hearing fee. ${hearingFeeRemissionAmount} will be covered by fee remission. You must still pay the remaining fee of ${hearingFeeOutStandingAmount}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>',
-        '<p class="govuk-body">You''ll get help with the hearing fee. ${hearingFeeRemissionAmount} will be covered by fee remission. You must still pay the remaining fee of ${hearingFeeOutStandingAmount}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>',
+        '<p class="govuk-body">You''ll get help with the hearing fee. ${hearingFeeRemissionAmount} will be covered by fee remission. You must still pay the remaining fee of ${hearingFeeOutStandingAmount} by ${hearingDueDateEn}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>',
+        '<p class="govuk-body">You''ll get help with the hearing fee. ${hearingFeeRemissionAmount} will be covered by fee remission. You must still pay the remaining fee of ${hearingFeeOutStandingAmount} by ${hearingDueDateCy}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>',
         'CLAIMANT');
 
 /**
