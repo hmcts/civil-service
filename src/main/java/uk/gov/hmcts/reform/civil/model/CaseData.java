@@ -840,6 +840,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasDefendant2AgreedToFreeMediation() {
+        return YES.equals(getResponseClaimMediationSpec2Required());
+    }
+
+    @JsonIgnore
     public boolean isMultiPartyDefendant() {
         return !YES.equals(getDefendantSingleResponseToBothClaimants())
             && YES.equals(getApplicant1ProceedWithClaim());
