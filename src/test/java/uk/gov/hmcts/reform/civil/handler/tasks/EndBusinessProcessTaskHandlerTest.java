@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,8 +26,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
@@ -48,6 +51,9 @@ class EndBusinessProcessTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
+    @Mock
+    private BaseExternalTaskHandler baseExternalTaskHandler;
+
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
@@ -66,6 +72,31 @@ class EndBusinessProcessTaskHandlerTest {
                 "caseId", CASE_ID,
                 "caseEvent", END_BUSINESS_PROCESS
             ));
+    }
+
+    @Test
+    void shouldNotTriggerEndBusinessProcessCCDEvent_whenCalledMoreThanOnceInSequence() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.FINISHED).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+        CaseDataContent caseDataContentWithFinishedStatus = getCaseDataContent(caseDetails, startEventResponse);
+
+        assertThrows(
+            NotRetryableException.class,
+            () -> handler.execute(mockExternalTask, externalTaskService));
+
+        verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
+        verify(coreCaseDataService, never()).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
+        verify(baseExternalTaskHandler).handleFailureNotRetryable(mockExternalTask, externalTaskService,
+                                                                  any(NotRetryableException.class)
+        );
     }
 
     @Test

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,15 +30,20 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        ExternalTaskInput externalTaskInput = mapper.convertValue(externalTask.getAllVariables(),
-                                                                  ExternalTaskInput.class);
+        ExternalTaskInput externalTaskInput = mapper.convertValue(
+            externalTask.getAllVariables(),
+            ExternalTaskInput.class
+        );
         String caseId = externalTaskInput.getCaseId();
-
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
-
-        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        switch (businessProcess.getStatusOrDefault()) {
+            case FINISHED:
+                throw new NotRetryableException("Stopping multiple calls, END_BUSINESS_PROCESS already performed.");
+            default:
+                coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        }
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
