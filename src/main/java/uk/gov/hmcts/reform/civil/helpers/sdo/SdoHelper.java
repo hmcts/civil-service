@@ -665,7 +665,7 @@ public class SdoHelper {
                     return "by telephone";
                 } else if (SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing
                     .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
-                    return "by video";
+                    return "by video conference";
                 } else if (SdoR2FastTrackMethod.fastTrackMethodInPerson
                     .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
                     return "in person";
