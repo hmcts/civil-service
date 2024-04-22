@@ -81,17 +81,17 @@ public class HearingsPartyMapper {
 
         // applicant 1 solicitor firm individuals
         if (caseData.getApplicant1LRIndividuals() != null) {
-            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1LRIndividuals()));
+            parties.addAll(getDetailsFor(LEGAL_REP_ROLE, caseData.getApplicant1LRIndividuals()));
         }
 
         // respondent 1 solicitor firm individuals
         if (caseData.getRespondent1LRIndividuals() != null) {
-            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1LRIndividuals()));
+            parties.addAll(getDetailsFor(LEGAL_REP_ROLE, caseData.getRespondent1LRIndividuals()));
         }
 
         // respondent 2 solicitor firm individuals
         if (caseData.getRespondent2LRIndividuals() != null) {
-            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2LRIndividuals()));
+            parties.addAll(getDetailsFor(LEGAL_REP_ROLE, caseData.getRespondent2LRIndividuals()));
         }
     }
 
