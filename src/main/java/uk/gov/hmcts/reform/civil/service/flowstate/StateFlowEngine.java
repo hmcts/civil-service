@@ -22,15 +22,15 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
@@ -605,9 +605,10 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE_PROCEED)
                 .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimantResponseBeforeSDO
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf((takenOfflineByStaffAfterClaimantResponseBeforeSDO
                                                                  .or(takenOfflineByStaffAfterSDO)
                                                                  .or(takenOfflineAfterNotSuitableForSdo))
+                                                                 .and(not(caseDismissedPastHearingFeeDue)))
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
                 .transitionTo(IN_MEDIATION).onlyIf(specSmallClaimCarm)
