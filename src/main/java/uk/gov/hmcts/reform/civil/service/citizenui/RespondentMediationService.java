@@ -23,7 +23,7 @@ public class RespondentMediationService {
                 }
             } else {
                 if (caseData.isMultiPartyDefendant()) {
-                    if (caseData.hasDefendantAgreedToFreeMediation() || caseData.hasDefendant2AgreedToFreeMediation()){
+                    if (caseData.hasDefendantAgreedToFreeMediation() || caseData.hasDefendant2AgreedToFreeMediation()) {
                         return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
                     }
                 }
