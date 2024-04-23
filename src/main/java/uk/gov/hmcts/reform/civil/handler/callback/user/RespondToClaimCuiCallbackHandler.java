@@ -30,7 +30,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Slf4j
 @Service
@@ -66,10 +68,16 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(builder);
+            addEventAndDateAddedToRespondentWitnesses(builder);
+        }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
 
+        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
