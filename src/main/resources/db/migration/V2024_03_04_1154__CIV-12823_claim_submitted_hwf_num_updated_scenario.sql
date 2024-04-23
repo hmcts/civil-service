@@ -9,7 +9,7 @@ VALUES ('Scenario.AAA6.ClaimIssue.HWF.Updated', '{"Notice.AAA6.ClaimIssue.HWF.In
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.HWF.Updated', 'Your help with fees application has been updated', 'Your help with fees application has been updated',
+VALUES ('Notice.AAA6.ClaimIssue.HWF.Updated', 'Your help with fees application has been updated', 'Mae eich cais am help i dalu ffioedd wedi cael ei ddiweddaru',
         '<p class="govuk-body">You''ve applied for help with the ${typeOfFee} fee. You''ll receive an update from us within 5 to 10 working days.</p>',
-        '<p class="govuk-body">You''ve applied for help with the ${typeOfFee} fee. You''ll receive an update from us within 5 to 10 working days.</p>',
+        '<p class="govuk-body">Fe wnaethoch gais am help i dalu ffi’r ${typeOfFee}. Byddwch yn cael diweddariad gennym mewn 5 i 10 diwrnod gwaith.</p>',
         'CLAIMANT');
