@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
@@ -80,7 +81,11 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         } else if (isCaseStateJudicialReferral(caseData)) {
             return getJudicialReferralScenarios(caseData);
         } else if (isCaseStateInMediation(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
+            if (isCarmApplicableForMediation(caseData)) {
+                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario();
+            } else {
+                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
+            }
         } else if (isClaimantRejectRepaymentPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
         }
@@ -175,5 +180,9 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
                 && caseData.getRespondent1().isCompanyOROrganisation()
                 && caseData.hasApplicantRejectedRepaymentPlan());
+    }
+
+    private boolean isCarmApplicableForMediation(CaseData caseData) {
+        return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
 }
