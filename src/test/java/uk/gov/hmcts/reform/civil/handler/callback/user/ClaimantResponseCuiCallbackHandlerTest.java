@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -383,6 +384,54 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedCaseData = getCaseData(response);
             assertThat(updatedCaseData.getApplicantExperts()).isNotNull();
             assertThat(updatedCaseData.getApplicantWitnesses()).isNotNull();
+
+        }
+
+        @Test
+        void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("CLAIMANT_NAME")
+                                 .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQExperts(Experts.builder()
+                                                           .expertRequired(YES)
+                                                           .details(wrapElements(Expert.builder()
+                                                                                     .name(
+                                                                                         "John Smith")
+                                                                                     .firstName("Jane")
+                                                                                     .lastName("Smith")
+
+                                                                                     .build()))
+                                                           .build())
+                                  .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
+                                                             .details(wrapElements(Witness.builder()
+                                                                                       .name(
+                                                                                           "John Smith")
+                                                                                       .firstName("Jane")
+                                                                                       .lastName("Smith")
+
+                                                                                       .build())).build())
+                                  .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            Expert expert = updatedCaseData.getApplicant1DQ().getApplicant1DQExperts().getDetails().get(0).getValue();
+            Witness witness = updatedCaseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().get(0).getValue();
+
+            assertThat(expert.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
+            assertThat(expert.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
+            assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
+            assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
 
