@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
@@ -107,10 +108,6 @@ public class SdoHelper {
 
     public static String getPhysicalTrialTextNihl(CaseData caseData) {
         if (caseData.getSdoR2Trial() != null
-            && PhysicalTrialBundleOptions.NONE.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
-            return "None";
-
-        } else if (caseData.getSdoR2Trial() != null
             && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
             return caseData.getSdoR2Trial().getPhysicalBundlePartyTxt();
         }
@@ -666,9 +663,17 @@ public class SdoHelper {
 
         if (caseData.getSdoR2Trial() != null) {
             if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
-                return caseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel();
-            } else {
-                return "";
+                if (SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "by telephone";
+                } else if (SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "by video conference";
+                } else if (SdoR2FastTrackMethod.fastTrackMethodInPerson
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing())) {
+                    return "in person";
+                }
+                return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
             }
         }
         return "";
