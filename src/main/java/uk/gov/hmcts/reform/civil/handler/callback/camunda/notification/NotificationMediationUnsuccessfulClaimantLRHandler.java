@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
@@ -113,7 +114,9 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 sendMailAccordingToReason(caseData);
             }
         } else {
-            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented()) &&
+                caseData.isApplicant1NotRepresented() &&
+                featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     addTemplate(caseData),
