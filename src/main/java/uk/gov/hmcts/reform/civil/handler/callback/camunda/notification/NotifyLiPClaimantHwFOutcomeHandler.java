@@ -87,7 +87,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
             case MORE_INFORMATION_HWF -> getMoreInformationProperties(caseData);
             case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
-            case FEE_PAYMENT_OUTCOME, INVALID_HWF_REFERENCE, UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
+            case INVALID_HWF_REFERENCE, UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -104,9 +104,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
-                notificationsProperties.getNotifyApplicantForHwfPartialRemission(),
-                CaseEvent.FEE_PAYMENT_OUTCOME,
-                notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcome()
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -124,10 +122,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
-                notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual(),
-                CaseEvent.FEE_PAYMENT_OUTCOME,
-                notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()
-
+                notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);
