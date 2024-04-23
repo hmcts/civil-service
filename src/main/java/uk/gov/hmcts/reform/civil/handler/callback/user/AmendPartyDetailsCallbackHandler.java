@@ -51,11 +51,11 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
-        if(caseData.isApplicantRepresented() || caseData.getApplicantSolicitor1UserDetails() != null && caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
+        if (caseData.isApplicantRepresented() || caseData.getApplicantSolicitor1UserDetails() != null && caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
             errors.addAll(validateEmailService.validate(caseData.getApplicantSolicitor1UserDetails().getEmail()));
         }
 
-        if(!caseData.isRespondent1LiP()  || caseData.getRespondentSolicitor1EmailAddress() != null) {
+        if (!caseData.isRespondent1LiP() || caseData.getRespondentSolicitor1EmailAddress() != null) {
             errors.addAll(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()));
         }
 
