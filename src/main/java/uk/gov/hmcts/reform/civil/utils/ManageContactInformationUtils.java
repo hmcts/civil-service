@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
@@ -69,7 +71,9 @@ public class ManageContactInformationUtils {
 
     public static void addApplicant1Options(List<DynamicListElement> list, CaseData caseData, boolean isAdmin) {
         addApplicant1PartyOptions(list, caseData);
-        addApplicantLegalRepIndividuals(list, false);
+        if (!NO.equals(caseData.getApplicant1Represented())) {
+            addApplicantLegalRepIndividuals(list, false);
+        }
         addApplicant1ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
@@ -339,7 +343,7 @@ public class ManageContactInformationUtils {
             }
         } else {
             // applicant 2 org individuals
-            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_ONE);
+            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_TWO);
         }
     }
 
