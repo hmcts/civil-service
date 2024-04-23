@@ -215,18 +215,30 @@ public class SdoHelperTest {
             assertThat(SdoHelper.getHearingLocationNihl(caseData)).isNotNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldreturn_physicalbundletext(boolean isParty) {
+        @Test
+        void shouldreturn_physicalbundletextWhenBundleOptionIsParty() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
                 .sdoR2Trial(SdoR2Trial.builder()
                                 .physicalBundlePartyTxt("Test")
-                                .physicalBundleOptions(isParty ? PhysicalTrialBundleOptions.PARTY : PhysicalTrialBundleOptions.NONE).build())
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY).build())
                 .build();
             assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
+        }
+
+        @Test
+        void shouldreturn_emptyPhysicalbundletextWhenBundleOptionIsNone() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .physicalBundlePartyTxt("Test")
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.NONE).build())
+                .build();
+            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isEmpty();
         }
 
         @ParameterizedTest
@@ -310,6 +322,25 @@ public class SdoHelperTest {
                                 .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson).build())
                 .build();
             assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SdoR2FastTrackMethod.class)
+        void shouldReturn_method_of_hearingForNIHL(SdoR2FastTrackMethod method) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(method).build())
+                .build();
+
+            if (method == SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
+            } else if (method == SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
+            } else if (method == SdoR2FastTrackMethod.fastTrackMethodInPerson) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
+            }
         }
 
         @ParameterizedTest
