@@ -7,7 +7,6 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -21,7 +20,7 @@ import static java.lang.String.format;
 @Service
 public class JsonSchemaValidationService {
 
-    private String jsonSchemaFile;
+    private final String jsonSchemaFile;
 
     @Autowired
     public JsonSchemaValidationService() {
