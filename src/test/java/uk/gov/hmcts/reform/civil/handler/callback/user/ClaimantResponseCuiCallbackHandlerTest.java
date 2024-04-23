@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -402,11 +404,12 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder()
-                    .nameOfAirline("Sri Lankan")
+                    .airlineList(DynamicList.builder()
+                        .value(DynamicListElement.builder().code("Sri Lankan").build()).build())
                     .flightCourtLocation(CaseLocationCivil.builder()
-                                             .baseLocation("111")
-                                             .region("region 1")
-                                             .build())
+                        .baseLocation("111")
+                        .region("region 1")
+                        .build())
                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -428,8 +431,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder()
-                                        .nameOfAirline("OTHER")
-                                        .build())
+                    .airlineList(DynamicList.builder()
+                        .value(DynamicListElement.builder().code("OTHER").build()).build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

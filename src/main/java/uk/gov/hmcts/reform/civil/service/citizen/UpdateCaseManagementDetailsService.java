@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -70,7 +72,9 @@ public class UpdateCaseManagementDetailsService {
     private void updateFlightDelayCaseManagementLocation(
         CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getFlightDelayDetails())
-            .map(FlightDelayDetails::getNameOfAirline)
+            .map(FlightDelayDetails::getAirlineList)
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getCode)
             .map(airline -> mapToLocation(airline, caseData.getFlightDelayDetails(), availableLocations))
             .ifPresent(caseLocationCivil -> setCaseManagementLocation(builder, caseLocationCivil, availableLocations));
     }

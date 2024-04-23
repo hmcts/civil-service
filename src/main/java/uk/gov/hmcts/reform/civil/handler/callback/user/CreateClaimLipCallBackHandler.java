@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -115,7 +117,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         caseDataBuilder
             .claimType(ClaimType.FLIGHT_DELAY)
             .flightDelayDetails(FlightDelayDetails.builder()
-                                               .nameOfAirline(airlineName)
+                                               .airlineList(DynamicList.builder()
+                                                                .value(DynamicListElement.builder()
+                                                                           .code(airlineName).build()).build())
                                                .flightNumber("ABC123")
                                                .flightCourtLocation(getAirlineCaseLocation(airlineName, callbackParams)).build()).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
