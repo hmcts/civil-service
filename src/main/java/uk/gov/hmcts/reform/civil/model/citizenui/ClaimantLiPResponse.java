@@ -39,6 +39,11 @@ public class ClaimantLiPResponse {
     }
 
     @JsonIgnore
+    public boolean hasCourtDecisionInFavourOfDefendant() {
+        return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT == claimantCourtDecision;
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAcceptedCourtDecision() {
         return ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE == claimantResponseOnCourtDecision
             || ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN == claimantResponseOnCourtDecision;
