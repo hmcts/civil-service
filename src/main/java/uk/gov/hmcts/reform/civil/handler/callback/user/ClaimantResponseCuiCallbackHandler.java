@@ -34,7 +34,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Slf4j
 @Service
@@ -102,6 +104,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
 
         CaseData updatedData = builder.build();
