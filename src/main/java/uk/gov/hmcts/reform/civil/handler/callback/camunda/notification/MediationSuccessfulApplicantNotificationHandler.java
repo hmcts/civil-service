@@ -84,9 +84,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            if (Objects.nonNull(caseData.getApplicant1Represented()) &&
-                caseData.isApplicant1NotRepresented() &&
-                featureToggleService.isLipVLipEnabled()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented())
+                && caseData.isApplicant1NotRepresented()
+                && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     addTemplate(caseData),
