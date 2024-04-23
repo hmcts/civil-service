@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION;
@@ -58,7 +59,11 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
         } else if (caseData.getCcdState() == IN_MEDIATION) {
-            return SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
+            if (isCarmApplicableForMediation(caseData)) {
+                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM.getScenario();
+            } else {
+                return SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
+            }
         } else if (caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
         } else if (hasClaimantRejectedCourtDecision(caseData)) {
@@ -80,5 +85,9 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
                 .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj)
                 .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
                 .isPresent();
+    }
+
+    private boolean isCarmApplicableForMediation(CaseData caseData) {
+        return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
 }
