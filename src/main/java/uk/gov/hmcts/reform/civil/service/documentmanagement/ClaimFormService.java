@@ -20,7 +20,6 @@ public class ClaimFormService {
 
     private final DocumentDownloadService documentDownloadService;
 
-    @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
     public CaseDocument uploadSealedDocument(

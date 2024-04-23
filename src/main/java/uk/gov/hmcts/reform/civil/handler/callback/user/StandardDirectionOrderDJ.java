@@ -120,7 +120,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
 
-    @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
     private final WorkingDayIndicator workingDayIndicator;
 

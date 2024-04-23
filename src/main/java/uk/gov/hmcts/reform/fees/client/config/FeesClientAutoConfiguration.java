@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.fees.client.config;
 
 import feign.codec.Encoder;
 import feign.form.FormEncoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -19,15 +19,15 @@ import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 @Configuration
 @ConditionalOnProperty(prefix = "fees", name = "api.url")
 @EnableFeignClients(basePackages = "uk.gov.hmcts.reform.fees.client")
+@RequiredArgsConstructor
 public class FeesClientAutoConfiguration {
+
+    private final ObjectFactory<HttpMessageConverters> messageConverters;
 
     @Bean
     public FeesHealthIndicator feesHealthIndicator(FeesApi feesApi) {
         return new FeesHealthIndicator(feesApi);
     }
-
-    @Autowired
-    private ObjectFactory<HttpMessageConverters> messageConverters;
 
     @Bean
     @Primary
