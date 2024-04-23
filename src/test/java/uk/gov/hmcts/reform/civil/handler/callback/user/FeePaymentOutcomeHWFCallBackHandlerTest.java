@@ -32,9 +32,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.FeePaymentOutcomeHWFCallBackHandler.WRONG_REMISSION_TYPE_SELECTED;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,8 +115,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
-            assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(FEE_PAYMENT_OUTCOME);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(CITIZEN_HEARING_FEE_PAYMENT.toString());
         }
 
         @Test
