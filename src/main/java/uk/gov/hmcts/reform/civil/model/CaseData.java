@@ -1405,6 +1405,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hearingFeeFullRemissionNotGrantedHWF() {
+        return Objects.nonNull(getFeePaymentOutcomeDetails())
+            && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee())
+            && getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee() == NO;
+    }
+
+    @JsonIgnore
     public boolean isLipvLROneVOne() {
         return !isRespondent1LiP()
             && isApplicant1NotRepresented()
