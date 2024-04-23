@@ -7,9 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.time.LocalDate;
 
 @Getter
@@ -18,15 +17,13 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class DefaultJudgmentDefendantLrCoverLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
     private final String claimReferenceNumber;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private final Organisation legalOrg;
+    private final String defendantName;
+    private final String claimantName;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate issueDate;
-
 
 }
