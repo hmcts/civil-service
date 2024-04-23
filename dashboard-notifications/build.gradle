@@ -1,7 +1,7 @@
 
 def versions = [
-  junit              : '5.10.0',
-  junitPlatform      : '1.10.0',
+  junit              : '5.10.2',
+  junitPlatform      : '1.10.2',
   testcontainers: '1.17.6',
   lombok             : '1.18.26'
 ]
