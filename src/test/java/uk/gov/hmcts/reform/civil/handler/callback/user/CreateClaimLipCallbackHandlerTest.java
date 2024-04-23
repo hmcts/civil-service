@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,12 +18,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -80,12 +76,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private HelpWithFeesForTabService hwfForTabService;
 
-    @MockBean
-    private AirlineEpimsService airlineEpimsService;
-
-    @MockBean
-    private LocationRefDataService locationRefDataService;
-
     @Autowired
     private CreateClaimLipCallBackHandler handler;
 
@@ -132,11 +122,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
-            LocationRefData refData = LocationRefData.builder().epimmsId("123").build();
-            ArrayList<LocationRefData> refDataList = new ArrayList<>();
-            refDataList.add(refData);
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(refDataList);
-            when(airlineEpimsService.getEpimsIdForAirline(any(String.class))).thenReturn("123");
             when(toggleService.isHmcEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
@@ -161,11 +146,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
-            LocationRefData refData = LocationRefData.builder().epimmsId("123").build();
-            ArrayList<LocationRefData> refDataList = new ArrayList<>();
-            refDataList.add(refData);
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(refDataList);
-            when(airlineEpimsService.getEpimsIdForAirline(any(String.class))).thenReturn("123");
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
@@ -189,11 +169,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetOrganisationPolicies_whenInvoked() {
-            LocationRefData refData = LocationRefData.builder().epimmsId("123").build();
-            ArrayList<LocationRefData> refDataList = new ArrayList<>();
-            refDataList.add(refData);
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(refDataList);
-            when(airlineEpimsService.getEpimsIdForAirline(any(String.class))).thenReturn("123");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();

@@ -10,22 +10,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
@@ -38,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -54,8 +43,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 @RequiredArgsConstructor
 public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
-    private static final String LOCATION_NOT_FOUND_MESSAGE = "Location not found for ePIMS_ID: %s";
-
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final Time time;
     private final ObjectMapper objectMapper;
@@ -63,8 +50,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final HelpWithFeesForTabService helpWithFeesForTabService;
     private final FeatureToggleService featureToggleService;
-    private final AirlineEpimsService airlineEpimsService;
-    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -112,40 +97,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateWithPartyIds(caseDataBuilder);
         }
-        caseDataBuilder.isFlightDelayClaim(YesOrNo.YES);
-        String airlineName = "Sri Lankan";
-        caseDataBuilder
-            .claimType(ClaimType.FLIGHT_DELAY)
-            .flightDelayDetails(FlightDelayDetails.builder()
-                                               .airlineList(DynamicList.builder()
-                                                                .value(DynamicListElement.builder()
-                                                                           .code(airlineName).build()).build())
-                                               .flightNumber("ABC123")
-                                               .flightCourtLocation(getAirlineCaseLocation(airlineName, callbackParams)).build()).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
-        if (airline.equals("OTHER")) {
-            return null;
-        }
-        String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
-        if (matchedLocations.isEmpty()) {
-            throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
-        } else {
-            return CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
-        }
-    }
-
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private void addOrginsationPoliciesforClaimantLip(CaseData.CaseDataBuilder caseDataBuilder) {
