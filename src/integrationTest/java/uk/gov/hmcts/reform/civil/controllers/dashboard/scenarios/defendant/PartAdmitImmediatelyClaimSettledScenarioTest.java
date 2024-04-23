@@ -45,7 +45,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
                     .value(
                         "<p class=\"govuk-body\">mr claimant has accepted your offer to pay £100 immediately in full and final settlement of the claim. " +
                             "Funds must be received in <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a> by 1 January 2024.</p><p class=\"govuk-body\">" +
-                            "If they don´t receive the money by then, they can request a County Court Judgment(CCJ).</p>")
+                            "If they don´t receive the money by then, they can request a County Court Judgment (CCJ).</p>")
             );
     }
 }

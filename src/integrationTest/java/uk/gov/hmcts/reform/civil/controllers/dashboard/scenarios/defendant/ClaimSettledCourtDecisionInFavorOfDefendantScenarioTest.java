@@ -56,7 +56,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Bas
                                + "then responded with an alternative plan that was accepted."
                                + "</p><p class=\"govuk-body\">"
                                + " You must respond by " + responseDeadline + ". If you do not respond by then, "
-                               + "or reject the agreement, they can request a County Court Judgment(CCJ).</p><p"
+                               + "or reject the agreement, they can request a County Court Judgment (CCJ).</p><p"
                                +
                                " class=\"govuk-body\">You can <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" "
                                + "class=\"govuk-link\">view the repayment plan</a> or <a "
