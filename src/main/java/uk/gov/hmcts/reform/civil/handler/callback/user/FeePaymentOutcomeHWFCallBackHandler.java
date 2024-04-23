@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
@@ -29,8 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 
 @Slf4j
 @Service
@@ -83,9 +81,7 @@ public class FeePaymentOutcomeHWFCallBackHandler extends CallbackHandler {
             caseDataBuilder.issueDate(issueDate).build();
             caseDataBuilder.businessProcess(BusinessProcess.ready(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         } else if (caseData.isHWFTypeHearing()) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
-            caseDataBuilder.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(FEE_PAYMENT_OUTCOME).build());
+            caseDataBuilder.businessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
         }
         caseData = caseDataBuilder.build();
         caseData = hwfFeePaymentOutcomeService.updateHwfReferenceNumber(caseData);
