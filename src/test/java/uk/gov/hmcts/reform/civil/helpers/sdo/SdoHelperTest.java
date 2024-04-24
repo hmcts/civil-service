@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -22,14 +23,12 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
@@ -49,6 +48,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
@@ -319,28 +319,9 @@ public class SdoHelperTest {
                 .build()
                 .toBuilder()
                 .sdoR2Trial(SdoR2Trial.builder()
-                                .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson).build())
+                                .methodOfHearing((getHearingMethodList("INTER", "In Person"))).build())
                 .build();
             assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = SdoR2FastTrackMethod.class)
-        void shouldReturn_method_of_hearingForNIHL(SdoR2FastTrackMethod method) {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(method).build())
-                .build();
-
-            if (method == SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
-            } else if (method == SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
-            } else if (method == SdoR2FastTrackMethod.fastTrackMethodInPerson) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
-            }
         }
 
         @ParameterizedTest
@@ -1968,28 +1949,6 @@ public class SdoHelperTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = SmallClaimsSdoR2HearingMethod.class)
-        void shouldReturnHearingMethodsForDrh(SmallClaimsSdoR2HearingMethod method) {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().methodOfHearing(method).build())
-                .build();
-
-            if (method == SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
-            } else if (method == SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
-            } else if (method == SmallClaimsSdoR2HearingMethod.IN_PERSON) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
-            }
-        }
-
-        @ParameterizedTest
         @EnumSource(value = SmallClaimsSdoR2PhysicalTrialBundleOptions.class)
         void shouldReturnPhysicalTrialBundleTxt(SmallClaimsSdoR2PhysicalTrialBundleOptions option) {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2008,6 +1967,136 @@ public class SdoHelperTest {
             } else {
                 assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
             }
+        }
+
+        @ParameterizedTest
+        @CsvSource({"VID, Video", "INTER, In Person", "TEL, Telephone"})
+        void shouldReturnHearingMethodsForDrh(String key, String value) {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().methodOfHearing(getHearingMethodList(key, value)).build())
+                .build();
+
+            if (key.equals("TEL")) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
+            } else if (key.equals("VID")) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
+            } else if (key.equals("INTER")) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({"VID, Video", "INTER, In Person", "TEL, Telephone"})
+        void shouldReturn_method_of_hearingForNIHL(String key, String value) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(getHearingMethodList(key, value)).build())
+                .build();
+
+            if (key.equals("TEL")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
+            } else if (key.equals("VID")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
+            } else if (key.equals("INTER")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
+            }
+        }
+
+    }
+
+    private DynamicList getHearingMethodList(String key, String value) {
+        Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        return hearingMethodList;
+    }
+
+    @Nested
+    class CarmMediationSectionTestDRH {
+
+        @Test
+        void shouldReturnTrue_whenCarmEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, true)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmEnabledAndStatementNotExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder().build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnText_whenStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isEqualTo("small claims mediation text");
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementExistsTextIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
         }
     }
 
