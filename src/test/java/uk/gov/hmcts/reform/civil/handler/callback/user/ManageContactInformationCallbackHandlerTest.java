@@ -1812,9 +1812,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                assertThat(response.getWarnings()).isEqualTo(List.of(
-                    "There is another litigation friend on this case. If the parties are using the same litigation "
-                        + "friend you must update the other litigation friend's details too."));
+                assertThat(response.getWarnings()).isEmpty();
             }
 
             @ParameterizedTest

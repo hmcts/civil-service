@@ -105,7 +105,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
-    private static final String CHECK_LITIGATION_FRIEND_WARNING = "There is another litigation friend on this case. If the parties are using the same litigation friend you must update the other litigation friend's details too.";
+    private static final String CHECK_LITIGATION_FRIEND_WARNING = "There is another litigation friend on this case. "
+        + "If the parties are using the same litigation friend you must update the other litigation friend's details too.";
     private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
     private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
@@ -329,7 +330,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse showWarning(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
@@ -345,12 +345,12 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
         }
 
-        if(showLitigationFriendUpdateWarning(partyChosen, caseData)) {
+        if (showLitigationFriendUpdateWarning(partyChosen, caseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_WARNING);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .warnings(warnings)
             .errors(errors)
             .build();
