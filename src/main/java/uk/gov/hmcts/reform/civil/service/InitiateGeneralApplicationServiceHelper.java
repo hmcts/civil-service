@@ -199,8 +199,8 @@ public class InitiateGeneralApplicationServiceHelper {
                     .generalAppRespondentSolicitors(List.of(
                         element(GASolicitorDetailsGAspec
                                     .builder()
-                                    .email(caseData.getRespondent1().getPartyEmail())
-                                    .id(caseData.getRespondent1().getPartyID())
+                                    .email(caseData.getDefendantUserDetails().getEmail())
+                                    .id(caseData.getDefendantUserDetails().getId())
                                     .forename(caseData.getRespondent1().getIndividualFirstName())
                                     .surname(Optional.ofNullable(caseData.getRespondent1().getIndividualLastName()))
                                     .build())));

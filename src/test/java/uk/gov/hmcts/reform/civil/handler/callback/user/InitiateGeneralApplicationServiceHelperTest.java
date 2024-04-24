@@ -576,7 +576,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
             .respondent1(Party.builder()
                              .partyID("party")
                              .partyEmail("party@gmail.com")
-                             .individualFirstName("party").build()).build();
+                             .individualFirstName("party").build())
+            .defendantUserDetails(IdamUserDetails.builder().id("ID").email("partyemail@gmail.com").build())
+            .build();
 
         GeneralApplication result = helper
             .setRespondentDetailsIfPresent(
@@ -591,7 +593,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(1);
 
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getOrganisationIdentifier()).isNull();
-        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getEmail()).isEqualTo("party@gmail.com");
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getId())
+            .isEqualTo("ID");
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getEmail())
+            .isEqualTo("partyemail@gmail.com");
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getForename()).isEqualTo("party");
         assertFalse(result.getGeneralAppRespondentSolicitors().get(0).getValue().getSurname().isPresent());
 
