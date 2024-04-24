@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
@@ -828,4 +830,41 @@ public class SdoGeneratorServiceTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
     }
+
+    @Test
+    public void shouldGenerateSdoSmallDrhDocumentCarmEnabled() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL_DRH);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+                                                      .input("mediation representation")
+                                                      .build())
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormSmallDrh
+                            && ((SdoDocumentFormSmallDrh) templateData).getSdoR2SmallClaimMediationSectionInput()
+                            .equals("mediation representation")),
+            any(DocmosisTemplates.class)
+        );
+    }
+
 }

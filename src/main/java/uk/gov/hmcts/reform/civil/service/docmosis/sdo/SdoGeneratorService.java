@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -413,6 +414,8 @@ public class SdoGeneratorService {
                 && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
+            .hasSdoR2TrialPhysicalBundleParty(caseData.getSdoR2Trial() != null
+                && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions()) ? true : false)
             .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
             .hasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
             .welshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
@@ -533,6 +536,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -567,8 +571,13 @@ public class SdoGeneratorService {
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
             .welshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2DrhUseOfWelshLanguage().getDescription() : null)
+            .carmEnabled(carmEnabled)
+            .sdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
             .caseManagementLocation(
-                locationHelper.getHearingLocation(null, caseData, authorisation));
+                locationHelper.getHearingLocation(null, caseData, authorisation))
+            .sdoR2SmallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSectionDRH(caseData, carmEnabled)
+            );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             sdoDocumentFormBuilderDrh.hearingLocation(
