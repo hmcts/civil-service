@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -54,7 +55,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -102,6 +105,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
+    private static final String CHECK_LITIGATION_FRIEND_WARNING = "There is another litigation friend on this case. If the parties are using the same litigation friend you must update the other litigation friend's details too.";
     private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
     private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
@@ -339,6 +343,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
+        }
+
+        if(showLitigationFriendUpdateWarning(partyChosen, caseData)) {
+            warnings.add(CHECK_LITIGATION_FRIEND_WARNING);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -639,4 +647,28 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return userService.getUserInfo(userAuthToken).getRoles()
             .stream().anyMatch(ADMIN_ROLES::contains);
     }
+
+    private boolean showLitigationFriendUpdateWarning(String partyChosen, CaseData caseData) {
+        if ((CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
+            && bothClaimantsHaveLitigationFriends(caseData)) {
+            return true;
+        }
+
+        if ((DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
+            && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && bothDefendantsHaveLitigationFriends(caseData)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean bothClaimantsHaveLitigationFriends(CaseData caseData) {
+        return nonNull(caseData.getApplicant1LitigationFriend()) && nonNull(caseData.getApplicant2LitigationFriend());
+    }
+
+    private boolean bothDefendantsHaveLitigationFriends(CaseData caseData) {
+        return nonNull(caseData.getRespondent1LitigationFriend()) && nonNull(caseData.getRespondent2LitigationFriend());
+    }
+
 }
