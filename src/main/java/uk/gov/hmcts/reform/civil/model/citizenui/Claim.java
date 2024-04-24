@@ -94,6 +94,8 @@ public interface Claim {
 
     boolean isPaymentPlanRejected();
 
+    boolean isPaymentPlanRejectedRequestedJudgeDecision();
+
     boolean isHwFClaimSubmit();
 
     boolean isHwFMoreInformationNeeded();

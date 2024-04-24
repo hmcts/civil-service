@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
 import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
@@ -606,5 +608,25 @@ class CcdClaimStatusDashboardFactoryTest {
                 caseData, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD);
+    }
+
+    @Test
+    void given_claimantRejectsDefendantsPaymentPlan_RequestedJudgeDecision_WhenGetStatus_thenReturnAwaitingJudgeReview() {
+        CaseData claim = CaseData.builder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+                .caseDataLiP(CaseDataLiP.builder()
+                        .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                .claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
+                                .build())
+                        .build())
+                .respondent1(Party.builder()
+                        .type(Party.Type.INDIVIDUAL)
+                        .build()).build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION);
     }
 }
