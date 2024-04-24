@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
@@ -215,18 +216,30 @@ public class SdoHelperTest {
             assertThat(SdoHelper.getHearingLocationNihl(caseData)).isNotNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldreturn_physicalbundletext(boolean isParty) {
+        @Test
+        void shouldreturn_physicalbundletextWhenBundleOptionIsParty() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
                 .sdoR2Trial(SdoR2Trial.builder()
                                 .physicalBundlePartyTxt("Test")
-                                .physicalBundleOptions(isParty ? PhysicalTrialBundleOptions.PARTY : PhysicalTrialBundleOptions.NONE).build())
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY).build())
                 .build();
             assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
+        }
+
+        @Test
+        void shouldreturn_emptyPhysicalbundletextWhenBundleOptionIsNone() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .physicalBundlePartyTxt("Test")
+                                .physicalBundleOptions(PhysicalTrialBundleOptions.NONE).build())
+                .build();
+            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isEmpty();
         }
 
         @ParameterizedTest
@@ -310,6 +323,25 @@ public class SdoHelperTest {
                                 .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson).build())
                 .build();
             assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SdoR2FastTrackMethod.class)
+        void shouldReturn_method_of_hearingForNIHL(SdoR2FastTrackMethod method) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(method).build())
+                .build();
+
+            if (method == SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
+            } else if (method == SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
+            } else if (method == SdoR2FastTrackMethod.fastTrackMethodInPerson) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
+            }
         }
 
         @ParameterizedTest
@@ -1977,6 +2009,86 @@ public class SdoHelperTest {
             } else {
                 assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
             }
+        }
+    }
+
+    @Nested
+    class CarmMediationSectionTestDRH {
+
+        @Test
+        void shouldReturnTrue_whenCarmEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, true)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmNotEnabledAndStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenCarmEnabledAndStatementNotExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder().build())
+                .build();
+
+            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+        }
+
+        @Test
+        void shouldReturnText_whenStatementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .input("small claims mediation text")
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isEqualTo("small claims mediation text");
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementExistsTextIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build().toBuilder()
+                .sdoR2SmallClaimsMediationSectionStatement(
+                    SdoR2SmallClaimsMediation.builder()
+                        .build())
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
+        }
+
+        @Test
+        void shouldReturnNull_whenStatementDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
         }
     }
 
