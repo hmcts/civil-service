@@ -18,7 +18,11 @@ import java.time.LocalDate;
 public class DefaultJudgmentDefendantLrCoverLetter implements MappableObject {
 
     private final String claimReferenceNumber;
-    private final Organisation legalOrg;
+    private final String legalOrgName;
+    private final String addressLine1;
+    private final String addressLine2;
+    private final String townCity;
+    private final String postCode;
     private final String defendantName;
     private final String claimantName;
 

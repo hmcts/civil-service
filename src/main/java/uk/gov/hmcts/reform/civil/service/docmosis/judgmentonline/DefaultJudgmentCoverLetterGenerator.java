@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
+import com.nimbusds.openid.connect.sdk.assurance.evidences.Organization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentDefendantLrCoverLetter;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.SetAsideJudgmentInErrorLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR;
 
 @Slf4j
@@ -27,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAU
 @Service
 public class DefaultJudgmentCoverLetterGenerator {
 
+    private final OrganisationService organisationService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
@@ -73,13 +79,38 @@ public class DefaultJudgmentCoverLetterGenerator {
     }
 
     public DefaultJudgmentDefendantLrCoverLetter getTemplateData(CaseData caseData) {
-        return DefaultJudgmentDefendantLrCoverLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .letterIssueDate(LocalDate.now())
-            .issueDate(caseData.getJoIssuedDate())
-            .build();
+        String orgId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
+        if (organisation.isPresent()) {
+            StringBuilder claimantName = new StringBuilder().append(caseData.getApplicant1().getPartyName());
+            claimantName.append(applicant2Present(caseData)
+                                    ? " and " + caseData.getApplicant2().getPartyName() : "");
+            StringBuilder defendantName = new StringBuilder().append(caseData.getRespondent1().getPartyName());
+            defendantName.append(respondent2Present(caseData)
+                                    ? " and " + caseData.getRespondent2().getPartyName() : "");
+
+            return DefaultJudgmentDefendantLrCoverLetter
+                .builder()
+                .claimReferenceNumber(caseData.getLegacyCaseReference())
+                .legalOrgName(organisation.get().getName())
+                .addressLine1(organisation.get().getContactInformation().get(0).getAddressLine1())
+                .addressLine2(organisation.get().getContactInformation().get(0).getAddressLine2())
+                .townCity(organisation.get().getContactInformation().get(0).getTownCity())
+                .postCode(organisation.get().getContactInformation().get(0).getPostCode())
+                .defendantName(defendantName.toString())
+                .claimantName(claimantName.toString())
+                .issueDate(LocalDate.now())
+                .build();
+        }
+        return null;
+    }
+
+    private boolean applicant2Present(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
+    }
+
+    private boolean respondent2Present(CaseData caseData) {
+        return caseData.getAddRespondent2() != null
+            && caseData.getAddRespondent2() == YES;
     }
 }
