@@ -68,12 +68,12 @@ public class DefendantResponseFullDefenceDisputeAllCarmScenarioTest extends Dash
         //Verify task Item is created
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-                .andExpectAll(
-                        status().is(HttpStatus.OK.value()),
-                        jsonPath("$[0].reference").value(caseId),
-                        jsonPath("$[0].taskNameEn").value(
-                                "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                        jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
-                );
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
+            );
     }
 }
