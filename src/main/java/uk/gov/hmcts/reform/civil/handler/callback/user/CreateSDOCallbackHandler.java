@@ -92,6 +92,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
@@ -892,6 +893,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
         updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+
+        CaseData caseData = callbackParams.getCaseData();
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+            updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+                                                                 .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
+                                                                 .build());
+        }
     }
 
     private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
@@ -1698,5 +1707,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
         updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
+        if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
+            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+        }
     }
 }
