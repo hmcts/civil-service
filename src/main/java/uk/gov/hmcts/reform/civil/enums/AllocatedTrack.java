@@ -20,7 +20,7 @@ public enum AllocatedTrack {
         Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && intermediateOrMultiTrackValue.equals(true)) {
             log.info("isMultiOrIntermediateTrackEnabled toggle is on, for case {}, claim value {}",
-                     caseData.getCcdCaseReference(), statementOfValueInPounds);
+                     caseData != null ? caseData.getCcdCaseReference() : "Unknown Case", statementOfValueInPounds);
             return isIntermediateOrMultiTrack(statementOfValueInPounds) ? INTERMEDIATE_CLAIM : MULTI_CLAIM;
         }
         return getAllocatedTrack(statementOfValueInPounds, claimType, personalInjuryType);
