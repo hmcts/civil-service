@@ -27,7 +27,6 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
         SEND_COVER_LETTER_DEFENDANT_LR);
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
     private final DefaultJudgmentCoverLetterGenerator defaultJudgmentCoverLetterGenerator;
-    private static final String FIRST_CONTACT_PACK_LETTER_TYPE = "first-contact-pack";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,18 +48,14 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
 
     private CallbackResponse sendCoverLetterToDefendantLR(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!isRespondent1Lip(caseData)) {
+        if (YesOrNo.YES.equals(caseData.getRespondent1Represented())) {
             generateCoverLetterDefendantLr(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private boolean isRespondent1Lip(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getRespondent1Represented());
-    }
-
     private void generateCoverLetterDefendantLr(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        defaultJudgmentCoverLetterGenerator.generateAndPrintSetAsideLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 }
