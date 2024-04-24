@@ -307,3 +307,4 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         );
     }
 }
+
