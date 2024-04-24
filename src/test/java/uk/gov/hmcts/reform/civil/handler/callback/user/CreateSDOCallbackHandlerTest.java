@@ -38,11 +38,11 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
@@ -100,6 +100,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -177,7 +178,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
-import static uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod.fastTrackMethodInPerson;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
@@ -484,6 +484,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
+            Category category = Category.builder().categoryKey("HearingChannel").key(HearingSubChannel.INTER.name())
+                .valueEn(HearingMethod.IN_PERSON.getLabel()).activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
@@ -549,7 +553,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("lengthList").asString().isEqualTo(FIVE_HOURS.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("methodOfHearing").asString().isEqualTo(fastTrackMethodInPerson.toString());
+                .extracting("methodOfHearing").extracting("value").extracting("label").asString().isEqualTo(
+                    HearingMethod.IN_PERSON.getLabel());
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
@@ -2481,6 +2486,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2493,6 +2500,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 )
                 .build();
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+
             assertThat(data.getSdoR2SmallClaimsJudgesRecital().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
             assertThat(data.getSdoR2SmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(21));
             assertThat(data.getSdoR2SmallClaimsPPI().getText()).isEqualTo(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
@@ -2510,7 +2520,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsWitnessStatements()
                            .getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
             assertThat(data.getSdoR2SmallClaimsHearing().getTrialOnOptions()).isEqualTo(HearingOnRadioOptions.OPEN_DATE);
-            assertThat(data.getSdoR2SmallClaimsHearing().getMethodOfHearing()).isEqualTo(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING);
+            DynamicList hearingMethodValuesDRH = data.getSdoR2SmallClaimsHearing().getMethodOfHearing();
+            List<String> hearingMethodValuesDRHActual = hearingMethodValuesDRH.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+            assertThat(hearingMethodValuesDRHActual).containsOnly(HearingMethod.IN_PERSON.getLabel());
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
             assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
@@ -2521,6 +2535,27 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt()).isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getDate()).isEqualTo(LocalDate.now().plusDays(7));
+            assertThat(data.getSdoR2SmallClaimsMediationSectionStatement().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
+        }
+
+        @Test
+        void shouldPrePopulateDRHFields_CarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
         }
 
         @Test
@@ -2563,7 +2598,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPrePopulateToggleDRHFields() {
+        void shouldPrePopulateToggleDRHFields_CarmEnabled() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
@@ -2582,6 +2617,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2598,6 +2634,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearingToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsWitnessStatementsToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsPPIToggle()).isNull();
+            assertThat(response.getData()).extracting("sdoR2SmallClaimsMediationSectionToggle").isNotNull();
         }
 
         @Test

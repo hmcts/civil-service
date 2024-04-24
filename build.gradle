@@ -119,14 +119,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.706'
+        version: '1.12.707'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.20') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.23') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -423,8 +423,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.13'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.13'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.14'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.14'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
