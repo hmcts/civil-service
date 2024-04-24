@@ -53,10 +53,11 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final HelpWithFeesForTabService helpWithFeesForTabService;
     private final FeatureToggleService featureToggleService;
 
-    @Value("${court-location.specified-claim.region-id}")
-    private String regionId;
     @Value("${court-location.specified-claim.epimms-id}")
     private String epimmsId;
+
+    @Value("${court-location.specified-claim.region-id}")
+    private String regionId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -105,6 +106,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateWithPartyIds(caseDataBuilder);
         }
+
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
