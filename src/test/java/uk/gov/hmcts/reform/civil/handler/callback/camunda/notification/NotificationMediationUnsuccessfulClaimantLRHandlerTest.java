@@ -101,12 +101,12 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                                                                        PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME,
                                                                        CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
         private static final Map<String, String> CARM_1V2_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                           PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
-                                                                           CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+                                                                       PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME,
+                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
         private static final Map<String, String> CARM_LIP_CLAIMANT_PROPERTY_MAP = Map.of(PARTY_NAME, APPLICANT_PARTY_NAME,
-                                                                                    CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
         private static final Map<String, String> CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                                              CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
         @BeforeEach
         void setUp() {
