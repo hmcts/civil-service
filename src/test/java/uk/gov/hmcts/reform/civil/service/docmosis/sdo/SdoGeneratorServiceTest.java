@@ -102,7 +102,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_R2;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -237,8 +237,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     void sdoSmallFlightDelay() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_FLIGHT_DELAY)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL_FLIGHT_DELAY.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_R2)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
