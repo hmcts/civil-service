@@ -42,13 +42,13 @@ public class HelpWithFeeDashboardNoticeHandlerIntegrationTest  extends Dashboard
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("We’re reviewing your help with fees application"),
+                jsonPath("$[0].titleEn").value("We're reviewing your help with fees application"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You’ve applied for help with the hearing fee. You’ll receive an update in 5 to 10 working days.</p>"
+                    "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update in 5 to 10 working days.</p>"
                 ),
-                jsonPath("$[0].titleCy").value("We’re reviewing your help with fees application"),
+                jsonPath("$[0].titleCy").value("We're reviewing your help with fees application"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You’ve applied for help with the hearing fee. You’ll receive an update in 5 to 10 working days.</p>"
+                    "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update in 5 to 10 working days.</p>"
                 )
             );
 
