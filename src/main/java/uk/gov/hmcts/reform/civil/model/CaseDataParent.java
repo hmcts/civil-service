@@ -205,6 +205,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsMediation sdoR2SmallClaimsMediationSectionStatement;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsMediationSectionToggle;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
     private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
     private List<OrderDetailsPagesSectionsToggle> sdoR2FastTrackUseOfWelshToggle;
