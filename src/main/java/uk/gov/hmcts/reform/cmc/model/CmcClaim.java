@@ -461,6 +461,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return false;
+    }
+
+    @Override
     public boolean isHwFClaimSubmit() {
         return false;
     }

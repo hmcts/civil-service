@@ -60,6 +60,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_REJECTED_PAYMENT_PLAN(
         Claim::isPaymentPlanRejected
     ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION(
+        Claim::isPaymentPlanRejectedRequestedJudgeDecision
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
