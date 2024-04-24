@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@DTSPO-17308-Test")
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
@@ -97,16 +97,13 @@ withPipeline(type, product, component) {
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
-    retry (3) {
-      sh """
-        eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
-        ./bin/wait-for.sh definition-store
-        ./bin/add-roles.sh
-        ./bin/pull-latest-camunda-files.sh ${camundaBranch}
-        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
-        ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
-      """
-    }
+    sh """
+      eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/add-roles.sh
+      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
+    """
 
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
