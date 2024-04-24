@@ -119,14 +119,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.706'
+        version: '1.12.707'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.20') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.23') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
