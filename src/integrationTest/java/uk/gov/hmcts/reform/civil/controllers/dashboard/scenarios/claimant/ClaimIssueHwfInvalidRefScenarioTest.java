@@ -44,7 +44,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu ffi’r hawliad, ond mae'r cyfeirnod yn annily."
                     + "<br>Anfonwyd e-bost atoch gyda chyfarwyddiadau ar beth i'w wneud nesaf. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu,"
-                    + " gallwch anwybyddu'r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
+                    + " gallwch anwybyddu'r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
         );
     }

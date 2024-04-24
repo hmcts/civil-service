@@ -42,7 +42,7 @@ public class ClaimIssueHwfInfoRequiredScenarioTest extends BaseIntegrationTest {
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi’r hawliad.<br>Anfonwyd e-bost atoch gyda mwy o fanylion." +
                     " Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu, gallwch anwybyddu'r neges hon.<br>" +
-                    "Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
+                    "Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
         );
     }

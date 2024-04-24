@@ -52,7 +52,7 @@ public class NoRemissionHwFScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydym wedi gwrthod eich cais am help i dalu ffi’r hawliad. Gweler yr e-bost am ragor o fanylion.</p>" +
                         "<p class=\"govuk-body\">Rhaid i chi dalu’r ffi lawn o "
-                        + claimFee + ". Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
+                        + claimFee + ". Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
             );
 
     }

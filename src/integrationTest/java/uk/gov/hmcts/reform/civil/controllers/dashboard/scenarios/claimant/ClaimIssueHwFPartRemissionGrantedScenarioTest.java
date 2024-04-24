@@ -46,7 +46,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
                 "Mae eich cais am help i dalu ffioedd wedi cael ei adolygu"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Byddwch yn cael help gyda ffi’r hawliad. Bydd y swm o £1000 yn cael ei ddileu.<br>" +
-                    "Bydd rhaid i chi dal dalu’r ffi sy’n weddill o £25. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
+                    "Bydd rhaid i chi dal dalu’r ffi sy’n weddill o £25. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
         );
     }
