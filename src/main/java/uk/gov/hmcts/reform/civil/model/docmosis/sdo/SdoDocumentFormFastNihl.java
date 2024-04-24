@@ -76,6 +76,7 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final boolean hasSdoTrial;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2TrialWindow;
+    private final boolean hasSdoR2TrialPhysicalBundleParty;
     private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
     private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
