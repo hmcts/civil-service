@@ -64,7 +64,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
             templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_R2;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
@@ -286,7 +286,6 @@ public class SdoGeneratorService {
             )
             .fastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .fastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            .fastTrackCreditHire(caseData.getFastTrackCreditHire())
             .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
@@ -345,10 +344,11 @@ public class SdoGeneratorService {
                     SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                               ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
-            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact());
-            sdoDocumentFormBuilder.sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
+                .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
         } else {
-            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact());
+            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
+                .fastTrackCreditHire(caseData.getFastTrackCreditHire());
         }
 
         return sdoDocumentFormBuilder.build();
@@ -518,7 +518,11 @@ public class SdoGeneratorService {
                 .smallClaimsWelshLanguageToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null
-                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null);
+                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
+
+                .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+        } else {
+            sdoDocumentFormBuilder.smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement());
         }
 
         sdoDocumentFormBuilder.hearingLocation(
