@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -23,7 +22,7 @@ public class SdoR2Trial {
     private SdoR2TrialHearingLengthOther lengthListOther;
     private DynamicList hearingCourtLocationList;
     private DynamicList altHearingCourtLocationList;
-    private SdoR2FastTrackMethod methodOfHearing;
+    private DynamicList methodOfHearing;
     private PhysicalTrialBundleOptions physicalBundleOptions;
     private String physicalBundlePartyTxt;
     private String hearingNotesTxt;
