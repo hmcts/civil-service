@@ -2481,6 +2481,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2493,6 +2495,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 )
                 .build();
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+
             assertThat(data.getSdoR2SmallClaimsJudgesRecital().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
             assertThat(data.getSdoR2SmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(21));
             assertThat(data.getSdoR2SmallClaimsPPI().getText()).isEqualTo(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
@@ -2521,6 +2526,27 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt()).isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getDate()).isEqualTo(LocalDate.now().plusDays(7));
+            assertThat(data.getSdoR2SmallClaimsMediationSectionStatement().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
+        }
+
+        @Test
+        void shouldPrePopulateDRHFields_CarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
         }
 
         @Test
@@ -2563,7 +2589,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPrePopulateToggleDRHFields() {
+        void shouldPrePopulateToggleDRHFields_CarmEnabled() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
@@ -2582,6 +2608,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2598,6 +2625,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearingToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsWitnessStatementsToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsPPIToggle()).isNull();
+            assertThat(response.getData()).extracting("sdoR2SmallClaimsMediationSectionToggle").isNotNull();
         }
 
         @Test
