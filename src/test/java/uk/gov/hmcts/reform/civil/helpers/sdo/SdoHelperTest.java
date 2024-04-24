@@ -324,25 +324,6 @@ public class SdoHelperTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = SdoR2FastTrackMethod.class)
-        void shouldReturn_method_of_hearingForNIHL(SdoR2FastTrackMethod method) {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(method).build())
-                .build();
-
-            if (method == SdoR2FastTrackMethod.fastTrackMethodTelephoneHearing) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
-            } else if (method == SdoR2FastTrackMethod.fastTrackMethodVideoConferenceHearing) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
-            } else if (method == SdoR2FastTrackMethod.fastTrackMethodInPerson) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
-            }
-        }
-
-        @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldReturn_getSdoTrialHearingTimeAllocated(boolean isOther) {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2007,6 +1988,25 @@ public class SdoHelperTest {
                 assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
             } else if (key.equals("INTER")) {
                 assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({"VID, Video", "INTER, In Person", "TEL, Telephone"})
+        void shouldReturn_method_of_hearingForNIHL(String key, String value) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder().methodOfHearing(getHearingMethodList(key, value)).build())
+                .build();
+
+            if (key.equals("TEL")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
+            } else if (key.equals("VID")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
+            } else if (key.equals("INTER")) {
+                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
             }
         }
 
