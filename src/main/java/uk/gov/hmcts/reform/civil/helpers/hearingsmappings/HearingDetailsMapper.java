@@ -149,7 +149,11 @@ public class HearingDetailsMapper {
 
     public static List<String> getHearingChannels(String authToken, String hmctsServiceId, CaseData caseData, CategoryService categoryService) {
         Map<String, String> hearingMethodCode = getHearingMethodCodes(categoryService, hmctsServiceId, authToken);
-        if (caseData.getHearingMethodValuesFastTrack() != null) {
+        if (caseData.getSdoR2SmallClaimsHearing() != null && caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())));
+        } else if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getMethodOfHearing() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getSdoR2Trial().getMethodOfHearing())));
+        } else if (caseData.getHearingMethodValuesFastTrack() != null) {
             return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesFastTrack())));
         } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
             return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearing())));
