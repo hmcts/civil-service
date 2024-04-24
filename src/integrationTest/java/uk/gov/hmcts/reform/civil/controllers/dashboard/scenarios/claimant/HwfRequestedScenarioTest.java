@@ -79,7 +79,9 @@ public class HwfRequestedScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("We're reviewing your help with fees application"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update in 5 to 10 working days.</p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update in 5 to 10 working days.</p>"),
+                jsonPath("$[0].titleCy").value("Rydym yn adolygu eich cais am help i dalu ffioedd"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Fe wnaethoch gais am help i dalu ffi’r hawliad. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>")
             );
     }
 
