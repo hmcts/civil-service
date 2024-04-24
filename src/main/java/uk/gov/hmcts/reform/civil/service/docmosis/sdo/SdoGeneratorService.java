@@ -521,6 +521,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -555,8 +556,13 @@ public class SdoGeneratorService {
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
             .welshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2DrhUseOfWelshLanguage().getDescription() : null)
+            .carmEnabled(carmEnabled)
+            .sdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
             .caseManagementLocation(
-                locationHelper.getHearingLocation(null, caseData, authorisation));
+                locationHelper.getHearingLocation(null, caseData, authorisation))
+            .sdoR2SmallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSectionDRH(caseData, carmEnabled)
+            );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             sdoDocumentFormBuilderDrh.hearingLocation(
