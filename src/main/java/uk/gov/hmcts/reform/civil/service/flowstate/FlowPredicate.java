@@ -625,15 +625,12 @@ public class FlowPredicate {
                 return (caseData.getTakenOfflineByStaffDate() != null
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1ResponseDate() == null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() != null
-                    && caseData.getRespondent2ResponseDate() == null);
+                    && caseData.getRespondent2TimeExtensionDate() != null);
             default:
                 return (caseData.getTakenOfflineByStaffDate() != null
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1ResponseDate() == null);
+                    && caseData.getRespondent1TimeExtensionDate() != null);
         }
     }
 
