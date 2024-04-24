@@ -173,6 +173,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
     private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private SdoR2WitnessOfFact sdoR2FastTrackWitnessOfFact;
     private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
     private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
@@ -201,6 +202,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatementOther;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;

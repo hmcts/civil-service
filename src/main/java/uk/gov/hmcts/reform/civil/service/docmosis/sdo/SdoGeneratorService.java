@@ -271,7 +271,6 @@ public class SdoGeneratorService {
             )
             .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
-            .fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
             .fastTrackTrialBundleTypeText(
@@ -346,7 +345,10 @@ public class SdoGeneratorService {
                     SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                               ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact());
             sdoDocumentFormBuilder.sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+        } else {
+            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact());
         }
 
         return sdoDocumentFormBuilder.build();

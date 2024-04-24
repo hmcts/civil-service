@@ -166,6 +166,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -439,23 +443,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
 
-        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                        + "fact on whom they intend to rely.")
-            .input2("3")
-            .input3("3")
-            .input4("For this limitation, a party is counted as a witness.")
-            .input5("Each witness statement should be no more than")
-            .input6("10")
-            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
-            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
-                        + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
-                        + "permitted except with permission from the Court.")
-            .build();
-
-        updatedData.fastTrackWitnessOfFact(tempFastTrackWitnessOfFact).build();
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact()).build();
+        } else {
+            updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact()).build();
+        }
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
             .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
@@ -691,35 +683,59 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
-        SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .smallClaimsNumberOfWitnessesToggle(checkList)
-            .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+        if (featureToggleService.isSdoR2Enabled()) {
+            SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = SdoR2SmallClaimsWitnessStatements
+                .builder()
+                .sdoStatementOfWitness("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                                           + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
+                                           + " the hearing.")
+                .isRestrictWitness(NO)
+                .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
+                                                     .noOfWitnessClaimant(2)
+                                                     .noOfWitnessDefendant(2)
+                                                     .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
+                                                     .build())
+                .isRestrictPages(NO)
+                .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                                   .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
+                                                   .noOfPages(12)
+                                                   .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
+                                                   .build())
+                .text(WITNESS_DESCRIPTION_TEXT)
+                .build();
+            updatedData.sdoR2SmallClaimsWitnessStatementOther(tempSdoR2SmallClaimsWitnessStatements).build();
+
+        } else {
+            SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+                .smallClaimsNumberOfWitnessesToggle(checkList)
+                .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                         + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
                         + " the hearing.")
-            .input2("2")
-            .input3("2")
-            .input4("For this limitation, a party is counted as a witness.")
-            .text("A witness statement must: \na) Start with the name of the case and the claim number;"
-                      + "\nb) State the full name and address of the witness; "
-                      + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
-                      + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
-                      + "statement are true. I understand that proceedings for contempt of court may be "
-                      + "brought against anyone who makes, or causes to be made, a false statement in a "
-                      + "document verified by a statement of truth without an honest belief in its truth'."
-                      + "\ne) be signed by the witness and dated."
-                      + "\nf) If a witness is unable to read the statement there must be a certificate that "
-                      + "it has been read or interpreted to the witness by a suitably qualified person and "
-                      + "at the final hearing there must be an independent interpreter who will not be "
-                      + "provided by the Court."
-                      + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                      + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
-                      + "accordance with the paragraphs above."
-                      + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
-                      + "the hearing. If they do not attend, it will be for the court to decide how much "
-                      + "reliance, if any, to place on their evidence.")
-            .build();
+                .input2("2")
+                .input3("2")
+                .input4("For this limitation, a party is counted as a witness.")
+                .text("A witness statement must: \na) Start with the name of the case and the claim number;"
+                          + "\nb) State the full name and address of the witness; "
+                          + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                          + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
+                          + "statement are true. I understand that proceedings for contempt of court may be "
+                          + "brought against anyone who makes, or causes to be made, a false statement in a "
+                          + "document verified by a statement of truth without an honest belief in its truth'."
+                          + "\ne) be signed by the witness and dated."
+                          + "\nf) If a witness is unable to read the statement there must be a certificate that "
+                          + "it has been read or interpreted to the witness by a suitably qualified person and "
+                          + "at the final hearing there must be an independent interpreter who will not be "
+                          + "provided by the Court."
+                          + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
+                          + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
+                          + "accordance with the paragraphs above."
+                          + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
+                          + "the hearing. If they do not attend, it will be for the court to decide how much "
+                          + "reliance, if any, to place on their evidence.")
+                .build();
 
-        updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+            updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+        }
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
@@ -861,6 +877,50 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
+        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
+                        + "fact on whom they intend to rely.")
+            .input2("3")
+            .input3("3")
+            .input4("For this limitation, a party is counted as a witness.")
+            .input5("Each witness statement should be no more than")
+            .input6("10")
+            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
+            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
+            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
+                        + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
+                        + "permitted except with permission from the Court.")
+            .build();
+        return tempFastTrackWitnessOfFact;
+    }
+
+    private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
+        SdoR2WitnessOfFact tempSdoR2WitnessOfFact = SdoR2WitnessOfFact.builder()
+            .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
+            .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                      .isRestrictWitness(NO)
+                                      .restrictNoOfWitnessDetails(
+                                          SdoR2RestrictNoOfWitnessDetails.builder()
+                                              .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
+                                              .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
+                                              .build()).build())
+            .sdoRestrictPages(SdoR2RestrictPages.builder()
+                                  .isRestrictPages(NO)
+                                  .restrictNoOfPagesDetails(
+                                      SdoR2RestrictNoOfPagesDetails.builder()
+                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                          .noOfPages(12)
+                                          .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
+                                          .build()).build())
+            .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
+            .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
+            .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
+            .build();
+        return tempSdoR2WitnessOfFact;
     }
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
