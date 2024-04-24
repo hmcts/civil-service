@@ -60,4 +60,13 @@ public final class SdoR2UiConstantSmallClaim {
     public static final String IMP_NOTES_TEXT = "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +
         " Any such application must be received by the Court" +
         " (together with the appropriate fee) by 4pm on";
+    public static final String CARM_MEDIATION_TEXT = "If you failed to attend a mediation appointment,"
+        + " then the judge at the hearing may impose a sanction. "
+        + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
+        + "You should deliver to every other party, and to the court, your explanation for non-attendance, "
+        + "with any supporting documents, at least 14 days before the hearing. "
+        + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
+        + "deliver their comments,"
+        + " with any supporting documents, to all parties and to the court at least "
+        + "14 days before the hearing.";
 }
