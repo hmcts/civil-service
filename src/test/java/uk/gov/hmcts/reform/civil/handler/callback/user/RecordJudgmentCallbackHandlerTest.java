@@ -210,7 +210,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentInstalmentDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder().firstInstalmentDate(LocalDate.now().minusDays(2)).build());
+            caseData.setJoInstalmentDetails(JudgmentInstalmentDetails.builder().startDate(LocalDate.now().minusDays(2)).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event

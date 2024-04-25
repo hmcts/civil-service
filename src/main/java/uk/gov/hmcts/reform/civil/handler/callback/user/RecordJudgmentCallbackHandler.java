@@ -65,7 +65,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoOrderMadeDate(null);
             caseData.setJoJudgmentStatusDetails(null);
             caseData.setJoPaymentPlanSelection(null);
-            caseData.setJoJudgmentInstalmentDetails(null);
+            caseData.setJoInstalmentDetails(null);
             caseData.setJoJudgmentRecordReason(null);
             caseData.setJoAmountOrdered(null);
             caseData.setJoAmountCostOrdered(null);

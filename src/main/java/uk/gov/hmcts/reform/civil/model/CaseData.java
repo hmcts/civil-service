@@ -620,7 +620,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joAmountCostOrdered;
     private YesOrNo joIsRegisteredWithRTL;
     private PaymentPlanSelection joPaymentPlanSelection;
-    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
+    private JudgmentInstalmentDetails joInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
     private YesOrNo joIsLiveJudgmentExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
