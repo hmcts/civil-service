@@ -113,8 +113,7 @@ class EndBusinessProcessTaskHandlerTest {
         handler.execute(mockExternalTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
-        verify(coreCaseDataService).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
-
+        verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 
