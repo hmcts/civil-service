@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
@@ -23,7 +22,7 @@ public class SdoR2SmallClaimsHearing {
     private SdoR2SmallClaimsHearingLengthOther lengthListOther;
     private DynamicList hearingCourtLocationList;
     private DynamicList altHearingCourtLocationList;
-    private SmallClaimsSdoR2HearingMethod methodOfHearing;
+    private DynamicList methodOfHearing;
     private SmallClaimsSdoR2PhysicalTrialBundleOptions physicalBundleOptions;
     private SdoR2SmallClaimsBundleOfDocs sdoR2SmallClaimsBundleOfDocs;
     private String hearingNotesTxt;
