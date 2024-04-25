@@ -452,6 +452,48 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 .contains("READY", "APPLY_NOC_DECISION_LIP");
         }
 
+        @Test
+        void shouldApplyNoticeOfChange_whenInvokedByDefendant1ForDefendantLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            CaseDetails caseDetailsAfterNoCApplied =
+                caseDetailsAfterNoCApplied(
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    RESPONDENT_ONE_ORG_POLICY
+                );
+
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+            when(caseAssignmentApi.applyDecision(
+                params.getParams().get(BEARER_TOKEN).toString(),
+                authTokenGenerator.generate(),
+                DecisionRequest.decisionRequest(
+                    params.getRequest().getCaseDetails())
+            ))
+                .thenReturn(
+                    AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(caseDetailsAfterNoCApplied.getData()).build());
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertChangeOrganisationFieldIsUpdated(response);
+            assertOrgIDIsUpdated(response, RESPONDENT_ONE_ORG_POLICY);
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .contains("READY", "APPLY_NOC_DECISION_DEFENDANT_LIP");
+        }
+
         @Nested
         class ChangedOrgTest {
 
