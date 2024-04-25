@@ -277,6 +277,18 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
+    public void shouldMapParameters_whenHearingFeeHwFPartRemissionGranted() {
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.HEARING)
+            .hearingHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
+                                       .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("hearingFeeRemissionAmount").isEqualTo("£25");
+        assertThat(result).extracting("hearingFeeOutStandingAmount").isEqualTo("£100");
+    }
+
+    @Test
     public void shouldMapParameters_whenHearingFast() {
         LocalDate date = LocalDate.now();
         caseData = caseData.toBuilder()
