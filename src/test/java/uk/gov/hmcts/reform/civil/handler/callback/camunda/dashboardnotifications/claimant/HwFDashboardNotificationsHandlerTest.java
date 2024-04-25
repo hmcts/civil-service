@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -48,6 +50,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_NO_REMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED;
 
 @ExtendWith(MockitoExtension.class)
 public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
@@ -69,8 +77,8 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
         }
 
         @ParameterizedTest
-        @MethodSource("provideHwfEventsForConfigureScenario")
-        void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldConfigureScenariosForClaimIssueHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
@@ -79,6 +87,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .hwfCaseEvent(hwfEvent)
                                            .build())
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -109,16 +118,58 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
         }
 
         @ParameterizedTest
-        @MethodSource("provideHwfEventsForConfigureScenario")
-        void shouldNotConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+        @MethodSource("provideHearingFeeHwfEventsForConfigureScenario")
+        void shouldConfigureScenariosForHearingFeeHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildClaimIssuedPaymentCaseData();
+                .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.HEARING)
                 .hearingHwfDetails(HelpWithFeesDetails.builder()
                                            .hwfCaseEvent(hwfEvent)
                                            .build())
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("hearingFeeRemissionAmount", "£1000");
+            scenarioParams.put("hearingFeeOutStandingAmount", "£25");
+            scenarioParams.put("hearingFee", "£455");
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(dashboardApiClient, times(0)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldNotConfigureScenariosForHwfEventsWhenFeeTypeNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(null)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                       .hwfCaseEvent(hwfEvent)
+                                       .build())
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -137,7 +188,67 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             );
         }
 
-        private static Stream<Arguments> provideHwfEventsForConfigureScenario() {
+        @ParameterizedTest
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldNotConfigureScenariosForHwfEventsWhenHwfDetailsNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(null)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(dashboardApiClient, times(0)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")
+        void shouldNotConfigureScenariosForHwfEventsWhenRepresented(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .buildClaimIssuedPaymentCaseData();
+
+            caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                .hwfCaseEvent(hwfEvent)
+                                .build())
+                .applicant1Represented(YesOrNo.YES)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(dashboardApiClient, times(0)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            );
+        }
+
+        private static Stream<Arguments> provideClaimIssueHwfEventsForConfigureScenario() {
             return Stream.of(
                 Arguments.of(PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA6_CLAIM_ISSUE_HWF_PART_REMISSION),
                 Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA6_CLAIM_ISSUE_HWF_INVALID_REF),
@@ -145,6 +256,17 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 Arguments.of(UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA6_CLAIM_ISSUE_HWF_UPDATED),
                 Arguments.of(NO_REMISSION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_NO_REMISSION),
                 Arguments.of(FULL_REMISSION_HWF, SCENARIO_AAA6_CLAIM_ISSUE_HWF_FULL_REMISSION)
+            );
+        }
+
+        private static Stream<Arguments> provideHearingFeeHwfEventsForConfigureScenario() {
+            return Stream.of(
+                Arguments.of(PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION),
+                Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF),
+                Arguments.of(MORE_INFORMATION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED),
+                Arguments.of(UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED),
+                Arguments.of(NO_REMISSION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION),
+                Arguments.of(FULL_REMISSION_HWF, SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION)
             );
         }
     }
