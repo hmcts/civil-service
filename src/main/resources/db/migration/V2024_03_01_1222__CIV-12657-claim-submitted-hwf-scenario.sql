@@ -10,9 +10,9 @@ VALUES ('Scenario.AAA6.ClaimIssue.HWF.Requested', '{"Notice.AAA6.ClaimIssue.Clai
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.HWF.Requested', 'We''re reviewing your help with fees application' , 'We''re reviewing your help with fees application',
+VALUES ('Notice.AAA6.ClaimIssue.HWF.Requested', 'We''re reviewing your help with fees application' , 'Rydym yn adolygu eich cais am help i dalu ffioedd',
         '<p class="govuk-body">You''ve applied for help with the claim fee. You''ll receive an update in 5 to 10 working days.</p>',
-        '<p class="govuk-body">You''ve applied for help with the claim fee. You''ll receive an update in 5 to 10 working days.</p>',
+        '<p class="govuk-body">Fe wnaethoch gais am help i dalu ffi’r hawliad. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>',
         'CLAIMANT');
 
 /**
