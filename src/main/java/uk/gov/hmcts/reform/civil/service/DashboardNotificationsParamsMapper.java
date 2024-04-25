@@ -285,12 +285,12 @@ public class DashboardNotificationsParamsMapper {
                 return params;
             case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
                 CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
-                    params.put(
-                        ORDER_DOCUMENT,
-                        caseData.getSDODocument().isPresent()
-                            ? caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
-                            : ""
-                    );
+                params.put(
+                    ORDER_DOCUMENT,
+                    caseData.getSDODocument().isPresent()
+                        ? caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
+                        : ""
+                );
                 return params;
             default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
         }
