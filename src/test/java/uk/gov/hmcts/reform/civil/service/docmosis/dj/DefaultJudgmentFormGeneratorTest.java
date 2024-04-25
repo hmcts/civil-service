@@ -186,4 +186,86 @@ public class DefaultJudgmentFormGeneratorTest {
 
         assertThat(caseDocuments).hasSize(2);
     }
+
+    @Test
+    void shouldGenerateDefendantDocNonDivergent_whenValidDataIsProvidedLip() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_DEFENDANT)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_DEFENDANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                              GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
+
+        assertThat(caseDocuments).hasSize(1);
+    }
+
+    @Test
+    void shouldGenerateClaimantDocsNonDivergent_whenValidDataIsProvidedLip() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
+            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                              GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
+
+        assertThat(caseDocuments).hasSize(1);
+    }
+
+    @Test
+    void shouldGenerateClaimantDocsNonDivergent1v2_whenValidDataIsProvidedLip() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_DEFENDANT)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_DEFENDANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT1)))
+            .thenReturn(CASE_DOCUMENT);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_DEFENDANT2)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(interestCalculator.calculateInterest(any(CaseData.class)))
+            .thenReturn(new BigDecimal(10));
+
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal(2000)))
+            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
+            .respondent2(PartyBuilder.builder().company().build())
+            .totalClaimAmount(new BigDecimal(2000))
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                              GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
+
+        assertThat(caseDocuments).hasSize(2);
+    }
 }

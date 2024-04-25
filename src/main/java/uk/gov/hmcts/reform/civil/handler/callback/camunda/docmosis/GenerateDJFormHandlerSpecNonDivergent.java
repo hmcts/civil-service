@@ -81,8 +81,6 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
         caseDocuments.forEach(caseDocument -> {
             systemGeneratedCaseDocuments.add(element(caseDocument));
         });
-        assignCategoryId.assignCategoryIdToCollection(systemGeneratedCaseDocuments, document -> document.getValue().getDocumentLink(),
-                                                      "detailsOfClaim");
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }
 

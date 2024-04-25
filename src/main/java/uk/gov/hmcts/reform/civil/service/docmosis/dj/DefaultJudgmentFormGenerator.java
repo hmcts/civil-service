@@ -123,31 +123,63 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .formText("No response,")
             .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
             .respondent(getPartyDetails(party))
-            .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
-                                                   )
+            .claimantLR(Objects.nonNull(caseData.getApplicant1OrganisationPolicy())
+                            ? getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()) : null)
             .debt(debtAmount.toString())
             .costs(cost.toString())
             .totalCost(debtAmount.add(cost).setScale(2).toString())
-            .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
-                                    ? null : caseData.getSolicitorReferences()
-                .getApplicantSolicitor1Reference())
-            .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
-                                     ? null : caseData.getSolicitorReferences()
-                .getRespondentSolicitor1Reference()).build();
+            .applicantReference(getApplicantSolicitorRef(caseData))
+            .respondentReference(getRespondent1SolicitorRef(caseData)).build();
         if (featureToggleService.isJudgmentOnlineLive()) {
-            builder.respondent1Name(caseData.getRespondent1().getPartyName())
-                .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
-                .respondent1Ref(Objects.isNull(caseData.getSolicitorReferences())
-                                    ? null : Objects.isNull(caseData.getSolicitorReferences()
-                    .getRespondentSolicitor1Reference()) ? null : caseData.getSolicitorReferences()
-                    .getRespondentSolicitor1Reference())
-                .respondent2Ref(Objects.isNull(caseData.getSolicitorReferences())
-                                    ? null : Objects.isNull(caseData.getSolicitorReferences()
-                    .getRespondentSolicitor2Reference()) ? null : caseData.getSolicitorReferences()
-                    .getRespondentSolicitor2Reference())
-                .applicantDetails(getPartyDetails(party));
+            builder = addNonDivergentTemplateFields(builder, caseData, party);
         }
         return builder.build();
+    }
+
+    private String getApplicantSolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getApplicantSolicitor1Reference() != null) {
+            return caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
+        }
+        return null;
+    }
+
+    private String getRespondent1SolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getRespondentSolicitor1Reference() != null) {
+            return caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+        }
+        return null;
+    }
+
+    private String getRespondent2SolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getRespondentSolicitor2Reference() != null) {
+            return caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
+        }
+        return null;
+    }
+
+    private DefaultJudgmentForm.DefaultJudgmentFormBuilder addNonDivergentTemplateFields(DefaultJudgmentForm.DefaultJudgmentFormBuilder builder,
+                                                                                         CaseData caseData, uk.gov.hmcts.reform.civil.model.Party party) {
+        return builder.respondent1Name(caseData.getRespondent1().getPartyName())
+            .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .respondent1Ref(getRespondent1SolicitorRef(caseData))
+            .respondent2Ref(getRespondent2SolicitorRef(caseData))
+            .claimantLR(getClaimantLipOrLRDetailsForAddress(caseData))
+            .applicantDetails(getPartyDetails(party));
+    }
+
+    private Party getClaimantLipOrLRDetailsForAddress(CaseData caseData) {
+        if (caseData.isApplicantLiP()) {
+            return getPartyDetails(caseData.getApplicant1());
+        } else {
+            if (caseData.getApplicant1OrganisationPolicy() != null) {
+                return getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy());
+            } else {
+                return null;
+            }
+        }
     }
 
     private DocmosisTemplates getDocmosisTemplate(String event) {
