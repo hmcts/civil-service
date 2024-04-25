@@ -55,7 +55,7 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     public String getScenario(CaseData caseData) {
 
         if (caseData.isRespondentResponseFullDefence()) {
-            if (caseData.hasDefendantNotAgreedToFreeMediation()) {
+            if (caseData.hasDefendantNotAgreedToFreeMediation() && caseData.isSmallClaim()) {
                 return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
             } else if (caseData.isFastTrackClaim()) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();
