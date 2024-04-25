@@ -64,9 +64,9 @@ public class FeesPaymentService {
                 authorization,
                 requestDto
             );
-        log.info("After Payment status service - call()--------{}",govPayCardPaymentRequest.toString());
+        log.info("After Payment status service - call()--------{}", govPayCardPaymentRequest.toString());
         CardPaymentStatusResponse cardPaymentStatusResponse =  CardPaymentStatusResponse.from(govPayCardPaymentRequest);
-        log.info("return value CardPaymentStatusResponse--------{}",cardPaymentStatusResponse.toString());
+        log.info("return value CardPaymentStatusResponse--------{}", cardPaymentStatusResponse.toString());
         return cardPaymentStatusResponse;
     }
 
@@ -74,7 +74,7 @@ public class FeesPaymentService {
         FeeType feeType, String caseReference, String paymentReference, String authorization) {
         log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
-        log.info("After paymentStatusService call -----------------------{}",cardPaymentDetails.toString());
+        log.info("After paymentStatusService call -----------------------{}", cardPaymentDetails.toString());
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
             .status(paymentStatus)
@@ -82,7 +82,7 @@ public class FeesPaymentService {
             .externalReference(cardPaymentDetails.getPaymentGroupReference())
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
-        log.info("paymentStatus -----------------------{}",paymentStatus);
+        log.info("paymentStatus -----------------------{}", paymentStatus);
         if (paymentStatus.equals("Failed")) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
@@ -97,7 +97,7 @@ public class FeesPaymentService {
 
             log.error("Update payment status failed for claim [{}]", caseReference);
         }
-        log.info("response -----------------------{}",response.toString());
+        log.info("response -----------------------{}", response.toString());
         return response.build();
     }
 }
