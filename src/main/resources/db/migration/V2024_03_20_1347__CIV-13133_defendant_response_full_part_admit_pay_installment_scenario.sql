@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Defendant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency} starting ${firstRepaymentDateEn}.</p><p class="govuk-body">The court will contact you when they respond.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
-        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency} starting ${firstRepaymentDateCy}.</p><p class="govuk-body">The court will contact you when they respond.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
+        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}. You have offered to do this starting from ${firstRepaymentDateEn}.</p><p class="govuk-body">We will contact you when the claimant responds to your offer.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
+        '<p class="govuk-body">You have offered to pay ${defendantAdmittedAmount} in instalments of ${installmentAmount} ${paymentFrequency}. You have offered to do this starting from ${firstRepaymentDateCy}.</p><p class="govuk-body">We will contact you when the claimant responds to your offer.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
         'DEFENDANT');
 
 /**

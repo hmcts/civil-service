@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseDeadlineDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -30,6 +31,10 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 .toBuilder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                        .individualFirstName("James")
+                        .individualLastName("John")
+                        .build())
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
@@ -42,7 +47,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has not responded to the claim.</p>" +
+                    "<p class=\"govuk-body\">James John has not responded to the claim.</p>" +
                     "<p class=\"govuk-body\">You can now request a county court judgment.<p/>" +
                     "<p class=\"govuk-body\">The defendant can still respond to the claim before you ask for a judgment.</p>" +
                     "<p class=\"govuk-body\"><a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" class=\"govuk-link\">Request a CCJ</a></p>")
