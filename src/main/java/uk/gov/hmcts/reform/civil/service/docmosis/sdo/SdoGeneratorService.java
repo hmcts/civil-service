@@ -481,7 +481,6 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
             )
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
             .hasNewDirections(
