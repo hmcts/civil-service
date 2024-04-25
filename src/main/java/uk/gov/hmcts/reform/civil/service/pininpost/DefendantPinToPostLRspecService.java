@@ -90,7 +90,7 @@ public class DefendantPinToPostLRspecService {
             return response.headers().get("Location").stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Missing 'Location' header"));
         } else {
-            log.error("Pin does not match or expired for {}", caseReference);
+            log.error("Pin does not match or expired for {}, pin {}", caseReference, pin);
             throw new PinNotMatchException();
         }
     }
