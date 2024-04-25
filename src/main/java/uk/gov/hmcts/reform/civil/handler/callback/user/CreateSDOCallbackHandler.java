@@ -28,16 +28,14 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -535,7 +533,49 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
+        if (featureToggleService.isSdoR2Enabled()) {
+            List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
+            SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
+                .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                            + "a) the need to hire a replacement vehicle; and\n"
+                            + "b) impecuniosity")
+                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+                .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                            + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                            + "save with permission of the Trial Judge.")
+                .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                            + "later than 4pm on")
+                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+                .build();
 
+            SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
+                .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                            + "disclosure as ordered earlier in this Order must include:\n"
+                            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                            + "commencement of hire until the earlier of:\n "
+                            + "     i) 3 months after cessation of hire\n"
+                            + "     ii) the repair or replacement of the claimant's vehicle\n"
+                            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                            + "prior to the commencement of hire until the earlier of:\n"
+                            + "     i) 3 months after cessation of hire\n"
+                            + "     ii) the repair or replacement of the claimant's vehicle\n"
+                            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+                .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                            + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+                            + "one witness to provide evidence of basic hire rates available within the claimant's "
+                            + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                            + "is available.")
+                .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+                .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+                .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+                .detailsShowToggle(addOrRemoveToggleList)
+                .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
+                .build();
+
+            updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
+        }
         FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
             .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
@@ -884,50 +924,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .collect(Collectors.toList());
         hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
         return hearingMethodList;
-    }
-
-    private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
-        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                        + "fact on whom they intend to rely.")
-            .input2("3")
-            .input3("3")
-            .input4("For this limitation, a party is counted as a witness.")
-            .input5("Each witness statement should be no more than")
-            .input6("10")
-            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
-            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
-                        + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
-                        + "permitted except with permission from the Court.")
-            .build();
-        return tempFastTrackWitnessOfFact;
-    }
-
-    private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
-        SdoR2WitnessOfFact tempSdoR2WitnessOfFact = SdoR2WitnessOfFact.builder()
-            .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
-            .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                      .isRestrictWitness(NO)
-                                      .restrictNoOfWitnessDetails(
-                                          SdoR2RestrictNoOfWitnessDetails.builder()
-                                              .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
-                                              .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                              .build()).build())
-            .sdoRestrictPages(SdoR2RestrictPages.builder()
-                                  .isRestrictPages(NO)
-                                  .restrictNoOfPagesDetails(
-                                      SdoR2RestrictNoOfPagesDetails.builder()
-                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
-                                          .noOfPages(12)
-                                          .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                          .build()).build())
-            .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
-            .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
-            .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
-            .build();
-        return tempSdoR2WitnessOfFact;
     }
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
