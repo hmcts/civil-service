@@ -415,7 +415,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
-        boolean isNonDivergent = caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both");
+
+        boolean isNonDivergent = ((Optional.ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")));
 
         if (featureToggleService.isJudgmentOnlineLive() && (MultiPartyScenario.isOneVOne(caseData) || isNonDivergent)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
