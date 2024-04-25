@@ -58,7 +58,7 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
         if (caseData.isRespondentResponseFullDefence()) {
             if (isCarmApplicable(caseData) && caseData.isClaimBeingDisputed()) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM.getScenario();
-            } else if (caseData.hasDefendantNotAgreedToFreeMediation()) {
+            } else if (caseData.hasDefendantNotAgreedToFreeMediation() && caseData.isSmallClaim()) {
                 return SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario();
             } else if (caseData.isFastTrackClaim()) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT.getScenario();

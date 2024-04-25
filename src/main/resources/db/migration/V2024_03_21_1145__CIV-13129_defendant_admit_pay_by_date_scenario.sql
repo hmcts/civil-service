@@ -5,7 +5,7 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
 VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant',
         '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant",
          "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant"}',
-        '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant" : ["defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
+        '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant" : ["respondent1PartyName", "defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
 
 /**
  * Add notification template
@@ -13,8 +13,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">The defendant has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
 /**
