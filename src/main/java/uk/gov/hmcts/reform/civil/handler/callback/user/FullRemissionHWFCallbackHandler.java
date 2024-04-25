@@ -83,7 +83,8 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     ),
                     () -> updatedData.hearingHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
-                            .hwfCaseEvent(FULL_REMISSION_HWF).build()
+                            .hwfCaseEvent(FULL_REMISSION_HWF)
+                            .build()
                     )
                 );
         }
