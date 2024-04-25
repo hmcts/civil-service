@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -99,9 +100,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn())
-            || (null != caseData.getCcjPaymentDetails()
+        return (null != caseData.getCcjPaymentDetails()
             && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
@@ -230,9 +229,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
             && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
             || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -298,7 +297,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return  caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
@@ -308,7 +307,31 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isPaymentPlanRejected() {
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && caseData.hasApplicantRejectedRepaymentPlan());
+            && caseData.hasApplicantRejectedRepaymentPlan()
+            && !isIndividualORSoleTrader());
+    }
+
+    @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+                && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+                && caseData.hasApplicantRejectedRepaymentPlan()
+                && isIndividualORSoleTrader()
+                && isCourtDecisionRejected());
+    }
+
+    private boolean isCourtDecisionRejected() {
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1LiPResponse)
+                .orElse(null);
+
+        return applicant1Response != null
+                && applicant1Response.hasClaimantRejectedCourtDecision();
+    }
+
+    private boolean isIndividualORSoleTrader() {
+        return nonNull(caseData.getRespondent1())
+               ? caseData.getRespondent1().isIndividualORSoleTrader() : false;
     }
 
     @Override
@@ -346,5 +369,13 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isHwfPaymentOutcome() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence()
+                && caseData.getApplicant1ResponseDate() != null
+                && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+                && caseData.isBilingual();
     }
 }

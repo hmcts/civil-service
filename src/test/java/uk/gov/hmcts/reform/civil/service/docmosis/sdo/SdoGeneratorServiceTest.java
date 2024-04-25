@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -24,7 +27,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
@@ -37,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
@@ -55,6 +58,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
@@ -65,10 +69,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -76,6 +82,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,9 +99,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_R2;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -144,6 +152,9 @@ public class SdoGeneratorServiceTest {
 
     @Autowired
     private SdoGeneratorService generator;
+
+    @Mock
+    private CategoryService categoryService;
 
     @BeforeEach
     void setUp() {
@@ -226,8 +237,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     void sdoSmallFlightDelay() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_FLIGHT_DELAY)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL_FLIGHT_DELAY.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_R2)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
@@ -529,6 +540,40 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
+    public void shouldGenerateSdoDisposalDocumentWithR2Template() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoDisposal()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.YES)
+            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+            .orderType(OrderType.DISPOSAL)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormDisposal),
+            eq(SDO_R2_DISPOSAL)
+        );
+    }
+
+    @Test
     public void shouldGenerateSdoFastTrackNihlDocument_pathone() {
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -588,14 +633,13 @@ public class SdoGeneratorServiceTest {
 
     private CaseData prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
 
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
+        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
+            Optional.of(categorySearchResult));
+
         List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
         DynamicListElement selectedCourt = DynamicListElement.builder()
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
@@ -638,10 +682,17 @@ public class SdoGeneratorServiceTest {
                                             .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
                                             .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
                                             .build());
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            ).build();
         updatedData.sdoR2Trial(SdoR2Trial.builder()
                                    .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
                                    .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
-                                   .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson)
+                                   .methodOfHearing(HearingMethodUtils.getHearingMethodList(categorySearchResult))
                                    .physicalBundleOptions(PhysicalTrialBundleOptions.NONE)
                                    .sdoR2TrialFirstOpenDateAfter(
                                        SdoR2TrialFirstOpenDateAfter.builder()
@@ -758,4 +809,41 @@ public class SdoGeneratorServiceTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
     }
+
+    @Test
+    public void shouldGenerateSdoSmallDrhDocumentCarmEnabled() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL_DRH);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+                                                      .input("mediation representation")
+                                                      .build())
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormSmallDrh
+                            && ((SdoDocumentFormSmallDrh) templateData).getSdoR2SmallClaimMediationSectionInput()
+                            .equals("mediation representation")),
+            any(DocmosisTemplates.class)
+        );
+    }
+
 }

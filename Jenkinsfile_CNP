@@ -48,7 +48,16 @@ def secrets = [
     secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
     secret('iac-default-password','IAC_DEFAULT_PASSWORD'),
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
-  ]
+  ],
+  'aac-${env}': [
+    secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
+    secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
+    secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
+    secret('idam-noc-approver-username', 'IDAM_NOC_APPROVER_USERNAME'),
+    secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
+    secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
+    secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
+  ],
 ]
 
 // Vars for Kubernetes
@@ -85,9 +94,13 @@ withPipeline(type, product, component) {
 
   before('smoketest:preview') {
     validateRpaContract()
+    env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+
     retry (3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
+        ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-ccd-files.sh ${ccdBranch}
@@ -95,8 +108,6 @@ withPipeline(type, product, component) {
       """
     }
 
-    env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
   }

@@ -51,11 +51,17 @@ public enum DashboardClaimStatus {
     IN_MEDIATION(
         Claim::isMediationPending
     ),
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD(
+        Claim::isWaitingForClaimantIntentDocUpload
+    ),
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
     CLAIMANT_REJECTED_PAYMENT_PLAN(
         Claim::isPaymentPlanRejected
+    ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION(
+        Claim::isPaymentPlanRejectedRequestedJudgeDecision
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing

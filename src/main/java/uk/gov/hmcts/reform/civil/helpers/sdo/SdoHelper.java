@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
@@ -41,6 +41,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SdoHelper {
 
     public static final String EMPTY_STRING = "";
+    public static final String BY_TELEPHONE = "by telephone";
+    public static final String BY_VIDEO = "by video";
+    public static final String IN_PERSON = "in person";
 
     private SdoHelper() {
         // Utility class, no instances
@@ -104,10 +107,6 @@ public class SdoHelper {
 
     public static String getPhysicalTrialTextNihl(CaseData caseData) {
         if (caseData.getSdoR2Trial() != null
-            && PhysicalTrialBundleOptions.NONE.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
-            return "None";
-
-        } else if (caseData.getSdoR2Trial() != null
             && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
             return caseData.getSdoR2Trial().getPhysicalBundlePartyTxt();
         }
@@ -194,15 +193,15 @@ public class SdoHelper {
 
     public static String getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
-            if (SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "by telephone";
-            } else if (SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "by video";
-            } else if (SmallClaimsSdoR2HearingMethod.IN_PERSON
-                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "in person";
+            if (HearingMethod.TELEPHONE.getLabel()
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
+                return BY_TELEPHONE;
+            } else if (HearingMethod.VIDEO.getLabel()
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
+                return BY_VIDEO;
+            } else if (HearingMethod.IN_PERSON.getLabel()
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())) {
+                return IN_PERSON;
             }
         }
         return "";
@@ -385,6 +384,19 @@ public class SdoHelper {
         return null;
     }
 
+    public static boolean showCarmMediationSectionDRH(CaseData caseData, boolean carmEnabled) {
+        return caseData.getSdoR2SmallClaimsMediationSectionStatement() != null
+            && caseData.getSdoR2SmallClaimsMediationSectionStatement().getInput() != null
+            && carmEnabled;
+    }
+
+    public static String getSmallClaimsMediationTextDRH(CaseData caseData) {
+        if (caseData.getSdoR2SmallClaimsMediationSectionStatement() != null) {
+            return caseData.getSdoR2SmallClaimsMediationSectionStatement().getInput();
+        }
+        return null;
+    }
+
     public static boolean hasSmallClaimsVariable(CaseData caseData, String variableName) {
         switch (variableName) {
             case "smallClaimsHearingToggle":
@@ -405,6 +417,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsAddNewDirections() != null;
             case "smallClaimsMediationSectionToggle":
                 return caseData.getSmallClaimsMediationSectionStatement() != null;
+            case "sdoR2SmallClaimsUseOfWelshToggle":
+                return caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null;
             default:
                 return false;
         }
@@ -472,6 +486,8 @@ public class SdoHelper {
             case "fastTrackTrialDateToToggle":
                 return caseData.getFastTrackHearingTime() != null
                     && caseData.getFastTrackHearingTime().getDateToToggle() != null;
+            case "sdoR2FastTrackUseOfWelshToggle":
+                return caseData.getSdoR2FastTrackUseOfWelshToggle() != null;
             default:
                 return false;
         }
@@ -659,9 +675,16 @@ public class SdoHelper {
 
         if (caseData.getSdoR2Trial() != null) {
             if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
-                return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
-            } else {
-                return "";
+                if (HearingMethod.TELEPHONE.getLabel()
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel())) {
+                    return "by telephone";
+                } else if (HearingMethod.VIDEO.getLabel()
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel())) {
+                    return "by video conference";
+                } else if (HearingMethod.IN_PERSON.getLabel()
+                    .equals(caseData.getSdoR2Trial().getMethodOfHearing().getValue().getLabel())) {
+                    return "in person";
+                }
             }
         }
         return "";

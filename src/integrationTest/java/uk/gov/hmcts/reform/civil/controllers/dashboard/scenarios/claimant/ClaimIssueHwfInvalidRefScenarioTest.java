@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -26,6 +27,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends DashboardBaseIntegratio
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(INVALID_HWF_REFERENCE).build())
             .ccdCaseReference(Long.valueOf(caseId))

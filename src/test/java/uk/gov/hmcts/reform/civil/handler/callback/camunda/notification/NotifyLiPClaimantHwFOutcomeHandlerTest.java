@@ -37,7 +37,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -511,49 +510,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL,
                 getNotificationCommonDataMapForClaimIssued(),
-                REFERENCE_NUMBER
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicant_HwfOutcome_FeePaymentOutcome_Hearing_ClaimIssueInEnglish() {
-            // Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
-                .build();
-            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(notificationService, times(1)).sendMail(
-                EMAIL,
-                EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME,
-                getNotificationCommonDataMapForHearing(),
-                REFERENCE_NUMBER
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicant_HwfOutcome_FeePaymentOutcome_Hearing_ClaimIssueInBilingual() {
-            // Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
-                .build();
-            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails)
-                .claimantBilingualLanguagePreference("BOTH").build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(notificationService, times(1)).sendMail(
-                EMAIL,
-                EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME,
-                getNotificationCommonDataMapForHearing(),
                 REFERENCE_NUMBER
             );
         }

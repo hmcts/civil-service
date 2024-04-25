@@ -59,8 +59,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn")
-                    .value(
-                        "<p class=\"govuk-body\">You have confirmed that the defendant paid £3000 on 16 March 2024.</p>")
+                    .value("<p class=\"govuk-body\">You have confirmed that the defendant paid £3000 on 16 March 2024.</p>")
             );
     }
 }

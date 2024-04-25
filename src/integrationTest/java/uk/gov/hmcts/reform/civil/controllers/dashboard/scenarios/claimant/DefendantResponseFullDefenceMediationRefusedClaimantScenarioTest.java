@@ -26,7 +26,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
     @Test
     void should_create_full_defence_mediation_refused_response_scenario() throws Exception {
 
-        String caseId = generateRandomCaseId();
+        String caseId = "12345678901";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -47,18 +47,10 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
-    }
-
-    private String generateRandomCaseId() {
-        Random random = new Random();
-        StringBuilder randomNumber = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            int digit = random.nextInt(10);
-            randomNumber.append(digit);
-        }
-        return randomNumber.toString();
     }
 }

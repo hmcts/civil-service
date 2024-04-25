@@ -76,6 +76,7 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final boolean hasSdoTrial;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2TrialWindow;
+    private final boolean hasSdoR2TrialPhysicalBundleParty;
     private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
     private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
@@ -88,6 +89,8 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private List<IncludeInOrderToggle> sdoR2SeparatorEvidenceAcousticEngineerToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsToEntExpertToggle;
     private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
+    private final boolean hasNihlWelshLangToggle;
+
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
     private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
@@ -113,4 +116,5 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final String isApplicationToRelyOnFurther;
     private String sdoR2ImportantNotesTxt;
     private String physicalBundlePartyTxt;
+    private final String welshLanguageDescription;
 }

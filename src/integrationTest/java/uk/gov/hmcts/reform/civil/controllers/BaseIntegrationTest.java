@@ -29,11 +29,16 @@ import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -176,6 +181,16 @@ public abstract class BaseIntegrationTest {
     protected String toJson(Object input) {
         try {
             return objectMapper.writeValueAsString(input);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(
+                String.format("Failed to serialize '%s' to JSON", input.getClass().getSimpleName()), e
+            );
+        }
+    }
+
+    protected List<TaskList> toTaskList(String input) {
+        try {
+            return Arrays.asList(objectMapper.readValue(input, TaskList[].class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(
                 String.format("Failed to serialize '%s' to JSON", input.getClass().getSimpleName()), e

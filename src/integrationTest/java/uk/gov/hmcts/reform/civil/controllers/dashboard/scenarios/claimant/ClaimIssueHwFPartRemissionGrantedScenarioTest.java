@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -18,8 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -33,6 +30,7 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends DashboardBase
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .hwfFeeType(FeeType.CLAIMISSUED)
+            .applicant1Represented(YesOrNo.NO)
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                        .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
                                        .remissionAmount(BigDecimal.valueOf(100000))

@@ -25,8 +25,9 @@ public class ClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegr
     @Test
     void should_create_claimant_settlement_agreement_scenario() throws Exception {
 
+        LocalDateTime respondent1SettlementDeadline = LocalDateTime.now();
+
         String caseId = "12346789";
-        LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                        .applicant1SignedSettlementAgreement(YesOrNo.YES).build()).build();

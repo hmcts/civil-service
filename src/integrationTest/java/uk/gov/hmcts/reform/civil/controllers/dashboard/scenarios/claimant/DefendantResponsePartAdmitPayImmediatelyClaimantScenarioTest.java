@@ -30,7 +30,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
     @Test
     void should_create_part_admit_defendant_response_scenario() throws Exception {
 
-        String caseId = generateRandomCaseId();
+        String caseId = "12345678902";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -56,8 +56,10 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 March 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 Mawrth 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 March 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 Mawrth 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
         //Verify task Item is created
@@ -69,15 +71,5 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
                     "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">View the response to the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
             );
-    }
-
-    private String generateRandomCaseId() {
-        Random random = new Random();
-        StringBuilder randomNumber = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            int digit = random.nextInt(10);
-            randomNumber.append(digit);
-        }
-        return randomNumber.toString();
     }
 }

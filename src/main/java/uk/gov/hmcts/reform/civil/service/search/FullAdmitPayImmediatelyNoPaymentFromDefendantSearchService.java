@@ -46,7 +46,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
         return null;
     }
 
