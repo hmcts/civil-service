@@ -312,7 +312,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapOrderParameters_whenEventIsFinalOrder() {
+    void shouldMapOrderParameters_whenEventIsFinalOrder() {
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
         caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
@@ -327,7 +327,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapOrderParameters_whenEventIsSdoDj() {
+    void shouldMapOrderParameters_whenEventIsSdoDj() {
         List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
         sdoDjCaseDocuments.add(element(generateOrder(SDO_ORDER)));
         caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
@@ -342,7 +342,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapOrderParameters_whenEventIsSdo() {
+    void shouldMapOrderParameters_whenEventIsSdo() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
@@ -357,7 +357,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldThrowException_whenEventIsIncorrect() {
+    void shouldThrowException_whenEventIsIncorrect() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();

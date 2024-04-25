@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -268,28 +269,28 @@ public class DashboardNotificationsParamsMapper {
             .map(amount -> "£" + amount);
     }
 
-    public HashMap<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+    public Map<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
         HashMap<String, Object> params = new HashMap<>();
 
         switch (caseEvent) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT:
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
                 params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
                     .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
                 return params;
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT:
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
+            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
                 params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
                     .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
                 return params;
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT:
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
-                if (caseData.getSDODocument().isPresent()) {
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
                     params.put(
                         ORDER_DOCUMENT,
-                        caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
+                        caseData.getSDODocument().isPresent()
+                            ? caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
+                            : ""
                     );
-                }
                 return params;
             default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
         }

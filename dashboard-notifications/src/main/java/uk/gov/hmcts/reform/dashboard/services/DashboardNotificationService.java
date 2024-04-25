@@ -29,7 +29,7 @@ public class DashboardNotificationService {
 
     private final IdamApi idamApi;
 
-    private final String clickAction = "Click";
+    private final static String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,

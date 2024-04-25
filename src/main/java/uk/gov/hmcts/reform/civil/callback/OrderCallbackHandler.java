@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 
 public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
 
-    public OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
+    protected OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 
@@ -23,7 +23,7 @@ public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        HashMap<String, Object> paramsMap = mapper.getMapWithDocumentInfo(caseData, caseEvent);
+        HashMap<String, Object> paramsMap = (HashMap) mapper.getMapWithDocumentInfo(caseData, caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
