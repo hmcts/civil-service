@@ -146,6 +146,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
@@ -5805,7 +5806,7 @@ public class CaseDataBuilder {
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -5820,7 +5821,7 @@ public class CaseDataBuilder {
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -5837,7 +5838,7 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IMMEDIATELY)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -5848,9 +5849,10 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_BY_DATE)
+            .joPaymentPlan(JudgmentPaymentPlan.builder()
+                    .type(PaymentPlanSelection.PAY_BY_DATE)
+                    .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
 

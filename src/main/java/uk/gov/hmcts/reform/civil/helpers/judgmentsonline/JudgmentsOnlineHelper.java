@@ -51,13 +51,13 @@ public class JudgmentsOnlineHelper {
         if (isOrderMadeFutureDate) {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
-        if (caseData.getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_BY_DATE)) {
+        if (caseData.getJoPaymentPlan().getType().equals(PaymentPlanSelection.PAY_BY_DATE)) {
             boolean isFutureDate =
-                JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoPaymentToBeMadeByDate());
+                JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoPaymentPlan().getPaymentDeadlineDate());
             if (!isFutureDate) {
                 errors.add(ERROR_MESSAGE_DATE_PAID_BY_MUST_BE_IN_FUTURE);
             }
-        } else if (caseData.getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
+        } else if (caseData.getJoPaymentPlan().getType().equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
             boolean isFutureDate =
                 JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoInstalmentDetails().getStartDate());
             if (!isFutureDate) {

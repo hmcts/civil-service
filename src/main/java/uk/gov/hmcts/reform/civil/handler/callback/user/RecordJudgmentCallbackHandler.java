@@ -64,7 +64,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         if (caseData.getJoIsLiveJudgmentExists() != null) {
             caseData.setJoOrderMadeDate(null);
             caseData.setJoJudgmentStatusDetails(null);
-            caseData.setJoPaymentPlanSelection(null);
+            caseData.setJoPaymentPlan(null);
             caseData.setJoInstalmentDetails(null);
             caseData.setJoJudgmentRecordReason(null);
             caseData.setJoAmountOrdered(null);
