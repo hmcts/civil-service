@@ -10,9 +10,9 @@ VALUES ('Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{"Notice.AAA6.ClaimIssue.
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'You need to pay your claim fee',
+VALUES ('Notice.AAA6.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'Mae angen i chi dalu ffi eich hawliad',
         '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
-        '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
+        '<p class="govuk-body">Nid yw eich hawliad wedi''i gyhoeddi eto, er mwyn bwrw ymlaen, rhaid i chi dalu ffi’r hawliad o ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Talu ffi’r hawliad</a>.</p>',
         'CLAIMANT');
 
 /**
