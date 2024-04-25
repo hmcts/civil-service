@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -36,6 +37,10 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(responseDeadline)
@@ -55,7 +60,7 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(responseDeadline) + ". " +
-                        "The payment must clear the account by then, if not the claimant can request a county court judgment.</p>" +
+                        "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
                 )
             );
@@ -81,6 +86,10 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -100,7 +109,7 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ". " +
-                        "The payment must clear the account by then, if not the claimant can request a county court judgment.</p>" +
+                        "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
                 )
             );
