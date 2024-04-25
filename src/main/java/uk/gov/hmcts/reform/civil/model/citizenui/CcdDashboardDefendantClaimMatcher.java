@@ -299,6 +299,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return false;
+    }
+
+    @Override
     public boolean isHwFClaimSubmit() {
         return false;
     }
@@ -330,6 +335,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHwfPaymentOutcome() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
         return false;
     }
 }
