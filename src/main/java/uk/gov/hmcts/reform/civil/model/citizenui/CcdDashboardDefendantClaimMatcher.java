@@ -342,4 +342,14 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isWaitingForClaimantIntentDocUpload() {
         return false;
     }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
 }
