@@ -350,7 +350,6 @@ public class SdoGeneratorService {
             sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
                 .fastTrackCreditHire(caseData.getFastTrackCreditHire());
         }
-
         return sdoDocumentFormBuilder.build();
     }
 

@@ -32,9 +32,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
@@ -282,19 +280,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .ifPresent(updatedData::caseManagementLocation);
 
         if (V_1.equals(callbackParams.getVersion())) {
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-            Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-                authToken, HEARING_CHANNEL, serviceId
-            );
-            DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-            List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-                .getListItems()
-                .stream()
-                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-                .collect(Collectors.toList());
-            hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+            DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, caseData);
             DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
                 .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
             hearingMethodList.setValue(hearingMethodInPerson);
@@ -923,6 +909,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return tempSdoR2WitnessOfFact;
     }
 
+    private DynamicList getDynamicHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+            .getListItems()
+            .stream()
+            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+            .collect(Collectors.toList());
+        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+        return hearingMethodList;
+    }
+
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
             .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
@@ -960,6 +963,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                    CaseData.CaseDataBuilder<?, ?> updatedData, Optional<RequestedCourt> preferredCourt) {
         DynamicList courtList = getCourtLocationForSdoR2(callbackParams, updatedData, preferredCourt.orElse(null));
         courtList.setValue(courtList.getListItems().get(0));
+
+        DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, callbackParams.getCaseData());
+        DynamicListElement hearingMethodTelephone = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+            .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null);
+        hearingMethodList.setValue(hearingMethodTelephone);
+
         updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
             SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
         updatedData.sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(LocalDate.now().plusDays(21)).text(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION).build());
@@ -980,7 +989,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                           .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
         updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
                                                 .trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
-                                                .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
+                                                .methodOfHearing(hearingMethodList)
                                                 .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
                                                 .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO)
                                                 .sdoR2SmallClaimsHearingFirstOpenDateAfter(SdoR2SmallClaimsHearingFirstOpenDateAfter.builder()
@@ -1016,6 +1025,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
+        DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, callbackParams.getCaseData());
+        DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+            .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
+        hearingMethodList.setValue(hearingMethodInPerson);
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                                                   .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
@@ -1058,7 +1071,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2Trial(SdoR2Trial.builder()
                                    .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
                                    .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
-                                   .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson)
+                                   .methodOfHearing(hearingMethodList)
                                    .physicalBundleOptions(PhysicalTrialBundleOptions.NONE)
                                    .sdoR2TrialFirstOpenDateAfter(
                                        SdoR2TrialFirstOpenDateAfter.builder()
