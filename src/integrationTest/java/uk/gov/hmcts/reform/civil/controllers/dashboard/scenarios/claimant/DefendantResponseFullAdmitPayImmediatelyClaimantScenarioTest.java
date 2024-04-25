@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -35,6 +36,10 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("James")
+                    .individualLastName("John")
+                    .build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(admitPaymentDeadline)
@@ -52,9 +57,9 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by " +
+                    "<p class=\"govuk-body\">James John has offered to pay £1000 by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ".</p>" +
-                        "<p class=\"govuk-body\">The payment must clear the account by then, if not you can request a county court judgment.</p>" +
+                        "<p class=\"govuk-body\">The payment must be received in your account by then, if not you can request a county court judgment.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"
                 )
             );
