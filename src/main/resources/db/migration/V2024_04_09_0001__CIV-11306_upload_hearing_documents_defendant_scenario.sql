@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
         '{}',
-        '{"Notice.AAA6.CP.HearingDocuments.Upload.Defendant" : ["sdoDocumentUploadRequestedDate"]}');
+        '{"Notice.AAA6.CP.HearingDocuments.Upload.Defendant" : ["sdoDocumentUploadRequestedDateEn", "sdoDocumentUploadRequestedDateCy"]}');
 
 /**
  * Add notification template
@@ -21,8 +21,8 @@ VALUES ('Notice.AAA6.CP.HearingDocuments.Upload.Defendant', 'Upload documents', 
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
-values ('<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'Hearings',
-        '<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'Hearings',
+values ('<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'Hearing',
+        '<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'Hearing',
         'Hearing.Document.Upload', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
         '{5, 5}', 'DEFENDANT', 2,
         'Deadline is 4pm on ${sdoDocumentUploadRequestedDateEn}',
@@ -30,6 +30,6 @@ values ('<a href="{UPLOAD_HEARING_DOCUMENTS}">Upload hearing documents</a>', 'He
 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a>View documents</a>', 'Hearings' ,'<a>View documents</a>', 'Hearings',
+values ('<a>View documents</a>', 'Hearings' ,'<a>View documents</a>', 'Hearing',
         'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Upload.Defendant',
         '{1, 1}', 'DEFENDANT', 3);
