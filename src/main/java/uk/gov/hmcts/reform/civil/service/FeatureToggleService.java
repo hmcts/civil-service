@@ -97,6 +97,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
     }
 
+    public boolean isJudgmentOnlineLive() {
+        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+    }
+
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
