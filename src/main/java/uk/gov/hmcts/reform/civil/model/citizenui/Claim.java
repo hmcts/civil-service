@@ -113,4 +113,8 @@ public interface Claim {
     boolean defendantRespondedWithPreferredLanguageWelsh();
 
     boolean isWaitingForClaimantIntentDocUpload();
+
+    boolean isClaimSubmittedNotPaidOrFailedNotHwF();
+
+    boolean isClaimSubmittedWaitingTranslatedDocuments();
 }
