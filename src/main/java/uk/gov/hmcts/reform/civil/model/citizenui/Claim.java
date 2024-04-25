@@ -111,4 +111,8 @@ public interface Claim {
     boolean isHwfPaymentOutcome();
 
     boolean isWaitingForClaimantIntentDocUpload();
+
+    boolean isClaimSubmittedNotPaidOrFailedNotHwF();
+
+    boolean isClaimSubmittedWaitingTranslatedDocuments();
 }
