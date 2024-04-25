@@ -29,7 +29,7 @@ public class DashboardNotificationService {
 
     private final IdamApi idamApi;
 
-    private final String CLICK_ACTION = "Click";
+    private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
@@ -68,7 +68,7 @@ public class DashboardNotificationService {
         if (existingNotification.isPresent()) {
             updated = notification.toBuilder().id(existingNotification.get().getId()).build();
             notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
-                                                                                         CLICK_ACTION
+                                                                                         clickAction
             );
         }
 
@@ -87,13 +87,13 @@ public class DashboardNotificationService {
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
                 .dashboardNotification(notification)
-                .actionPerformed(CLICK_ACTION)
+                .actionPerformed(clickAction)
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
 
             if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals(CLICK_ACTION)) {
+                && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
                 notificationAction.setId(notification.getNotificationAction().getId());
             }
             notification.setNotificationAction(notificationAction);
