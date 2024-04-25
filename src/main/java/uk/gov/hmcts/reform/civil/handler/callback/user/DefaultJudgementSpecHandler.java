@@ -92,6 +92,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .put(callbackKey(MID, "repaymentValidate"), this::repaymentValidate)
             .put(callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm)
+
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
