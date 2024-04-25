@@ -47,16 +47,16 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+        //BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
 
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-            ).collect(Collectors.toList()));
+//        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+//                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
+//            ).collect(Collectors.toList()));
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
