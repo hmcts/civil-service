@@ -24,6 +24,7 @@ public class PaymentStatusService {
     public CardPaymentServiceRequestResponse createGovPayCardPaymentRequest(
         String serviceRequestReference, String authorization, CardPaymentServiceRequestDTO requestDto) {
         try {
+            log.info("Payment status service - createGovPayCardPaymentRequest()--------");
             return paymentsClient.createGovPayCardPaymentRequest(serviceRequestReference, authorization, requestDto);
         } catch (FeignException.InternalServerError ex) {
             throw new RetryablePaymentException(ex.contentUTF8(), ex);
