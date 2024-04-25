@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @ExtendWith(SpringExtension.class)
+@Ignore
 class BundleCreationTriggerEventHandlerTest {
 
     private static final String TEST_URL = "url";

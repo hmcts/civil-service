@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -54,9 +53,9 @@ public class BundleCreationTriggerEventHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-//        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-//                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-//            ).collect(Collectors.toList()));
+        //caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+        //                       .stream().map(bundle -> prepareNewBundle(bundle, caseData)
+        //   ).collect(Collectors.toList()));
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
