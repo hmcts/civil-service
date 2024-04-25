@@ -42,7 +42,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
                     + " phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value("Rydych wedi darparu cyfeirnod help i dalu ffioedd annilys"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu ffi’r hawliad, ond mae'r cyfeirnod yn annily."
+                "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu ffi’r hawliad, ond mae'r cyfeirnod yn annilys."
                     + "<br>Anfonwyd e-bost atoch gyda chyfarwyddiadau ar beth i'w wneud nesaf. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu,"
                     + " gallwch anwybyddu'r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
