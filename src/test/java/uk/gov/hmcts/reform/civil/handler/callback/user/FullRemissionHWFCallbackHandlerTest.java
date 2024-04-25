@@ -57,6 +57,22 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(10000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(FULL_REMISSION_HWF);
+        }
+
+        @Test
+        void shouldUpdateFullRemissionDataWithDetailsNull_ClaimFee() {
+            CaseData caseData = CaseData.builder()
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(10000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(FULL_REMISSION_HWF);
         }
 
         @Test
@@ -73,6 +89,23 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
+            assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(FULL_REMISSION_HWF);
+        }
+
+        @Test
+        void shouldUpdateFullRemissionDataWithDetailsNull_HearingFee() {
+            CaseData caseData = CaseData.builder()
+                .hearingReferenceNumber("000HN001")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
+            assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(FULL_REMISSION_HWF);
         }
 
         @Test
