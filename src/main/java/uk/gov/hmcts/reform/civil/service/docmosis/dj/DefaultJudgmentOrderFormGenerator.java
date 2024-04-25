@@ -181,6 +181,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialClinicalNegligenceAddSection(nonNull(caseData.getTrialClinicalNegligence()))
             .trialCreditHire(caseData.getTrialCreditHire())
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
+            .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
             .sdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
             .sdoDJR2TrialCreditHireDetailsAddSection(
                 (nonNull(caseData.getSdoDJR2TrialCreditHire())

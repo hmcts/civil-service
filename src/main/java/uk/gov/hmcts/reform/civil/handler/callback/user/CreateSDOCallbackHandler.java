@@ -28,14 +28,14 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -95,17 +95,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
@@ -865,6 +854,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private DynamicList getDynamicHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+            .getListItems()
+            .stream()
+            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+            .collect(Collectors.toList());
+        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+        return hearingMethodList;
+    }
+
     private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
             .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
@@ -907,23 +913,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
             .build();
         return tempSdoR2WitnessOfFact;
-    }
-
-    private DynamicList getDynamicHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-            .getListItems()
-            .stream()
-            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .collect(Collectors.toList());
-        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
-        return hearingMethodList;
     }
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
