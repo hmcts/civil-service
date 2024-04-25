@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -46,6 +46,25 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
+    public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
+                                                     CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
+                                                     CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(
+            CallbackParamsBuilder.builder()
+                .request(CallbackRequest.builder()
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                             .build())
+                .build()))
+            .isEqualTo(TASK_ID);
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -68,6 +87,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
 
+            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+
             handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(
@@ -79,7 +100,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
         }
 
         @Test
-        void shouldRecordScenarioInSDO_whenInvoked() {
+        void shouldRecordScenarioInSdoDj_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .orderSDODocumentDJCollection(List.of(
                     ElementUtils.element(CaseDocument.builder().documentLink(
@@ -91,6 +112,34 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.CP.OrderMade.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioInSdo_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .orderSDODocumentDJCollection(List.of(
+                    ElementUtils.element(CaseDocument.builder().documentLink(
+                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
+                .applicant1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 

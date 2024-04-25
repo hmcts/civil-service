@@ -29,6 +29,8 @@ public class DashboardNotificationService {
 
     private final IdamApi idamApi;
 
+    private final String CLICK_ACTION = "Click";
+
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
                                         NotificationActionRepository notificationActionRepository, IdamApi idamApi) {
@@ -65,7 +67,9 @@ public class DashboardNotificationService {
         DashboardNotificationsEntity updated = notification;
         if (existingNotification.isPresent()) {
             updated = notification.toBuilder().id(existingNotification.get().getId()).build();
-            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(), "Click");
+            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
+                                                                                         CLICK_ACTION
+            );
         }
 
         return dashboardNotificationsRepository.save(updated);
@@ -83,13 +87,13 @@ public class DashboardNotificationService {
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
                 .dashboardNotification(notification)
-                .actionPerformed("Click")
+                .actionPerformed(CLICK_ACTION)
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
 
             if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals("Click")) {
+                && notification.getNotificationAction().getActionPerformed().equals(CLICK_ACTION)) {
                 notificationAction.setId(notification.getNotificationAction().getId());
             }
             notification.setNotificationAction(notificationAction);

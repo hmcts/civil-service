@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +25,7 @@ public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+    public static final String ORDER_DOCUMENT = "orderDocument";
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -264,5 +266,32 @@ public class DashboardNotificationsParamsMapper {
             .map(BigDecimal::toPlainString)
             .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
+    }
+
+    public HashMap<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        HashMap<String, Object> params = new HashMap<>();
+
+        switch (caseEvent) {
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT:
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
+                params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT:
+            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
+                params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT:
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
+                if (caseData.getSDODocument().isPresent()) {
+                    params.put(
+                        ORDER_DOCUMENT,
+                        caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl()
+                    );
+                }
+                return params;
+            default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
+        }
     }
 }
