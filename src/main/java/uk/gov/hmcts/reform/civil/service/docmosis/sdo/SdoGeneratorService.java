@@ -245,17 +245,7 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence")
             )
             .hasCreditHire(
-                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
-                    && !featureToggleService.isSdoR2Enabled())
-            )
-            .hasSdoR2CreditHire(
-                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
-                    && featureToggleService.isSdoR2Enabled())
-            )
-            .hasSdoR2CreditHireDetails(
-                (nonNull(caseData.getSdoR2FastTrackCreditHire()) && (caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle() != null)
-                    && caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle()
-                    .equals(List.of(AddOrRemoveToggle.ADD)))
+                SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
             )
             .hasEmployersLiability(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimEmployersLiability")
@@ -350,7 +340,6 @@ public class SdoGeneratorService {
             sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
                 .fastTrackCreditHire(caseData.getFastTrackCreditHire());
         }
-
         return sdoDocumentFormBuilder.build();
     }
 
