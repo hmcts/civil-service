@@ -39,9 +39,8 @@ public class UpdateClaimStateService {
     }
 
     private boolean isCaseSettledAllowed(CaseData caseData) {
-        return ((Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
-            && caseData.isClaimantIntentionSettlePartAdmit())
-            || (caseData.isPartAdmitImmediatePaymentClaimSettled()));
+        return (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+            && caseData.isClaimantIntentionSettlePartAdmit());
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
