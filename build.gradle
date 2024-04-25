@@ -25,7 +25,7 @@ def versions = [
   springSecurity     : '5.8.12',
   camunda            : '7.19.0',
   jackson            : '2.17.0',
-  testcontainers     : '1.17.6'
+  testcontainers     : '1.19.7'
 ]
 
 allprojects {
@@ -119,14 +119,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.704'
+        version: '1.12.708'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.20') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.23') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -324,7 +324,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.76'
+  implementation 'com.github.hmcts:civil-commons:v1.0.78'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.88'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.20'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
@@ -417,14 +417,14 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.48.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.2'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.16.0'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.13'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.13'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.14'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.14'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -451,7 +451,7 @@ dependencies {
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
   // dashboard specific changes ends
 
   contractTestImplementation sourceSets.main.runtimeClasspath
