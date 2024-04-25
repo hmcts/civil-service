@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest extends DashboardBaseIntegrationTest {
@@ -31,6 +33,11 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("James")
+                    .individualLastName("John")
+                    .build())
             .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDateTime.of(2024, 3, 21, 16, 0))
@@ -46,8 +53,8 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">The defendant has rejected the claim and refused mediation.<br>You need to respond by 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation.<br>You need to respond by 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
     }
 }
