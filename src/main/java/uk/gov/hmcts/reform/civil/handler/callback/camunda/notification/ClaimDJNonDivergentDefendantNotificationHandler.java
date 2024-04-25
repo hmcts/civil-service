@@ -32,8 +32,8 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LR,
                                                           NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT2_LR,
                                                           NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LIP);
-    private static final String REFERENCE_TEMPLATE =
-        "dj-non-divergent-defendant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "dj-non-divergent-defendant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "dj-non-divergent-defendant-notification-lip-%s";
     private static final String TASK_ID_RESPONDENT1 = "NotifyDJNonDivergentDefendant1";
     private static final String TASK_ID_RESPONDENT2 = "NotifyDJNonDivergentDefendant2";
     private static final String TASK_ID_RESPONDENT1_LIP = "NotifyDJNonDivergentDefendant1LiP";
@@ -87,11 +87,16 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
                 recipientEmail,
                 getTemplate(isRespondentLip),
                 getEmailProperties(callbackParams, caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                getReferenceTemplate(caseData, isRespondentLip)
             );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getReferenceTemplate(CaseData caseData, boolean isRespondentLip) {
+        return isRespondentLip ? String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference())
+            : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
     private Map<String, String> getEmailProperties(CallbackParams callbackParams, CaseData caseData) {
