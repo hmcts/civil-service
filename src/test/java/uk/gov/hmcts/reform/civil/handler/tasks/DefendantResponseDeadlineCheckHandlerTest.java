@@ -13,11 +13,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
@@ -65,7 +67,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -88,7 +90,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService, never()).complete(mockTask, null);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -103,11 +105,13 @@ class DefendantResponseDeadlineCheckHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 500)))
-            .when(externalTaskService).complete(mockTask);
+            .when(externalTaskService).complete(mockTask, null);
 
-        handler.execute(mockTask, externalTaskService);
+        assertThrows(
+            CompleteTaskException.class,
+            () -> handler.execute(mockTask, externalTaskService));
 
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),
