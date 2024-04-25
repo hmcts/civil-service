@@ -124,7 +124,7 @@ class BundleCreationTriggerHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(1000L)
+            eq(300000L)
         );
     }
 
