@@ -62,8 +62,8 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + " in instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " " + frequency.getDashboardLabel() + " starting " + DateUtils.formatDate(firstPaymentDate)
-                        + ".</p><p class=\"govuk-body\">The court will contact you when they respond.</p><a "
+                        + " " + frequency.getDashboardLabel() + ". You have offered to do this starting from " + DateUtils.formatDate(firstPaymentDate)
+                        + ".</p><p class=\"govuk-body\">We will contact you when the claimant responds to your offer.</p><a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
