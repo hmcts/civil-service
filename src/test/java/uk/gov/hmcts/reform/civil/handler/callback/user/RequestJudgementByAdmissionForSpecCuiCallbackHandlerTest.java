@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -433,7 +433,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC.name());
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
         }
 
         @Test
@@ -499,7 +499,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC.name());
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
         }
 
         @Test
@@ -527,7 +527,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC.name());
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
         }
 
         @Test

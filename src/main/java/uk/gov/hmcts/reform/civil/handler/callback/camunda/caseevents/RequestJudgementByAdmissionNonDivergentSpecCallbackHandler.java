@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class RequestJudgementByAdmissionNonDivergentSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(REQUEST_JUDGEMENT_ADMISSION_NON_DIVERGENT_SPEC);
+    private static final List<CaseEvent> EVENTS = List.of(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
 
     @Override
     protected Map<String, Callback> callbacks() {
