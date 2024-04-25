@@ -38,7 +38,9 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL).build())
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .type(Party.Type.INDIVIDUAL).build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
                                                .whenWillThisAmountBePaid(responseDeadline)
@@ -56,12 +58,12 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
+                    "<p class=\"govuk-body\">Claimant John has offered to pay you £1000 by "
                       +  DateUtils.formatDate(responseDeadline) + "<br>"
                       +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
+                    "<p class=\"govuk-body\">Claimant John has offered to pay you £1000 by "
                      +   DateUtils.formatDateInWelsh(responseDeadline) + "<br>"
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
@@ -89,7 +91,9 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder()
+            .respondent1(Party.builder().soleTraderTitle("Mr.")
+                        .soleTraderFirstName("Sole")
+                        .soleTraderLastName("Trader")
                         .type(Party.Type.SOLE_TRADER).build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
                                                .builder()
@@ -108,12 +112,12 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
+                    "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1000 by "
                      +   DateUtils.formatDate(admitPaymentDeadline) + "<br>"
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                jsonPath("$[0].titleCy").value("Response to the claim"),
                jsonPath("$[0].descriptionCy").value(
-                   "<p class=\"govuk-body\">The defendant has offered to pay £1000 by "
+                   "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1000 by "
                     +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + "<br>"
                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
