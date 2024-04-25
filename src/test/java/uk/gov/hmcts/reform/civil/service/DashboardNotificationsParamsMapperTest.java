@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -327,9 +328,9 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapOrderParameters_whenEventIsSdoDj() {
-        List<Element<CaseDocument>> SdoDjCaseDocuments = new ArrayList<>();
-        SdoDjCaseDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().orderSDODocumentDJCollection(SdoDjCaseDocuments).build();
+        List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
+        sdoDjCaseDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
 
         Map<String, Object> resultClaimant =
             mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
@@ -353,6 +354,19 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @Test
+    public void shouldThrowException_whenEventIsIncorrect() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        CaseEvent event = CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
+
+        assertThatThrownBy(() -> mapper.getMapWithDocumentInfo(caseData, event))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasNoCause()
+            .hasMessage("Invalid caseEvent in " + event);
     }
 }
 

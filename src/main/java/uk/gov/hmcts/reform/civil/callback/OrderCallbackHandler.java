@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
-public abstract class OrderCallbackHandler extends DashboardCallbackHandler{
+public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
 
     public OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
