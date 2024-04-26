@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.cmc.model.Response;
 
 import java.time.LocalDate;
@@ -39,6 +40,15 @@ public class ClaimStoreService {
         } catch (Exception e) {
             log.error(e.getMessage());
             return Collections.emptyList();
+        }
+    }
+
+    public DefendantLinkStatus isOcmcDefendantLinked(String caseReference) {
+        try {
+            return claimStoreApi.isDefendantLinked(caseReference);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return DefendantLinkStatus.builder().linked(false).build();
         }
     }
 

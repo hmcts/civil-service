@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,6 +72,21 @@ public class CaseAssignmentController {
         log.info("case reference {}", caseReference);
         String redirectUrl = defendantPinToPostLRspecService.validateOcmcPin(pin.getPin(), caseReference);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+    }
+
+    @GetMapping(path = {
+        "/reference/{caseReference}/ocmc"
+    })
+    @Operation(summary = "Check whether a claim is linked to a defendant")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Boolean> isOcmcDefendantLinked(
+        @PathVariable("caseReference") String caseReference) {
+        log.info("case reference {}", caseReference);
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
