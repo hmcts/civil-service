@@ -77,7 +77,6 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
 
         final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListWithInactive("DEFENDANT", caseId);
 
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

@@ -80,7 +80,6 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
 
         final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListWithInactive("CLAIMANT", caseId);
 
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
