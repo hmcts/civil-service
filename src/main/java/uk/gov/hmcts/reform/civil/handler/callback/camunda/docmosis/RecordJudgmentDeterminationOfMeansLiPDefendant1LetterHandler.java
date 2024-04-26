@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -8,11 +9,19 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.RecordJudgmentDeterminationOfMeansPiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.SetAsideJudgmentInErrorLiPLetterGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +59,9 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendant1LetterHandler extend
 
     private CallbackResponse sendRecordJudgmentDeterminationOfMeansLetterToLiPDefendant1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isRespondent1Lip(caseData)) {
-            generateSetAsideJudgmentInErrorLiPDefendantLetter(callbackParams);
+        if (isRespondent1Lip(caseData) && caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
+            recordJudgmentDeterminationOfMeansPiPLetterGenerator
+                .generateAndPrintRecordJudgmentDeterminationOfMeansLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -60,8 +70,4 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendant1LetterHandler extend
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
 
-    private void generateSetAsideJudgmentInErrorLiPDefendantLetter(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        recordJudgmentDeterminationOfMeansPiPLetterGenerator.getTemplateData(caseData);
-    }
 }
