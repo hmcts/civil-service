@@ -61,10 +61,10 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(coverLetterGenerator).generateAndPrintDjCoverLetter(
+        verify(coverLetterGenerator).generateAndPrintDjCoverLetters(
             caseData,
-            params.getParams().get(BEARER_TOKEN).toString()
+            params.getParams().get(BEARER_TOKEN).toString(), false
         );
     }
-
+//TODO add test for second legal org
 }

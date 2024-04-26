@@ -16,14 +16,15 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.applicant2Present;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrganisationByPolicy;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Present;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,12 +39,12 @@ public class DefaultJudgmentCoverLetterGenerator {
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
     private static final String DEFAULT_JUDGMENT_COVER_LETTER = "default-judgment-cover-letter";
 
-    public byte[] generateAndPrintDjCoverLetter(CaseData caseData, String authorisation) {
-        DocmosisDocument coverLetter = generate(caseData);
+    public byte[] generateAndPrintDjCoverLetters(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
+        DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
         CaseDocument coverLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR.getDocumentTitle(),
+                DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
                 coverLetter.getBytes(),
                 DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
             )
@@ -59,26 +60,31 @@ public class DefaultJudgmentCoverLetterGenerator {
             throw new DocumentDownloadException(coverLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
         }
 
-        List<String> recipients = getRecipientsList(caseData);
+        List<String> recipients = getRecipientsList(caseData, toSecondLegalOrg);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients);
         return letterContent;
     }
 
-    private List<String> getRecipientsList(CaseData caseData) {
-        Optional <Organisation> organisationOp = getOrganisation(caseData);
+    private List<String> getRecipientsList(CaseData caseData, boolean toSecondLegalOrg) {
+        Optional <Organisation> organisationOp = toSecondLegalOrg ?
+            getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
+            : getOrganisationByPolicy(caseData.getRespondent1OrganisationPolicy(), this.organisationService);
         return organisationOp.map(Organisation::getName).stream().toList();
     }
 
-    private DocmosisDocument generate(CaseData caseData) {
+    private DocmosisDocument generateCoverLetter(CaseData caseData, boolean toSecondLegalOrg) {
         return documentGeneratorService.generateDocmosisDocument(
-            getTemplateData(caseData),
-            DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR
+            getTemplateData(caseData, toSecondLegalOrg),
+            DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG
         );
     }
 
-    public DefaultJudgmentDefendantLrCoverLetter getTemplateData(CaseData caseData) {
-        Optional <Organisation> organisationOp = getOrganisation(caseData);
+    public DefaultJudgmentDefendantLrCoverLetter getTemplateData(CaseData caseData, boolean toSecondLegalOrg) {
+        Optional <Organisation> organisationOp = toSecondLegalOrg ?
+            getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
+            : getOrganisationByPolicy(caseData.getRespondent1OrganisationPolicy(), this.organisationService);
+
         if(organisationOp.isPresent()) {
             Organisation organisation = organisationOp.get();
             StringBuilder claimantName = new StringBuilder().append(caseData.getApplicant1().getPartyName());
@@ -104,17 +110,4 @@ public class DefaultJudgmentCoverLetterGenerator {
         return null;
     }
 
-    private Optional <Organisation> getOrganisation(CaseData caseData) {
-        String orgId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-        return organisationService.findOrganisationById(orgId);
-    }
-
-    private boolean applicant2Present(CaseData caseData) {
-        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
-    }
-
-    private boolean respondent2Present(CaseData caseData) {
-        return caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2() == YES;
-    }
 }

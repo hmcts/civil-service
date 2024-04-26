@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG;
 
 @SpringBootTest(classes = {
     DefaultJudgmentCoverLetterGenerator.class,
@@ -93,18 +93,19 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
         when(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
-            eq(DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR)
+            eq(DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG)
         ))
             .thenReturn(new DocmosisDocument(
-                DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR.getDocumentTitle(),
+                DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
                 LETTER_CONTENT
             ));
         when(documentManagementService
                  .uploadDocument(
                      BEARER_TOKEN,
-                     new PDF(DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LR.getDocumentTitle(),
-                             LETTER_CONTENT,
-                             DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
+                     new PDF(
+                         DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
+                         LETTER_CONTENT,
+                         DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
                      )
                  ))
             .thenReturn(COVER_LETTER);
@@ -115,7 +116,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
 
         // when
-        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetter(caseData, BEARER_TOKEN);
+        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, BEARER_TOKEN, false);
         // then
         verify(bulkPrintService)
             .printLetter(

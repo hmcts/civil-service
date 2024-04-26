@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.DefaultJudgmentCoverLetterGenerator;
 
 import java.util.List;
@@ -18,11 +19,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.areRespondentLegalOrgsEqual;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Present;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandler {
 
+    private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(
         SEND_COVER_LETTER_DEFENDANT_LR);
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
@@ -32,7 +36,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::sendCoverLetterToDefendantLR
+            this::sendCoverLetterToDefendantLrLegalOrgs
         );
     }
 
@@ -46,16 +50,19 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
         return EVENTS;
     }
 
-    private CallbackResponse sendCoverLetterToDefendantLR(CallbackParams callbackParams) {
+    private CallbackResponse sendCoverLetterToDefendantLrLegalOrgs(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (YesOrNo.YES.equals(caseData.getRespondent1Represented())) {
-            generateCoverLetterDefendantLr(callbackParams);
+            generateCoverLetterDefendantLrLegalOrgs(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void generateCoverLetterDefendantLr(CallbackParams callbackParams) {
+    private void generateCoverLetterDefendantLrLegalOrgs(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
+        if(respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData, organisationService)) {
+            defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
+        }
     }
 }
