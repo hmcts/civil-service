@@ -53,7 +53,7 @@ public class CaseAssignmentController {
         @ApiResponse(responseCode = "400", description = "Bad Request")})
     public ResponseEntity<CaseDetails> validateCaseAndPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
-        log.info("case reference {}", caseReference);
+        log.info("Validate case reference {} and pin", caseReference);
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
         defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
@@ -69,7 +69,7 @@ public class CaseAssignmentController {
         @ApiResponse(responseCode = "400", description = "Bad Request")})
     public ResponseEntity<String> validateOcmcPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
-        log.info("case reference {}", caseReference);
+        log.info("Validate ocmc case reference {} and pin", caseReference);
         String redirectUrl = defendantPinToPostLRspecService.validateOcmcPin(pin.getPin(), caseReference);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
     }
@@ -84,7 +84,7 @@ public class CaseAssignmentController {
         @ApiResponse(responseCode = "400", description = "Bad Request")})
     public ResponseEntity<Boolean> isOcmcDefendantLinked(
         @PathVariable("caseReference") String caseReference) {
-        log.info("case reference {}", caseReference);
+        log.info("Check claim reference {} is linked to defendant", caseReference);
         boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
