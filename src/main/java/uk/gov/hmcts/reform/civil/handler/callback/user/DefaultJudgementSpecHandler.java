@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -415,9 +416,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
-        boolean isNonDivergent = caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both");
 
-        if (featureToggleService.isJudgmentOnlineLive() && (MultiPartyScenario.isOneVOne(caseData) || isNonDivergent)) {
+        if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -429,6 +429,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private boolean  isNonDivergent(CaseData caseData) {
+        return  MultiPartyScenario.isOneVOne(caseData)
+            || (ofNullable(caseData.getRespondent2()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 }
 
