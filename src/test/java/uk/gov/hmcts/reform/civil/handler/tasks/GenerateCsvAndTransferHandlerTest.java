@@ -109,7 +109,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(runTimeService).setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled", false);
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -123,7 +123,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimToBeProcessed, false);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
         verify(runTimeService).setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled", true);
     }
 
@@ -139,7 +139,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimNotToBeProcessed, false);
         verify(mediationCsvServiceFactory, times(0)).getMediationCSVService(any());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -155,7 +155,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimNotToBeProcessed, false);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -169,7 +169,7 @@ class GenerateCsvAndTransferHandlerTest {
         inMediationCsvHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimToBeProcessed, false);
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {

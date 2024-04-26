@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
@@ -29,6 +30,10 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                        .individualFirstName("Claimant")
+                        .individualLastName("John")
+                        .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .responseClaimMediationSpecRequired(YesOrNo.YES)
@@ -43,12 +48,12 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>" +
+                    .value("<p class=\"govuk-body\">You have rejected the claim and suggested mediation. Claimant John can reject or agree to mediation.<br>" +
                               "The court will contact you when they respond.<br>"
                                + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and agreed to mediation. The claimant can reject or agree to mediation.<br>" +
+                    .value("<p class=\"govuk-body\">You have rejected the claim and suggested mediation. Claimant John can reject or agree to mediation.<br>" +
                         "The court will contact you when they respond.<br>"
                          + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>")
 

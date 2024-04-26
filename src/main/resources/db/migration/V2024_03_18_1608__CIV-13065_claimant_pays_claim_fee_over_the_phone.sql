@@ -13,7 +13,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.ClaimIssue.HWF.PhonePayment',
         'The claim fee has been paid',
-        'The claim fee has been paid',
+        'Mae ffi’r hawliad wedi cael ei thalu',
         '<p class="govuk-body">The claim fee has been paid in full.</p>',
-        '<p class="govuk-body">The claim fee has been paid in full.</p>',
+        '<p class="govuk-body">Mae ffi’r hawliad wedi cael ei thalu’n llawn.</p>',
         'CLAIMANT');
