@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -101,12 +102,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
-        boolean isNonDivergent = data.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both");
 
-        if (featureToggleService.isJudgmentOnlineLive() &&
-            (MultiPartyScenario.isOneVOne(data) || MultiPartyScenario.isTwoVOne(data) || isNonDivergent) &&
-            data.isPayImmediately()) {
-
+        if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(data) && data.isPayImmediately()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
@@ -145,5 +142,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                 + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>"
         );
+    }
+
+    private boolean  isNonDivergent(CaseData caseData) {
+        return  MultiPartyScenario.isOneVOne(caseData)
+            || MultiPartyScenario.isTwoVOne(caseData)
+            || (ofNullable(caseData.getRespondent2()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 }
