@@ -92,11 +92,11 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                 jsonPath("$[0].titleEn").value("You settled the claim through mediation"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement (PDF).</a></p>"),
+                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>"),
                 jsonPath("$[0].titleCy").value("You settled the claim through mediation"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement (PDF).</a></p>")
+                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>")
             );
     }
 }
