@@ -72,11 +72,12 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        HearingsResponse hearingsResponse = getHearings(caseId);
-        System.out.println("(GL) Hearing response: " + hearingsResponse);
 
         //Testing purposes ===================================
         if (caseId  == Long.parseLong("1714058217963373")) {
+
+            HearingsResponse hearingsResponse = getHearings(caseId);
+            log.info("(GL) Hearing response: " + hearingsResponse);
             var data = caseDataBuilder.nextHearingDetails(null)
                 .build().toMap(objectMapper);
             data.put("nextHearingDetails", null);
