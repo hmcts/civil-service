@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_CLAIMANT;
 
@@ -52,7 +53,9 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     private CallbackResponse notifyClaimantSDOrderDj(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            caseData.isApplicant1NotRepresented()
+                ? caseData.getClaimantUserDetails().getEmail()
+                : caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getStandardDirectionOrderDJTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
@@ -75,11 +78,13 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
+            Optional<Organisation> organisation = organisationService
+                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                                          .getOrganisation().getOrganisationID());
+            if (organisation.isPresent()) {
+                return organisation.get().getName();
+            }
         }
         return caseData.getApplicant1().getPartyName();
     }
