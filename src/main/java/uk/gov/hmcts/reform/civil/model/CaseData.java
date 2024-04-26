@@ -74,6 +74,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
@@ -628,8 +629,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentSetAsideOrderType joSetAsideOrderType;
     private LocalDate joSetAsideOrderDate;
     private LocalDate joSetAsideDefenceReceivedDate;
-
     private YesOrNo joShowRegisteredWithRTLOption;
+
+    private JudgmentDetails activeJudgment;
+    private List<Element<JudgmentDetails>> historicJudgment;
+
 
     private final TransferCaseDetails transferCaseDetails;
 
