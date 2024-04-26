@@ -316,6 +316,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
@@ -557,4 +558,13 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
 
+    @JsonIgnore
+    public boolean applicant1SuggestedPayImmediately() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayBySetDate() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
 }
