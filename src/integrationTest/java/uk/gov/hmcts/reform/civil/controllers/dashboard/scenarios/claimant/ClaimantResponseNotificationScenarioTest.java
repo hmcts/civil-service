@@ -21,7 +21,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
 
     @Test
     void shouldCreateNotification_forClaimantWhenClaimantProceedsCarm() throws Exception {
-        String caseId = String.valueOf(System.currentTimeMillis());
+        String caseId = "901234567891";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -54,7 +54,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
 
     @Test
     void shouldCreateNotification_forClaimantWhenClaimantProceeds() throws Exception {
-        String caseId = String.valueOf(System.currentTimeMillis());
+        String caseId = "901234567892";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -71,15 +71,15 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("You've rejected the defendant's response"),
+                jsonPath("$[0].titleEn").value("You have said you wish continue with your claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You've both agreed to try mediation. "
+                    .value("<p class=\"govuk-body\">Your case will be referred for mediation. "
                                + "Your mediation appointment will be arranged within 28 days.</p><p class=\"govuk-body\">"
                                + "<a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\" "
                                + " rel=\"noopener noreferrer\" class=\"govuk-link\"> Find out more about how mediation works (opens in new tab)</a>.</p>"),
-                jsonPath("$[0].titleCy").value("You've rejected the defendant's response"),
+                jsonPath("$[0].titleCy").value("You have said you wish continue with your claim"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You've both agreed to try mediation. "
+                    .value("<p class=\"govuk-body\">Your case will be referred for mediation. "
                                + "Your mediation appointment will be arranged within 28 days.</p><p class=\"govuk-body\">"
                                + "<a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\" "
                                + " rel=\"noopener noreferrer\" class=\"govuk-link\"> Find out more about how mediation works (opens in new tab)</a>.</p>"));
