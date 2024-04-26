@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +30,8 @@ public class Notification {
 
     private NotificationAction notificationAction;
 
+    private HashMap<String, Object> params;
+
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
 
         NotificationBuilder notification = Notification.builder()
@@ -37,7 +40,8 @@ public class Notification {
             .titleCy(dashboardNotificationsEntity.getTitleCy())
             .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
             .descriptionCy(dashboardNotificationsEntity.getDescriptionCy())
-            .timeToLive(dashboardNotificationsEntity.getDashboardNotificationsTemplates().getTimeToLive());
+            .timeToLive(dashboardNotificationsEntity.getDashboardNotificationsTemplates().getTimeToLive())
+            .params(dashboardNotificationsEntity.getParams());
 
         Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
             .ifPresent(action -> notification.notificationAction(NotificationAction.from(action)));
