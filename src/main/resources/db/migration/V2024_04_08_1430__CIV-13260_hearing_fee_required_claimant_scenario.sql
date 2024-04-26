@@ -15,7 +15,7 @@ VALUES ('Notice.AAA6.CP.HearingFee.Required.Claimant', 'You must pay the hearing
         ' You must do this by ${hearingDueDateCy}. If you do not take one of these actions, your claim will be struck out.',
         '<p class="govuk-body">Rhaid i chi naill ai <a href="{PAY_HEARING_FEE_URL_REDIRECT}" class="govuk-link">dalu ffi''r gwrandawiad</a> o ${hearingFee}' ||
         ' neu <a href="{APPLY_HELP_WITH_FEES_START}" class="govuk-link">wneud cais am help i dalu ffioedd</a>.' ||
-        ' Mae''n rhaid i chi wneud hyn erbyn ${hearingDueDateEn}. Os na fyddwch yn cymryd un o''r camau hyn, bydd eich hawliad yn cael ei ddileu.',
+        ' Mae''n rhaid i chi wneud hyn erbyn ${hearingDueDateCy}. Os na fyddwch yn cymryd un o''r camau hyn, bydd eich hawliad yn cael ei ddileu.',
         'CLAIMANT');
 
 /**
