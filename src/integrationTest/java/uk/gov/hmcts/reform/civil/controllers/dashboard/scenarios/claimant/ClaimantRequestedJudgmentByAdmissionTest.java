@@ -38,11 +38,11 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
             jsonPath("$[0].titleEn").value(
                 "You requested a County Court Judgment against Mr Defendant Guy"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You accepted the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p><p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"),
+                "<p class=\"govuk-body\">You accepted the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
                 "You requested a County Court Judgment against Mr Defendant Guy"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You accepted the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p><p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>")
+                "<p class=\"govuk-body\">You accepted the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>")
         );
     }
 }

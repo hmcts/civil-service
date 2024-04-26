@@ -26,6 +26,10 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .build();
@@ -41,7 +45,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You have not responded to the claim.</p>"
-                               + "<p class=\"govuk-body\">The claimant can now request a county court judgment.<p/>"
+                               + "<p class=\"govuk-body\">Claimant John can now request a county court judgment.<p/>"
                                + "<p class=\"govuk-body\">You can still respond to the claim before they ask for a judgment.</p>"
                                + "<p class=\"govuk-body\">A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact."
                                + " Bailiffs could also be sent to your home.</p>"
@@ -49,7 +53,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
                                + " claim</a></p>"),
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">You have not responded to the claim.</p>"
-                               + "<p class=\"govuk-body\">The claimant can now request a county court judgment.<p/>"
+                               + "<p class=\"govuk-body\">Claimant John can now request a county court judgment.<p/>"
                                + "<p class=\"govuk-body\">You can still respond to the claim before they ask for a judgment.</p>"
                                + "<p class=\"govuk-body\">A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact."
                                + " Bailiffs could also be sent to your home.</p>"

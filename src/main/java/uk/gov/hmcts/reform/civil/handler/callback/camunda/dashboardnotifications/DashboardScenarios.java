@@ -99,6 +99,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant"),
+    SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT("Scenario.AAA6.CP.OrderMade.Claimant"),
+    SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT("Scenario.AAA6.CP.OrderMade.Defendant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant"),
     SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT(
@@ -113,7 +115,15 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
-    SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant");
+    SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF("Scenario.AAA6.CP.HearingFee.HWF.InvalidRef"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED("Scenario.AAA6.CP.HearingFee.HWF.InfoRequired"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED("Scenario.AAA6.CP.HearingFee.HWF.Updated"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.PartRemission"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.Rejected"),
+    SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission"),
+    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant"),
+    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant");
 
     private final String scenario;
 
