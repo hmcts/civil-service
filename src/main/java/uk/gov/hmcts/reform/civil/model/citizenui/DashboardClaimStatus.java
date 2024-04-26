@@ -84,6 +84,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::defendantRespondedWithPreferredLanguageWelsh
+    ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
@@ -111,9 +114,6 @@ public enum DashboardClaimStatus {
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
-    ),
-    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
-      Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
