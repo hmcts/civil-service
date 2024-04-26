@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,12 +167,36 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             // When
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid")
+                                                                      .roles(List.of("caseworker-civil-solicitor"))
+                                                                      .build());
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             // Then
             assertThat(response.getErrors().get(0))
                 .isEqualTo("You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed");
+        }
+
+        @Test
+        void shouldNotReturnError_whenIssueDateIsBeforeOf28DaysForCaseworker() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(NO)
+                .issueDate(LocalDate.now().minusDays(35))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            
+            // When
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid")
+                                                                      .roles(List.of("caseworker-civil-staff"))
+                                                                      .build());
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
