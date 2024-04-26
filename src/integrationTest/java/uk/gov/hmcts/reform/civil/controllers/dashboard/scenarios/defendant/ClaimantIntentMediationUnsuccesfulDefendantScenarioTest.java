@@ -39,7 +39,8 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
             .ccdCaseReference(Long.valueOf(32341))
             .respondent1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build());
+                            .type(Party.Type.INDIVIDUAL).build())
+            .build();
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
