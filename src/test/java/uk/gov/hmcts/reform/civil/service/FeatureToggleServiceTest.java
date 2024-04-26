@@ -166,6 +166,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
+        var sdoR2Key = "minti";
+        givenToggle(sdoR2Key, toggleStat);
+
+        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
