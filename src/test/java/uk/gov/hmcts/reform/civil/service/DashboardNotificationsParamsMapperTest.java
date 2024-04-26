@@ -4,6 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -18,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -26,10 +31,16 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 public class DashboardNotificationsParamsMapperTest {
@@ -42,6 +53,21 @@ public class DashboardNotificationsParamsMapperTest {
     void setup() {
         mapper = new DashboardNotificationsParamsMapper();
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+    }
+
+    public CaseDocument generateOrder(DocumentType documentType) {
+        return CaseDocument.builder()
+            .createdBy("Test")
+            .documentName("document test name")
+            .documentSize(0L)
+            .documentType(documentType)
+            .createdDatetime(LocalDateTime.of(2024, Month.APRIL, 04, 14, 14))
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name.pdf")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
     }
 
     @Test
@@ -286,6 +312,64 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("hearingFeeRemissionAmount").isEqualTo("£25");
         assertThat(result).extracting("hearingFeeOutStandingAmount").isEqualTo("£100");
+    }
+
+    @Test
+    void shouldMapOrderParameters_whenEventIsFinalOrder() {
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+        finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
+
+        Map<String, Object> resultClaimant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
+        Map<String, Object> resultDefendant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
+
+        assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @Test
+    void shouldMapOrderParameters_whenEventIsSdoDj() {
+        List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
+        sdoDjCaseDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
+
+        Map<String, Object> resultClaimant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+        Map<String, Object> resultDefendant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT);
+
+        assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @Test
+    void shouldMapOrderParameters_whenEventIsSdo() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+
+        Map<String, Object> resultClaimant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+        Map<String, Object> resultDefendant =
+            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+
+        assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @Test
+    void shouldThrowException_whenEventIsIncorrect() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        CaseEvent event = CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
+
+        assertThatThrownBy(() -> mapper.getMapWithDocumentInfo(caseData, event))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasNoCause()
+            .hasMessage("Invalid caseEvent in " + event);
     }
 
     @Test
