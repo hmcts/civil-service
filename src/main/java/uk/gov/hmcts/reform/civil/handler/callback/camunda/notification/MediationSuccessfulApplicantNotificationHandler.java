@@ -61,7 +61,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             if (caseData.isLipvLipOneVOne()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    caseData.isBilingual()? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipProperties(caseData),
                     referenceTemplate
                 );
