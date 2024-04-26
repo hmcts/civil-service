@@ -156,7 +156,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
                 "respondentLip@example.com",
                 TEMPLATE_ID_LIP,
                 getNotificationDataMapLip(caseData),
-                "dj-non-divergent-defendant-notification-000DC001"
+                "dj-non-divergent-defendant-notification-lip-000DC001"
             );
         }
 
