@@ -98,7 +98,9 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
     }
 
-    public boolean isMintiEnabled() { return featureToggleApi.isFeatureEnabled("minti"); }
+    public boolean isMintiEnabled() {
+        return featureToggleApi.isFeatureEnabled("minti");
+    }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
@@ -117,7 +119,6 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        log.info("isMultiOrIntermediateTrackEnabled>>>",featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false));
         return featureToggleApi.isFeatureEnabled("minti")
             && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
