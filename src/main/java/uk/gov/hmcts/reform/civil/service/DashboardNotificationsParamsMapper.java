@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -315,8 +317,9 @@ public class DashboardNotificationsParamsMapper {
                         .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
                 }
                 case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
-                    if (caseData.getSDODocument().isPresent()) {
-                        return caseData.getSDODocument().isPresent().get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    Optional<Element<CaseDocument>> sdoDocument = caseData.getSDODocument();
+                    if (sdoDocument.isPresent()) {
+                        return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
                     }
                 }
                 default -> {
