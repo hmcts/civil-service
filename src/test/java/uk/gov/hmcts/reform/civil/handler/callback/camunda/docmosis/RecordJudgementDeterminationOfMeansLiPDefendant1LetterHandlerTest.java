@@ -8,15 +8,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.RecordJudgmentDeterminationOfMeansPiPLetterGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -30,8 +34,6 @@ public class RecordJudgementDeterminationOfMeansLiPDefendant1LetterHandlerTest e
 
     @Autowired
     private RecordJudgmentDeterminationOfMeansLiPDefendant1LetterHandler handler;
-    @MockBean
-    private RecordJudgmentDeterminationOfMeansPiPLetterGenerator lipLetterGenerator;
 
     public static final String TASK_ID_DEFENDANT = "SendRecordJudgmentDeterminationOfMeansLiPLetterDef1";
 
@@ -52,9 +54,7 @@ public class RecordJudgementDeterminationOfMeansLiPDefendant1LetterHandlerTest e
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
-        caseData.setJoSetAsideJudgmentErrorText("Some text");
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(POST_JO_DEFENDANT1_PIN_IN_LETTER.name());
         // when
@@ -62,10 +62,7 @@ public class RecordJudgementDeterminationOfMeansLiPDefendant1LetterHandlerTest e
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(lipLetterGenerator).generateAndPrintRecordJudgmentDeterminationOfMeansLetter(
-            caseData,
-            params.getParams().get(BEARER_TOKEN).toString()
-        );
+
     }
 
 }

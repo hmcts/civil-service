@@ -12,18 +12,16 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.RecordJudgmentDeterminationOfMeansLiPDefendantLetter;
-import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.SetAsideJudgmentInErrorLiPDefendantLetter;
-import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -74,8 +72,6 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
             RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER
         );
     }
-
-
 
     public RecordJudgmentDeterminationOfMeansLiPDefendantLetter getTemplateData(CaseData caseData) {
         return RecordJudgmentDeterminationOfMeansLiPDefendantLetter
