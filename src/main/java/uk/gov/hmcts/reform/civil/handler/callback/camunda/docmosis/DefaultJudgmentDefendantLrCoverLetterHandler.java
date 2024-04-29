@@ -36,7 +36,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::sendCoverLetterToDefendantLrLegalOrgs
+            this::sendCoverLetterToDefendantLrLegalOrganisations
         );
     }
 
@@ -50,19 +50,19 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
         return EVENTS;
     }
 
-    private CallbackResponse sendCoverLetterToDefendantLrLegalOrgs(CallbackParams callbackParams) {
+    private CallbackResponse sendCoverLetterToDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (YesOrNo.YES.equals(caseData.getRespondent1Represented())) {
-            generateCoverLetterDefendantLrLegalOrgs(callbackParams);
+            generateCoverLetterDefendantLrLegalOrganisations(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void generateCoverLetterDefendantLrLegalOrgs(CallbackParams callbackParams) {
+    private void generateCoverLetterDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
+        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
         if(respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData, organisationService)) {
-            defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
+            defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
         }
     }
 }

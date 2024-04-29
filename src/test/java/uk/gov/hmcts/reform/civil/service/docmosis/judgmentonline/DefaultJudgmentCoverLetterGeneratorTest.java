@@ -116,7 +116,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
 
         // when
-        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLetters(caseData, BEARER_TOKEN, false);
+        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, BEARER_TOKEN, false);
         // then
         verify(bulkPrintService)
             .printLetter(

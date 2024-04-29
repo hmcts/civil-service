@@ -61,7 +61,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(coverLetterGenerator).generateAndPrintDjCoverLetters(
+        verify(coverLetterGenerator).generateAndPrintDjCoverLettersPlusDocument(
             caseData,
             params.getParams().get(BEARER_TOKEN).toString(), false
         );

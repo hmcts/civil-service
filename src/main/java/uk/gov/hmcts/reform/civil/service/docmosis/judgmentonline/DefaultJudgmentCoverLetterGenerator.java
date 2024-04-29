@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -9,15 +10,20 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentDefendantLrCoverLetter;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Pre
 @Service
 public class DefaultJudgmentCoverLetterGenerator {
 
+    private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final OrganisationService organisationService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
@@ -39,30 +46,54 @@ public class DefaultJudgmentCoverLetterGenerator {
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
     private static final String DEFAULT_JUDGMENT_COVER_LETTER = "default-judgment-cover-letter";
 
-    public byte[] generateAndPrintDjCoverLetters(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
-        DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
-        CaseDocument coverLetterCaseDocument =  documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
-                coverLetter.getBytes(),
-                DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
-            )
-        );
-        String documentUrl = coverLetterCaseDocument.getDocumentLink().getDocumentUrl();
-        String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+    @Value("${stitching.enabled:true}")
+    private boolean stitchEnabled;
 
-        byte[] letterContent;
-        try {
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-        } catch (IOException e) {
-            log.error("Failed getting letter content for Default Judgment Cover Letter ");
-            throw new DocumentDownloadException(coverLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
+    public byte[] generateAndPrintDjCoverLettersPlusDocument(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
+        byte[] letterContent = new byte[0];
+        if (stitchEnabled) {
+            DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
+            CaseDocument coverLetterCaseDocument = documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(
+                    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
+                    coverLetter.getBytes(),
+                    DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
+                )
+            );
+
+            List<DocumentMetaData> letterAndDocumentMetaDataList = fetchDocumentsFromCaseData(
+                caseData,
+                coverLetterCaseDocument,
+                toSecondLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2 : DocumentType.DEFAULT_JUDGMENT_DEFENDANT1
+            );
+
+            CaseDocument stitchedDocuments = civilDocumentStitchingService.bundle(
+                letterAndDocumentMetaDataList,
+                authorisation,
+                coverLetterCaseDocument.getDocumentName(),
+                coverLetterCaseDocument.getDocumentName(),
+                caseData
+            );
+
+            String documentUrl = stitchedDocuments.getDocumentLink().getDocumentUrl();
+            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+
+            try {
+                letterContent = documentDownloadService.downloadDocument(
+                    authorisation,
+                    documentId
+                ).file().getInputStream().readAllBytes();
+            } catch (IOException e) {
+                log.error("Failed getting letter content for Default Judgment Cover Letter ");
+                throw new DocumentDownloadException(coverLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
+            }
+
+            List<String> recipients = getRecipientsList(caseData, toSecondLegalOrg);
+            bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                         caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients
+            );
         }
-
-        List<String> recipients = getRecipientsList(caseData, toSecondLegalOrg);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients);
         return letterContent;
     }
 
@@ -108,6 +139,26 @@ public class DefaultJudgmentCoverLetterGenerator {
                 .build();
         }
         return null;
+    }
+
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument, DocumentType requiredDocumentType) {
+        List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
+
+        documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
+                                                      "Cover Letter",
+                                                      LocalDate.now().toString()));
+
+        Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getSystemGeneratedCaseDocuments().stream()
+            .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                .getDocumentType().equals(requiredDocumentType)).findAny();
+
+        optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
+            caseDocumentElement.getValue().getDocumentLink(),
+            "Default Judgment Defendant document",
+            LocalDate.now().toString()
+        )));
+
+        return documentMetaDataList;
     }
 
 }
