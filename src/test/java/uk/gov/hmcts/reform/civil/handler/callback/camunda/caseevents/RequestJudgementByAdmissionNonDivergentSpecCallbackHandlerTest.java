@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     JacksonAutoConfiguration.class
 })
 public class RequestJudgementByAdmissionNonDivergentSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     RequestJudgementByAdmissionNonDivergentSpecCallbackHandler handler;
 
