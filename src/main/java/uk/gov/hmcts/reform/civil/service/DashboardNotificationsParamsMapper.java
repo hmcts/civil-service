@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -13,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -24,6 +29,7 @@ public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+    public static final String ORDER_DOCUMENT = "orderDocument";
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -142,6 +148,12 @@ public class DashboardNotificationsParamsMapper {
             params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
         }
 
+        Optional<LocalDate> hearingDocumentDeadline = getHearingDocumentDeadline(caseData);
+        hearingDocumentDeadline.ifPresent(date -> {
+            params.put("sdoDocumentUploadRequestedDateEn", DateUtils.formatDate(date));
+            params.put("sdoDocumentUploadRequestedDateCy", DateUtils.formatDateInWelsh(date));
+        });
+
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
 
         if (nonNull(caseData.getHearingDate())) {
@@ -166,7 +178,35 @@ public class DashboardNotificationsParamsMapper {
                 "£" + this.removeDoubleZeros(caseData.getHearingFee().toPounds().toPlainString())
             );
         }
+
+        if (caseData.getHearingRemissionAmount() != null) {
+            params.put(
+                "hearingFeeRemissionAmount",
+                "£" + this.removeDoubleZeros(MonetaryConversions.penniesToPounds(
+                    caseData.getHearingRemissionAmount()).toPlainString())
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "hearingFeeOutStandingAmount",
+                "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
+            );
+        }
+
         return params;
+    }
+
+    private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            // TODO currently, user can edit the date description
+            return Optional.empty();
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            return Optional.ofNullable(caseData.getFastTrackDisclosureOfDocuments())
+                .map(FastTrackDisclosureOfDocuments::getDate3);
+        } else {
+            return Optional.ofNullable(caseData.getDisposalHearingDisclosureOfDocuments())
+                .map(DisposalHearingDisclosureOfDocuments::getDate2);
+        }
     }
 
     private Optional<LocalDate> getFirstRepaymentDate(CaseData caseData) {
@@ -249,5 +289,32 @@ public class DashboardNotificationsParamsMapper {
             .map(BigDecimal::toPlainString)
             .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
+    }
+
+    public Map<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        HashMap<String, Object> params = new HashMap<>();
+
+        switch (caseEvent) {
+            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
+                params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
+                params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
+                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
+                return params;
+            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
+                CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
+                caseData.getSDODocument().ifPresent(sdoDocument -> {
+                    params.put(
+                        ORDER_DOCUMENT,
+                        sdoDocument.getValue().getDocumentLink().getDocumentBinaryUrl()
+                    );
+                });
+                return params;
+            default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
+        }
     }
 }
