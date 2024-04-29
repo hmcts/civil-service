@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -195,9 +196,9 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
-    public HashMap<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
 
-        HashMap<String, Object> params = mapCaseDataToParams(caseData);
+        Map<String, Object> params = mapCaseDataToParams(caseData);
         String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
@@ -315,7 +316,7 @@ public class DashboardNotificationsParamsMapper {
                 }
                 case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
                     if (caseData.getSDODocument().isPresent()) {
-                        return caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                        return caseData.getSDODocument().isPresent().get().getValue().getDocumentLink().getDocumentBinaryUrl();
                     }
                 }
                 default -> {
