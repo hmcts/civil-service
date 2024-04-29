@@ -117,6 +117,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF("Scenario.AAA6.CP.HearingFee.HWF.InvalidRef"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED("Scenario.AAA6.CP.HearingFee.HWF.InfoRequired"),
