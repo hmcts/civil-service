@@ -360,16 +360,25 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    void shouldThrowException_whenEventIsIncorrect() {
+    void shouldReturnNull_whenEventIsIncorrect() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
-        CaseEvent event = CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
 
-        assertThatThrownBy(() -> mapper.mapCaseDataToParams(caseData, event))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasNoCause()
-            .hasMessage("Invalid caseEvent in " + event);
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
+        assertThat(result).doesNotContainEntry("orderDocument", null);
+    }
+
+    @Test
+    void shouldReturnNull_whenEventIsNull() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).doesNotContainEntry("orderDocument", null);
     }
 
     @Test
