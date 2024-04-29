@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 public class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -54,7 +55,7 @@ public class BundleCreationDefendantNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenario_whenInvoked() {
+        void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1.name()).build()
@@ -69,6 +70,27 @@ public class BundleCreationDefendantNotificationHandlerTest extends BaseCallback
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedWhenTrialReady() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1.name()).build()
+            ).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

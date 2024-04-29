@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Random;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,7 +30,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
     @Test
     void should_create_part_admit_defendant_response_scenario() throws Exception {
 
-        String caseId = "12345678902";
+        String caseId = "11234949494";
         LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
@@ -40,6 +40,10 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(
                 LocalDate.of(2024, 3, 18)
             ).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("James")
+                    .individualLastName("John")
+                    .build())
             .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
@@ -56,10 +60,8 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 March 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay £300 by 18 Mawrth 2024.<br>The payment must clear the account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has offered to pay £300 by 18 March 2024.<br>The payment must be received in your account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">James John has offered to pay £300 by 18 Mawrth 2024.<br>The payment must be received in your account by then, if not you can request a county court judgment.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
             );
 
         //Verify task Item is created

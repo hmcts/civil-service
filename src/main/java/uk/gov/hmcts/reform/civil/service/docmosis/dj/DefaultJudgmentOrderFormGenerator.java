@@ -246,6 +246,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private String checkDefendantRequested(final CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return caseData.getRespondent1().getPartyName();
+        }
         String defendantName = caseData.getDefendantDetails().getValue().getLabel();
         if (BOTH_DEFENDANTS.equals(defendantName)) {
             return caseData.getRespondent1().getPartyName()

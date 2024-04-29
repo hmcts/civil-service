@@ -37,14 +37,16 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends DashboardBaseIntegratio
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
-            .andExpect(status().isOk())
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("Your help with fees application has been updated"),
-                jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"),
-                jsonPath("$[0].titleCy").value("Your help with fees application has been updated"),
-                jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days.</p>"));
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        status().is(HttpStatus.OK.value()),
+                        jsonPath("$[0].titleEn").value("Your help with fees application has been updated"),
+                        jsonPath("$[0].descriptionEn")
+                                .value("<p class=\"govuk-body\">You've applied for help with the claim fee. " +
+                                           "You'll receive an update from us within 5 to 10 working days.</p>"),
+                        jsonPath("$[0].titleCy").value("Mae eich cais am help i dalu ffioedd wedi cael ei ddiweddaru"),
+                        jsonPath("$[0].descriptionCy")
+                                .value("<p class=\"govuk-body\">Fe wnaethoch gais am help i dalu ffi’r hawliad." +
+                                           " Byddwch yn cael diweddariad gennym mewn 5 i 10 diwrnod gwaith.</p>"));
     }
 }

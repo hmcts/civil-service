@@ -47,13 +47,13 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends DashboardBase
             jsonPath("$[0].titleEn").value(
                 "Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
-                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+                "<p class=\"govuk-body\">You'll get help with the claim fee. £1000 will be covered by fee remission.<br>You must still pay the remaining fee of £25. " +
+                    "You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been reviewed"),
+                "Mae eich cais am help i dalu ffioedd wedi cael ei adolygu"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br>" +
-                    "You must still pay the remaining fee of £25. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">Byddwch yn cael help gyda ffi’r hawliad. Bydd y swm o £1000 yn cael ei ddileu.<br>" +
+                    "Bydd rhaid i chi dal dalu’r ffi sy’n weddill o £25. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
         );
     }

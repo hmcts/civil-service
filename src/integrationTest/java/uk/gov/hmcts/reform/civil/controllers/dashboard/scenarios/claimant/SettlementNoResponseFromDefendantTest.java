@@ -69,13 +69,13 @@ public class SettlementNoResponseFromDefendantTest extends DashboardBaseIntegrat
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "The defendant has not signed your settlement agreement"),
+                "Mr Defendant person has not signed your settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a> (CCJ), based on the repayment plan shown in the agreement.</p> <p class=\"govuk-body\">The court will make an order requiring them to pay the money. It does not guarantee that they pay it.</p> <p class=\"govuk-body\">Mr Defendant person can still sign the settlement agreement until you request a CCJ.</p>"),
+                "<p class=\"govuk-body\">You can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a> (CCJ), based on the repayment plan shown in the agreement.</p> <p class=\"govuk-body\">The court will make an order requiring them to pay the money. The order does not guarantee that they will pay it.</p> <p class=\"govuk-body\">Mr Defendant person can still sign the settlement agreement until you request a CCJ.</p>"),
             jsonPath("$[0].titleCy").value(
-                "The defendant has not signed your settlement agreement"),
+                "Mr Defendant person has not signed your settlement agreement"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a> (CCJ), based on the repayment plan shown in the agreement.</p> <p class=\"govuk-body\">The court will make an order requiring them to pay the money. It does not guarantee that they pay it.</p> <p class=\"govuk-body\">Mr Defendant person can still sign the settlement agreement until you request a CCJ.</p>")
+                "<p class=\"govuk-body\">You can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a> (CCJ), based on the repayment plan shown in the agreement.</p> <p class=\"govuk-body\">The court will make an order requiring them to pay the money. The order does not guarantee that they will pay it.</p> <p class=\"govuk-body\">Mr Defendant person can still sign the settlement agreement until you request a CCJ.</p>")
 
         );
     }
