@@ -32,6 +32,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -186,6 +187,74 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenarioInDJSdo_whenInvokedMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .orderSDODocumentDJCollection(List.of(
+                    ElementUtils.element(CaseDocument.builder().documentLink(
+                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
+                .respondent1Represented(YesOrNo.NO)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .totalClaimAmount(BigDecimal.valueOf(999))
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .build())
+                .build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT.name()).build()
+            ).build();
+
+            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmFastClaim() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .orderSDODocumentDJCollection(List.of(
+                    ElementUtils.element(CaseDocument.builder().documentLink(
+                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
+                .respondent1Represented(YesOrNo.NO)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .totalClaimAmount(BigDecimal.valueOf(11111111))
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .build())
+                .build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
+            ).build();
+
+            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient, never()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
                 "BEARER_TOKEN",
