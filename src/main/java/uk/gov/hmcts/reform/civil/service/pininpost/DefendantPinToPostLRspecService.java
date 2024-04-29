@@ -96,7 +96,6 @@ public class DefendantPinToPostLRspecService {
     }
 
     public boolean isOcmcDefendantLinked(String caseReference) {
-        log.info("-----------calling ocmc isDefendantLinked()-------------");
         DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked(caseReference);
         log.info("ocmc case reference {} defendent status is {}", caseReference, status.isLinked());
         return status.isLinked();
