@@ -9,8 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,7 +22,6 @@ public class ClaimantLiPResponse {
     private RepaymentDecisionType claimantCourtDecision;
     private ClaimantResponseOnCourtDecisionType claimantResponseOnCourtDecision;
     private String applicant1RejectedRepaymentReason;
-    private LocalDate applicant1SuggestedImmediatePaymentDeadLine;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {
