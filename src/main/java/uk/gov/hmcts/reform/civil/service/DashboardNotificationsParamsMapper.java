@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -196,6 +195,17 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
+    public HashMap<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+
+        HashMap<String, Object> params = mapCaseDataToParams(caseData);
+        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
+        if (nonNull(orderDocumentUrl)) {
+            params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+
+        return params;
+    }
+
     private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             // TODO currently, user can edit the date description
@@ -291,30 +301,28 @@ public class DashboardNotificationsParamsMapper {
             .map(amount -> "£" + amount);
     }
 
-    public Map<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
-        HashMap<String, Object> params = new HashMap<>();
+    private String addToMapDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
 
-        switch (caseEvent) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
-                caseData.getSDODocument().ifPresent(sdoDocument -> {
-                    params.put(
-                        ORDER_DOCUMENT,
-                        sdoDocument.getValue().getDocumentLink().getDocumentBinaryUrl()
-                    );
-                });
-                return params;
-            default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
+        if (nonNull(caseEvent)) {
+            switch (caseEvent) {
+                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
+                    return caseData.getFinalOrderDocumentCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT -> {
+                    return caseData.getOrderSDODocumentDJCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
+                    if (caseData.getSDODocument().isPresent()) {
+                        return caseData.getSDODocument().get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
         }
+        return null;
     }
 }

@@ -23,7 +23,7 @@ public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.getMapWithDocumentInfo(caseData, caseEvent);
+        HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData, caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);

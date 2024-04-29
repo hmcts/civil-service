@@ -321,9 +321,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
@@ -336,9 +336,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
@@ -351,9 +351,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
@@ -366,7 +366,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
         CaseEvent event = CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
 
-        assertThatThrownBy(() -> mapper.getMapWithDocumentInfo(caseData, event))
+        assertThatThrownBy(() -> mapper.mapCaseDataToParams(caseData, event))
             .isInstanceOf(IllegalArgumentException.class)
             .hasNoCause()
             .hasMessage("Invalid caseEvent in " + event);
