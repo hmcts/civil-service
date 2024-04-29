@@ -46,13 +46,13 @@ public class ClaimIssueHwfFullRemissionGrantedScenarioTest extends DashboardBase
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been reviewed"),
+                "Your help with fees application has been approved"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">The full claim fee of £455 will be covered. You do not need to make a payment.</p>"),
+                "<p class=\"govuk-body\">The full claim fee of £455 will be covered by fee remission.<br>You do not need to make a payment.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been reviewed"),
+                "Mae eich cais am help i dalu ffioedd wedi cael ei gymeradwyo"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">The full claim fee of £455 will be covered. You do not need to make a payment.</p>")
+                "<p class=\"govuk-body\">Bydd ffi lawn yr hawliad o £455 yn cael ei ddileu.<br>Nid oes angen i chi wneud taliad.</p>")
         );
     }
 }
