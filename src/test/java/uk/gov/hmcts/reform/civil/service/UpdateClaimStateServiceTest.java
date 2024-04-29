@@ -251,6 +251,8 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
@@ -265,7 +267,7 @@ class UpdateClaimStateServiceTest {
         var response = service.setUpCaseState(caseData);
 
         //Then
-        assertThat(response).isEqualTo(CaseState.CASE_SETTLED.name());
+        assertThat(response).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
     }
 
     @Test

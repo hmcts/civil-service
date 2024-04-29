@@ -166,6 +166,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
+        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
+        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
+
+        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
         var sdoR2Key = "minti";
         givenToggle(sdoR2Key, toggleStat);

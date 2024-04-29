@@ -55,7 +55,7 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(responseDeadline) + ". " +
-                        "The court will contact you when they respond.</p>" +
+                        "We will contact you when the claimant responds to your offer.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
@@ -100,7 +100,7 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ". " +
-                        "The court will contact you when they respond.</p>" +
+                        "We will contact you when the claimant responds to your offer.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
                 )
             );
