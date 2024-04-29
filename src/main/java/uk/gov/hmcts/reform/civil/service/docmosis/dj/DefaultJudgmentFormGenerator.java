@@ -50,10 +50,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final FeesService feesService;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService featureToggleService;
-    private final String APPLICANT1 = "applicant1";
-    private final String APPLICANT2 = "applicant2";
-    private final String RESPONDENT1 = "respondent1";
-    private final String RESPONDENT2 = "respondent2";
+    private final String applicant1 = "applicant1";
+    private final String applicant2 = "applicant2";
+    private final String respondent1 = "respondent1";
+    private final String respondent2 = "respondent2";
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
@@ -162,7 +162,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
-        if (partyType.equals(RESPONDENT1)) {
+        if (partyType.equals(respondent1)) {
             if (caseData.isRespondent1LiP()) {
                 return getPartyDetails(caseData.getRespondent1());
             } else {
@@ -312,17 +312,17 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, String event) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
         if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name())) {
-            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event, APPLICANT1));
+            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event, applicant1));
             if (caseData.getApplicant2() != null) {
                 defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant2(), event
-                    , APPLICANT2));
+                    , applicant2));
             }
         } else {
             defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent1(), event,
-                                                                        RESPONDENT1));
+                                                                        respondent1));
             if (caseData.getRespondent2() != null) {
                 defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent2(),
-                                                                            event, RESPONDENT2));
+                                                                            event, respondent2));
             }
         }
         return generateDocmosisDocsForNonDivergent(defaultJudgmentForms, authorisation, caseData, event);
