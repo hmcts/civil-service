@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
@@ -85,6 +87,10 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                                     bearerToken, locationRefDataService);
 
         buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId());
+
+        log.info("hearingStartDate: {}, venue: {}, hearingDays: {}, requestVersion: {}, ccdState: {}, responseDateTime: {}, hearingType: {}",
+                 hearingStartDate, hearingStartDay.getHearingVenueId(), getHearingDays(hearing), hearing.getRequestDetails().getVersionNumber(),
+                 caseData.getCcdState().name(), hearing.getHearingResponse().getReceivedDateTime(), hearing.getHearingDetails().getHearingType());
 
         camundaService.setProcessVariables(
             processInstanceId,
