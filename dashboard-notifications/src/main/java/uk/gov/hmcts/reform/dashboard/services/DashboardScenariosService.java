@@ -93,6 +93,7 @@ public class DashboardScenariosService {
                     .descriptionEn(stringSubstitutor.replace(template.getDescriptionEn()))
                     .createdAt(OffsetDateTime.now())
                     .updatedOn(OffsetDateTime.now())
+                    .params(scenarioRequestParams.getParams())
                     .build();
 
                 log.info(
