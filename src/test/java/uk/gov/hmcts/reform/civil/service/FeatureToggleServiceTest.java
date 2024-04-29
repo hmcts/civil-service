@@ -176,10 +176,10 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
-        var sdoR2Key = "minti";
-        givenToggle(sdoR2Key, toggleStat);
+        var mintiKey = "minti";
+        givenToggle(mintiKey, toggleStat);
 
-        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -204,7 +204,10 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
         var caseFileKey = "multi-or-intermediate-track";
+        givenToggle(mintiKey, toggleStat);
+
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .build();
         if (toggleStat) {
