@@ -95,6 +95,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Upload.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Upload.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant"),
@@ -123,7 +125,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.Rejected"),
     SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission"),
     SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant"),
-    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant");
+    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT("Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant");
 
     private final String scenario;
 
