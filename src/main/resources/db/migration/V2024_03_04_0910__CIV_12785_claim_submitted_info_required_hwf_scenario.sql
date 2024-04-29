@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimIssue.HWF.InfoRequired', '{"Notice.AAA6.ClaimIssue.HWF.Requested"}',
-        '{"Notice.AAA6.ClaimIssue.HWF.InfoRequired" : ["typeOfFee"]}');
+        '{"Notice.AAA6.ClaimIssue.HWF.InfoRequired" : []}');
 
 /**
  * Add notification template
@@ -12,7 +12,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.ClaimIssue.HWF.InfoRequired',
         'Your help with fees application needs more information',
-        'Your help with fees application needs more information',
-        '<p class="govuk-body">We need more information on your application for help with the claim fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
-        '<p class="govuk-body">We need more information on your application for help with the claim fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        'Mae angen i chi ddarparu mwy o wybodaeth am eich cais am help i dalu ffioedd',
+        '<p class="govuk-body">We need more information on your application for help with the claim fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi’r hawliad.<br>Anfonwyd e-bost atoch gyda mwy o fanylion. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu, gallwch anwybyddu''r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>',
         'CLAIMANT');

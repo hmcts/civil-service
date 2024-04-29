@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
@@ -24,13 +25,17 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
-  
+    private final NotificationActionRepository notificationActionRepository;
+
     private final IdamApi idamApi;
+
+    private String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        IdamApi idamApi) {
+                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
+        this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
     }
 
@@ -62,7 +67,11 @@ public class DashboardNotificationService {
         DashboardNotificationsEntity updated = notification;
         if (existingNotification.isPresent()) {
             updated = notification.toBuilder().id(existingNotification.get().getId()).build();
+            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
+                                                                                         clickAction
+            );
         }
+
         return dashboardNotificationsRepository.save(updated);
 
     }
@@ -78,13 +87,13 @@ public class DashboardNotificationService {
             NotificationActionEntity notificationAction = NotificationActionEntity.builder()
                 .reference(notification.getReference())
                 .dashboardNotification(notification)
-                .actionPerformed("Click")
+                .actionPerformed(clickAction)
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
                 .createdAt(OffsetDateTime.now())
                 .build();
 
             if (nonNull(notification.getNotificationAction())
-                && notification.getNotificationAction().getActionPerformed().equals("Click")) {
+                && notification.getNotificationAction().getActionPerformed().equals(clickAction)) {
                 notificationAction.setId(notification.getNotificationAction().getId());
             }
             notification.setNotificationAction(notificationAction);
