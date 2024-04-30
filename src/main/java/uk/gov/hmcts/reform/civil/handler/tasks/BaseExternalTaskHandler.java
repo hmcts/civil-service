@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 
 import java.util.Arrays;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
 /**
@@ -39,13 +38,14 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
+        boolean handleTaskSucceeded = false;
 
         try {
             log.info("External task '{}' started with processInstanceId '{}'",
                      topicName, processInstanceId
             );
             handleTask(externalTask);
-            completeTask(externalTask, externalTaskService);
+            handleTaskSucceeded = true;
         } catch (BpmnError e) {
             log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
                       topicName, processInstanceId, e
@@ -55,25 +55,27 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             log.error("External task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
-            handleFailureNoRetryable(externalTask, externalTaskService, e);
+            handleFailureNotRetryable(externalTask, externalTaskService, e);
         } catch (Exception e) {
             log.error("External task before handleFailure '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
             handleFailure(externalTask, externalTaskService, e);
         }
+
+        if (handleTaskSucceeded) {
+            completeTask(externalTask, externalTaskService);
+        }
     }
 
-    @Retryable(value = CompleteTaskException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))
+    //Total possible waiting time 16 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
+    @Retryable(value = CompleteTaskException.class, maxAttempts = 3, backoff = @Backoff(delay = 60000, multiplier = 15))
     default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            ofNullable(getVariableMap()).ifPresentOrElse(
-                variableMap -> externalTaskService.complete(externalTask, variableMap),
-                () -> externalTaskService.complete(externalTask)
-            );
+            externalTaskService.complete(externalTask, getVariableMap());
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );
@@ -87,10 +89,10 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
 
     @Recover
     default void recover(CompleteTaskException exception, ExternalTask externalTask, ExternalTaskService externalTaskService) {
-        log.error("Recover CompleteTaskException for external task '{}' errored  with processInstanceId '{}'",
-                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception
+        log.error("All attempts to completing task '{}' failed  with processInstanceId '{}' with error message '{}'",
+                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception.getMessage()
         );
-        externalTaskService.complete(externalTask);
+        handleFailureNotRetryable(externalTask, externalTaskService, exception);
     }
 
     /**
@@ -118,7 +120,8 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             e.getMessage(),
             getStackTrace(e),
             remainingRetries - 1,
-            calculateExponentialRetryTimeout(1000, maxRetries, remainingRetries)
+            //Total possible waiting time 15 minutes - if changing this, change lockDuration in ExternalTaskListenerConfiguration
+            calculateExponentialRetryTimeout(5 * 60 * 1000, maxRetries, remainingRetries)
         );
     }
 
@@ -129,7 +132,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    default void handleFailureNoRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+    default void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int remainingRetries = 0;
         log.info(
             "No Retryable Handle failure processInstanceId: '{}' ",

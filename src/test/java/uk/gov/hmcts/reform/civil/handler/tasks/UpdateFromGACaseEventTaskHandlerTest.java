@@ -118,7 +118,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -432,7 +432,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -463,7 +463,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -494,7 +494,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
@@ -548,7 +548,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -592,7 +592,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Nested

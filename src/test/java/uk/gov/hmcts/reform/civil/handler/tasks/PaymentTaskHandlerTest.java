@@ -87,6 +87,7 @@ class PaymentTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                                                   FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                                                  FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                                                   FlowFlag.BULK_CLAIM_ENABLED.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();

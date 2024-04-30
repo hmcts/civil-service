@@ -65,6 +65,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
+    public boolean isDashboardServiceEnabled() {
+        return featureToggleApi.isFeatureEnabled("dashboard-service");
+    }
+
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -91,6 +95,10 @@ public class FeatureToggleService {
 
     public boolean isSdoR2Enabled() {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
+
+    public boolean isJudgmentOnlineLive() {
+        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {

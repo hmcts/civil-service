@@ -13,11 +13,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.TrialReadyCheckEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.search.TrialReadyCheckSearchService;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
@@ -65,7 +67,7 @@ class TrialReadyCheckHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new TrialReadyCheckEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -88,13 +90,13 @@ class TrialReadyCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService, never()).complete(mockTask, null);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(1000L)
+            eq(300000L)
         );
     }
 
@@ -103,11 +105,13 @@ class TrialReadyCheckHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
-            .when(externalTaskService).complete(mockTask);
+            .when(externalTaskService).complete(mockTask, null);
 
-        handler.execute(mockTask, externalTaskService);
+        assertThrows(
+            CompleteTaskException.class,
+            () -> handler.execute(mockTask, externalTaskService));
 
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),

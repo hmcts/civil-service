@@ -49,6 +49,8 @@ spring:
             client-secret: internal
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
+    placeholder-replacement: false
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -187,6 +189,11 @@ reference:
 aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
+
+
+dashboard:
+  api:
+    url: http://localhost:4000
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -395,6 +402,11 @@ notifications:
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
 
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
+  notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
+  notifyDefendantLipForNoLongerAccessTemplate: "e9c3426a-7888-420f-816e-c74217264111"
+  notifyDefendantLrAfterNoticeOfChangeTemplate: "421711bb-c113-4a2f-8f2a-6d93510c0e8f"
+  notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
+  notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -576,6 +588,29 @@ spring:
   config:
     activate:
       on-profile: integration-test
+  datasource:
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:11.4://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
+    hikari:
+      minimum-idle: 1
+      connectionTimeout: 10000
+      idleTimeout: 30000
+      maxLifetime: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      naming:
+        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    placeholder-replacement: false
 
   main:
     lazy-initialization: true

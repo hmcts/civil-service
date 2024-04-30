@@ -8,3 +8,5 @@ pluginManagement {
     }
   }
 }
+rootProject.name = 'civil-service'
+include 'dashboard-notifications'
