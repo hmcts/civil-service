@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,10 +17,16 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.DefaultJudgmentCoverLetterGenerator;
+import uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_COVER_LETTER_DEFENDANT_LR;
@@ -31,6 +41,8 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
     private DefaultJudgmentDefendantLrCoverLetterHandler handler;
     @MockBean
     private DefaultJudgmentCoverLetterGenerator coverLetterGenerator;
+    @MockBean
+    private OrganisationService organisationService;
 
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
 
@@ -56,15 +68,18 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_COVER_LETTER_DEFENDANT_LR.name());
+
+        when(coverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(eq(caseData), any(), eq(false)))
+            .thenReturn(new byte[]{50});
+
+        when(coverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(eq(caseData), any(), eq(true)))
+            .thenReturn(new byte[]{20});
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(coverLetterGenerator).generateAndPrintDjCoverLettersPlusDocument(
-            caseData,
-            params.getParams().get(BEARER_TOKEN).toString(), false
-        );
+        verify(coverLetterGenerator, times(1)).generateAndPrintDjCoverLettersPlusDocument(
+            caseData, params.getParams().get(BEARER_TOKEN).toString(), false);
     }
-//TODO add test for second legal org
 }
