@@ -249,7 +249,7 @@ task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in func
     return System.env.ENVIRONMENT == 'preview'
   }
 
-  commandLine '/usr/bin/yarn', '--silent --parallel', 'run', 'test:api-nonprod'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
