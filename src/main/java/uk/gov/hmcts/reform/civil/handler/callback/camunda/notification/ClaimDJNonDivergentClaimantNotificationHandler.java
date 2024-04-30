@@ -83,7 +83,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandler extends CallbackHand
 
     private String getTemplate(boolean isApplicantLip) {
         return isApplicantLip ? notificationsProperties.getNotifyUpdateTemplate()
-            : notificationsProperties.getNotifyDJNonDivergentSpecTemplate();
+            : notificationsProperties.getNotifyDJNonDivergentSpecClaimantTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {

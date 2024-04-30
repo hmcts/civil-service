@@ -75,7 +75,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyDJNonDivergentSpecTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));

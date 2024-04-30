@@ -72,7 +72,8 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
-            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData)
+            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
     }
 
@@ -111,7 +112,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
 
     private String getTemplate(boolean isRespondentLip) {
         return isRespondentLip ? notificationsProperties.getNotifyUpdateTemplate()
-            : notificationsProperties.getNotifyDJNonDivergentSpecTemplate();
+            : notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate();
     }
 
     private String getRecipientEmail(CallbackParams callbackParams) {
