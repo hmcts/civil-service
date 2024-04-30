@@ -109,6 +109,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                                          .applicant1SignedSettlementAgreement(
                                                                              YesOrNo.YES).build()).build())
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()

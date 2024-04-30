@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ALREADY_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_FULL_DISPUTE_MEDIATION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_DEFENCE_NO_MEDIATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT;
@@ -51,6 +52,10 @@ public class DefendantResponseDefendantNotificationHandler extends DashboardCall
 
     @Override
     public String getScenario(CaseData caseData) {
+
+        if (isCarmApplicable(caseData) && isFullDefenceFullDispute(caseData)) {
+            return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM.getScenario();
+        }
 
         if (caseData.isPayBySetDate()) {
             if (caseData.getRespondent1().isCompanyOROrganisation()) {
@@ -90,5 +95,15 @@ public class DefendantResponseDefendantNotificationHandler extends DashboardCall
         }
 
         return null;
+    }
+
+    private boolean isFullDefenceFullDispute(CaseData caseData) {
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.isClaimBeingDisputed();
+    }
+
+    private boolean isCarmApplicable(CaseData caseData) {
+        return getFeatureToggleService().isCarmEnabledForCase(caseData)
+            && caseData.isSmallClaim();
     }
 }
