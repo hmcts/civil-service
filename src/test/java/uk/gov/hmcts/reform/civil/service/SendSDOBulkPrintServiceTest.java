@@ -39,7 +39,8 @@ class SendSDOBulkPrintServiceTest {
     private SendSDOBulkPrintService sendSDOBulkPrintService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
     private static final String TEST = "test";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
+    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
+    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 

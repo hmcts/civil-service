@@ -76,6 +76,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
+    protected static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
 
     @Autowired
     private EvidenceUploadApplicantHandler handler;
@@ -524,7 +525,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryID_whenDocumentExists() {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         var documentUpload = UploadEvidenceWitness.builder()
                 .witnessOptionUploadDate(LocalDate.of(2023, 2, 10))
                 .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))

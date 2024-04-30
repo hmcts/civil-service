@@ -8,7 +8,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -51,10 +50,8 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
     @Autowired
     private SetAsideJudgmentInErrorLiPLetterGenerator setAsideJudgmentInErrorLiPLetterGenerator;
     private static final String SET_ASIDE_JUDGMENT_LETTER = "set-aside-judgment-letter";
-    public static final String TASK_ID_DEFENDANT = "SendSetAsideLiPLetterDef1";
-    private static final String TEST = "test";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
-    private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
+
+    static final byte[] LETTER_CONTENT = new byte[] {37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument SET_ASIDE = CaseDocumentBuilder.builder()
@@ -85,13 +82,13 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
                 LETTER_CONTENT
             ));
         when(documentManagementService
-                 .uploadDocument(
-                     BEARER_TOKEN,
-                     new PDF(SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
-                             LETTER_CONTENT,
-                             DocumentType.SET_ASIDE_JUDGMENT_LETTER
-                     )
-                 ))
+            .uploadDocument(
+                BEARER_TOKEN,
+                new PDF(SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
+                    LETTER_CONTENT,
+                    DocumentType.SET_ASIDE_JUDGMENT_LETTER
+                )
+            ))
             .thenReturn(SET_ASIDE);
 
         given(documentDownloadService.downloadDocument(

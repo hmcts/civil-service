@@ -93,6 +93,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
+    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
     @Autowired
     private EvidenceUploadRespondentHandler handler;
 
@@ -1029,7 +1030,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryID_whenDocumentExistsTwoRespondentSpec() {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         var documentUpload = UploadEvidenceDocumentType.builder()
                 .documentIssuedDate(LocalDate.of(2022, 2, 10))
                 .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
@@ -1056,7 +1057,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryID_whenDocumentExistsTwoRespondentUnSpec() {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         var documentUpload = UploadEvidenceDocumentType.builder()
                 .documentIssuedDate(LocalDate.of(2022, 2, 10))
                 .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
@@ -1083,7 +1084,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryID_whenDocumentExistsOneRespondentSpec() {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         var documentUpload = UploadEvidenceExpert.builder()
             .expertDocument(testDocument)
             .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
@@ -1111,7 +1112,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldAssignCategoryID_whenDocumentExistsOneRespondentUnSpec() {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         var documentUpload = UploadEvidenceExpert.builder()
             .expertDocument(testDocument)
             .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))

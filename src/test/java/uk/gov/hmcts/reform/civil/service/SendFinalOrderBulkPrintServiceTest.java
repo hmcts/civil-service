@@ -44,7 +44,8 @@ class SendFinalOrderBulkPrintServiceTest {
     public static final String TASK_ID_DEFENDANT = "SendFinalOrderToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
     private static final String TEST = "test";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
+    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
+    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
