@@ -40,7 +40,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
         CaseDocument recordJudgmentDeterminationOfMeansLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
+                RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 recordJudgmentDeterminationOfMeansLetter.getBytes(),
                 DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER
             )
