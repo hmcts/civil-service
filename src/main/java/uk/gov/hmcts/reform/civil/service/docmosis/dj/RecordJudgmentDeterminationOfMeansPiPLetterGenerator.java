@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
         CaseDocument recordJudgmentDeterminationOfMeansLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER.getDocumentTitle(),
+                RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 recordJudgmentDeterminationOfMeansLetter.getBytes(),
                 DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER
             )
