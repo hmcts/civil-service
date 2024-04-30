@@ -6,7 +6,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,8 +30,10 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAllocation;
 
 @Service
@@ -60,7 +64,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
             templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_R2;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
@@ -241,7 +245,17 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence")
             )
             .hasCreditHire(
-                SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
+                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
+                    && !featureToggleService.isSdoR2Enabled())
+            )
+            .hasSdoR2CreditHire(
+                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
+                    && featureToggleService.isSdoR2Enabled())
+            )
+            .hasSdoR2CreditHireDetails(
+                (nonNull(caseData.getSdoR2FastTrackCreditHire()) && (caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle() != null)
+                    && caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle()
+                    .equals(List.of(AddOrRemoveToggle.ADD)))
             )
             .hasEmployersLiability(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimEmployersLiability")
@@ -257,7 +271,6 @@ public class SdoGeneratorService {
             )
             .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
-            .fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
             .fastTrackTrialBundleTypeText(
@@ -273,7 +286,6 @@ public class SdoGeneratorService {
             )
             .fastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .fastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            .fastTrackCreditHire(caseData.getFastTrackCreditHire())
             .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
@@ -332,6 +344,11 @@ public class SdoGeneratorService {
                     SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                               ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
+                .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+        } else {
+            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
+                .fastTrackCreditHire(caseData.getFastTrackCreditHire());
         }
         return sdoDocumentFormBuilder.build();
     }
@@ -398,6 +415,8 @@ public class SdoGeneratorService {
                 && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
+            .hasSdoR2TrialPhysicalBundleParty(caseData.getSdoR2Trial() != null
+                && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions()) ? true : false)
             .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
             .hasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
             .welshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
@@ -462,7 +481,6 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
             )
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
             .hasNewDirections(
@@ -498,7 +516,11 @@ public class SdoGeneratorService {
                 .smallClaimsWelshLanguageToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
                 .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null
-                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null);
+                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
+
+                .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+        } else {
+            sdoDocumentFormBuilder.smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement());
         }
 
         sdoDocumentFormBuilder.hearingLocation(
@@ -518,6 +540,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -552,8 +575,13 @@ public class SdoGeneratorService {
             .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
             .welshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2DrhUseOfWelshLanguage().getDescription() : null)
+            .carmEnabled(carmEnabled)
+            .sdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
             .caseManagementLocation(
-                locationHelper.getHearingLocation(null, caseData, authorisation));
+                locationHelper.getHearingLocation(null, caseData, authorisation))
+            .sdoR2SmallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSectionDRH(caseData, carmEnabled)
+            );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             sdoDocumentFormBuilderDrh.hearingLocation(

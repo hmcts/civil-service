@@ -181,5 +181,20 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("applicant1OrganisationPolicy.OrgPolicyCaseAssignedRole")
                 .isEqualTo("[APPLICANTSOLICITORONE]");
         }
+
+        @Test
+        void shouldSetCaseManagementLocation() {
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation.region")
+                .isEqualTo("2");
+            assertThat(response.getData())
+                .extracting("caseManagementLocation.baseLocation")
+                .isEqualTo("420219");
+        }
     }
 }
