@@ -246,7 +246,6 @@ task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in func
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  jvmArgs = ['-Xms1024m', '-Xmx2048m']
   maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   forkEvery = 10
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
