@@ -102,6 +102,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
+    public boolean isMintiEnabled() {
+        return featureToggleApi.isFeatureEnabled("minti");
+    }
+
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
@@ -119,6 +123,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        return featureToggleApi.isFeatureEnabled("minti")
+            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 }
