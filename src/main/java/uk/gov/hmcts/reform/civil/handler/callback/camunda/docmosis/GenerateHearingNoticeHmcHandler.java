@@ -73,6 +73,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
+        log.info("Getting camunda variables for process: {},", processInstanceId);
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         var camundaVars = camundaService.getProcessVariables(processInstanceId);
@@ -87,10 +88,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                                     bearerToken, locationRefDataService);
 
         buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId());
-
-        log.info("hearingStartDate: {}, venue: {}, hearingDays: {}, requestVersion: {}, ccdState: {}, responseDateTime: {}, hearingType: {}",
-                 hearingStartDate, hearingStartDay.getHearingVenueId(), getHearingDays(hearing), hearing.getRequestDetails().getVersionNumber(),
-                 caseData.getCcdState().name(), hearing.getHearingResponse().getReceivedDateTime(), hearing.getHearingDetails().getHearingType());
 
         camundaService.setProcessVariables(
             processInstanceId,
