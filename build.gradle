@@ -187,8 +187,10 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Test) {
+  jvmArgs = ['-Xms1024m', '-Xmx2048m']
+  maxParallelForks = Runtime.runtime.availableProcessors()
+  forkEvery = 10
   useJUnitPlatform()
-
   testLogging {
     exceptionFormat = 'full'
   }
