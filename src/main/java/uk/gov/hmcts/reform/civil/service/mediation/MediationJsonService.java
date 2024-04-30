@@ -284,14 +284,14 @@ public class MediationJsonService {
         for (UnavailableDate unavailableDate : unavailableDates) {
             if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
                 toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .fromDate(formatDate(unavailableDate.getDate()))
-                                                  .toDate(formatDate(unavailableDate.getDate()))
+                                                  .dateFrom(formatDate(unavailableDate.getDate()))
+                                                  .dateTo(formatDate(unavailableDate.getDate()))
                                                   .build());
             }
             if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
                 toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .fromDate(formatDate(unavailableDate.getFromDate()))
-                                                  .toDate(formatDate(unavailableDate.getToDate()))
+                                                  .dateFrom(formatDate(unavailableDate.getFromDate()))
+                                                  .dateTo(formatDate(unavailableDate.getToDate()))
                                                   .build());
             }
         }
