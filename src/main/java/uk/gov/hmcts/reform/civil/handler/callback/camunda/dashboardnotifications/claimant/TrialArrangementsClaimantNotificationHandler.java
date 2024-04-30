@@ -44,6 +44,6 @@ public class TrialArrangementsClaimantNotificationHandler extends DashboardCallb
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && !SdoHelper.isSmallClaimsTrack(caseData);
+        return caseData.isApplicantNotRepresented() && SdoHelper.isFastTrack(caseData);
     }
 }
