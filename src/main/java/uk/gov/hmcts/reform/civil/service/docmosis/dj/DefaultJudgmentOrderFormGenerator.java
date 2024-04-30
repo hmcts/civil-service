@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -181,6 +182,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHire(caseData.getTrialCreditHire())
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
+            .sdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
+            .sdoDJR2TrialCreditHireDetailsAddSection(
+                (nonNull(caseData.getSdoDJR2TrialCreditHire())
+                    && nonNull(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle())
+                    && caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle()
+                    .equals(List.of(AddOrRemoveToggle.ADD))))
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
             .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .trialHearingTrialDJAddSection(
@@ -227,6 +234,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 caseData,
                                 authorisation
                             ));
+        if (featureToggleService.isSdoR2Enabled()) {
+            djTrialTemplateBuilder.sdoDJR2TrialCreditHire(caseData.getSdoDJR2TrialCreditHire());
+        }
         if (featureToggleService.isSdoR2Enabled()) {
             djTrialTemplateBuilder.hasTrialHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2TrialUseOfWelshLangToggleDJ()));
             djTrialTemplateBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2TrialWelshLanguageDJ() != null

@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -253,4 +254,7 @@ public class CaseDataCaseSdo implements MappableObject {
     private final YesOrNo setFastTrackFlag;
     private final String eventDescriptionRTJ;
     private final String additionalInformationRTJ;
+
+    //default judgement SDO R2 fields for trial
+    private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
 }
