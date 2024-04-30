@@ -35,6 +35,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC;
 
 @ExtendWith(MockitoExtension.class)
@@ -135,6 +137,39 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonClaimantNonAttendance() {
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            scenarioParams.put("ccdCaseReference", "123");
+            MediationUnsuccessfulReason reason = NOT_CONTACTABLE_CLAIMANT_ONE;
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .respondent1ResponseDeadline(dateTime)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
