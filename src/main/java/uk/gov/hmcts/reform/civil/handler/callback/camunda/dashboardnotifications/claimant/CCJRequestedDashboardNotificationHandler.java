@@ -5,14 +5,18 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
@@ -42,16 +46,21 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
     @Override
     public String getScenario(CaseData caseData) {
 
-        if (hasSsaTermsBroken(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
+        if (claimantSubmitsEitherCCJorDJWithoutSA(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario();
         }
-
-        return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario();
+        return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
     }
 
-    private boolean hasSsaTermsBroken(CaseData caseData) {
-        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-        return (caseDataLiP != null && YesOrNo.NO == caseDataLiP.getRespondentSignSettlementAgreement()) || caseData.isSettlementAgreementDeadlineExpired()
-            || !caseData.isJudgementDateNotPermitted();
+    private boolean claimantSubmitsEitherCCJorDJWithoutSA(CaseData caseData) {
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                null);
+        return (nonNull(whenWillThisAmountBePaid)
+            && whenWillThisAmountBePaid.isBefore(LocalDate.now())
+            && caseData.isFullAdmitPayImmediatelyClaimSpec())
+            || (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getCcdState());
     }
 }
