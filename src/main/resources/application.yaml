@@ -475,6 +475,16 @@ feign:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       message:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      signal:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      execution:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      incident:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      variableInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      eventSubscription:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       idam-api:
         loggerLevel: full
       core-case-data-api:
