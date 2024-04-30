@@ -724,7 +724,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasDefendantPayedTheAmountClaimed() {
+    public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
             .equals(getDefenceRouteRequired());
     }
