@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT2_LR;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimSetAsideJudgmentClaimantNotificationHandlerTest.TEMPLATE_ID_LIP;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
@@ -120,7 +121,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap2(caseData),
                 "dj-non-divergent-defendant-notification-000DC001"
             );
 
@@ -164,6 +165,16 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
 
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            LEGAL_ORG_NAME, "Test Org Name",
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo",
+            CLAIMANT_NAME, "Mr. John Rambo"
+        );
+    }
+
+    @NotNull
+    private Map<String, String> getNotificationDataMap2(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, "Test Org Name",
