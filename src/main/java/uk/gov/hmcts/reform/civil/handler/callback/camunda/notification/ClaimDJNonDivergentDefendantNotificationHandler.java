@@ -132,7 +132,8 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
-            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData)
+            DEFENDANT_NAME_INTERIM, getDefendantNameBasedOnCaseType(caseData),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
     }
 
