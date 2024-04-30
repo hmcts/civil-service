@@ -457,6 +457,41 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
+    public void shouldGenerateSdoR2FastTrackDocumentWithR2TemplateAndFastTrackUpLiftsEnabled() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        fastTrackList.add(FastTrack.fastClaimCreditHire);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoFastTrackCreditHire()
+            .build()
+            .toBuilder()
+            .trialAdditionalDirectionsForFastTrack(fastTrackList)
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormFast),
+            eq(SDO_FAST_FAST_TRACK_INT_R2)
+        );
+    }
+
+    @Test
     public void shouldGenerateSdoDisposalDocument() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
