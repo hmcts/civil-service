@@ -187,6 +187,8 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Test) {
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  forkEvery = 100
   useJUnitPlatform()
 
   testLogging {
@@ -269,8 +271,6 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-  forkEvery = 10
   dependsOn(inStrictOrder(awaitApplicationReadiness,
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
