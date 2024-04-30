@@ -213,6 +213,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
                     }
@@ -228,6 +229,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
                     }
@@ -241,6 +243,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         migrateCase,
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
@@ -266,6 +269,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         EVIDENCE_UPLOAD_JUDGE,
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
@@ -293,6 +297,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -320,6 +325,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
@@ -361,6 +367,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
@@ -392,6 +399,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
@@ -423,6 +431,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
@@ -462,6 +471,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
                     }
@@ -485,6 +495,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
                     }
@@ -506,6 +517,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         CLAIMANT_RESPONSE_CUI,
@@ -525,6 +537,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         CLAIMANT_RESPONSE_CUI,
@@ -546,6 +559,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
@@ -565,6 +579,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
@@ -592,6 +607,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         HEARING_SCHEDULED,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
@@ -636,6 +652,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         REFER_TO_JUDGE,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
@@ -649,6 +666,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         REFER_TO_JUDGE,
                         migrateCase,
@@ -662,6 +680,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         CREATE_SDO,
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
@@ -689,6 +708,7 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         CREATE_SDO,
                         TRANSFER_ONLINE_CASE
                     }
@@ -701,6 +721,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         REFER_TO_JUDGE,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
@@ -714,6 +735,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         REFER_TO_JUDGE,
                         migrateCase,
                         TRANSFER_ONLINE_CASE
@@ -726,6 +748,7 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -812,6 +835,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_FEE_UNPAID,
