@@ -246,9 +246,8 @@ task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in func
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-  forkEvery = 10
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
+
+  commandLine '/usr/bin/yarn', '--silent --parallel', 'run', 'test:api-nonprod'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
@@ -270,6 +269,8 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  forkEvery = 10
   dependsOn(inStrictOrder(awaitApplicationReadiness,
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
