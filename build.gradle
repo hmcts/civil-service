@@ -187,7 +187,6 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Test) {
-  forkEvery = 100
   useJUnitPlatform()
 
   testLogging {
