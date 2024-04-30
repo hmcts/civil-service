@@ -30,7 +30,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC;
 
 @ExtendWith(MockitoExtension.class)
@@ -127,6 +129,40 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+
+            params.put("ccdCaseReference", "123");
+            MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
+
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+
+            CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .respondent1ResponseDeadline(dateTime)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(params).build()
             );
