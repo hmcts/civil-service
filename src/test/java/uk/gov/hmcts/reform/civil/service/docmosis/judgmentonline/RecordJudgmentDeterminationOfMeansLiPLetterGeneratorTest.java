@@ -80,7 +80,7 @@ class RecordJudgmentDeterminationOfMeansLiPLetterGeneratorTest {
             .build();
 
     @BeforeEach
-    void setup(){
+    void setup() {
         given(defendantPinToPostLRspecService.buildDefendantPinToPost())
             .willReturn(DefendantPinToPostLRspec.builder()
                             .accessCode(
