@@ -501,6 +501,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return false;
+    }
+
+    @Override
     public boolean isWaitingForClaimantIntentDocUpload() {
         return false;
     }
