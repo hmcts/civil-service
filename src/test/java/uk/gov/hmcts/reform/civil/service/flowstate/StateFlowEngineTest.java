@@ -2416,7 +2416,9 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnFullDefense_whenDefendantHasRespondedAndApplicantHasResponseDate() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDismissedHearingFeeDueDate(null)
+                .build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
