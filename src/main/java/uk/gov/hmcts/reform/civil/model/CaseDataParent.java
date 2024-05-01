@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
@@ -215,6 +216,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
     private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -555,6 +557,12 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean isFullDefenceNotPaid() {
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
     }
 
 }
