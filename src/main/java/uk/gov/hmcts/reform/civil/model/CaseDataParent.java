@@ -565,4 +565,10 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
             .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
     }
 
+    @JsonIgnore
+    public boolean isRespondentBilingual() {
+        return null != caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage()
+            && !caseDataLiP.getRespondent1LiPResponse().getRespondent1ResponseLanguage().equalsIgnoreCase(Language.ENGLISH.toString());
+    }
+
 }
