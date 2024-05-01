@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -367,6 +370,31 @@ public class DashboardNotificationsParamsMapperTest {
             .isInstanceOf(IllegalArgumentException.class)
             .hasNoCause()
             .hasMessage("Invalid caseEvent in " + event);
+    }
+
+    @Test
+    public void shouldMapParameters_whenHearingFast() {
+        LocalDate date = LocalDate.now();
+        caseData = caseData.toBuilder()
+            .respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
+            .respondToClaim(RespondToClaim.builder()
+                                .build())
+            .drawDirectionsOrderRequired(YES)
+            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+            .orderType(OrderType.DECIDE_DAMAGES)
+            .fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
+                                                .date3(date)
+                                                .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("sdoDocumentUploadRequestedDateEn")
+                .isEqualTo(DateUtils.formatDate(date));
+        assertThat(result).extracting("sdoDocumentUploadRequestedDateCy")
+                .isEqualTo(DateUtils.formatDateInWelsh(date));
     }
 }
 

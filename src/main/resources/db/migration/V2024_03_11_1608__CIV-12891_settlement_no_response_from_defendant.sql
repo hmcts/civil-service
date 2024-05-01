@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.SettlementNoResponse.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.SettlementAgreement.Claimant"}',
+        '{"Notice.AAA6.ClaimantIntent.SettlementAgreement.Claimant","Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant"}',
         '{"Notice.AAA6.ClaimantIntent.SettlementNoResponse.Claimant": ["respondent1PartyName"]}');
 
 /**
