@@ -50,7 +50,7 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
                         "${sdoDocumentUploadRequestedDateEn}. Any documents submitted after the deadline may not be " +
                         "considered by the judge.</p>"
                 ),
-                jsonPath("$[0].titleCy").value("Upload documents"),
+                jsonPath("$[0].titleCy").value("Llwytho dogfennau"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Gallwch <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
                         "class=\"govuk-link\">lwytho a chyflwyno dogfennau</a> i gefnogi eich amddiffyniad. Dilynwch y cyfarwyddiadau a nodir yn y " +
