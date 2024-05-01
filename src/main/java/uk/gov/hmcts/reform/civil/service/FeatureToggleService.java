@@ -98,7 +98,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+        return false;
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
