@@ -172,11 +172,9 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_defendantPayedInFull_whenGetStatus_thenReturnSettled() {
+    void given_caseStateSettled_whenGetStatus_thenReturnSettledClaimant() {
         CaseData claim = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
+            .ccdState(CaseState.CASE_SETTLED)
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -185,11 +183,9 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_claimantAcceptedDefendantResponse_whenGetStatus_thenReturnSettled() {
+    void given_caseStateSettled_whenGetStatus_thenReturnSettledDefendant() {
         CaseData claim = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .ccdState(CaseState.CASE_SETTLED)
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
