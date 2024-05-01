@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.stitching;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class BundleRequestExecutor {
 
     private final ObjectMapper objectMapper;
 
-    public CaseData post(final BundleRequest payload, final String endpoint, String authorisation) {
+    public Optional<CaseData> post(final BundleRequest payload, final String endpoint, String authorisation) {
         requireNonNull(payload, "payload must not be null");
         requireNonNull(endpoint, "endpoint must not be null");
 
@@ -55,10 +56,13 @@ public class BundleRequestExecutor {
                 CaseDetails.class
             );
             if (response1.getStatusCode().equals(HttpStatus.OK)) {
-                return caseDetailsConverter.toCaseData(requireNonNull(response1.getBody()));
+                return Optional.of(caseDetailsConverter.toCaseData(requireNonNull(response1.getBody())));
             } else {
                 log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
                              + "cause problems down the line.", endpoint, response1.getStatusCode().value());
+                log.info("Stitching endpoint returned {} with reason {}",
+                         response1.getStatusCodeValue(),
+                         response1.getStatusCode().getReasonPhrase());
             }
 
         } catch (RestClientResponseException e) {
@@ -67,7 +71,7 @@ public class BundleRequestExecutor {
                       endpoint);
             logRelevantInfoQuietly(e);
         }
-        return null;
+        return Optional.empty();
     }
 
     @SuppressWarnings("unchecked")

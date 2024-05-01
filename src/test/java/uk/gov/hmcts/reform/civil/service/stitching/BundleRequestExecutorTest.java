@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,14 +57,14 @@ class BundleRequestExecutorTest {
 
         // When
         BundleRequest request = BundleRequest.builder().build();
-        CaseData result = bundleRequestExecutor.post(request, endpoint, "not important");
+        var result = bundleRequestExecutor.post(request, endpoint, "not important");
 
         // Then
-        assertThat(result).isEqualTo(expectedCaseData);
+        assertThat(result.get()).isEqualTo(expectedCaseData);
     }
 
     @Test
-    void whenPostIsCalledAndEndpointFails_thenReturnsNull() {
+    void whenPostIsCalledAndEndpointFails_thenReturnsEmpty() {
         // Given
         String endpoint = "some url";
         String errorData = "{\"data\":{\"respondentClaimResponseTypeForSpecGeneric\":\"FULL_ADMISSION\"},\"errors\":"
@@ -77,14 +78,14 @@ class BundleRequestExecutorTest {
         BundleRequest request = BundleRequest.builder().build();
 
         // When
-        CaseData result = bundleRequestExecutor.post(request, endpoint, "not important");
+        var result = bundleRequestExecutor.post(request, endpoint, "not important");
 
         // Then
-        assertThat(result).isNull();
+        assertThat(result.isEmpty()).isTrue();
     }
 
     @Test
-    void whenPostIsCalledAndEndpointReturnsNon200_thenReturnsNull() {
+    void whenPostIsCalledAndEndpointReturnsNon200_thenReturnsEmpty() {
         // Given
         String endpoint = "some url";
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
@@ -95,10 +96,10 @@ class BundleRequestExecutorTest {
 
         // When
         BundleRequest request = BundleRequest.builder().build();
-        CaseData result = bundleRequestExecutor.post(request, endpoint, "not important");
+        var result = bundleRequestExecutor.post(request, endpoint, "not important");
 
         // Then
-        assertThat(result).isNull();
+        assertThat(result.isEmpty()).isTrue();
     }
 
 }
