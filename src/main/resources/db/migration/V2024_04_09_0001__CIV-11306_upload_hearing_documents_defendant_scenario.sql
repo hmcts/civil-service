@@ -13,7 +13,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.HearingDocuments.Upload.Defendant', 'Upload documents', 'Upload documents',
         '<p class="govuk-body">You can <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents</a> to support your defence. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDateEn}. Any documents submitted after the deadline may not be considered by the judge.</p>',
-        '<p class="govuk-body">You can <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents</a> to support your defence. Follow the instructions set out in the directions order. You must submit all documents by ${sdoDocumentUploadRequestedDateCy}. Any documents submitted after the deadline may not be considered by the judge.</p>',
+        '<p class="govuk-body">Gallwch <a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">upload and submit documents</a> i gefnogi eich amddiffyniad. Dilynwch y cyfarwyddiadau a nodir yn y gorchymyn cyfarwyddiadau. Rhaid i chi gyflwyno’r holl ddogfennau erbyn ${sdoDocumentUploadRequestedDateCy}. Mae''n bosib na fydd y barnwr yn ystyried unrhyw ddogfennau a gyflwynir ar ôl y dyddiad hwn.</p>',
         'DEFENDANT');
 
 /**
