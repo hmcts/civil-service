@@ -121,7 +121,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
-                getNotificationDataMap2(caseData),
+                getNotificationDataMap(caseData),
                 "dj-non-divergent-defendant-notification-000DC001"
             );
 
@@ -170,15 +170,6 @@ public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCal
             LEGAL_ORG_NAME, "Test Org Name",
             DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo",
             CLAIMANT_NAME, "Mr. John Rambo"
-        );
-    }
-
-    @NotNull
-    private Map<String, String> getNotificationDataMap2(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME, "Test Org Name",
-            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo"
         );
     }
 
