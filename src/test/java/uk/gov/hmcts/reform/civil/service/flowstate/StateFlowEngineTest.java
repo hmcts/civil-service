@@ -1387,6 +1387,7 @@ class StateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .build();
 
             // When
@@ -2416,7 +2417,9 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnFullDefense_whenDefendantHasRespondedAndApplicantHasResponseDate() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDismissedHearingFeeDueDate(null)
+                .build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -3243,6 +3246,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -3283,6 +3287,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
 

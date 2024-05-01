@@ -150,7 +150,7 @@ public class MockTaskList {
         );
     }
 
-    public static List<TaskList> getMediationTaskListWithInactive(String role, String reference) {
+    public static List<TaskList> getMediationUnsuccessfulTaskListMock(String role, String reference) {
         return List.of(
             TaskList.builder()
                 .reference(reference)
@@ -169,15 +169,15 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Upload mediation documents</a>")
-                .taskNameEn("<a>Upload mediation documents</a>")
+                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
                 .categoryCy("Mediation")
                 .categoryEn("Mediation")
                 .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .currentStatusEn(TaskStatus.ACTION_NEEDED.getName())
+                .currentStatusCy(TaskStatus.ACTION_NEEDED.getWelshName())
+                .nextStatusEn(TaskStatus.ACTION_NEEDED.getName())
+                .nextStatusCy(TaskStatus.ACTION_NEEDED.getWelshName())
                 .taskOrder(6)
                 .build(),
             TaskList.builder()
@@ -187,13 +187,11 @@ public class MockTaskList {
                 .categoryCy("Mediation")
                 .categoryEn("Mediation")
                 .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
+                .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
+                .nextStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
+                .nextStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
                 .taskOrder(7)
-                .build()
-        );
+                .build());
     }
-
 }

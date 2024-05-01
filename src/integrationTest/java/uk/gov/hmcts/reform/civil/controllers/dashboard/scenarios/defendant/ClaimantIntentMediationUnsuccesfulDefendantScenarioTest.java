@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
@@ -101,5 +103,53 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
         Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
         Evaluations.evaluateMediationTasklist(response, taskListExpected);
 
+    }
+
+    @Test
+    void should_create_mediation_unsuccessful_scenario_for_carm_defandant_nonattendance() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        String caseId = "32341";
+        final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListMock("DEFENDANT", caseId);
+        Party respondent1 = new Party();
+        respondent1.toBuilder().partyName("John Doe").build();
+        MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
+            .toBuilder()
+            .ccdCaseReference(Long.valueOf(32341))
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+            .build();
+
+        handler.handle(callbackParams(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("You did not attend mediation"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
+                        + "a penalty against you. Your case will not be reviewed by the court. "
+                        + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
+                        + "attend your appointment.</a></p>"),
+                jsonPath("$[0].titleCy").value("You did not attend mediation"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
+                        + "a penalty against you. Your case will not be reviewed by the court. "
+                        + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
+                        + "attend your appointment.</a></p>"));
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
     }
 }
