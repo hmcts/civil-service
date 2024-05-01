@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,6 +22,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.nio.charset.Charset;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -76,11 +80,12 @@ class BundleRequestExecutorTest {
                                                        Charset.defaultCharset()));
         BundleRequest request = BundleRequest.builder().build();
 
-        // When
-        var result = bundleRequestExecutor.post(request, endpoint, "not important");
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
 
-        // Then
-        assertThat(result.isEmpty()).isTrue();
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
     }
 
     @Test
@@ -95,10 +100,11 @@ class BundleRequestExecutorTest {
 
         // When
         BundleRequest request = BundleRequest.builder().build();
-        var result = bundleRequestExecutor.post(request, endpoint, "not important");
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
 
-        // Then
-        assertThat(result.isEmpty()).isTrue();
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
     }
-
 }

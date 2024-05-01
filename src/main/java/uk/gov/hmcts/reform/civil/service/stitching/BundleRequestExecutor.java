@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +9,22 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,6 +41,7 @@ public class BundleRequestExecutor {
 
     private final ObjectMapper objectMapper;
 
+    @Retryable(value = {RetryableStitchingException.class}, maxAttempts = 5, backoff = @Backoff(delay = 500))
     public Optional<CaseData> post(final BundleRequest payload, final String endpoint, String authorisation) {
         requireNonNull(payload, "payload must not be null");
         requireNonNull(endpoint, "endpoint must not be null");
@@ -63,6 +68,7 @@ public class BundleRequestExecutor {
                 log.info("Stitching endpoint returned {} with reason {}",
                          response1.getStatusCodeValue(),
                          response1.getStatusCode().getReasonPhrase());
+                throw new RetryableStitchingException();
             }
 
         } catch (RestClientResponseException e) {
@@ -70,7 +76,26 @@ public class BundleRequestExecutor {
             log.error("The call to the endpoint with URL {} failed. This is likely to cause problems down the line.",
                       endpoint);
             logRelevantInfoQuietly(e);
+            throw new RetryableStitchingException();
         }
+    }
+
+    @Recover
+    public Optional<CaseData> recover(RetryableStitchingException e,
+                                       final BundleRequest payload,
+                                       final String endpoint,
+                                       String authorisation) {
+        log.info("Tried to call {} too many times without success", endpoint);
+        return Optional.empty();
+    }
+
+    //need to handle maximum retries exception as well, hence method overload
+    @Recover
+    public Optional<CaseData> recover(RuntimeException e,
+                                       final BundleRequest payload,
+                                       final String endpoint,
+                                       String authorisation) {
+        log.info("Tried to call {} too many times without success", endpoint);
         return Optional.empty();
     }
 
