@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Hello"
-
 IFS=','; read -ra FILES <<< "${ADDITIONAL_COMPOSE_FILES}"
 for FILE in "${FILES[@]}"; do
   # process "$i"
