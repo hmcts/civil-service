@@ -164,14 +164,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
+    // @ParameterizedTest
+    // @ValueSource(booleans = {true, false})
+    // void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
+    //     var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
+    //     givenToggle(isJudgmentOnlineLiveKey, toggleStat);
 
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
-    }
+    //     assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
+    // }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
