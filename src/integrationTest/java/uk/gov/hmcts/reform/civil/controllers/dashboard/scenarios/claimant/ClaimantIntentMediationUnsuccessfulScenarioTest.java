@@ -43,7 +43,6 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                              .type(Party.Type.INDIVIDUAL).build())
             .build();
 
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
