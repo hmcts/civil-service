@@ -30,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @Testcontainers
 @RunWith(SpringRunner.class)
 @EnableFeignClients(defaultConfiguration = DashboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @MockBean

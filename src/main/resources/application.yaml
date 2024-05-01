@@ -580,6 +580,11 @@ mediation:
 
 
 ---
+junit:
+  jupiter:
+    execution:
+      parallel:
+        enabled=true:
 
 spring:
   config:
@@ -611,6 +616,10 @@ spring:
 
   main:
     lazy-initialization: true
+
+logging:
+  level:
+    org.springframework.test.context.cache: DEBUG
 
 management:
   endpoints:
