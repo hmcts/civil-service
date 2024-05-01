@@ -89,6 +89,7 @@ You should get a response similar to this:
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
 
+
 ### Preview environment
 
 Preview environment will be created when opening new PR. CCD and Camunda BPMN definitions will be pulled from the latest
