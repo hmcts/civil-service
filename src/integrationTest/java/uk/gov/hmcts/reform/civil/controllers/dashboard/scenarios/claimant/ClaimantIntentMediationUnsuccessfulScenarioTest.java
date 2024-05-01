@@ -43,6 +43,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                              .type(Party.Type.INDIVIDUAL).build())
             .build();
 
+
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -79,6 +80,8 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
 
+        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListWithInactive("CLAIMANT", caseId);
+
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -94,6 +97,15 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
                         + "class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
+
     }
 
     @Test
