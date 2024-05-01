@@ -194,4 +194,51 @@ public class MockTaskList {
                 .taskOrder(7)
                 .build());
     }
+
+    public static List<TaskList> getMediationTaskListWithInactive(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy(
+                    "<a>View mediation settlement agreement</a>")
+                .taskNameEn(
+                    "<a>View mediation settlement agreement</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(5)
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a>Upload mediation documents</a>")
+                .taskNameEn("<a>Upload mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(6)
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameEn("<a>View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(7)
+                .build()
+        );
+    }
+
 }
