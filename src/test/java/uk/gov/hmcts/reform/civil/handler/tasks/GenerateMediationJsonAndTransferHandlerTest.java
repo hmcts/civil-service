@@ -91,7 +91,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimToBeProcessed, true);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -105,7 +105,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -120,7 +120,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService, times(0)).getInMediationCases(eq(claimNotToBeProcessed), anyBoolean());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -135,7 +135,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
         verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
@@ -147,7 +147,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimToBeProcessed, true);
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask);
+        verify(externalTaskService).complete(externalTask, null);
     }
 
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {

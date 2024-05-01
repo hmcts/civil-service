@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.Objects;
-
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher {
+public abstract class CcdDashboardClaimMatcher {
 
     protected CaseData caseData;
 
@@ -28,11 +27,6 @@ public class CcdDashboardClaimMatcher {
     }
 
     public boolean isSettled() {
-        return !caseData.isRespondentResponseFullDefence()
-            && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant())
-            && Objects.isNull(caseData.getCcjPaymentDetails())
-            && !caseData.hasApplicantRejectedRepaymentPlan()
-            || caseData.isPartAdmitClaimSettled();
+        return caseData.getCcdState() == CaseState.CASE_SETTLED;
     }
 }

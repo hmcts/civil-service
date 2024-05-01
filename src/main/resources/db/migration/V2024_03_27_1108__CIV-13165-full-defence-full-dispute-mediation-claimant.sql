@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant', '{"Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.ClaimIssue.HWF.PhonePayment", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.ClaimIssue.HWF.FullRemission"}', '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant" : ["applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
+VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant', '{"Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.ClaimIssue.HWF.PhonePayment", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.ClaimIssue.HWF.FullRemission"}', '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant" : ["respondent1PartyName", "applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
 
 /**
  * Add notification template
@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Cl
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has rejected the claim and agreed to mediation. You can reject or agree to mediation.</p><p class="govuk-body">You need to respond by ${applicant1ResponseDeadlineEn}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">The defendant has rejected the claim and agreed to mediation. You can reject or agree to mediation.</p><p class="govuk-body">You need to respond by ${applicant1ResponseDeadlineCy}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and suggested mediation. You can reject or agree to mediation.</p><p class="govuk-body">You need to respond by ${applicant1ResponseDeadlineEn}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and suggested mediation. You can reject or agree to mediation.</p><p class="govuk-body">You need to respond by ${applicant1ResponseDeadlineCy}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
 /**

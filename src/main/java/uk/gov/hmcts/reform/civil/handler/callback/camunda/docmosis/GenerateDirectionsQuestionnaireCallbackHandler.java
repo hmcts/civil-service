@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGene
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,9 +41,12 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         GENERATE_DIRECTIONS_QUESTIONNAIRE
     );
 
+    private static final List<String> TASK_IDS =
+        Arrays.asList("ClaimantResponseGenerateDirectionsQuestionnaire",
+                      "DefendantResponseFullDefenceGenerateDirectionsQuestionnaire");
+
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -51,6 +54,11 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::prepareDirectionsQuestionnaire
         );
+    }
+
+    @Override
+    public List<String> camundaActivityIds(CallbackParams callbackParams) {
+        return TASK_IDS;
     }
 
     @Override
