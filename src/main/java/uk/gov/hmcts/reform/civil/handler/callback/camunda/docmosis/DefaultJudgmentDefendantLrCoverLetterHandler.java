@@ -59,7 +59,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
     private void generateCoverLetterDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
-        if(respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData)) {
+        if (respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData)) {
             defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
         }
     }

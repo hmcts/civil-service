@@ -98,8 +98,8 @@ public class DefaultJudgmentCoverLetterGenerator {
     }
 
     private List<String> getRecipientsList(CaseData caseData, boolean toSecondLegalOrg) {
-        Optional <Organisation> organisationOp = toSecondLegalOrg ?
-            getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
+        Optional<Organisation> organisationOp = toSecondLegalOrg
+            ? getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
             : getOrganisationByPolicy(caseData.getRespondent1OrganisationPolicy(), this.organisationService);
         return organisationOp.map(Organisation::getName).stream().toList();
     }
@@ -112,11 +112,11 @@ public class DefaultJudgmentCoverLetterGenerator {
     }
 
     public DefaultJudgmentDefendantLrCoverLetter getTemplateData(CaseData caseData, boolean toSecondLegalOrg) {
-        Optional <Organisation> organisationOp = toSecondLegalOrg ?
-            getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
+        Optional<Organisation> organisationOp = toSecondLegalOrg
+            ? getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), this.organisationService)
             : getOrganisationByPolicy(caseData.getRespondent1OrganisationPolicy(), this.organisationService);
 
-        if(organisationOp.isPresent()) {
+        if (organisationOp.isPresent()) {
             Organisation organisation = organisationOp.get();
             StringBuilder claimantName = new StringBuilder().append(caseData.getApplicant1().getPartyName());
             claimantName.append(applicant2Present(caseData)
