@@ -14,12 +14,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -114,6 +117,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             given(notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
             given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
             given(notificationsProperties.getMediationUnsuccessfulLIPTemplate()).willReturn(CARM_LIP_MAIL_TEMPLATE);
+            given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
             given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
         }
@@ -296,6 +300,40 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .applicant1Represented(YesOrNo.NO)
                     .mediation(Mediation.builder()
                                    .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
+
+                //When
+                notificationHandler.handle(params);
+                //Then
+                verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                               emailTemplate.capture(),
+                                                               notificationDataMap.capture(), reference.capture()
+                );
+                assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_PARTY_EMAIL);
+                assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_LIP_MAIL_TEMPLATE);
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_LIP_CLAIMANT_PROPERTY_MAP);
+            }
+
+            @ParameterizedTest
+            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
+                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE",
+                "NOT_CONTACTABLE_DEFENDANT_TWO"})
+            void shouldSendNotificationToClaimantLIP_1v1_WithBilingualwhenEventIsCalled(MediationUnsuccessfulReason reason) {
+                //Given
+                CaseData caseData = CaseData.builder()
+                    .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
+                                    .partyEmail(APPLICANT_PARTY_EMAIL).build())
+                    .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
+                    .legacyCaseReference(REFERENCE_NUMBER)
+                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                    .addApplicant2(YesOrNo.NO)
+                    .addRespondent2(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .mediation(Mediation.builder()
+                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                    .claimantBilingualLanguagePreference("BOTH")
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
