@@ -64,7 +64,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
     private static final CaseDocument STITCHED_DOC = CaseDocumentBuilder.builder()
         .documentName("stitched doc")
-        .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER) //TODO is this type??
+        .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)
         .build();
 
     @MockBean

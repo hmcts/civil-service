@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -29,13 +28,11 @@ public class JudgmentOnlineUtils {
             && caseData.getAddRespondent2() == YES;
     }
 
-    public static boolean areRespondentLegalOrgsEqual(CaseData caseData, OrganisationService organisationService) {
-        Optional <Organisation> organisationOp1 = getOrganisationByPolicy(caseData.getRespondent1OrganisationPolicy(), organisationService);
-        Optional <Organisation> organisationOp2 = getOrganisationByPolicy(caseData.getRespondent2OrganisationPolicy(), organisationService);
-        if(organisationOp1.isPresent() && organisationOp2.isPresent()) {
-            return organisationOp1.get().getOrganisationIdentifier().equals(organisationOp2.get().getOrganisationIdentifier());
-        } else {
-            return false;
-        }
+    public static boolean areRespondentLegalOrgsEqual(CaseData caseData) {
+        return (caseData.getRespondent2() != null
+            && caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
+            && caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
+            && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
+            caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
     }
 }

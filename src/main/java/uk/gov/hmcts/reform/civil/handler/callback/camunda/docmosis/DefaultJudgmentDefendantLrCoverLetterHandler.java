@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.DefaultJudgmentCoverLetterGenerator;
 
 import java.util.List;
@@ -26,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Pre
 @RequiredArgsConstructor
 public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandler {
 
-    private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(
         SEND_COVER_LETTER_DEFENDANT_LR);
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
@@ -61,7 +59,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
     private void generateCoverLetterDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
-        if(respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData, organisationService)) {
+        if(respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData)) {
             defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
         }
     }
