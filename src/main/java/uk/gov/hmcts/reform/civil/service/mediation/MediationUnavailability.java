@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @EqualsAndHashCode
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediationUnavailability {
 
     private String dateFrom;

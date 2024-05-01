@@ -304,20 +304,14 @@ public class MediationJsonService {
                 return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
             }
         }
-        return List.of(MediationUnavailability.builder()
-                           .dateFrom(null)
-                           .dateTo(null)
-                           .build());
+        return List.of(MediationUnavailability.builder().build());
     }
 
     private List<MediationUnavailability> getDateRangeToAvoid(MediationLiPCarm mediationLiPCarm) {
         if (YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
             return toMediationUnavailableDates(mediationLiPCarm.getUnavailableDatesForMediation());
         }
-        return List.of(MediationUnavailability.builder()
-                           .dateFrom(null)
-                           .dateTo(null)
-                           .build());
+        return List.of(MediationUnavailability.builder().build());
     }
 
     private String formatDate(LocalDate unavailableDate) {
