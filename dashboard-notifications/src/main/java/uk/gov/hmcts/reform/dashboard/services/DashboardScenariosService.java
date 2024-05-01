@@ -142,7 +142,7 @@ public class DashboardScenariosService {
                 .build();
 
             log.info(
-                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
+                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, HintTextEn = {}",
                 scenarioReference,
                 taskItemEntity.getId(),
                 taskItemEntity.getTaskNameEn(),
