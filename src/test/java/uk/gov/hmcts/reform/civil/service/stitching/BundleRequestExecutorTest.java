@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,5 +106,17 @@ class BundleRequestExecutorTest {
         );
 
         assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    public void whenRecoveryNeededReturnEmptyOptional() {
+        assertThat(bundleRequestExecutor.recover(new RetryableStitchingException(), null, null, null))
+            .isEqualTo(Optional.empty());
+    }
+
+    @Test
+    public void whenRuntimeRecoveryNeededReturnEmptyOptional() {
+        assertThat(bundleRequestExecutor.recover(new RuntimeException(), null, null, null))
+            .isEqualTo(Optional.empty());
     }
 }
