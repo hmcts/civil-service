@@ -56,9 +56,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                         + " class=\"govuk-link\">View the order</a>.</p>"),
                 jsonPath("$[0].titleCy").value("An order has been made"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The judge has made an order on your claim. "
+                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad. "
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">View the order</a>.</p>")
+                        + " class=\"govuk-link\">Gweld y gorchymyn</a>.</p>")
             );
     }
 
