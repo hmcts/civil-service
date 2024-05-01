@@ -144,7 +144,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
             any()
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
 
-        given(civilDocumentStitchingService.bundle(any(), any(), any(),any(), any()))
+        given(civilDocumentStitchingService.bundle(any(), any(), any(), any(), any()))
             .willReturn(STITCHED_DOC);
 
         uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg1 = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();

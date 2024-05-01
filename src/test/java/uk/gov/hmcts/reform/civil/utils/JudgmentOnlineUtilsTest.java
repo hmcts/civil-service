@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Pre
 class JudgmentOnlineUtilsTest {
 
     private OrganisationService organisationService;
+
     @Test
     void testShouldGetOrganisationByPolicy() {
         organisationService = mock(OrganisationService.class);
@@ -47,10 +48,10 @@ class JudgmentOnlineUtilsTest {
     void testShouldCheckApplicant2Present(boolean applicant2Present) {
         CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment();
-        if(applicant2Present) {
+        if (applicant2Present) {
             caseDataBuilder.addApplicant2(YesOrNo.YES);
         } else {
-        caseDataBuilder.build();
+            caseDataBuilder.build();
         }
 
         assertThat(applicant2Present(caseDataBuilder.build())).isEqualTo(applicant2Present);
@@ -61,7 +62,7 @@ class JudgmentOnlineUtilsTest {
     void testShouldCheckRespondent2Present(boolean respondent2Present) {
         CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment();
-        if(respondent2Present) {
+        if (respondent2Present) {
             caseDataBuilder.addRespondent2(YesOrNo.YES);
         } else {
             caseDataBuilder.build();
