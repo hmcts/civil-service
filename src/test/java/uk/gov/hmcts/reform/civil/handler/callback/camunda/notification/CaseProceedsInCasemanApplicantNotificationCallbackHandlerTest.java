@@ -27,17 +27,17 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
-    CaseProceedsInCasemanApplicantNotificationHandler.class,
+    CaseProceedsInCasemanApplicantNotificationCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-class CaseProceedsInCasemanApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private CaseProceedsInCasemanApplicantNotificationHandler handler;
+    private CaseProceedsInCasemanApplicantNotificationCallbackHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
