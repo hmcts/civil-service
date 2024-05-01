@@ -122,7 +122,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.711'
+        version: '1.12.712'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
