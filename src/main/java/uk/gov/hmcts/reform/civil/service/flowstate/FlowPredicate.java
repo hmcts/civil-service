@@ -1079,6 +1079,9 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 
+    public static final Predicate<CaseData> reasonNotSuitableForSdo = caseData ->
+        StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
+
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
         Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
         || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
