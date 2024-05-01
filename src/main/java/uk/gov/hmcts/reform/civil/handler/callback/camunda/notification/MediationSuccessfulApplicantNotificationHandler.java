@@ -105,7 +105,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     }
 
     private String addTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual()
+        return caseData.isBilingual()
             ? notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate() :
             notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate();
     }
