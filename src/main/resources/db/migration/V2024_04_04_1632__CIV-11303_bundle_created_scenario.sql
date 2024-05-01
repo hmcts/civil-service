@@ -49,4 +49,8 @@ values ('<a href={VIEW_BUNDLE} class="govuk-link">View the bundle</a>',
        ('<a href={VIEW_BUNDLE} class="govuk-link">View the bundle</a>',
         'Hearing',
         '<a href={VIEW_BUNDLE} class="govuk-link">View the bundle</a>',
-        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant', '{3, 3}', 'DEFENDANT', 8);
+        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant', '{3, 3}', 'DEFENDANT', 8),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Bundle.Ready.Claimant', '{2, 2}', 'CLAIMANT', 7),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Bundle.Ready.Defendant', '{2, 2}', 'DEFENDANT', 7);

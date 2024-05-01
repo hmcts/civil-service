@@ -57,6 +57,8 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[0].currentStatusEn").value("Inactive"),
+                jsonPath("$[1].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[1].currentStatusEn").value("Inactive"),
                 jsonPath("$[2].currentStatusEn").doesNotHaveJsonPath()
             );
     }

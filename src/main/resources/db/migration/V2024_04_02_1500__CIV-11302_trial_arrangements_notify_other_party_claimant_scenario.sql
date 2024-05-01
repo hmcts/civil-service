@@ -16,3 +16,8 @@ VALUES ('Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant',
         '<p class="govuk-body">You can <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">view the arrangements that they''ve confirmed.</a></p>',
         '<p class="govuk-body">You can <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">view the arrangements that they''ve confirmed.</a></p>',
         'CLAIMANT','Session');
+
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role, task_order)
+values ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant', '{7, 7}', 'DEFENDANT', 7);

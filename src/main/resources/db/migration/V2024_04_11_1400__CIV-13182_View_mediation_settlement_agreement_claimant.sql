@@ -30,6 +30,10 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>Upload hearing documents</a>',
   'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 9),
 
+('<a>Add the trial arrangements</a>',
+  'Hearings',
+  '<a>Add the trial arrangements</a>',
+  'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 10),
 
 ('<a>Pay the hearing fee</a>',
   'Hearings',
