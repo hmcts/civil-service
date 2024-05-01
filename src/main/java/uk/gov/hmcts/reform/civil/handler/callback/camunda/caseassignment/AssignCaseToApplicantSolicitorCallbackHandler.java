@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -29,13 +28,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
-public class AssignCaseToUserHandler extends CallbackHandler {
+public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
 
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
-    private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -52,12 +50,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        if (ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)) {
-            return TASK_ID;
-        } else {
-            throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
-        }
+        return TASK_ID;
     }
 
     @Override
