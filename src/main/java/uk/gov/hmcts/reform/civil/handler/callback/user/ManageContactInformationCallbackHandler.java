@@ -345,7 +345,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
         }
 
-        if (showLitigationFriendUpdateWarning(partyChosen, caseData)) {
+        if (showLitigationFriendUpdateWarning(partyChosen, oldCaseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_WARNING);
         }
 
