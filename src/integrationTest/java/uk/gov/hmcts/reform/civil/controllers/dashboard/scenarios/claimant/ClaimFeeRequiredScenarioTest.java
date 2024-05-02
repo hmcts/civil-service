@@ -1,36 +1,34 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.GenerateDashboardNotificationClaimFeeRequiredHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
 
-    public static final String SCENARIO_CLAIM_FEE_REQUIRED = "Scenario.AAA6.ClaimIssue.ClaimFee.Required";
-    private static final String DASHBOARD_CREATE_SCENARIO_URL
-        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
-    private static final String GET_NOTIFICATIONS_URL
-        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
-    private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
+    @Autowired
+    private GenerateDashboardNotificationClaimFeeRequiredHandler handler;
 
     @Test
     void should_create_scenario_for_claim_fee_required() throws Exception {
+        String caseId = "1234678011";
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+            .caseReference(Long.valueOf(caseId))
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(7000)).build())
+            .build();
 
-        UUID caseId = UUID.randomUUID();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("claimFee", "£70"))).build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_CLAIM_FEE_REQUIRED, caseId
-        )
-            .andExpect(status().isOk());
+        //when
+        handler.handle(callbackParams(caseData));
 
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
