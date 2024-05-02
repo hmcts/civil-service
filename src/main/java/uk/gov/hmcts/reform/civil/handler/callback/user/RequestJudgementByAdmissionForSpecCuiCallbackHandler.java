@@ -104,8 +104,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && data.isLRvLipOneVOne()
             && isNonDivergent(data)
+            && data.isLRvLipOneVOne()
             && data.isPayImmediately()) {
 
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();

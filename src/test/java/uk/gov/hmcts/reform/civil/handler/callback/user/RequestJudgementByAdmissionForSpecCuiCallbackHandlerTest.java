@@ -409,7 +409,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenNotPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLiPOneVOneAndNotPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
