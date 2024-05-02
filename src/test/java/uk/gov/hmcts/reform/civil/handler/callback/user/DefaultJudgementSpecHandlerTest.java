@@ -1050,7 +1050,30 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled2v1() {
+        void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled2v1JOIsNotLive() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .addApplicant2(YesOrNo.YES)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Smith")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess").isNotNull();
+            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldMoveToFinalOrderIssued_whenIsJOOnlineAnd2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1068,8 +1091,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
     }
 
