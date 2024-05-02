@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -37,6 +38,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EDIT_JUDGMENT);
     protected final ObjectMapper objectMapper;
+    private final EditJudgmentOnlineMapper judgmentOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -92,6 +94,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
+        caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {

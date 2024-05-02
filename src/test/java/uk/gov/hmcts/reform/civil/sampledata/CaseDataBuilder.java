@@ -5808,6 +5808,7 @@ public class CaseDataBuilder {
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5840,6 +5841,7 @@ public class CaseDataBuilder {
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5853,7 +5855,9 @@ public class CaseDataBuilder {
                     .type(PaymentPlanSelection.PAY_BY_DATE)
                     .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joIsRegisteredWithRTL(YES).build();
+            .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation( CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {

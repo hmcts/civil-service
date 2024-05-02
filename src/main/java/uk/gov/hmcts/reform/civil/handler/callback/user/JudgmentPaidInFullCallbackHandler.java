@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
@@ -37,6 +38,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDGMENT_PAID_IN_FULL);
     protected final ObjectMapper objectMapper;
+    private final RecordJudgmentOnlineMapper judgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
 
     @Override
@@ -86,7 +88,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
             caseData.getJoJudgmentStatusDetails().setLastUpdatedDate(LocalDateTime.now());
             caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         }
-
+        judgmentOnlineMapper.updateHistoricJudgment(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

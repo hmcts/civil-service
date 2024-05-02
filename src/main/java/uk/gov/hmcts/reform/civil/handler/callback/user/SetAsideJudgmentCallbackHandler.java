@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
@@ -39,6 +40,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_ASIDE_JUDGMENT);
     protected final ObjectMapper objectMapper;
+    private final RecordJudgmentOnlineMapper judgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
 
     @Override
@@ -83,6 +85,8 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
+        judgmentOnlineMapper.updateHistoricJudgment(caseData);
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
