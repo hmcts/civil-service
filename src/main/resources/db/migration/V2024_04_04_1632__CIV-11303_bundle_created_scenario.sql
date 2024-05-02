@@ -20,13 +20,13 @@ VALUES ('Scenario.AAA6.CP.Bundle.Ready.Claimant',
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy,
                                                    notification_role, time_to_live)
-VALUES ('Notice.AAA6.CP.Bundle.Ready.Claimant', 'The bundle is ready to view', 'The bundle is ready to view',
+VALUES ('Notice.AAA6.CP.Bundle.Ready.Claimant', 'The bundle is ready to view', 'Mae''r bwndel yn barod i''w weld',
         '<p class="govuk-body">The bundle contains all the documents that will be referred to at the hearing. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the bundle</a> to ensure that the information is accurate.</p>',
-        '<p class="govuk-body">The bundle contains all the documents that will be referred to at the hearing. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the bundle</a> to ensure that the information is accurate.</p>',
+        '<p class="govuk-body">Mae''r bwndel yn cynnwys yr holl ddogfennau y cyfeirir atynt yn y gwrandawiad. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Adolygwch y bwndel</a> i sicrhau bod yr wybodaeth yn gywir.</p>',
         'CLAIMANT', 'Session'),
-       ('Notice.AAA6.CP.Bundle.Ready.Defendant', 'The bundle is ready to view', 'The bundle is ready to view',
+       ('Notice.AAA6.CP.Bundle.Ready.Defendant', 'The bundle is ready to view', 'Mae''r bwndel yn barod i''w weld',
         '<p class="govuk-body">The bundle contains all the documents that will be referred to at the hearing. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the bundle</a> to ensure that the information is accurate.</p>',
-        '<p class="govuk-body">The bundle contains all the documents that will be referred to at the hearing. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Review the bundle</a> to ensure that the information is accurate.</p>',
+        '<p class="govuk-body">Mae''r bwndel yn cynnwys yr holl ddogfennau y cyfeirir atynt yn y gwrandawiad. <a href="{VIEW_BUNDLE_REDIRECT}" class="govuk-link">Adolygwch y bwndel</a> i sicrhau bod yr wybodaeth yn gywir.</p>',
         'DEFENDANT', 'Session');
 
 /**
