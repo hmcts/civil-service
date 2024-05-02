@@ -6446,6 +6446,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setDefendantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder setDefendant2MediationFlag(YesOrNo response) {
+        respondent2MediationRequired = response;
+        return this;
+    }
+
     public CaseDataBuilder applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo confirmation) {
         this.applicant1PartAdmitConfirmAmountPaidSpec = confirmation;
         return this;
@@ -7196,7 +7206,7 @@ public class CaseDataBuilder {
             .applicant1ClaimMediationSpecRequired(applicant1ClaimMediationSpecRequired)
             .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
             .responseClaimMediationSpecRequired(respondent1MediationRequired)
-            .responseClaimMediationSpec2Required(respondent1MediationRequired)
+            .responseClaimMediationSpec2Required(respondent2MediationRequired)
             .mediation(mediation)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
