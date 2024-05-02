@@ -44,12 +44,9 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
                         + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
-                jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
+                jsonPath("$[0].titleCy").value("Mae gwrandawiad wedi'i drefnu"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
-                        + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
-                        " to date. You can update contact details by telephoning the court at 0300 123 7050." +
-                        " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>")
+                    "<p class=\"govuk-body\">Mae eich gwrandawiad wedi'i drefnu ar gyfer 1 April 2024 yn Court Name. Cadwch eich manylion cyswllt chi a manylion cyswllt unrhyw un yr hoffech ddibynnu arnynt yn y llys yn gyfredol. Gallwch ddiweddaru manylion cyswllt drwy ffonio'r llys ar 0300 303 5174. <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Gweld yr hysbysiad o wrandawiad</a>.</p>")
             );
 
         //Verify task Item is created
@@ -97,11 +94,9 @@ public class HearingScheduledClaimantScenarioTest extends BaseIntegrationTest {
                     "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
                         + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
                         "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out."),
-                jsonPath("$[0].titleCy").value("You must pay the hearing fee"),
+                jsonPath("$[0].titleCy").value("Rhaid i chi dalu ffi'r gwrandawiad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
-                        + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
-                        "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out.")
+                    "<p class=\"govuk-body\">Rhaid i chi naill ai <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">dalu ffi'r gwrandawiad</a> o £200 neu <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\">wneud cais am help i dalu ffioedd</a>. Mae'n rhaid i chi wneud hyn erbyn 1 April 2024. Os na fyddwch yn cymryd un o'r camau hyn, bydd eich hawliad yn cael ei ddileu.")
             );
 
         //Verify task Item is created
