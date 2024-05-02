@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -101,6 +102,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
+    public boolean isMintiEnabled() {
+        return featureToggleApi.isFeatureEnabled("minti");
+    }
+
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
@@ -112,5 +117,17 @@ public class FeatureToggleService {
 
     public boolean isGaForLipsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("GaForLips");
+    }
+
+    public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabled("minti")
+            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 }

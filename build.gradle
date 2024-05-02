@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
-  id "org.flywaydb.flyway" version "10.11.1"
+  id "org.flywaydb.flyway" version "10.12.0"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -45,7 +45,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.15.0'
+    toolVersion = '10.16.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.710'
+        version: '1.12.712'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -324,7 +324,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:v1.0.78'
+  implementation 'com.github.hmcts:civil-commons:1.0.81'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
