@@ -1115,11 +1115,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
-        return AllocatedTrack.getAllocatedTrack(
-            caseData.getTotalClaimAmount(),
-            null,
-            null
-        );
+        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
+                                                toggleService, caseData);
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
