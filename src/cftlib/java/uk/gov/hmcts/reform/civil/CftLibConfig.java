@@ -96,19 +96,7 @@ public class CftLibConfig implements CFTLibConfigurer {
                     "pui-case-manager",
                     "caseworker",
                     "caseworker-civil",
-                    "caseworker-civil-solicitor"),
-            "TEST_JUDGE@mailinator.com",
-            List.of("caseworker", "caseworker-divorce", "caseworker-divorce-judge"),
-            "dummysystemupdate@test.com",
-            List.of("caseworker", "caseworker-divorce", "caseworker-divorce-systemupdate"),
-            "role.assignment.admin@gmail.com",
-            List.of("caseworker"),
-            "data.store.idam.system.user@gmail.com",
-            List.of("caseworker"),
-            "divorce_as_caseworker_admin@mailinator.com",
-            List.of("caseworker-divorce", "caseworker-divorce-superuser"),
-            "civil-system-update@mailnesia.com",
-            List.of("caseworker","caseworker-civil","caseworker-civil-systemupdate")
+                    "caseworker-civil-solicitor")
         );
 
         for (var entry : users.entrySet()) {
