@@ -559,4 +559,10 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
 
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
+    }
+
 }

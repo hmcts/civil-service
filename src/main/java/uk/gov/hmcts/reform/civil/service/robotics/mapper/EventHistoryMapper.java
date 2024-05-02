@@ -2385,7 +2385,7 @@ public class EventHistoryMapper {
                                              List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
-        if (caseData.hasDefendantPayedTheAmountClaimed()) {
+        if (caseData.hasDefendantPaidTheAmountClaimed()) {
             statesPaidEvents.add(buildDefenceFiledEvent(
                 builder,
                 respondent1ResponseDate,
