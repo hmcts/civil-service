@@ -49,11 +49,11 @@ public class GoToHearingScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trade's response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>"),
+                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trader's response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trade's response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>")
+                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trader's response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>")
             );
     }
 }
