@@ -103,7 +103,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
 
-        if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(data) && data.isPayImmediately()) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && data.isLRvLipOneVOne()
+            && isNonDivergent(data)
+            && data.isPayImmediately()) {
+
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
@@ -144,7 +148,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         );
     }
 
-    private boolean  isNonDivergent(CaseData caseData) {
+    private boolean isNonDivergent(CaseData caseData) {
         return  MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
             || (ofNullable(caseData.getRespondent2()).isPresent()

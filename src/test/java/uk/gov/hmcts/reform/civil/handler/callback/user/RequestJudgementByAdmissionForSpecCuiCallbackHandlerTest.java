@@ -381,10 +381,38 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenNotPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLROneVOne() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1Represented(YES)
                 .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenNotPaidImmediately() {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
                 .applicant1Represented(YES)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -409,10 +437,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIs1v1AndPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIsLRvLiP1v1AndPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(YES)
-                .specRespondent1Represented(YES)
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
                 .applicant1Represented(YES)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .defendantDetailsSpec(DynamicList.builder()
