@@ -1,32 +1,51 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.HearingScheduledDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT;
 
 public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
+    @Autowired
+    private HearingScheduledDefendantNotificationHandler handler;
+
     @Test
     void should_create_hearing_scheduled_scenario() throws Exception {
-        UUID caseId = UUID.randomUUID();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("hearingDateEn", "1 April 2024", "hearingCourtEn", "Court Name",
-                                                "hearingDateCy", "1 April 2024", "hearingCourtCy", "Court Name")))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), caseId
-        )
-            .andExpect(status().isOk());
+
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+
+        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
+        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
+        String caseId = "8123456783";
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .hearingDueDate(LocalDate.of(2024, 4, 1))
+            .hearingDate(LocalDate.of(2024, 4, 1))
+            .hearingLocation(list).build();
+
+        // When
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -36,13 +55,13 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
-                        + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
+                        + "Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A hearing has been scheduled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
-                        + "Court Name. Please keep your contact details and anyone you wish to rely on in court up" +
+                    "<p class=\"govuk-body\">Your hearing has been scheduled for 1 Ebrill 2024 at "
+                        + "Name. Please keep your contact details and anyone you wish to rely on in court up" +
                         " to date. You can update contact details by telephoning the court at 0300 123 7050." +
                         " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>")
             );
