@@ -465,7 +465,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndIsDivergentAndPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build())
                 .respondent1(PartyBuilder.builder().individual().build())
@@ -481,39 +481,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                                              .label("John Doe")
                                                              .build())
                                                   .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getState())
-                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
-        }
-
-        @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndIsNonDivergentAndPaidImmediately() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .specRespondent1Represented(YES)
-                .respondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("Both Defendants")
-                                                     .build())
-                                          .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

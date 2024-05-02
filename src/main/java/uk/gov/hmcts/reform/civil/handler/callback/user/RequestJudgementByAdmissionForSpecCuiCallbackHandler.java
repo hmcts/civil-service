@@ -104,7 +104,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             data.getCcjPaymentDetails();
 
         if (featureToggleService.isJudgmentOnlineLive()
-            && isNonDivergent(data)
             && data.isLRvLipOneVOne()
             && data.isPayImmediately()) {
 
@@ -146,14 +145,5 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                 + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>"
         );
-    }
-
-    private boolean isNonDivergent(CaseData caseData) {
-        return  MultiPartyScenario.isOneVOne(caseData)
-            || MultiPartyScenario.isTwoVOne(caseData)
-            || (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 }
