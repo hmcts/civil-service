@@ -1064,6 +1064,7 @@ class FlowPredicateTest {
                         .respondent2ClaimResponseType(FULL_ADMISSION)
                         .respondent2(Party.builder().partyName("Respondent2").build())
                         .respondent2SameLegalRepresentative(YES)
+                        .addRespondent2(YES)
                         .addApplicant2(null)
                         .build();
 
@@ -1107,6 +1108,7 @@ class FlowPredicateTest {
                         .respondent2(Party.builder().partyName("Respondent2").build())
                         .respondent2SameLegalRepresentative(NO)
                         .respondent2ResponseDate(LocalDateTime.now().minusDays(1))
+                        .addRespondent2(YES)
                         .addApplicant2(null)
                         .build();
 
@@ -2843,7 +2845,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void testDisjoint() {
+    void testDisjoint() {
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
@@ -2866,7 +2868,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void when1v2ssIssued_thenPendingClaimIssued() {
+    void when1v2ssIssued_thenPendingClaimIssued() {
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
@@ -2888,7 +2890,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void when1v2dsIssued_thenPendingClaimIssued() {
+    void when1v2dsIssued_thenPendingClaimIssued() {
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
@@ -2911,7 +2913,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void whenXv1Issued_thenPendingClaimIssued() {
+    void whenXv1Issued_thenPendingClaimIssued() {
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
@@ -2933,13 +2935,13 @@ class FlowPredicateTest {
     class AllAgreedToMediation {
 
         @Test
-        public void whenUnspec_false() {
+        void whenUnspec_false() {
             CaseData caseData = CaseData.builder().build();
             Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
-        public void whenNotSmall_false() {
+        void whenNotSmall_false() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
@@ -2947,7 +2949,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void when1v1() {
+        void when1v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(SMALL_CLAIM.name())
@@ -2974,7 +2976,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void when1v2ss() {
+        void when1v2ss() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(SMALL_CLAIM.name())
@@ -3003,7 +3005,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void when1v2ds() {
+        void when1v2ds() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(SMALL_CLAIM.name())
@@ -3037,7 +3039,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void when2v1() {
+        void when2v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(SMALL_CLAIM.name())
@@ -3394,7 +3396,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+    void isInHearingReadiness_whenHearingNoticeSubmitted() {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("11111")
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -3404,7 +3406,7 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
+    void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("11111")
             .listingOrRelisting(ListingOrRelisting.RELISTING)

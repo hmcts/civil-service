@@ -2349,6 +2349,61 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDraftExt() {
+        solicitorReferences = SolicitorReferences.builder()
+            .applicantSolicitor1Reference("12345")
+            .respondentSolicitor1Reference("6789")
+            .build();
+        courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("214320")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocationCivil.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
+            .build();
+        uploadParticularsOfClaim = NO;
+        claimValue = ClaimValue.builder()
+            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
+            .build();
+        claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
+        personalInjuryType = ROAD_ACCIDENT;
+        applicantSolicitor1PbaAccounts = DynamicList.builder()
+            .value(DynamicListElement.builder().label("PBA0077597").build())
+            .build();
+        claimFee = Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(BigDecimal.valueOf(100))
+            .build();
+        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
+        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        respondent2OrgRegistered = NO;
+        addApplicant2 = NO;
+        addRespondent2 = YES;
+        applicant1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY A").build())
+            .build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+        respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
+        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
+        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsUnregistered() {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
@@ -2397,6 +2452,17 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
         defendant2LIPAtClaimIssued = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedExt() {
+        atStateClaimDraftExt();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = FAST_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
         return this;
     }
 
@@ -2967,6 +3033,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePaymentSuccessfulExt() {
+        atStateClaimSubmittedExt();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentReference = "12345";
+        paymentSuccessfulDate = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStatePaymentSuccessful() {
         atStateClaimSubmitted();
         claimIssuedPaymentDetails = PaymentDetails.builder()
@@ -2993,6 +3070,12 @@ public class CaseDataBuilder {
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
         respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
             .organisation(Organisation.builder().build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStatePendingClaimIssuedExt() {
+        atStatePaymentSuccessfulExt();
+        issueDate = CLAIM_ISSUED_DATE;
         return this;
     }
 
@@ -3052,6 +3135,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssued() {
         atStatePendingClaimIssued();
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        ccdState = CASE_ISSUED;
+        buildHmctsInternalCaseName();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedExt() {
+        atStatePendingClaimIssuedExt();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
         buildHmctsInternalCaseName();
@@ -3144,6 +3235,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimNotifiedExt() {
+        atStateClaimIssuedExt();
+        claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
+        claimDetailsNotificationDeadline = DEADLINE;
+        ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        servedDocumentFiles = ServedDocumentFiles.builder().particularsOfClaimText("test").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimNotified() {
         atStateClaimIssued();
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
@@ -3209,6 +3309,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineAfterClaimDetailsNotified() {
         atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedExt() {
+        atStateClaimNotifiedExt();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
 
@@ -4623,6 +4733,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateNotificationAcknowledgedExt() {
+        atStateClaimDetailsNotifiedExt();
+        respondent1ClaimResponseIntentionType = FULL_DEFENCE;
+        respondent1AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;;
+        respondent2AcknowledgeNotificationDate = claimDetailsNotificationDate.plusDays(1);
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledged() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
@@ -4665,6 +4785,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateNotificationAcknowledgedRespondent2Only() {
         atStateNotificationAcknowledgedRespondent2();
         respondent1AcknowledgeNotificationDate = null;
+        return this;
+    }
+
+    public CaseDataBuilder atDeadlinePassedAfterStateNotificationAcknowledgedExt() {
+        atStateNotificationAcknowledgedExt();
+        this.claimDismissedDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        this.claimDismissedDeadline = LocalDateTime.now().minusDays(1);
         return this;
     }
 
