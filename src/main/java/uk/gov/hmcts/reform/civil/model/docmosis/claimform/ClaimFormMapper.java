@@ -143,7 +143,6 @@ public class ClaimFormMapper {
             .add(getClaimFee(caseData)).toString();
     }
 
-    @JsonIgnore
     private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
         if (caseData.isHelpWithFees()

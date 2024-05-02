@@ -161,5 +161,4 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             ? "OCON225"
             : "OCON225a";
     }
-
 }
