@@ -643,6 +643,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String casePartyRequestForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
+    private String dashboardNotificationTypeOrder;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -723,7 +724,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasDefendantPayedTheAmountClaimed() {
+    public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
             .equals(getDefenceRouteRequired());
     }
@@ -837,6 +838,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasDefendantAgreedToFreeMediation() {
         return YES.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendant2AgreedToFreeMediation() {
+        return YES.equals(getResponseClaimMediationSpec2Required());
     }
 
     @JsonIgnore

@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
@@ -673,6 +675,53 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLossToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2SeparatorUploadOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2TrialToggle").asString().isEqualTo("[INCLUDE]");
+        }
+
+        @Test
+        void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getText()).isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
+                .isEqualTo("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                               + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
+                               + " the hearing.");
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictWitness()).isEqualTo(NO);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictPages()).isEqualTo(NO);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
+                           .getPartyIsCountedAsWitnessTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getFontDetails()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getWitnessShouldNotMoreThanTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
+
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoStatementOfWitness()).isEqualTo(
+                SdoR2UiConstantFastTrack.STATEMENT_WITNESS);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getIsRestrictWitness()).isEqualTo(
+                NO);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant()).isEqualTo(3);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant()).isEqualTo(3);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getPartyIsCountedAsWitnessTxt())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getIsRestrictPages()).isEqualTo(NO);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getWitnessShouldNotMoreThanTxt())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages()).isEqualTo(12);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getFontDetails())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadline()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate()).isEqualTo(LocalDate.now().plusDays(70));
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineText()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
         }
 
         @ParameterizedTest
@@ -2073,52 +2122,99 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "in a separate paginated bundle by the claimant's solicitors and kept up to date. "
                                + "All references to medical notes are to be made by reference "
                                + "to the pages in that bundle.");
-
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
-                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                               + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                               + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                               + "commencement of hire until the earlier of:\n "
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                               + " months prior to the commencement of hire until the earlier of:\n"
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                               + "claimant.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
-                .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                               + "a) the need to hire a replacement vehicle; and\n"
-                               + "b) impecuniosity");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
-                .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
-                               + "from asserting need or relying on impecuniosity as the case may be at the final "
-                               + "hearing, save with permission of the Trial Judge.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
-                .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                               + "later than 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
-                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
-                               + " the paragraph above, each party may rely upon written evidence by way of witness"
-                               + " statement of one witness to provide evidence of basic hire rates available within"
-                               + " the claimant's geographical location, from a mainstream supplier, or a local"
-                               + " reputable supplier if none is available.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
-                .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
-                .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
-                .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
-
+            if (featureToggleService.isSdoR2Enabled()) {
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
+                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
+                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                                   + "commencement of hire until the earlier of:\n "
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
+                                   + " months prior to the commencement of hire until the earlier of:\n"
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
+                                   + "claimant.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input2")
+                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                                   + "a) the need to hire a replacement vehicle; and\n"
+                                   + "b) impecuniosity");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("date1")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input3")
+                    .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
+                                   + "from asserting need or relying on impecuniosity as the case may be at the final "
+                                   + "hearing, save with permission of the Trial Judge.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input4")
+                    .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                                   + "later than 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("date2")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input5")
+                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
+                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
+                                   + " statement of one witness to provide evidence of basic hire rates available within"
+                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
+                                   + " reputable supplier if none is available.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input6")
+                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date3")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input7")
+                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date4")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input8")
+                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("detailsShowToggle")
+                    .isEqualTo(List.of(AddOrRemoveToggle.ADD));
+            } else {
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
+                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
+                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                                   + "commencement of hire until the earlier of:\n "
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
+                                   + " months prior to the commencement of hire until the earlier of:\n"
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
+                                   + "claimant.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
+                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                                   + "a) the need to hire a replacement vehicle; and\n"
+                                   + "b) impecuniosity");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
+                    .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
+                                   + "from asserting need or relying on impecuniosity as the case may be at the final "
+                                   + "hearing, save with permission of the Trial Judge.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
+                    .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                                   + "later than 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
+                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
+                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
+                                   + " statement of one witness to provide evidence of basic hire rates available within"
+                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
+                                   + " reputable supplier if none is available.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
+                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
+                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
+                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
+            }
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items in disrepair.");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
