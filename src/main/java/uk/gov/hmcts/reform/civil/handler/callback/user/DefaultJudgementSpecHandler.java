@@ -433,6 +433,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private boolean  isNonDivergent(CaseData caseData) {
         return  MultiPartyScenario.isOneVOne(caseData)
+            || MultiPartyScenario.isTwoVOne(caseData)
             || (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
