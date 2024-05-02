@@ -926,6 +926,24 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     " Test reason2 | £ 20.00 |\n" +
                     "  | **Total** | £ 30.00 | ");
         }
+
+        @Test
+        void shouldCalculateAmount_AndReturnNoErrorWhenAbove25kAndToggleActive() {
+            // Given
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
+            claimAmountBreakup.add(ClaimAmountBreakup.builder()
+                                       .value(ClaimAmountBreakupDetails.builder()
+                                                  .claimAmount(new BigDecimal(10000000))
+                                                  .claimReason("Test reason1").build())
+                                       .build());
+            CaseData caseData = CaseData.builder().claimAmountBreakup(claimAmountBreakup).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "amount-breakup");
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).isNull();
+        }
     }
 
     @Nested
