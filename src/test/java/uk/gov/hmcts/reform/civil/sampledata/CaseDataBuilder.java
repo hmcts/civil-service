@@ -603,6 +603,7 @@ public class CaseDataBuilder {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
     }
+
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
@@ -3074,6 +3075,7 @@ public class CaseDataBuilder {
         addLegalRepDeadline = DEADLINE;
         return this;
     }
+
     public CaseDataBuilder atStateClaimIssued1v1LiPBilingual() {
         atStateClaimIssued1v1LiP();
         this.applicant1Represented = NO;
