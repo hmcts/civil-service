@@ -52,12 +52,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
@@ -162,6 +164,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
     private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private SdoR2WitnessOfFact sdoR2FastTrackWitnessOfFact;
     private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
     private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
@@ -190,10 +193,13 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatementOther;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsMediation sdoR2SmallClaimsMediationSectionStatement;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsMediationSectionToggle;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
     private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
     private List<OrderDetailsPagesSectionsToggle> sdoR2FastTrackUseOfWelshToggle;
@@ -210,6 +216,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
     private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -311,6 +318,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
@@ -552,4 +560,19 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
 
+    @JsonIgnore
+    public boolean applicant1SuggestedPayImmediately() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayBySetDate() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
+    }
 }

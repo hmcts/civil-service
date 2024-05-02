@@ -41,17 +41,16 @@ public class CCJRequestedDashboardNotificationDefendantHandler extends Dashboard
     @Override
     public String getScenario(CaseData caseData) {
 
-        if (respondentRejectedSettlementAgreementOrNotRespondedByDeadline(caseData)) {
-            return SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT
-                .getScenario();
-        }
         /* Assumption has been made that claimant will raise CCJ only if settlement agreement is broken
          * 1. Defendant fails to respond to the SA by deadline
          * 2. Defendant rejects the SA
          * 3. Defendant accepts the SA and then breaks the terms of the agreement
          *
          */
-        if (!caseData.isJudgementDateNotPermitted()) {
+        if (respondentRejectedSettlementAgreementOrNotRespondedByDeadline(caseData)) {
+            return SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT
+                .getScenario();
+        } else if (respondentAcceptedSettlementAgreementButMissedPayment(caseData)) {
             return SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_DEF_PAYMENT_MISSED_DEFENDANT.getScenario();
         }
         return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario();
@@ -61,5 +60,10 @@ public class CCJRequestedDashboardNotificationDefendantHandler extends Dashboard
         return caseData.hasApplicant1SignedSettlementAgreement()
             && (caseData.isRespondentRejectedSettlementAgreement()
             || (!caseData.isRespondentRespondedToSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired()));
+    }
+
+    private boolean respondentAcceptedSettlementAgreementButMissedPayment(CaseData caseData) {
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && caseData.isRespondentSignedSettlementAgreement();
     }
 }

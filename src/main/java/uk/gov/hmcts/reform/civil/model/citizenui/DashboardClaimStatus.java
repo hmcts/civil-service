@@ -60,6 +60,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_REJECTED_PAYMENT_PLAN(
         Claim::isPaymentPlanRejected
     ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION(
+        Claim::isPaymentPlanRejectedRequestedJudgeDecision
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
@@ -83,6 +86,9 @@ public enum DashboardClaimStatus {
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
+    ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -123,6 +129,12 @@ public enum DashboardClaimStatus {
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
+    ),
+    CLAIM_SUBMITTED_NOT_PAID_OR_FAILED(
+        Claim::isClaimSubmittedNotPaidOrFailedNotHwF
+    ),
+    CLAIM_SUBMITTED_WAITING_TRANSLATED_DOCUMENTS(
+        Claim::isClaimSubmittedWaitingTranslatedDocuments
     ),
     NO_RESPONSE(
         Claim::hasResponsePending

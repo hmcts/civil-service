@@ -773,11 +773,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
-            errors.add("Total Claim Amount cannot exceed £ 25,000");
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
+                errors.add("Total Claim Amount cannot exceed £ 25,000");
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            }
         }
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
