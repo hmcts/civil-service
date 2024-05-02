@@ -60,8 +60,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             if (caseData.isLipvLipOneVOne()) {
                 sendEmail(
-                    "leonardo.palmeiro@hmcts.net",
-                    caseData.isBilingual()? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    caseData.getApplicant1().getPartyEmail(),
+                    caseData.isBilingual() ? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipProperties(caseData),
                     referenceTemplate
                 );

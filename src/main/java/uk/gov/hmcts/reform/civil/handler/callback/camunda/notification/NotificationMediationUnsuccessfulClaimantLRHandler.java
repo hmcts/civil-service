@@ -157,8 +157,10 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
 
     private void sendMailUnrepresentedClaimant(CaseData caseData) {
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",
-            caseData.isBilingual()? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh() : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+            caseData.getApplicant1().getPartyEmail(),
+            caseData.isBilingual()
+                ? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()
+                : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
             addPropertiesCARMforLIP(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference()));
     }

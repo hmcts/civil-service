@@ -77,8 +77,10 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             if (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()) {
                 String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LIP, claimId);
                 sendEmail(
-                    "leonardo.palmeiro@hmcts.net",
-                    caseData.isRespondentResponseBilingual()? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    caseData.getRespondent1().getPartyEmail(),
+                    caseData.isRespondentResponseBilingual()
+                        ? notificationsProperties.getNotifyLipSuccessfulMediationWelsh()
+                        : notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipProperties(caseData),
                     referenceTemplate
                 );
