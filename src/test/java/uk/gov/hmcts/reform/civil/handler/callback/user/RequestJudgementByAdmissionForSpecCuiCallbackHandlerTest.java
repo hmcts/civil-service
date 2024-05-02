@@ -498,7 +498,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIs1v2AndIsNonDivergentAndPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndIsNonDivergentAndPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build())
                 .respondent1(PartyBuilder.builder().individual().build())
@@ -523,15 +523,15 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIs2v1AndPaidImmediately() {
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs2v1AndPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build())
                 .applicant2(PartyBuilder.builder().individual().build())
@@ -551,11 +551,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
         }
 
         @Test
