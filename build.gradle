@@ -188,7 +188,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
-
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   testLogging {
     exceptionFormat = 'full'
   }
