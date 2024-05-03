@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,10 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -37,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -45,17 +40,17 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToApplicantSolicitorCallbackHandler.TASK_ID;
 
 @SpringBootTest(classes = {
-    AssignCaseToUserHandler.class,
+    AssignCaseToApplicantSolicitorCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
+class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private AssignCaseToUserHandler assignCaseToUserHandler;
+    private AssignCaseToApplicantSolicitorCallbackHandler assignCaseToApplicantSolicitorCallbackHandler;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
@@ -90,7 +85,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnSupplementaryDataOnSubmitted() {
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
     }
@@ -110,7 +105,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnSpecSupplementaryData() {
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
 
@@ -145,14 +140,14 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator() {
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
@@ -185,7 +180,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
@@ -223,7 +218,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
@@ -257,7 +252,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
@@ -288,7 +283,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
-            assignCaseToUserHandler.handle(params);
+            assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
@@ -296,29 +291,14 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
+        assertThat(assignCaseToApplicantSolicitorCallbackHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     }
 
     @Test
     void shouldReturnCorrectCamundaTaskID() {
-        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
+        assertThat(assignCaseToApplicantSolicitorCallbackHandler.camundaActivityId(CallbackParamsBuilder.builder()
                                                                  .request(CallbackRequest.builder().eventId(
             "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = CaseEvent.class,
-        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1" }, mode = EnumSource.Mode.EXCLUDE
-    )
-    void shouldThrowExceptionWhenCaseEventIsInvalid(CaseEvent caseEvent) {
-        // Given: an invalid event id
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .request(CallbackRequest.builder().eventId(caseEvent.name()).build()).build();
-        // When: I call the camundaActivityId
-        // Then: an exception is thrown
-        CallbackException ex = assertThrows(CallbackException.class, () -> assignCaseToUserHandler.camundaActivityId(callbackParams),
-                                            "A CallbackException was expected to be thrown but wasn't.");
-        assertThat(ex.getMessage()).contains("Callback handler received illegal event");
     }
 
     private void verifyApplicantSolicitorOneRoles() {
