@@ -43,7 +43,7 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends DashboardBaseInte
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">Mr.Claimant wants to proceed with the claim.</p>" +
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p>" +
                                "<p class=\"govuk-body\">They rejected your admission of £700.</p>" +
                                "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>" +
                                "<p class=\"govuk-body\">You can <a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">view your response</a>" +
@@ -51,7 +51,7 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends DashboardBaseInte
                                "view the claimant's hearing requirements</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">Mr.Claimant wants to proceed with the claim.</p>" +
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p>" +
                                "<p class=\"govuk-body\">They rejected your admission of £700.</p>" +
                                "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>" +
                                "<p class=\"govuk-body\">You can <a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">view your response</a>" +
