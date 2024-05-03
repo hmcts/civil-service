@@ -30,6 +30,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
     }
 
     protected abstract String getScenario(CaseData caseData);
+    protected String getExtraScenario(CaseData caseData) {return null;};
 
     /**
      * Depending on the case data, the scenario may or may not be applicable.
@@ -41,11 +42,26 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return true;
     }
 
+    protected boolean shouldRecordExtraScenario(CaseData caseData) {
+        return false;
+    };
+
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
+            dashboardApiClient.recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                scenario,
+                authToken,
+                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
+                    caseData)).build()
+            );
+        }
+
+        scenario = getExtraScenario(caseData);
+        if (!Strings.isNullOrEmpty(scenario) && shouldRecordExtraScenario(caseData)) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 scenario,
