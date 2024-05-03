@@ -36,12 +36,12 @@ jobs:
         with:
           name: integration-tests-results
           path: build/reports/tests/integration
-      - name: Publish test report
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: always()   # run this step even if previous step failed
-      - uses: dorny/test-reporter@v1
+      - name: Publish Integration Tests Report
+        uses: phoenix-actions/test-reporting@v8
+        id: integration-test-report               # Set ID reference for step
+        if: success() || failure()    # run this step even if previous step failed
         with:
-          artifact: integration-tests-results  # artifact name
-          name: Integration Tests                  # Name of the check run which will be created
-          path: '*.html'                     # Path to test results (inside artifact .zip)
-          reporter: java-junit              # Format of test results
+          name: Integration Tests            # Name of the check run which will be created
+          path: build/reports/tests/integration/*.html    # Path to test results
+          reporter: java-junit        # Format of test results
+
