@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -70,9 +71,13 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
+            sealedForm, "");
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+        assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
 
         if (stitchEnabled) {
@@ -85,12 +90,20 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData
             );
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+            CaseDocument stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(stitchedDocument, DocCategory.DQ_DEF1.getValue());
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF2_DEFENSE_DQ.getValue());
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+            if (Objects.nonNull(stitchedDocumentCopy)) {
+                caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(stitchedDocumentCopy));
+            }
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
+            if (Objects.nonNull(copy)) {
+                caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(copy));
+            }
         }
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 

@@ -360,6 +360,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
+        List<Element<CaseDocument>> dupeClaimantDefendantResponseDocs = caseData.getDupeClaimantDefendantResponseDocs();
         Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
                 buildElemCaseDocument(claimDocument, "Claimant",
@@ -393,9 +394,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
                     claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
-                claimantUploads.addAll(copy);
+                dupeClaimantDefendantResponseDocs.addAll(copy);
             }
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            updatedCaseData.dupeClaimantDefendantResponseDocs(copy);
         }
     }
 
