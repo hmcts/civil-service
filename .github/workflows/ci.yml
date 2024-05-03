@@ -36,7 +36,7 @@ jobs:
         if: always()   # run this step even if previous step failed
         with:
           name: Integration Tests            # Name of the check run which will be created
-          path: reports/tests  # Path to test results
+          path: /build/reports/tests  # Path to test results
           reporter: java-junit        # Format of test results
           files: |
             integration/**/*.html

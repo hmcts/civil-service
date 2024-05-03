@@ -273,7 +273,7 @@ task functional(description: 'Runs the functional tests.') {
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
 sonarqube {
   properties {
