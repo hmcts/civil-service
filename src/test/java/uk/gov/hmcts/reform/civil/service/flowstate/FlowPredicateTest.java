@@ -2002,6 +2002,17 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissed()
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
@@ -3394,13 +3405,25 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+    void isInHearingReadiness_whenHearingNoticeSubmitted() {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("11111")
             .listingOrRelisting(ListingOrRelisting.LISTING)
+            .takenOfflineByStaffDate(null)
             .build();
 
         assertTrue(isInHearingReadiness.test(caseData));
+    }
+
+    @Test
+    void isInHearingReadiness_whenHearingNoticeSubmittedExt() {
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("11111")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .build();
+
+        assertFalse(isInHearingReadiness.test(caseData));
     }
 
     @Test
