@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -79,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
@@ -2900,7 +2900,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atState(FlowState.Main.FULL_DEFENCE)
-                .respondent2Responds1v2SameSol(RespondentResponseType.FULL_DEFENCE)
+                .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
@@ -3021,7 +3021,7 @@ class EventHistoryMapperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent1DQ()
-                .respondent2Responds1v2DiffSol(RespondentResponseType.FULL_DEFENCE)
+                .respondent2Responds1v2DiffSol(FULL_DEFENCE)
                 .respondent2DQ()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
@@ -3395,7 +3395,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDefNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .atState1v2DivergentResponse(FULL_ADMISSION, RespondentResponseType.FULL_DEFENCE)
+                .atState1v2DivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondent2DQ()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
@@ -3609,7 +3609,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolResp1FullAdmissionResp2FullDefenceNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, RespondentResponseType.FULL_DEFENCE)
+                .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
                 .respondent2DQ()
                 .build();
@@ -3723,7 +3723,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .multiPartyClaimOneDefendantSolicitor()
-                .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, RespondentResponseType.FULL_DEFENCE)
+                .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
                 .respondent2DQ()
                 .build();
