@@ -207,7 +207,7 @@ tasks.withType(Copy) {
 }
 
 task integration(type: Test) {
-  maxHeapSize = '2G'
+  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -421,7 +421,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.48.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.49.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.16.0'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
