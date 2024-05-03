@@ -324,7 +324,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.82'
+  implementation 'com.github.hmcts:civil-commons:v1.0.83_CIV-12877'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
