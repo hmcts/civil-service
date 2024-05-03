@@ -50,10 +50,10 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">mr claimant has rejected your offer and asked you to "
+                    .value("<p class=\"govuk-body\">Mr. John Rambo has rejected your offer and asked you to "
                                + "sign a settlement agreement."
                                + "</p><p class=\"govuk-body\">"
-                               + "mr claimant proposed a repayment plan, and the court "
+                               + "Mr. John Rambo proposed a repayment plan, and the court "
                                + "then responded with an alternative plan that was accepted."
                                + "</p><p class=\"govuk-body\">"
                                + " You must respond by " + DateUtils.formatDate(responseDeadline) + ". If you do not respond by then, "
