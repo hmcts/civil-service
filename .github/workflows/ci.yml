@@ -35,14 +35,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: integration-tests-results
-          path: build/reports/tests/integration
+          path: build/test-results/integration
       - name: Publish test report
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         if: always()   # run this step even if previous step failed
         with:
           name: Integration Tests            # Name of the check run which will be created
-          path: build/reports/tests/integration  # Path to test results
+          path: build/test-results/integration  # Path to test results
           reporter: java-junit        # Format of test results
           files: |
-            **/*.html
+            **/*.xml
 

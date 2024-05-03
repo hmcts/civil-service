@@ -210,6 +210,12 @@ task integration(type: Test) {
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+  reports {
+    junitXml {
+      outputPerTestCase = true // defaults to false
+      mergeReruns = true // defaults to false
+    }
+  }
 
 }
 
