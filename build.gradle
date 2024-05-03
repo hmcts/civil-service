@@ -2,7 +2,7 @@ plugins {
   id 'application'
   id 'checkstyle'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.4'
+  id 'io.spring.dependency-management' version '1.1.5'
   id 'org.springframework.boot' version '2.7.18'
   id 'org.owasp.dependencycheck' version '9.1.0'
   id 'com.github.ben-manes.versions' version '0.51.0'
@@ -88,7 +88,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-     dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
+     dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
         entry 'guava'
       }
 
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.712'
+        version: '1.12.714'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -397,7 +397,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.88'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.20'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.21'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
