@@ -188,6 +188,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
+
   testLogging {
     exceptionFormat = 'full'
   }
@@ -245,7 +246,6 @@ task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in func
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
 }
 
