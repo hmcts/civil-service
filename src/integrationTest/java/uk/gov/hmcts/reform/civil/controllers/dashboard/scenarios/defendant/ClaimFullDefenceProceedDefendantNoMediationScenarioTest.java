@@ -43,7 +43,7 @@ public class ClaimFullDefenceProceedDefendantNoMediationScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">" + claimantName + " wants to proceed with the claim.</p>" +
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p>" +
                                "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>" +
                                "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">view your response</a> or " +
                                "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">view the claimant's hearing requirements</a>.</p>")
