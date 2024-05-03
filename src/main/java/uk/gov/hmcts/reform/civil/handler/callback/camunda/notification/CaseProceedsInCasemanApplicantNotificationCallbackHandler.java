@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,11 +22,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
-public class CaseProceedsInCasemanApplicantNotificationHandler extends CallbackHandler implements NotificationData {
+public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN);
 
-    public static final String TASK_ID = "CaseProceedsInCasemanNotifyApplicantSolicitor1";
+    public static final List<String> TASK_IDS =
+        Arrays.asList("CaseProceedsInCasemanNotifyApplicantSolicitor1",
+                      "CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForUnRegisteredFirm",
+                      "NotifyClaimProceedsOfflineNotifyApplicantSolicitor1",
+                      "NotifyClaimDetailsProceedOfflineApplicantSolicitor1CC");
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-applicant-notification-%s";
 
     private final NotificationService notificationService;
@@ -39,8 +44,8 @@ public class CaseProceedsInCasemanApplicantNotificationHandler extends CallbackH
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+    public List<String> camundaActivityIds(CallbackParams callbackParams) {
+        return TASK_IDS;
     }
 
     @Override

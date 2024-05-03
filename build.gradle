@@ -45,7 +45,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.15.0'
+    toolVersion = '10.16.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.711'
+        version: '1.12.712'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -203,7 +203,7 @@ tasks.withType(Copy) {
 }
 
 task integration(type: Test) {
-  maxHeapSize = '2G'
+  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -324,7 +324,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:v1.0.78'
+  implementation 'com.github.hmcts:civil-commons:1.0.82'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -416,7 +416,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.48.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.49.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.16.0'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
