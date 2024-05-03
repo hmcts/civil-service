@@ -135,7 +135,6 @@ public class EventHistoryMapper {
         stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
-                System.out.println(flowState);
                 switch (flowState) {
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
@@ -1847,7 +1846,7 @@ public class EventHistoryMapper {
                                     "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                                    validateRespondent2IntentionType(caseData)
                                 )
                             )
                         ));
@@ -1889,6 +1888,14 @@ public class EventHistoryMapper {
                                 )));
             }
         }
+    }
+
+    public String validateRespondent2IntentionType(CaseData caseData) {
+        if (caseData.isRespondent2NotRepresented() && caseData.getRespondent2ClaimResponseIntentionType() != null) {
+            return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
+        }
+        //represented by same solicitor
+        return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
     }
 
     private Event buildAcknowledgementOfServiceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
