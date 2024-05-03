@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettled.Defendant', '{"Notice.AAA6.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant"}',
+VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettled.Defendant', '{"Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant" : ["claimSettledAmount","claimSettledDateEn","claimSettledDateCy"]}');
 
 /**
