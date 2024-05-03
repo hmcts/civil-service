@@ -89,7 +89,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 
@@ -115,7 +115,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 
@@ -141,7 +141,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
 

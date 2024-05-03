@@ -388,6 +388,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
     public boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence()
                 && caseData.getApplicant1ResponseDate() != null
