@@ -18,10 +18,14 @@ public class RespondentMediationService {
             if (multiPartyScenario.equals(ONE_V_ONE)) {
                 return getDefendantResponseShowTagFor1v1(caseData);
             } else if (caseData.isMultiPartyClaimant(multiPartyScenario)) {
-                return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
+                if (caseData.hasDefendantAgreedToFreeMediation()) {
+                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
+                }
             } else {
                 if (caseData.isMultiPartyDefendant()) {
-                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
+                    if (caseData.hasDefendantAgreedToFreeMediation() || caseData.hasDefendant2AgreedToFreeMediation()) {
+                        return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
+                    }
                 }
             }
         }

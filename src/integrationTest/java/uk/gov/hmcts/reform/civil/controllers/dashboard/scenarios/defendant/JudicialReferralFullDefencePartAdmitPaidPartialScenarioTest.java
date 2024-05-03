@@ -1,40 +1,44 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.math.BigDecimal;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends DashboardBaseIntegrationTest {
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends BaseIntegrationTest {
+    @Autowired
+    private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_judicial_referral_full_defence_or_part_admit_paid_partial_amount() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
+        String caseId = "90123456782";
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("300000")).build())
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
 
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder()
-                .params(new HashMap<>(Map.of("applicant1PartyName", "Mr Claim Claimant",
-                                             "admissionPaidAmount", "£3000"
-                )))
-                .build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant",
-            caseId
-        )
-            .andExpect(status().isOk());
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")

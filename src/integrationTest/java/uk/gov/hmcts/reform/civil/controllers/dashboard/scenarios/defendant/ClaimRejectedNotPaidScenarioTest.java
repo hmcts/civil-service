@@ -1,39 +1,44 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class ClaimRejectedNotPaidScenarioTest extends BaseIntegrationTest {
+public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_claimant_reject_for_not_paid_defendant_notification() throws Exception {
-        UUID caseId = UUID.randomUUID();
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder()
-                .params(new HashMap<>(Map.of("applicant1PartyName", "Test Applicant",
-                                             "claimSettledAmount", "£1000"
-                )))
-                .build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
-            caseId
-        )
-            .andExpect(status().isOk());
+
+        String caseId = "12348991010";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(100000)).build())
+            .build();
+
+        handler.handle(callbackParams(caseData));
+
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
             .andExpect(status().isOk())

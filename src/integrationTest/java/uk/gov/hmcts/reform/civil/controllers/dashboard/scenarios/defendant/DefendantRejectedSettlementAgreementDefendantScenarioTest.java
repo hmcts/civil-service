@@ -1,42 +1,45 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
-import org.elasticsearch.core.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-import java.util.HashMap;
-import java.util.UUID;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DefendantSignSettlementAgreementDashboardNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends BaseIntegrationTest {
+public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private DefendantSignSettlementAgreementDashboardNotificationHandler handler;
 
     @Test
     void should_defendant_rejected_settlement_agreement_scenario() throws Exception {
-        UUID caseId = UUID.randomUUID();
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(new HashMap<>(Map.of("applicant1PartyName", "mr claimant")))
-                .build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA6_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_DEFENDANT.getScenario(),
-            caseId
-        ).andExpect(status().isOk());
+
+        String caseId = "90123456784";
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .caseDataLiP(
+                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
+                ).build()
+            )
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-
                 "<p class=\"govuk-body\">mr claimant can request a County Court Judgment (CCJ), " +
                     "which would order you to repay the money in line with the agreement. " +
                     "The court believes you can afford this.</p> " +

@@ -1,42 +1,48 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest {
+public class CourtFavoursClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_court_favours_defendant_sign_settlement_agreement() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
+        String caseId = "12348991011";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                                                        .build())
+                             .build())
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 16, 0, 0, 0))
+            .build();
 
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder()
-                .params(new HashMap<>(Map.of(
-                    "respondent1SettlementAgreementDeadlineEn", "16 March 2024",
-                    "respondent1SettlementAgreementDeadlineCy", "16 Mawrth 2024",
-                    "applicant1PartyName", "mr claimant"
-                )))
-                .build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            "Scenario.AAA6.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant",
-            caseId
-        )
-            .andExpect(status().isOk());
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")

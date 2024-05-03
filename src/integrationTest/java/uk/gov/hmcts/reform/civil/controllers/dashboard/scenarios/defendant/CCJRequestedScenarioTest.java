@@ -2,49 +2,32 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CCJRequestedDashboardNotificationDefendantHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class CCJRequestedScenarioTest extends BaseIntegrationTest {
+public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private CCJRequestedDashboardNotificationHandler handler;
+    private CCJRequestedDashboardNotificationDefendantHandler handler;
 
     @Test
     void should_create_ccj_requested_scenario() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
-        String claimantName = "Dave Indent";
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(
-                       new HashMap<>(Map.of(
-                           "applicant1PartyName", claimantName
-                       ))
-                   )
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL,
-               SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario(),
-               caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "12348991012";
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .ccdCaseReference(Long.valueOf(caseId))
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
