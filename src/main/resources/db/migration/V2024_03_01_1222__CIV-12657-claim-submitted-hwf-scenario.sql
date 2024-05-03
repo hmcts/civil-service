@@ -10,9 +10,9 @@ VALUES ('Scenario.AAA6.ClaimIssue.HWF.Requested', '{"Notice.AAA6.ClaimIssue.Clai
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.HWF.Requested', 'We''re reviewing your help with fees application' , 'We''re reviewing your help with fees application',
+VALUES ('Notice.AAA6.ClaimIssue.HWF.Requested', 'We''re reviewing your help with fees application' , 'Rydym yn adolygu eich cais am help i dalu ffioedd',
         '<p class="govuk-body">You''ve applied for help with the claim fee. You''ll receive an update in 5 to 10 working days.</p>',
-        '<p class="govuk-body">You''ve applied for help with the claim fee. You''ll receive an update in 5 to 10 working days.</p>',
+        '<p class="govuk-body">Fe wnaethoch gais am help i dalu ffi’r hawliad. Byddwch yn cael diweddariad mewn 5 i 10 diwrnod gwaith.</p>',
         'CLAIMANT');
 
 /**
@@ -37,16 +37,16 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 6),
        ('<a>View mediation documents</a>', 'Mediation','<a>View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 7),
-       ('<a>View hearings</a>', 'Hearings','<a>View hearings</a>',
-        'Hearings', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 8),
-       ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>',
-        'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 9),
-       ('<a>Add the trial arrangements</a>', 'Hearings' ,'<a>Add the trial arrangements</a>',
-        'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 10),
-       ('<a>Pay the hearing fee</a>', 'Hearings' ,'<a>Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 11),
-       ('<a>View the bundle</a>', 'Hearings' ,'<a>View the bundle</a>',
-        'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 12),
+       ('<a>View hearings</a>', 'Hearing','<a>View hearings</a>',
+        'Hearing', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 8),
+       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Upload hearing documents</a>',
+        'Hearing', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 9),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 10),
+       ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Pay the hearing fee</a>',
+        'Hearing', 'Hearing.Fee.Pay', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 11),
+       ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
+        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 12),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
         '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
         'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{3, 3}', 'CLAIMANT', 13),

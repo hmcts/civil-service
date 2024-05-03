@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant',
         '{"Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.ClaimIssue.HWF.PhonePayment","Notice.AAA6.DefResponse.MoretimeRequested.Claimant","Notice.AAA6.ClaimIssue.HWF.FullRemission"}',
-        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant" : ["applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant" : ["respondent1PartyName", "applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
 
 /**
  * Add notification template
@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">The defendant has rejected the claim.<br>You need to respond by ${applicant1ResponseDeadlineEn}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a>.</p>',
-        '<p class="govuk-body">The defendant has rejected the claim.<br>You need to respond by ${applicant1ResponseDeadlineCy}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a>.</p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim.<br>You need to respond by ${applicant1ResponseDeadlineEn}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a>.</p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim.<br>You need to respond by ${applicant1ResponseDeadlineCy}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a>.</p>',
         'CLAIMANT');
 
 /**
