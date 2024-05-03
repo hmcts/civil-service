@@ -16,11 +16,8 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +62,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         // If first time (IsLiveJudgmentExists = null) do not clear them
         if (caseData.getJoIsLiveJudgmentExists() != null) {
             caseData.setJoOrderMadeDate(null);
-            caseData.setJoJudgmentStatusDetails(null);
             caseData.setJoPaymentPlan(null);
             caseData.setJoInstalmentDetails(null);
             caseData.setJoJudgmentRecordReason(null);
@@ -90,11 +86,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
-
-        caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setJoSetAsideOrderDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
@@ -103,7 +94,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoSetAsideJudgmentErrorText(null);
         caseData.setJoJudgmentPaidInFull(null);
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));

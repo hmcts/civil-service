@@ -17,10 +17,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +35,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EDIT_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final EditJudgmentOnlineMapper judgmentOnlineMapper;
+    private final EditJudgmentOnlineMapper judgmentOnlineMapper = new EditJudgmentOnlineMapper();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -82,18 +79,9 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentStatusDetails judgmentStatusDetails = caseData.getJoJudgmentStatusDetails();
-        judgmentStatusDetails.setJudgmentStatusTypes(JudgmentStatusType.MODIFIED);
-        judgmentStatusDetails.setLastUpdatedDate(LocalDateTime.now());
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            if (caseData.getJoShowRegisteredWithRTLOption() == YesOrNo.NO) {
-                judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.MODIFIED));
-            } else {
-                judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
-            }
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
-        caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 

@@ -18,7 +18,7 @@ public class RecordJudgmentsOnlineMapperTest {
     private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper();
 
     @Test
-    void testIfActiveJudgmentIsAdded() {
+    void testIfActiveJudgmentIsAddedPayDate() {
 
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -35,5 +35,49 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+    }
+
+    @Test
+    void testIfActiveJudgmentIsAddedPayInstallments() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals("1100", activeJudgment.getCosts());
+        assertEquals("2300", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals(caseData.getJoInstalmentDetails(), activeJudgment.getInstalmentDetails());
+
+    }
+
+    @Test
+    void testIfActiveJudgmentIsAddedPayImmediately() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals("1100", activeJudgment.getCosts());
+        assertEquals("2300", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+        assertEquals(caseData.getJoInstalmentDetails(), activeJudgment.getInstalmentDetails());
+
     }
 }

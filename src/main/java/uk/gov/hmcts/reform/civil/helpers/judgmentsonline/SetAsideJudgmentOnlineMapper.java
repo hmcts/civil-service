@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

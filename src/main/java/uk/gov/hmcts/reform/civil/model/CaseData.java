@@ -81,7 +81,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
@@ -614,7 +613,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
-    private JudgmentStatusDetails joJudgmentStatusDetails;
     private LocalDate joOrderMadeDate;
     private LocalDate joIssuedDate;
     private String joAmountOrdered;
@@ -630,10 +628,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joSetAsideOrderDate;
     private LocalDate joSetAsideDefenceReceivedDate;
     private YesOrNo joShowRegisteredWithRTLOption;
-
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
-
 
     private final TransferCaseDetails transferCaseDetails;
 
