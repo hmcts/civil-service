@@ -30,7 +30,10 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
     }
 
     protected abstract String getScenario(CaseData caseData);
-    protected String getExtraScenario(CaseData caseData) {return null;};
+
+    protected String getExtraScenario(CaseData caseData) {
+        return null;
+    }
 
     /**
      * Depending on the case data, the scenario may or may not be applicable.
@@ -44,7 +47,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected boolean shouldRecordExtraScenario(CaseData caseData) {
         return false;
-    };
+    }
 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
