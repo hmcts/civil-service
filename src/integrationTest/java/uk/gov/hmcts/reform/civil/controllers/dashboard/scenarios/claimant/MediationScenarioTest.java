@@ -1,34 +1,31 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
-import java.util.HashMap;
-import java.util.UUID;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class MediationScenarioTest extends BaseIntegrationTest {
+public class MediationScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private ClaimantResponseNotificationHandler handler;
 
     @Test
     void should_create_mediation_scenario() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>())
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario(), caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "4123456789";
+        CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+        caseData = caseData.toBuilder().ccdState(CaseState.IN_MEDIATION).ccdCaseReference(Long.valueOf(caseId)).build();
+
+        // When
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")

@@ -116,9 +116,11 @@ public class HwfRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available"),
-                jsonPath("$[1].taskNameEn").value("<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
@@ -140,7 +142,8 @@ public class HwfRequestedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
                 jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
                 jsonPath("$[11].currentStatusEn").value("Not available yet"),
-                jsonPath("$[12].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[12].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[12].currentStatusEn").value("Available"),
                 jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),

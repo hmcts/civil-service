@@ -139,7 +139,8 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
                 jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
                 jsonPath("$[11].currentStatusEn").value("Not available yet"),
-                jsonPath("$[12].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[12].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[12].currentStatusEn").value("Available"),
                 jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),
