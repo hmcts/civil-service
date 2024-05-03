@@ -135,12 +135,12 @@ public class ClaimFormMapper {
 
     private String calculateTotalAmountOfClaim(CaseData caseData, BigDecimal interest) {
         if (interest != null) {
-            return Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
+            return (Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
                 .add(interest)
-                .add(getClaimFee(caseData)).toString();
+                .add(getClaimFee(caseData))).setScale(2).toString();
         }
-        return Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
-            .add(getClaimFee(caseData)).toString();
+        return (Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
+            .add(getClaimFee(caseData))).setScale(2).toString();
     }
 
     private BigDecimal getClaimFee(CaseData caseData) {
