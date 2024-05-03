@@ -35,6 +35,9 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         if: always()   # run this step even if previous step failed
         with:
+          name: Integration Tests            # Name of the check run which will be created
+          path: reports/tests  # Path to test results
+          reporter: java-junit        # Format of test results
           files: |
-            test-results/**/*.xml
-            test-results/**/*.json
+            integration/**/*.html
+
