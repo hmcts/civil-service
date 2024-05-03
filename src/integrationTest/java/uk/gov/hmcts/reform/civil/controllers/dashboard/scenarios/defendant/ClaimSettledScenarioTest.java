@@ -64,7 +64,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">mr claimant has confirmed that you paid £3000 on 16 March 2024.</p>")
+                        "<p class=\"govuk-body\">Mr. John Rambo has confirmed that you paid £3000 on 16 March 2024.</p>")
             );
     }
 }
