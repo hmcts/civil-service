@@ -51,11 +51,11 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
                         + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
-                jsonPath("$[0].titleCy").value("The claim has been struck out"),
+                jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
+                    "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
