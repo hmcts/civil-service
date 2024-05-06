@@ -18,6 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.areRespondentLegalOrgsEqual;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Present;
 
@@ -51,6 +52,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
     private CallbackResponse sendCoverLetterToDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (YesOrNo.YES.equals(caseData.getRespondent1Represented())) {
+            log.info("DJ handler - generate cover letter");
             generateCoverLetterDefendantLrLegalOrganisations(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();

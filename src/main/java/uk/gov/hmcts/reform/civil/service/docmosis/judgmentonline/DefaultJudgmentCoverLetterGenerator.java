@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.applicant2Present;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrganisationByPolicy;
@@ -51,7 +52,9 @@ public class DefaultJudgmentCoverLetterGenerator {
 
     public byte[] generateAndPrintDjCoverLettersPlusDocument(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
         byte[] letterContent = new byte[0];
+        log.info("DJ generator");
         if (stitchEnabled) {
+            log.info("DJ generator - stitch enabled");
             DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
             CaseDocument coverLetterCaseDocument = documentManagementService.uploadDocument(
                 authorisation,
@@ -61,13 +64,13 @@ public class DefaultJudgmentCoverLetterGenerator {
                     DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
                 )
             );
-
+            log.info("DJ generator - document uploaded");
             List<DocumentMetaData> letterAndDocumentMetaDataList = fetchDocumentsFromCaseData(
                 caseData,
                 coverLetterCaseDocument,
                 toSecondLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2 : DocumentType.DEFAULT_JUDGMENT_DEFENDANT1
             );
-
+            log.info("DJ generator - document fetched");
             CaseDocument stitchedDocuments = civilDocumentStitchingService.bundle(
                 letterAndDocumentMetaDataList,
                 authorisation,
@@ -75,7 +78,7 @@ public class DefaultJudgmentCoverLetterGenerator {
                 coverLetterCaseDocument.getDocumentName(),
                 caseData
             );
-
+            log.info("DJ generator - document stitched");
             String documentUrl = stitchedDocuments.getDocumentLink().getDocumentUrl();
             String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
@@ -93,6 +96,8 @@ public class DefaultJudgmentCoverLetterGenerator {
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                          caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients
             );
+            log.info("DJ generator - bulkPrint service called");
+            log.info("DJ generator - recipients", recipients);
         }
         return letterContent;
     }
