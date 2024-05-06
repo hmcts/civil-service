@@ -41,12 +41,12 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::configureScenarioForBothParties,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitData
         );
     }
 
-    private CallbackResponse configureScenarioForBothParties(CallbackParams callbackParams) {
+    private CallbackResponse submitData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (featureToggleService.isCarmEnabledForCase(caseData)){
@@ -57,7 +57,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
-    };
+    }
 
     private void recordScenarios(String[] scenarios, CaseData caseData, String authToken) {
         for (String scenario : scenarios) {
