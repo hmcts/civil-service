@@ -27,13 +27,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
 
@@ -58,7 +56,6 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
     @MockBean
     private DashboardNotificationsParamsMapper mapper;
-
 
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
     private static final List<MediationDocumentsType> DOCUMENTS_REFERRED_OPTION = List.of(REFERRED_DOCUMENTS);
@@ -103,6 +100,7 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
                 verify(mapper, times(0)).mapCaseDataToParams(any());
 
             }
+
             @Test
             void shouldUploadRespondent1Documents_whenInvokedForMediationNonAttendance_WithCarmIsEnabled() {
                 when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);

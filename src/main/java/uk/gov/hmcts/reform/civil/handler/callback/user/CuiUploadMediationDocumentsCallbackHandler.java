@@ -12,14 +12,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -38,6 +36,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -49,10 +48,10 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     private CallbackResponse submitData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        if (featureToggleService.isCarmEnabledForCase(caseData)){
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             String[] scenarios = getScenario();
-            recordScenarios(scenarios,caseData,authToken);
+            recordScenarios(scenarios, caseData, authToken);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -69,7 +68,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
                     .params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }
-    };
+    }
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -77,9 +76,9 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     }
 
     private String[] getScenario() {
-            return new String[]{
-                SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-                SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
-            };
-        }
+        return new String[]{
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
+        };
+    }
 }
