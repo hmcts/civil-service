@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.RecordJudgmentDeterminationOfMeansLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentNonDivergentSpecLipDefendantLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
@@ -32,15 +32,15 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     private final PinInPostConfiguration pipInPostConfiguration;
-    private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER = "default-judgment-non-divergent-spec-pin_in_letter";
+    private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
 
     public byte[] generateAndPrintDefaultJudgementSpecLetter(CaseData caseData, String authorisation) {
-        DocmosisDocument recordJudgmentDeterminationOfMeansLetter = generate(caseData);
+        DocmosisDocument defaultJudgmentNonDivergentPinInLetter = generate(caseData);
         CaseDocument defaultJudgmentNonDivergentPinInLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(),
-                recordJudgmentDeterminationOfMeansLetter.getBytes(),
+                defaultJudgmentNonDivergentPinInLetter.getBytes(),
                 DocumentType.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER
             )
         );
@@ -58,7 +58,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER, recipients);
+                                     caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF, recipients);
         return letterContent;
     }
 
@@ -73,14 +73,15 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
         );
     }
 
-    public RecordJudgmentDeterminationOfMeansLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return RecordJudgmentDeterminationOfMeansLiPDefendantLetter
+    public DefaultJudgmentNonDivergentSpecLipDefendantLetter getTemplateData(CaseData caseData) {
+        return DefaultJudgmentNonDivergentSpecLipDefendantLetter
             .builder()
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode()) // TODO: Confirm with the team
+            .caseSubmittedDate(caseData.getSubmittedDate().toLocalDate()) // TODO: Confirm with the team
+            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode()) // TODO: Confirm with the Omaira if this is still needed
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
             .build();
     }
