@@ -140,7 +140,7 @@ idam:
     totp_secret: ${CIVIL_CLIENT_TOTP_SECRET}
   client:
     id: civil-service
-    secret: ${CIVIL_CLIENT_SECRET}
+    secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
