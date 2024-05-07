@@ -181,7 +181,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
