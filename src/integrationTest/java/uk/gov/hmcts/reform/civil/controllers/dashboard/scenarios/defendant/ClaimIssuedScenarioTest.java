@@ -1,53 +1,41 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimIssueNotificationsHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
+public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
 
-    private static final String DASHBOARD_CREATE_SCENARIO_URL
-        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
-    private static final String GET_NOTIFICATIONS_URL
-        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
-    private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
-
-    @MockBean
-    private OffsetDateTime time;
+    @Autowired
+    private ClaimIssueNotificationsHandler handler;
 
     @Test
     void should_create_scenario_for_claim_issue() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        String hearingFeeByTime = "4 pm";
-        LocalDate hearingFeeByDate = OffsetDateTime.now().toLocalDate();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("defaultRespondTime", hearingFeeByTime,
-                                                "respondent1ResponseDeadlineEn", hearingFeeByDate,
-                                                "respondent1ResponseDeadlineCy", hearingFeeByDate,
-                                                "daysLeftToRespond", 28,
-                                                "ccdCaseReference", caseId
-                   )))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimIssue.Response.Required", caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "12348991015";
+
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1ResponseDeadline(dateTime)
+            .issueDate(dateTime.toLocalDate())
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
@@ -96,8 +84,8 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You haven´t responded to the claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You need to respond before 4 pm on "
-                               + hearingFeeByDate
+                    .value("<p class=\"govuk-body\">You need to respond before 4pm on "
+                               + DateUtils.formatDate(dateTime)
                                + ". There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
                                + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
             );
