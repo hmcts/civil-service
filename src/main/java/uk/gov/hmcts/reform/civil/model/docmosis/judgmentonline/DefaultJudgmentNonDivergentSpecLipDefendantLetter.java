@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class DefaultJudgmentNonDivergentSpecLipDefendantLetter implements MappableObject {
+
     private final Party defendant;
     private final String claimantName;
     private final String claimReferenceNumber;
