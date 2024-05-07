@@ -6,24 +6,33 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EditJudgmentOnlineMapper extends RecordJudgmentOnlineMapper {
+public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
-        //TODO Will there be a case where we will edit existing judgments after going live ?
-        // in that case Ill have to check activeJudgment exists or not
-        JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
-        activeJudgment.toBuilder()
-            .state(getJudgmentState(caseData))
-            .build();
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (activeJudgment != null) {
+            activeJudgment = activeJudgment.toBuilder()
+                .state(getJudgmentState(caseData))
+                .instalmentDetails(caseData.getJoInstalmentDetails())
+                .paymentPlan(caseData.getJoPaymentPlan())
+                .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
+                .issueDate(caseData.getJoOrderMadeDate())
+                .orderedAmount(caseData.getJoAmountOrdered())
+                .costs(caseData.getJoAmountCostOrdered())
+                .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())).toString())
+                .build();
+        }
         return activeJudgment;
     }
 
+    @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return JudgmentState.MODIFIED;
     }

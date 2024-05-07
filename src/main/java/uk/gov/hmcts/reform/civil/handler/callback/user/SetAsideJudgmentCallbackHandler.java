@@ -75,7 +75,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
-        judgmentOnlineMapper.updateHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 

@@ -31,7 +31,7 @@ public class JudgmentPaidOnlineMapperTest {
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
 
-        judgmentOnlineMapper.updateHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
         assertNotNull(caseData.getActiveJudgment());
         assertEquals(JudgmentState.SATISFIED, caseData.getActiveJudgment().getState());
@@ -51,7 +51,7 @@ public class JudgmentPaidOnlineMapperTest {
                                              .confirmFullPaymentMade(List.of("CONFIRMED"))
                                              .build());
 
-        judgmentOnlineMapper.updateHistoricJudgment(caseData);
+        judgmentOnlineMapper.moveToHistoricJudgment(caseData);
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertNull(caseData.getActiveJudgment());
         assertNotNull(caseData.getHistoricJudgment());
