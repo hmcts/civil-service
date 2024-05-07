@@ -24,7 +24,7 @@ def versions = [
   pact               : '3.5.24',
   springSecurity     : '5.8.12',
   camunda            : '7.19.0',
-  jackson            : '2.17.0',
+  jackson            : '2.17.1',
   testcontainers     : '1.19.7'
 ]
 
@@ -93,11 +93,11 @@ allprojects {
       }
 
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.24'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.714'
+        version: '1.12.715'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
