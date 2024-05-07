@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -29,6 +30,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
         super(caseData);
         this.featureToggleService = featureToggleService;
+    }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return caseData.isApplicantNotRepresented()
+            && !caseData.isHWFTypeClaimIssued()
+            && ((caseData.getClaimIssuedPaymentDetails() == null && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED)
+            || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && caseData.isBilingual()
+            && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
     @Override
@@ -372,6 +388,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
     public boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence()
                 && caseData.getApplicant1ResponseDate() != null

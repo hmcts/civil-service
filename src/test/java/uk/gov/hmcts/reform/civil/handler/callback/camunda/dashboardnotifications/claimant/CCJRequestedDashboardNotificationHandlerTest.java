@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -74,7 +75,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotifications() {
+    public void createDashboardNotificationsWhenDJSubmitted() {
 
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
@@ -89,6 +90,40 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(dateTime)
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void createDashboardNotificationsWhenJBASubmitted() {
+
+        params.put("ccdCaseReference", "123");
+        params.put("defaultRespondTime", "4pm");
+
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDateTime.now())
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                          .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -114,8 +149,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .build();
@@ -134,24 +167,30 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         CaseData defendantRejectedSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .caseDataLiP(CaseDataLiP.builder()
                              .respondentSignSettlementAgreement(YesOrNo.NO)
                              .build())
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .build();
 
         CaseData defendantNotRespondedToSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0))
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .build();
 
         CaseData defendantBreakSSA = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent1ResponseDeadline(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .build();
 
         return Stream.of(

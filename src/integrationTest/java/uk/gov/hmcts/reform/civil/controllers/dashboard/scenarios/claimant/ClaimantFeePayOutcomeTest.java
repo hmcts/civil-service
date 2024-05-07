@@ -40,7 +40,10 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[1].titleEn").value("The claim fee has been paid"),
                 jsonPath("$[1].descriptionEn").value(
-                    "<p class=\"govuk-body\">The claim fee has been paid in full.</p>")
+                    "<p class=\"govuk-body\">The claim fee has been paid in full.</p>"),
+                jsonPath("$[1].titleCy").value("Mae ffi’r hawliad wedi cael ei thalu"),
+                jsonPath("$[1].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae ffi’r hawliad wedi cael ei thalu’n llawn.</p>")
             );
     }
 }
