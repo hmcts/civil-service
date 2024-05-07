@@ -153,8 +153,8 @@ public class DefaultJudgmentCoverLetterGenerator {
                                                       "Cover Letter",
                                                       LocalDate.now().toString()));
 
-        Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getSystemGeneratedCaseDocuments().stream()
-            .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+        Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getDefaultJudgmentDocuments().stream()
+            .filter(defaultJudgmentDocument -> defaultJudgmentDocument.getValue()
                 .getDocumentType().equals(requiredDocumentType)).findAny();
 
         optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
