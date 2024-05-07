@@ -24,7 +24,7 @@ def versions = [
   pact               : '3.5.24',
   springSecurity     : '5.8.12',
   camunda            : '7.19.0',
-  jackson            : '2.17.0',
+  jackson            : '2.17.1',
   testcontainers     : '1.19.7'
 ]
 
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.714'
+        version: '1.12.715'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
