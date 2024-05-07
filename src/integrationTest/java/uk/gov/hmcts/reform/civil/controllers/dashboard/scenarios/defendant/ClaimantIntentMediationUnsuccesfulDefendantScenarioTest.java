@@ -43,6 +43,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .build();
+
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
