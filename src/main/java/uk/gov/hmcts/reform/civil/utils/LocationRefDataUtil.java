@@ -31,6 +31,14 @@ public class LocationRefDataUtil {
         if (caseData.getCourtLocation().getCaseLocation() == null) {
             return caseData.getCourtLocation().getApplicantPreferredCourt();
         } else {
+            log.info("CaseLocation {}  == BaseLocation {} for CaseId {}",
+                     caseData.getCourtLocation().getCaseLocation() != null
+                         ? caseData.getCourtLocation().getCaseLocation() : "Case Location Null",
+                     caseData.getCourtLocation().getCaseLocation().getBaseLocation() != null
+                         ? caseData.getCourtLocation().getCaseLocation().getBaseLocation() : "Base Location Null", caseData.getCcdCaseReference()
+                     );
+            log.info("Case management Location {} for caseId {}", caseData.getCaseManagementLocation().getBaseLocation(),
+                     caseData.getCcdCaseReference());
             List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                 authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
             if (!courtLocations.isEmpty()) {
