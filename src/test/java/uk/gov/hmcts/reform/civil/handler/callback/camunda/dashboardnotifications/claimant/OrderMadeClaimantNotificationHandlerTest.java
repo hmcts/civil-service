@@ -180,7 +180,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
             ).build();
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
@@ -214,7 +214,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
             ).build();
 
-            when(mapper.getMapWithDocumentInfo(any(), any())).thenReturn(scenarioParams);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
