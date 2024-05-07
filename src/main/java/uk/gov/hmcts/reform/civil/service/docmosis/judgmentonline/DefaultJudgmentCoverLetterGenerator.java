@@ -98,6 +98,8 @@ public class DefaultJudgmentCoverLetterGenerator {
             );
             log.info("DJ generator - bulkPrint service called");
             log.info("DJ generator - recipients", recipients);
+        } else {
+            log.info("DJ generator - stitch disabled");
         }
         return letterContent;
     }
