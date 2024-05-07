@@ -24,7 +24,7 @@ values ('<a>View mediation settlement agreement</a>',
 
        ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
+        '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{3, 3}', 'CLAIMANT', 7);
 
 
@@ -55,6 +55,6 @@ values ('<a>View mediation settlement agreement</a>',
 
        ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
+        '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{3, 3}', 'DEFENDANT', 7);
 
