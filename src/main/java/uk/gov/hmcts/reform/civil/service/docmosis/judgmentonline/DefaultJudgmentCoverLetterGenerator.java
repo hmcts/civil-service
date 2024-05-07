@@ -52,7 +52,6 @@ public class DefaultJudgmentCoverLetterGenerator {
     public byte[] generateAndPrintDjCoverLettersPlusDocument(CaseData caseData, String authorisation, boolean toSecondLegalOrg) {
         byte[] letterContent = new byte[0];
         if (stitchEnabled) {
-            log.info("DJ generator - stitch enabled");
             DocmosisDocument coverLetter = generateCoverLetter(caseData, toSecondLegalOrg);
             CaseDocument coverLetterCaseDocument = documentManagementService.uploadDocument(
                 authorisation,
@@ -62,13 +61,13 @@ public class DefaultJudgmentCoverLetterGenerator {
                     DocumentType.DEFAULT_JUDGMENT_COVER_LETTER
                 )
             );
-            log.info("DJ generator - document uploaded");
+
             List<DocumentMetaData> letterAndDocumentMetaDataList = fetchDocumentsFromCaseData(
                 caseData,
                 coverLetterCaseDocument,
                 toSecondLegalOrg ? DocumentType.DEFAULT_JUDGMENT_DEFENDANT2 : DocumentType.DEFAULT_JUDGMENT_DEFENDANT1
             );
-            log.info("DJ generator - document fetched");
+
             CaseDocument stitchedDocuments = civilDocumentStitchingService.bundle(
                 letterAndDocumentMetaDataList,
                 authorisation,
@@ -76,7 +75,7 @@ public class DefaultJudgmentCoverLetterGenerator {
                 coverLetterCaseDocument.getDocumentName(),
                 caseData
             );
-            log.info("DJ generator - document stitched");
+
             String documentUrl = stitchedDocuments.getDocumentLink().getDocumentUrl();
             String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
@@ -94,9 +93,8 @@ public class DefaultJudgmentCoverLetterGenerator {
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                          caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_COVER_LETTER, recipients
             );
-            log.info("DJ generator - bulkPrint service called");
         } else {
-            log.error("DJ Cover Letter generator - stitch disabled");
+            log.error("Failed generating Cover Letter for Default Judgment - stitch disabled");
         }
         return letterContent;
     }
@@ -161,11 +159,6 @@ public class DefaultJudgmentCoverLetterGenerator {
             "Default Judgment Defendant document",
             LocalDate.now().toString()
         )));
-        log.info("List-size {}}", documentMetaDataList.size());
-        log.info("2nd file link {}", optionalSealedDocument.<Object>map(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentLink())).orElse(null));
-        log.info("List-1st file name {}", documentMetaDataList.get(0).getDocument().getDocumentFileName());
-        log.info("List-2nd file name {}", documentMetaDataList.get(1).getDocument().getDocumentFileName());
         return documentMetaDataList;
     }
-
 }
