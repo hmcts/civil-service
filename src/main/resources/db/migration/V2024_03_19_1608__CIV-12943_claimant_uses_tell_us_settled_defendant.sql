@@ -38,7 +38,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
           "Notice.AAA6.CP.Trial Arrangements.Finalised",
           "Notice.AAA6.CP.Trial Arrangements.Required"
         }',
-        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy"]}');
+        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy","applicant1PartyName"]}');
 /**
  * Add notification template
  */
@@ -47,6 +47,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         'The claim is settled',
         'The claim is settled',
-        '<p class="govuk-body">The claimant has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
-        '<p class="govuk-body">The claimant has confirmed that you settled on ${applicant1ClaimSettledDateCy}.</p>',
+        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
+        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateCy}.</p>',
         'DEFENDANT');
