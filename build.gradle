@@ -93,11 +93,11 @@ allprojects {
       }
 
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.23'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.23'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.24'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
