@@ -69,12 +69,4 @@ public class JudgmentsOnlineHelper {
         return errors;
     }
 
-    public static boolean  isNonDivergentCase(CaseData caseData) {
-        return  MultiPartyScenario.isOneVOne(caseData)
-            || MultiPartyScenario.isTwoVOne(caseData)
-            || (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
-    }
 }
