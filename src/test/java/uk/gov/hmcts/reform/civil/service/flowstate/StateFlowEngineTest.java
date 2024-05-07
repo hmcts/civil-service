@@ -2134,24 +2134,13 @@ class StateFlowEngineTest {
         )
         void shouldReturnFullDefenceProceed_whenCaseDataAtStateApplicantRespondToDefence(FlowState.Main flowState) {
             // Given
-            CaseData caseData;
-            if (flowState.fullName().equals(TAKEN_OFFLINE_AFTER_SDO.fullName())) {
-                caseData = CaseDataBuilder.builder().atState(flowState)
-                    .takenOfflineDate(LocalDateTime.now())
-                    .takenOfflineByStaffDate(null)
-                    // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
-                    .hearingReferenceNumber("12345")
-                    .listingOrRelisting(ListingOrRelisting.LISTING)
-                    .build();
-            } else {
-                caseData = CaseDataBuilder.builder().atState(flowState)
-                    .takenOfflineDate(LocalDateTime.now())
-                    .takenOfflineByStaffDate(LocalDateTime.now())
-                    // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
-                    .hearingReferenceNumber("12345")
-                    .listingOrRelisting(ListingOrRelisting.LISTING)
-                    .build();
-            }
+            CaseData caseData = CaseDataBuilder.builder().atState(flowState)
+                .takenOfflineDate(LocalDateTime.now())
+                // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
+                .hearingReferenceNumber("12345")
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .build();
+
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

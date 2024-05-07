@@ -656,29 +656,16 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> caseDismissedAfterDetailNotified = FlowPredicate::getPredicateForCaseDismissedAfterDetailNotified;
-
-    private static boolean getPredicateForCaseDismissedAfterDetailNotified(CaseData caseData) {
-        return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
-                caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1AcknowledgeNotificationDate() == null
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1ClaimResponseIntentionType() == null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() == null
-                    && caseData.getRespondent2TimeExtensionDate() == null
-                    && caseData.getRespondent2ClaimResponseIntentionType() == null
-                    && caseData.getRespondent1ResponseDate() == null
-                    && caseData.getRespondent2ResponseDate() == null
-                    && caseData.getTakenOfflineByStaffDate() == null;
-            default -> caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                && caseData.getRespondent1AcknowledgeNotificationDate() == null
-                && caseData.getRespondent1TimeExtensionDate() == null
-                && caseData.getRespondent1ClaimResponseIntentionType() == null
-                && caseData.getRespondent1ResponseDate() == null
-                && caseData.getTakenOfflineByStaffDate() == null;
-        };
-    }
+    public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
+        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getRespondent1ClaimResponseIntentionType() == null
+            && caseData.getRespondent2AcknowledgeNotificationDate() == null
+            && caseData.getRespondent2TimeExtensionDate() == null
+            && caseData.getRespondent2ClaimResponseIntentionType() == null
+            && caseData.getRespondent1ResponseDate() == null
+            && caseData.getRespondent2ResponseDate() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotifiedExtension = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
@@ -1088,8 +1075,7 @@ public class FlowPredicate {
         && caseData.getListingOrRelisting() != null
         && caseData.getListingOrRelisting().equals(LISTING)
         && caseData.getCaseDismissedHearingFeeDueDate() == null
-        && caseData.getTakenOfflineDate() == null
-        && caseData.getTakenOfflineByStaffDate() == null;
+        && caseData.getTakenOfflineDate() == null;
 
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 
