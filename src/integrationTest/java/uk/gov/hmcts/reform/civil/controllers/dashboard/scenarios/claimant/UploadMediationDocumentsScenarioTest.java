@@ -30,7 +30,6 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
         String caseId = String.valueOf(System.currentTimeMillis());
         final List<TaskList> taskListExpected = MockTaskList.getUploadMediationTaskListMock("CLAIMANT", caseId);
 
-
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
@@ -40,7 +39,6 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
             .build();
 
         handler.handle(callbackParams(caseData));
-
 
         //Verify dashboard information
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
