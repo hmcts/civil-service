@@ -37,7 +37,8 @@ public class LocationRefDataUtil {
                      caseData.getCourtLocation().getCaseLocation().getBaseLocation() != null
                          ? caseData.getCourtLocation().getCaseLocation().getBaseLocation() : "Base Location Null", caseData.getCcdCaseReference()
                      );
-            log.info("Case management Location {} for caseId {}", caseData.getCaseManagementLocation().getBaseLocation(),
+            log.info("Case management Location {} for caseId {}", caseData.getCaseManagementLocation() != null
+                         ? caseData.getCaseManagementLocation().getBaseLocation()  : "Case management location not available",
                      caseData.getCcdCaseReference());
             List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                 authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
