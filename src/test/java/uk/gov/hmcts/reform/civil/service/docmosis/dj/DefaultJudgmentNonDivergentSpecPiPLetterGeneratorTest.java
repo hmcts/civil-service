@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,6 +83,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
+        .submittedDate(LocalDateTime.now())
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
