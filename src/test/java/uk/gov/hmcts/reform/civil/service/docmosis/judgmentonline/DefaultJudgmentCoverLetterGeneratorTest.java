@@ -210,7 +210,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
             .respondent2(Party.builder().partyName("Respondent2 name").type(Party.Type.INDIVIDUAL).build())
             .respondent1OrganisationPolicy(organisation1Policy)
             .respondent2OrganisationPolicy(organisation2Policy)
-            .systemGeneratedCaseDocuments(claimantResponseDocuments)
+            .defaultJudgmentDocuments(claimantResponseDocuments)
             .build();
 
         // when
