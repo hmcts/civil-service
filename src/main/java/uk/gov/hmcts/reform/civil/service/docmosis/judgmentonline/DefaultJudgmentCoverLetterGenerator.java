@@ -162,9 +162,9 @@ public class DefaultJudgmentCoverLetterGenerator {
             "Default Judgment Defendant document",
             LocalDate.now().toString()
         )));
-        log.info("List-size", documentMetaDataList.size());
-        log.info("2nd file link", optionalSealedDocument.get().getValue().getDocumentLink().toString());
-        log.info("List-2nd file name", documentMetaDataList.get(1).getDocument().getDocumentFileName());
+        log.info("List-size {}}", documentMetaDataList.size());
+        log.info("2nd file link {}", optionalSealedDocument.<Object>map(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentLink())).orElse(null));
+        log.info("List-2nd file name {}", documentMetaDataList.get(1).getDocument().getDocumentFileName());
         return documentMetaDataList;
     }
 
