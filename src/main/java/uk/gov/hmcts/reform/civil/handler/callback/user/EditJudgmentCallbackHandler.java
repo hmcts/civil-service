@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -79,10 +80,15 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
-        caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        if (caseData.getActiveJudgment() != null) {
+            caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        } else {
+            errors.add("There is no active judgment to edit");
+        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
@@ -91,6 +97,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 

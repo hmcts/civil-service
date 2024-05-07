@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -24,17 +23,16 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public abstract class JudgmentOnlineMapper {
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-        //TODO CHECK IF WE NEED THIS
         JudgmentDetails activeJudgment = isNull(caseData.getActiveJudgment()) ? JudgmentDetails.builder()
             .judgmentId(getNextJudgmentId(caseData)).build() : caseData.getActiveJudgment();
         return activeJudgment.toBuilder()
             .isJointJudgment(YesOrNo.YES)
             .lastUpdateTimeStamp(LocalDateTime.now())
-            .courtLocation(caseData.getCaseManagementLocation().getBaseLocation())//TODO: verify if this is right
+            .courtLocation(caseData.getCaseManagementLocation().getBaseLocation())
             .build();
     }
 
-    public void updateHistoricJudgment(CaseData caseData) {
+    public void moveToHistoricJudgment(CaseData caseData) {
         JudgmentDetails activeJudgment = addUpdateActiveJudgment(caseData);
         if (isHistoricJudgment(activeJudgment)) {
             List<Element<JudgmentDetails>> historicList = isNull(caseData.getHistoricJudgment())
@@ -53,9 +51,9 @@ public abstract class JudgmentOnlineMapper {
 
     protected abstract JudgmentState getJudgmentState(CaseData caseData);
 
-    public Integer getNextJudgmentId(CaseData caseData) {
-        return caseData.getActiveJudgment() != null ? caseData.getActiveJudgment().getJudgmentId()
-            : Optional.ofNullable(caseData.getHistoricJudgment()).orElse(Collections.emptyList()).size() + 1;
+    private Integer getNextJudgmentId(CaseData caseData) {
+        return caseData.getHistoricJudgment() != null ? caseData.getHistoricJudgment().size() + 1
+            : 1;
     }
 
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {

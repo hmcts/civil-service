@@ -12,15 +12,28 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class EditJudgmentsOnlineMapperTest {
 
     private EditJudgmentOnlineMapper judgmentOnlineMapper = new EditJudgmentOnlineMapper();
 
     @Test
+    void testIfActiveJudgmentIsnullIfnotSet() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNull(activeJudgment);
+    }
+
+    @Test
     void testIfActiveJudgmentIsUpdated() {
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+        caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
+
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
