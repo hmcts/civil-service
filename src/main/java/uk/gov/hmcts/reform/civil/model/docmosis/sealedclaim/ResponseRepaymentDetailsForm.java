@@ -157,7 +157,7 @@ public class ResponseRepaymentDetailsForm {
 
     private static void fullDefenceData(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
-        if (caseData.hasDefendantPayedTheAmountClaimed()) {
+        if (caseData.hasDefendantPaidTheAmountClaimed()) {
             alreadyPaid(caseData, builder);
         } else if (caseData.isClaimBeingDisputed()) {
             builder.whyReject("DISPUTE");

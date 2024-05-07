@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -321,9 +320,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
@@ -336,9 +335,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
@@ -351,25 +350,34 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
 
         Map<String, Object> resultClaimant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
         Map<String, Object> resultDefendant =
-            mapper.getMapWithDocumentInfo(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
     }
 
     @Test
-    void shouldThrowException_whenEventIsIncorrect() {
+    void shouldReturnNull_whenEventIsIncorrect() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
         caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
-        CaseEvent event = CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
 
-        assertThatThrownBy(() -> mapper.getMapWithDocumentInfo(caseData, event))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasNoCause()
-            .hasMessage("Invalid caseEvent in " + event);
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
+        assertThat(result).doesNotContainEntry("orderDocument", null);
+    }
+
+    @Test
+    void shouldReturnNull_whenEventIsNull() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+
+        Map<String, Object> result =
+            mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).doesNotContainEntry("orderDocument", null);
     }
 
     @Test
