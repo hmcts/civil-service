@@ -164,6 +164,7 @@ public class DefaultJudgmentCoverLetterGenerator {
         )));
         log.info("List-size {}}", documentMetaDataList.size());
         log.info("2nd file link {}", optionalSealedDocument.<Object>map(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentLink())).orElse(null));
+        log.info("List-1st file name {}", documentMetaDataList.get(0).getDocument().getDocumentFileName());
         log.info("List-2nd file name {}", documentMetaDataList.get(1).getDocument().getDocumentFileName());
         return documentMetaDataList;
     }
