@@ -13,9 +13,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.CP.HearingFee.Paid.Claimant',
         'The hearing fee has been paid',
-        'The hearing fee has been paid',
+        'Mae ffi’r gwrandawiad wedi’i thalu',
         '<p class="govuk-body">The hearing fee has been paid in full.</p>',
-        '<p class="govuk-body">The hearing fee has been paid in full.</p>',
+        '<p class="govuk-body">Mae ffi’r gwrandawiad wedi’i thalu’n llawn.</p>',
         'CLAIMANT');
 
 
