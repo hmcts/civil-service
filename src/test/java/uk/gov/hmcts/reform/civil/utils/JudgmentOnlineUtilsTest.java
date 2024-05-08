@@ -89,4 +89,18 @@ class JudgmentOnlineUtilsTest {
 
         assertThat(areRespondentLegalOrgsEqual(caseData)).isEqualTo(sameLegalOrgs);
     }
+
+    @Test
+    void testShouldHandleNullValues() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+            .addApplicant2(null)
+            .addRespondent2(null)
+            .respondent2OrganisationPolicy(null)
+            .build();
+
+        assertThat(applicant2Present(caseData)).isFalse();
+        assertThat(respondent2Present(caseData)).isFalse();
+        assertThat(areRespondentLegalOrgsEqual(caseData)).isFalse();
+    }
 }
