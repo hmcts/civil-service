@@ -30,10 +30,12 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
     private ClaimantIntentMediationUnsuccessfulHandler handler;
 
     @Test
-    void shouldCreateMediationUnsuccessfulWhenCarmIsOff() throws Exception {
+    void shouldCreateMediationUnsuccessful() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         String caseId = "323491";
+        Party respondent1 = new Party();
+        respondent1.toBuilder().partyName("John Doe").build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .ccdCaseReference(Long.valueOf(323491))
