@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -44,7 +43,6 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_ASIDE_JUDGMENT);
     protected final ObjectMapper objectMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
-    private final FeatureToggleService featureToggleService;
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -97,7 +95,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
         }
 
         String nextState;
-        if (featureToggleService.isJudgmentOnlineLive() && caseData.getJoSetAsideOrderType().equals(
+        if (caseData.getJoSetAsideOrderType().equals(
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
             nextState = CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
             caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
