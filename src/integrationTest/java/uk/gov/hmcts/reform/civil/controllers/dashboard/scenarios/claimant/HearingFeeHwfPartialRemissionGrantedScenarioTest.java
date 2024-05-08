@@ -57,8 +57,9 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
             jsonPath("$[0].titleCy").value(
                 "Mae eich cais am help i dalu ffioedd wedi cael ei adolygu"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Byddwch yn cael help gyda ffi'r gwrandawiad. Bydd £100 yn cael ei gyflenwi gan ddileu ffi. " +
-                    "Rhaid i chi dal dalu'r ffi sy'n weddill o £355 erbyn 4 Ebrill 2024. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>")
+                "<p class=\"govuk-body\">Byddwch yn cael help gyda ffi'r gwrandawiad. Bydd £100 yn cael ei gyflenwi gan ddileu ffi. "
+                    + "Rhaid i chi dal dalu'r ffi sy'n weddill o £355 erbyn 4 Ebrill 2024. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. "
+                    + "Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")

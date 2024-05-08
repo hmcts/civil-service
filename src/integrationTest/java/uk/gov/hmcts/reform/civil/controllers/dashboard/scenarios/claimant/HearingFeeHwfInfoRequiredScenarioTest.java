@@ -51,7 +51,10 @@ public class HearingFeeHwfInfoRequiredScenarioTest extends DashboardBaseIntegrat
             jsonPath("$[0].titleCy").value(
                 "Mae angen i chi nodi mwy o wybodaeth ar eich cais am help i dalu ffioedd"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi'r gwrandawiad.<br>Anfonwyd e-bost atoch gyda mwy o fanylion. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu, gallwch anwybyddu'r neges hon. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi'r "
+                    + "gwrandawiad.<br>Anfonwyd e-bost atoch gyda mwy o fanylion. Os ydych eisoes wedi darllen yr "
+                    + "e-bost ac wedi gweithredu, gallwch anwybyddu'r neges hon. Gallwch dalu dros y ffôn drwy "
+                    + "ffonio {civilMoneyClaimsTelephone}.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
