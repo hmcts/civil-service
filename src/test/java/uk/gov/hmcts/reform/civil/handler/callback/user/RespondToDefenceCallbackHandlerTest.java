@@ -1227,10 +1227,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getDupeClaimantDefendantResponseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDupeClaimantDefendantResponseDocs().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDupeClaimantDefendantResponseDocs().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getDupeClaimantDefendantResponseDocs().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
 
         }
 

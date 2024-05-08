@@ -384,7 +384,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                       updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
-        List<Element<CaseDocument>> dupeClaimantDefendantResponseDocs = caseData.getDupeClaimantDefendantResponseDocs();
+        List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = caseData.getDuplicateClaimantDefendantResponseDocs();
         if (!claimantUploads.isEmpty()) {
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
@@ -394,10 +394,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
                     claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
-                dupeClaimantDefendantResponseDocs.addAll(copy);
+                duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
             updatedCaseData.claimantResponseDocuments(claimantUploads);
-            updatedCaseData.dupeClaimantDefendantResponseDocs(copy);
+            updatedCaseData.duplicateClaimantDefendantResponseDocs(copy);
         }
     }
 
