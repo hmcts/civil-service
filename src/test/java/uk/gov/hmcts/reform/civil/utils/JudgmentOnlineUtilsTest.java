@@ -96,6 +96,7 @@ class JudgmentOnlineUtilsTest {
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
             .addApplicant2(null)
             .addRespondent2(null)
+            .respondent1OrganisationPolicy(null)
             .respondent2OrganisationPolicy(null)
             .build();
 
