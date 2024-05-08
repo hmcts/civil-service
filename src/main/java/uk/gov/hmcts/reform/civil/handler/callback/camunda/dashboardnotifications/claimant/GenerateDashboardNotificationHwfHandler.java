@@ -40,8 +40,8 @@ public class GenerateDashboardNotificationHwfHandler extends DashboardCallbackHa
     }
 
     @Override
-    public String getExtraScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT.getScenario();
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicantNotRepresented();
     }
 
     @Override
@@ -52,8 +52,8 @@ public class GenerateDashboardNotificationHwfHandler extends DashboardCallbackHa
     }
 
     @Override
-    public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented();
+    public String getExtraScenario(CaseData caseData) {
+        return SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT.getScenario();
     }
 
     @Override
