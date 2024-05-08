@@ -557,7 +557,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("methodOfHearing").extracting("value").extracting("label").asString().isEqualTo(
                     HearingMethod.IN_PERSON.getLabel());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
+                .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.PARTY.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("sdoR2TrialFirstOpenDateAfter").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
@@ -2574,7 +2574,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .collect(Collectors.toList());
             assertThat(hearingMethodValuesDRHActual).containsOnly(HearingMethod.IN_PERSON.getLabel());
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
-            assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO);
+            assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo()).isEqualTo(LocalDate.now().plusDays(70));
