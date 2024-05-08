@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.JudgmentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -71,6 +72,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoAmountCostOrdered(null);
             caseData.setJoIsRegisteredWithRTL(null);
             caseData.setJoIssuedDate(null);
+            caseData.setJudgmentType(JudgmentType.DEFAULT_JUDGMENT);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
