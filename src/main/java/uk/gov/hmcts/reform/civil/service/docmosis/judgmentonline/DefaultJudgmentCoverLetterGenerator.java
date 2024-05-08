@@ -154,9 +154,8 @@ public class DefaultJudgmentCoverLetterGenerator {
         Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getDefaultJudgmentDocuments().stream()
             .filter(defaultJudgmentDocument -> defaultJudgmentDocument.getValue()
                 .getDocumentType().equals(requiredDocumentType)).sorted(Comparator.comparing(
-                caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
-                Comparator.reverseOrder()
-            )).findFirst();
+                    caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+                    Comparator.reverseOrder())).findFirst();
 
         optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
             caseDocumentElement.getValue().getDocumentLink(),
