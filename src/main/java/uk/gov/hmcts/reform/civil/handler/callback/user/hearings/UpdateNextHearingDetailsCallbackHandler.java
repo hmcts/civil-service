@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
@@ -26,7 +25,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
@@ -72,42 +70,25 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
-        Long caseId = callbackParams.getRequest().getCaseDetails().getId();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        HearingsResponse hearingsResponse = getHearings(caseId);
+        Long caseId = callbackParams.getRequest().getCaseDetails().getId();
 
-        CaseHearing latestHearing = getLatestHearing(hearingsResponse);
-        log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
-                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
+        //Testing purposes ===================================
+        if (caseId  == Long.parseLong("1714058217963373")) {
 
-        if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
-            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating next hearing details",
-                     latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
-            LocalDateTime nextHearingDate = getNextHearingDate(latestHearing);
-            caseDataBuilder.nextHearingDetails(
-                    nextHearingDate != null
-                        ? NextHearingDetails.builder()
-                            .hearingID(latestHearing.getHearingId().toString())
-                            .hearingDateTime(nextHearingDate)
-                            .build() : null)
-                .build();
+            HearingsResponse hearingsResponse = getHearings(caseId);
+            log.info("(GL) Hearing response: " + hearingsResponse);
+            var data = caseDataBuilder.nextHearingDetails(null)
+                .build().toMap(objectMapper);
+            data.put("nextHearingDetails", null);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(data).build();
         }
+        //=====================================================
 
-        if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
-            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
-                     latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
-            caseDataBuilder.nextHearingDetails(null);
-        }
-
-        NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
-        log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating nextHearingDetails with"
-                     + " hearingId [{}] and hearingDateTime [{}]",
-                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus(),
-                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingID() : "Null",
-                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingDateTime() : "Null");
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(caseDataBuilder.nextHearingDetails(null)
+                      .build().toMap(objectMapper)).build();
     }
 
     private HearingsResponse getHearings(Long caseId) {
