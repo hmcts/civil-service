@@ -22,20 +22,16 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -80,12 +76,12 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16,0);
+            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
-            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022,  12,  12));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -98,7 +94,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDefenceReceivedDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16,0);
+            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -116,7 +112,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16,0);
+            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -134,7 +130,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateOrderType() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16,0);
+            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();

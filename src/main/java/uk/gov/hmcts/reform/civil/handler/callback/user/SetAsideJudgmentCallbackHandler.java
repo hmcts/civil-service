@@ -23,8 +23,11 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -96,7 +99,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
             nextState = CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
             caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
-                caseData.getJoSetAsideOrderDate().atTime(0,0)));
+                caseData.getJoSetAsideOrderDate().atTime(0, 0)));
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
