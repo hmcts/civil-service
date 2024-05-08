@@ -19,7 +19,7 @@ public class CamundaRuntimeClient {
     private final AuthTokenGenerator authTokenGenerator;
     private final CamundaRuntimeApi camundaRestEngineApi;
 
-    @SuppressWarnings("")
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getProcessVariables(String processInstanceId) {
         HashMap<String, VariableValueDto> variablesResponse = camundaRestEngineApi.getProcessVariables(processInstanceId, authTokenGenerator.generate());
         HashMap parsedResponse = new HashMap<String, Object>();
