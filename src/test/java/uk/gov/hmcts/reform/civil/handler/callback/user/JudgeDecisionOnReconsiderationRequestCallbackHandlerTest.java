@@ -178,7 +178,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheld() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().decisionOnReconsiderationDocument(document)
+                .build().toBuilder().systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
