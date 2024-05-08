@@ -15,8 +15,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
-        JacksonAutoConfiguration.class,
-        CamundaRuntimeClient.class
+    JacksonAutoConfiguration.class,
+    CamundaRuntimeClient.class
 })
 class CamundaRuntimeClientTest {
 
