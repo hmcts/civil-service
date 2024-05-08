@@ -1309,7 +1309,7 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(10800L))
+                        .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(11900L))
                                 .version("1").build())
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)

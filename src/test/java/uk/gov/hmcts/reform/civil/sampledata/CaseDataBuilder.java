@@ -5563,7 +5563,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5599,7 +5599,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build()).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
@@ -5617,7 +5617,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5627,7 +5627,7 @@ public class CaseDataBuilder {
                                       .fee(
                                           Fee.builder()
                                               .code("FE203")
-                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .calculatedAmountInPence(BigDecimal.valueOf(30300))
                                               .version("1")
                                               .build())
                                       .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5641,7 +5641,7 @@ public class CaseDataBuilder {
                                       .fee(
                                           Fee.builder()
                                               .code("FE203")
-                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .calculatedAmountInPence(BigDecimal.valueOf(30300))
                                               .version("1")
                                               .build())
                                       .paymentDetails(PaymentDetails.builder()
@@ -5658,7 +5658,7 @@ public class CaseDataBuilder {
                                       .fee(
                                           Fee.builder()
                                               .code("FE203")
-                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .calculatedAmountInPence(BigDecimal.valueOf(30300))
                                               .version("1")
                                               .build())
                                       .paymentDetails(PaymentDetails.builder()
@@ -5672,7 +5672,7 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .claimValue(ClaimValue.builder()
-                            .statementOfValueInPennies(BigDecimal.valueOf(10800))
+                            .statementOfValueInPennies(BigDecimal.valueOf(11900))
                             .build())
             .allocatedTrack(SMALL_CLAIM)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
@@ -5692,7 +5692,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5713,7 +5713,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5745,7 +5745,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5755,7 +5755,7 @@ public class CaseDataBuilder {
                                       .fee(
                                           Fee.builder()
                                               .code("FE203")
-                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .calculatedAmountInPence(BigDecimal.valueOf(30300))
                                               .version("1")
                                               .build())
                                       .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5772,7 +5772,7 @@ public class CaseDataBuilder {
             .claimFee(
                 Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
@@ -5803,7 +5803,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
@@ -5834,7 +5834,7 @@ public class CaseDataBuilder {
                     .fee(
                         Fee.builder()
                             .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .calculatedAmountInPence(BigDecimal.valueOf(30300))
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())

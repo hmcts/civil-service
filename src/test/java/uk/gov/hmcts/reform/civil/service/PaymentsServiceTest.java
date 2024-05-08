@@ -144,7 +144,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseData.builder()
             .claimIssuedPBADetails(SRPbaDetails.builder()
                                       .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .calculatedAmountInPence(BigDecimal.valueOf(11900))
                                                .version("1")
                                                .build())
                                       .build())

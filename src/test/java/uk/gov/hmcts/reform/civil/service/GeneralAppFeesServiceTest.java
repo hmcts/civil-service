@@ -44,31 +44,31 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
 class GeneralAppFeesServiceTest {
 
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_108 = new BigDecimal("108.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_108 = new BigDecimal("10800");
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_275 = new BigDecimal("275.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_275 = new BigDecimal("27500");
+    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_119 = new BigDecimal("119.00");
+    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_119 = new BigDecimal("11900");
+    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_303 = new BigDecimal("303.00");
+    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_303 = new BigDecimal("30300");
 
-    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_14 = new BigDecimal("14.00");
-    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_14 = new BigDecimal("1400");
+    private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_15 = new BigDecimal("15.00");
+    private static final BigDecimal TEST_FEE_AMOUNT_PENCE_15 = new BigDecimal("1500");
     private static final String AppnToVaryOrSuspend = "dummy_urlgeneral%20application?channel=default&event=miscellaneous&jurisdiction1=civil"
             + "&jurisdiction2=civil&service=other&keyword=AppnToVaryOrSuspend";
     private static final String WithoutNotice = "dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
             + "jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice";
     private static final String GAOnNotice = "dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
             + "jurisdiction2=civil&service=general&keyword=GAOnNotice";
-    private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS_108).code("test_fee_code").version(1).build();
-    private static final Fee FEE_PENCE_108 = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_108).code("test_fee_code").version("1").build();
-    private static final FeeLookupResponseDto FEE_POUNDS_275 = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS_275).code("test_fee_code").version(1).build();
-    private static final Fee FEE_PENCE_275 = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_275).code("test_fee_code").version("1").build();
-    private static final FeeLookupResponseDto FEE_POUNDS_14 = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS_14).code("test_fee_code").version(2).build();
-    private static final Fee FEE_PENCE_14 = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14).code("test_fee_code").version("2").build();
+    private static final FeeLookupResponseDto FEE_POUNDS_119 = FeeLookupResponseDto.builder()
+            .feeAmount(TEST_FEE_AMOUNT_POUNDS_119).code("test_fee_code").version(1).build();
+    private static final Fee FEE_PENCE_119 = Fee.builder()
+            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_119).code("test_fee_code").version("1").build();
+    private static final FeeLookupResponseDto FEE_POUNDS_303 = FeeLookupResponseDto.builder()
+            .feeAmount(TEST_FEE_AMOUNT_POUNDS_303).code("test_fee_code").version(1).build();
+    private static final Fee FEE_PENCE_303 = Fee.builder()
+            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_303).code("test_fee_code").version("1").build();
+    private static final FeeLookupResponseDto FEE_POUNDS_15 = FeeLookupResponseDto.builder()
+            .feeAmount(TEST_FEE_AMOUNT_POUNDS_15).code("test_fee_code").version(2).build();
+    private static final Fee FEE_PENCE_15 = Fee.builder()
+            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_15).code("test_fee_code").version("2").build();
     private static final FeeLookupResponseDto FEE_POUNDS_0 = FeeLookupResponseDto.builder()
             .feeAmount(BigDecimal.ZERO).code("test_fee_code").version(2).build();
     public static final String FREE_REF = "FREE";
@@ -104,11 +104,11 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldReturnFeeData_whenConsentedApplicationIsBeingMadeForVaryAppln() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
-                .thenReturn(FEE_POUNDS_108);
+                .thenReturn(FEE_POUNDS_119);
 
         Fee feeDto = feesService.getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
 
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+        assertThat(feeDto).isEqualTo(FEE_PENCE_119);
         assertThat(queryCaptor.getValue().toString())
                 .hasToString(AppnToVaryOrSuspend);
     }
@@ -116,11 +116,11 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldReturnFeeData_whenConsentedApplicationIsBeingMade() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
-                .thenReturn(FEE_POUNDS_108);
+                .thenReturn(FEE_POUNDS_119);
 
         Fee feeDto = feesService.getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
 
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+        assertThat(feeDto).isEqualTo(FEE_PENCE_119);
         assertThat(queryCaptor.getValue().toString())
                 .hasToString(WithoutNotice);
     }
@@ -128,11 +128,11 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldReturnFeeData_whenUnonsentedWithoutNoticeApplicationIsBeingMade() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
-                .thenReturn(FEE_POUNDS_108);
+                .thenReturn(FEE_POUNDS_119);
 
         Fee feeDto = feesService.getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
 
-        assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+        assertThat(feeDto).isEqualTo(FEE_PENCE_119);
         assertThat(queryCaptor.getValue().toString())
                 .hasToString(WithoutNotice);
     }
@@ -140,11 +140,11 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldReturnFeeData_whenUnconsentedNotifiedApplicationIsBeingMade() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
-                .thenReturn(FEE_POUNDS_275);
+                .thenReturn(FEE_POUNDS_303);
 
         Fee feeDto = feesService.getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
 
-        assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+        assertThat(feeDto).isEqualTo(FEE_PENCE_303);
         verify(feesConfiguration, times(1)).getWithNoticeKeyword();
         verify(feesConfiguration, never()).getConsentedOrWithoutNoticeKeyword();
         assertThat(queryCaptor.getValue().toString())
@@ -241,18 +241,18 @@ class GeneralAppFeesServiceTest {
         void setUp() {
             try {
                 when(restTemplate.getForObject(new URI(WithoutNotice), FeeLookupResponseDto.class))
-                        .thenReturn(FEE_POUNDS_108);
+                        .thenReturn(FEE_POUNDS_119);
                 when(restTemplate.getForObject(new URI(GAOnNotice), FeeLookupResponseDto.class))
-                        .thenReturn(FEE_POUNDS_275);
+                        .thenReturn(FEE_POUNDS_303);
                 when(restTemplate.getForObject(new URI(AppnToVaryOrSuspend), FeeLookupResponseDto.class))
-                        .thenReturn(FEE_POUNDS_14);
+                        .thenReturn(FEE_POUNDS_15);
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         }
 
         @Test
-        void default_types_with_notice_should_pay_275() {
+        void default_types_with_notice_should_pay_303() {
             List<GeneralApplicationTypes> allTypes =
                     Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -264,17 +264,17 @@ class GeneralAppFeesServiceTest {
                 CaseData caseData = getFeeCase(
                         List.of(generalApplicationType), YesOrNo.NO, YesOrNo.YES, null);
                 Fee feeDto = feesService.getFeeForGA(caseData);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_303);
             }
             //mix
             CaseData caseData = getFeeCase(
                     allTypes, YesOrNo.NO, YesOrNo.YES, null);
             Fee feeDto = feesService.getFeeForGA(caseData);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_303);
         }
 
         @Test
-        void default_types_without_notice_should_pay_108() {
+        void default_types_without_notice_should_pay_119() {
             List<GeneralApplicationTypes> allTypes =
                     Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -286,13 +286,13 @@ class GeneralAppFeesServiceTest {
                 CaseData caseData = getFeeCase(
                         List.of(generalApplicationType), YesOrNo.NO, YesOrNo.NO, null);
                 Fee feeDto = feesService.getFeeForGA(caseData);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_119);
             }
             //mix
             CaseData caseData = getFeeCase(
                     allTypes, YesOrNo.NO, YesOrNo.NO, null);
             Fee feeDto = feesService.getFeeForGA(caseData);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_119);
         }
 
         @Test
@@ -301,12 +301,12 @@ class GeneralAppFeesServiceTest {
                     List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithNotice))
-                    .isEqualTo(FEE_PENCE_275);
+                    .isEqualTo(FEE_PENCE_303);
             CaseData caseDataWithin14DaysWithoutNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.NO, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithoutNotice))
-                    .isEqualTo(FEE_PENCE_108);
+                    .isEqualTo(FEE_PENCE_119);
             CaseData caseDataOutside14Days = getFeeCase(
                     List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.YES, YesOrNo.NO, LocalDate.now().plusDays(15));
@@ -315,42 +315,42 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void vary_types_should_be_14() {
+        void vary_types_should_be_15() {
             for (GeneralApplicationTypes type : GeneralAppFeesService.VARY_TYPES) {
                 CaseData caseDataWithNotice = getFeeCase(
                         List.of(type),
                         YesOrNo.YES, YesOrNo.YES, null);
                 Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_14);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_15);
                 CaseData caseDataWithoutNotice = getFeeCase(
                         List.of(type),
                         YesOrNo.NO, YesOrNo.NO, null);
                 feeDto = feesService.getFeeForGA(caseDataWithoutNotice);
-                assertThat(feeDto).isEqualTo(FEE_PENCE_14);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_15);
             }
         }
 
         @Test
-        void settle_should_be_108() {
+        void settle_should_be_119() {
             CaseData caseDataWithNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
                     YesOrNo.YES, YesOrNo.YES, null);
             Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_119);
         }
 
         @Test
-        void setAside_should_be_275() {
+        void setAside_should_be_303() {
             CaseData caseDataWithNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
                     YesOrNo.YES, YesOrNo.YES, null);
             Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_303);
             CaseData caseDataWithoutNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
                     YesOrNo.NO, YesOrNo.NO, null);
             feeDto = feesService.getFeeForGA(caseDataWithoutNotice);
-            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_303);
         }
 
         @Test
@@ -361,41 +361,41 @@ class GeneralAppFeesServiceTest {
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                    .isEqualTo(FEE_PENCE_108);
+                    .isEqualTo(FEE_PENCE_119);
         }
 
         @Test
-        void mix_default_set_aside_should_be_108() {
+        void mix_default_set_aside_should_be_119() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                    .isEqualTo(FEE_PENCE_108);
+                    .isEqualTo(FEE_PENCE_119);
         }
 
         @Test
-        void mix_default_vary_should_be_14() {
+        void mix_default_vary_should_be_15() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                    .isEqualTo(FEE_PENCE_14);
+                    .isEqualTo(FEE_PENCE_15);
             randomList.remove(randomList.size() - 1);
             randomList.add(GeneralApplicationTypes.VARY_ORDER);
             caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                    .isEqualTo(FEE_PENCE_14);
+                    .isEqualTo(FEE_PENCE_15);
             randomList.remove(randomList.size() - 1);
         }
 
         @Test
-        void mix_default_vary_set_aside_should_be_14() {
+        void mix_default_vary_set_aside_should_be_15() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.VARY_ORDER);
             randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
@@ -403,7 +403,7 @@ class GeneralAppFeesServiceTest {
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
-                    .isEqualTo(FEE_PENCE_14);
+                    .isEqualTo(FEE_PENCE_15);
         }
 
         private List<GeneralApplicationTypes> getRandomDefaultTypes() {

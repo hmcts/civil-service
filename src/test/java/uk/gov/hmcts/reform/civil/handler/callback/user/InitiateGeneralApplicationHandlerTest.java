@@ -121,9 +121,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
-    private final BigDecimal fee108 = new BigDecimal("10800");
-    private final BigDecimal fee14 = new BigDecimal("1400");
-    private final BigDecimal fee275 = new BigDecimal("27500");
+    private final BigDecimal fee119 = new BigDecimal("11900");
+    private final BigDecimal fee15 = new BigDecimal("1500");
+    private final BigDecimal fee303 = new BigDecimal("30300");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
 
@@ -682,7 +682,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
             given(feesService.getFeeForGA(any()))
-                    .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
+                    .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee119)
                             .version(FEE_VERSION).build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -698,7 +698,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee108)
+                            .calculatedAmountInPence(fee119)
                             .version(FEE_VERSION).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
@@ -714,7 +714,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee108)
+                            .calculatedAmountInPence(fee119)
                             .version(FEE_VERSION).build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -726,11 +726,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSet108Fees_whenApplicationIsConsented() {
+        void shouldSet119Fees_whenApplicationIsConsented() {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee108)
+                            .calculatedAmountInPence(fee119)
                             .version(FEE_VERSION).build());
 
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
@@ -741,15 +741,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("11900");
         }
 
         @Test
-        void shouldSet108Fees_whenApplicationIsUnConsentedWithoutNotice() {
+        void shouldSet119Fees_whenApplicationIsUnConsentedWithoutNotice() {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee108)
+                            .calculatedAmountInPence(fee119)
                             .version(FEE_VERSION).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, false);
@@ -759,15 +759,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("10800");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("11900");
         }
 
         @Test
-        void shouldSet275Fees_whenApplicationIsUnConsentedWithNotice() {
+        void shouldSet303Fees_whenApplicationIsUnConsentedWithNotice() {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee275)
+                            .calculatedAmountInPence(fee303)
                             .version(FEE_VERSION).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), false, true);
@@ -777,15 +777,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("30300");
         }
 
         @Test
-        void shouldSet275Fees_whenVaryApplicationIsUnConsented() {
+        void shouldSet303Fees_whenVaryApplicationIsUnConsented() {
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
-                            .calculatedAmountInPence(fee275)
+                            .calculatedAmountInPence(fee303)
                             .version(FEE_VERSION).build());
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
@@ -800,15 +800,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("30300");
         }
 
         @Test
-        void shouldSet14Fees_whenApplicationIsVaryOrder() {
+        void shouldSet15Fees_whenApplicationIsVaryOrder() {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
-                                .calculatedAmountInPence(fee14)
+                                .calculatedAmountInPence(fee15)
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
@@ -822,15 +822,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1500");
         }
 
         @Test
-        void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
+        void shouldSet15Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
-                                .calculatedAmountInPence(fee14).build());
+                                .calculatedAmountInPence(fee15).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -844,7 +844,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             assertThat(getPBADetails(response).getFee()).isNotNull();
-            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1500");
         }
 
         private GAPbaDetails getPBADetails(AboutToStartOrSubmitCallbackResponse response) {
@@ -856,7 +856,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmit extends LocationRefSampleDataBuilder {
 
-        private final Fee feeFromFeeService = Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
+        private final Fee feeFromFeeService = Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee119)
                 .version(FEE_VERSION).build();
 
         @Test

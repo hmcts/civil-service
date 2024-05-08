@@ -281,7 +281,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(11900)).build());
             when(camundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
                                 .hearingType("AAA7-TRI")
@@ -302,7 +302,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
             SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(11900)).build())
                 .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
                 .build();
 
@@ -327,7 +327,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
             SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(11900)).build())
                 .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
                 .build();
 
