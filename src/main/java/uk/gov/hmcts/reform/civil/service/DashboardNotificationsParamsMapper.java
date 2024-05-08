@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -170,7 +172,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate().minusWeeks(3);
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
-            params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
+            params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
         }
         if (nonNull(caseData.getHearingFee())) {
             params.put(
@@ -191,6 +193,17 @@ public class DashboardNotificationsParamsMapper {
                 "hearingFeeOutStandingAmount",
                 "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
             );
+        }
+
+        return params;
+    }
+
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+
+        Map<String, Object> params = mapCaseDataToParams(caseData);
+        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
+        if (nonNull(orderDocumentUrl)) {
+            params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
 
         return params;
@@ -291,30 +304,29 @@ public class DashboardNotificationsParamsMapper {
             .map(amount -> "£" + amount);
     }
 
-    public Map<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
-        HashMap<String, Object> params = new HashMap<>();
+    private String addToMapDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
 
-        switch (caseEvent) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
-                caseData.getSDODocument().ifPresent(sdoDocument -> {
-                    params.put(
-                        ORDER_DOCUMENT,
-                        sdoDocument.getValue().getDocumentLink().getDocumentBinaryUrl()
-                    );
-                });
-                return params;
-            default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
+        if (nonNull(caseEvent)) {
+            switch (caseEvent) {
+                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
+                    return caseData.getFinalOrderDocumentCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT -> {
+                    return caseData.getOrderSDODocumentDJCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
+                    Optional<Element<CaseDocument>> sdoDocument = caseData.getSDODocument();
+                    if (sdoDocument.isPresent()) {
+                        return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
         }
+        return null;
     }
 }
