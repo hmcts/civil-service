@@ -195,6 +195,51 @@ public class MockTaskList {
                 .build());
     }
 
+    public static List<TaskList> getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy(
+                    "<a>View mediation settlement agreement</a>")
+                .taskNameEn(
+                    "<a>View mediation settlement agreement</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(5)
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a>Upload mediation documents</a>")
+                .taskNameEn("<a>Upload mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.INACTIVE.getName())
+                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .nextStatusEn(TaskStatus.INACTIVE.getName())
+                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
+                .taskOrder(6)
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameEn("<a>View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
+                .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
+                .nextStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
+                .nextStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
+                .taskOrder(7)
+                .build());
+    }
+
     public static List<TaskList> getMediationTaskListWithInactive(String role, String reference) {
         return List.of(
             TaskList.builder()

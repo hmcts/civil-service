@@ -20,12 +20,12 @@ values ('<a>View mediation settlement agreement</a>',
        ('<a>Upload mediation documents</a>',
         'Mediation',
         '<a>Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{1, 1}', 'CLAIMANT', 6),
+        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6),
 
        ('<a>View mediation documents</a>',
         'Mediation',
         '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 7);
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{1, 1}', 'CLAIMANT', 7);
 
 
 /**
@@ -50,9 +50,9 @@ values ('<a>View mediation settlement agreement</a>',
        ('<a>Upload mediation documents</a>',
         'Mediation',
         '<a>Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{1, 1}', 'DEFENDANT', 6),
+        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 6),
 
        ('<a>View mediation documents</a>',
         'Mediation',
         '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 7);
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{1, 1}', 'DEFENDANT', 7);
