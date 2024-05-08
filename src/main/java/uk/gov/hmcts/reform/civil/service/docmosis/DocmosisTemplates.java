@@ -45,6 +45,7 @@ public enum DocmosisTemplates {
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0001.docx", "set_aside_letter.pdf"),
+    RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0003.docx", "record_judgment_determination_of_means_letter.pdf"),
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01377.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01357.docx", "%s_directions_questionnaire_form_%s.pdf"),
