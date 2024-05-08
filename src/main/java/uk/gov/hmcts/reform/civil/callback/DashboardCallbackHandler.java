@@ -53,13 +53,15 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData);
+        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
+            caseData)).build();
+
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 scenario,
                 authToken,
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                    caseData)).build()
+                scenarioParams
             );
         }
 
@@ -69,8 +71,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
                 caseData.getCcdCaseReference().toString(),
                 scenario,
                 authToken,
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                    caseData)).build()
+                scenarioParams
             );
         }
 
@@ -79,5 +80,9 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected FeatureToggleService getFeatureToggleService() {
         return featureToggleService;
+    }
+
+    protected void recordScenario(CaseData caseData, String authtoken, String scenario) {
+
     }
 }
