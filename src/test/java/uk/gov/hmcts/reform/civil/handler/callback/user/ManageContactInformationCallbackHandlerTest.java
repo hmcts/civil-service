@@ -1750,6 +1750,188 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertEquals(1, response.getErrors().size());
                 assertEquals("Please enter Postcode", response.getErrors().get(0));
             }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldReturnLitigationFriendWarning_sameDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .respondent2SameLegalRepresentative(YES)
+                    .build();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEqualTo(List.of(
+                    "There is another litigation friend on this case. If the parties are using the same litigation "
+                        + "friend you must update the other litigation friend's details too."));
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldNotReturnLitigationFriendWarning_diffDefendantLegalRep_twoDefendantLitigationFriends(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .respondent2SameLegalRepresentative(null)
+                    .build();;
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEmpty();
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldReturnLitigationFriendWarning_twoClaimantLitigationFriend(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addApplicant2LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEqualTo(List.of(
+                    "There is another litigation friend on this case. If the parties are using the same litigation "
+                        + "friend you must update the other litigation friend's details too."));
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldNotReturnLitigationFriendWarning_sameDefendantRep_oneDefendantLitigationFriend(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData().toBuilder()
+                    .respondent2SameLegalRepresentative(YES)
+                    .build();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEmpty();
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldNotReturnLitigationFriendWarning_diffDefendantRep_oneDefendantLitigationFriend(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEmpty();
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID})
+            void shouldNotReturnLitigationFriendWarning_oneClaimantLitigationFriend(String partyChosenId) {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+                CaseData caseData = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getWarnings()).isEmpty();
+            }
         }
 
         @Nested

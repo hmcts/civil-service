@@ -279,7 +279,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -395,7 +395,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.88'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.89'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.21'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
