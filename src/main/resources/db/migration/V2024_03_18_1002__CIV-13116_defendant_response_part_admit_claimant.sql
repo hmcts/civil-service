@@ -12,9 +12,9 @@ VALUES ('Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant',
-        'Response to the claim', 'Response to the claim',
+        'Response to the claim', 'Ymateb i’r hawliad',
         '<p class="govuk-body">${respondent1PartyName} has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}.<br>The payment must be received in your account by then, if not you can request a county court judgment.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">${respondent1PartyName} has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}.<br>The payment must be received in your account by then, if not you can request a county court judgment.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">Mae ${respondent1PartyName} wedi cynnig talu ${defendantAdmittedAmount} erbyn ${respondent1AdmittedAmountPaymentDeadlineCy}.<br>Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">Gweld ac ymateb</a></p>',
         'CLAIMANT');
 
 /**

@@ -68,6 +68,12 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                         DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
                         "The court will contact you when they respond.</p> " +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 i Claimant John erbyn " +
+                        DateUtils.formatDateInWelsh(whenWillPay) + ". Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p> " +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>"
                 )
             );
 

@@ -57,6 +57,13 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                         DateUtils.formatDate(responseDeadline) + ". " +
                         "We will contact you when the claimant responds to your offer.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
+                        DateUtils.formatDateInWelsh(responseDeadline) + ". " +
+                        "Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p>" +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>"
                 )
             );
 
@@ -102,6 +109,13 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                         DateUtils.formatDate(admitPaymentDeadline) + ". " +
                         "We will contact you when the claimant responds to your offer.</p>" +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ". " +
+                        "Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p>" +
+                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>"
                 )
             );
 

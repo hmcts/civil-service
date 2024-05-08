@@ -65,6 +65,16 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + " " + frequency.getDashboardLabel() + ". You have offered to do this starting from " + DateUtils.formatDate(firstPaymentDate)
                         + ".</p><p class=\"govuk-body\">We will contact you when the claimant responds to your offer.</p><a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £" + totalAmount
+                        + " mewn rhandaliadau o £"
+                        + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
+                        ".00", "")
+                        + " bob " + frequency.getDashboardLabel() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + " ymlaen.</p><p class=\"govuk-body\">Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p><a "
+                        + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>"
                 )
             );
 

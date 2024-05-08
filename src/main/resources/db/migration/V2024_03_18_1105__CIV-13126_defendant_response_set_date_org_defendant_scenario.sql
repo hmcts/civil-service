@@ -11,9 +11,9 @@ VALUES ('Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant', 'Response to the claim', 'Response to the claim',
+VALUES ('Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant', 'Response to the claim', 'Ymateb i’r hawliad',
         '<p class="govuk-body">You have offered to pay ${applicant1PartyName} ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. You need to send the claimant your financial details. The court will contact you when they respond.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
-        '<p class="govuk-body">You have offered to pay ${applicant1PartyName} ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}. You need to send the claimant your financial details. The court will contact you when they respond.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
+        '<p class="govuk-body">Rydych wedi cynnig talu ${defendantAdmittedAmount} i ${applicant1PartyName} erbyn ${respondent1AdmittedAmountPaymentDeadlineCy}. Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p> <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">Gweld eich ymateb</a>',
         'DEFENDANT');
 
 /**

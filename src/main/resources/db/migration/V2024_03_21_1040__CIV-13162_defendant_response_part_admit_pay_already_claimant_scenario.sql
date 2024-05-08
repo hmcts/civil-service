@@ -9,9 +9,9 @@ VALUES ('Scenario.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant', '{"Notice.AA
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant', 'Response to the claim', 'Response to the claim',
+VALUES ('Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant', 'Response to the claim', 'Ymateb i’r hawliad',
         '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateEn}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">The defendant has said they already paid ${admissionPaidAmount} on ${claimSettledDateCy}.</p><p class="govuk-body">You can confirm payment and settle, or proceed with the claim.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">Mae’r diffynnydd wedi dweud eu bod wedi talu ${admissionPaidAmount} yn barod ar ${claimSettledDateCy}.</p><p class="govuk-body">Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">Gweld ac ymateb</a></p>',
         'CLAIMANT');
 
 /**

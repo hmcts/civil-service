@@ -48,6 +48,11 @@ public class DefendantResponseFullDefenceNoMediationScenarioTest extends Dashboa
                     "<p class=\"govuk-body\">You have rejected the claim and refused mediation. The court"
                         + " will contact you when they respond.</p>"
                         + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi gwrthod yr hawliad ac wedi gwrthod cyfryngu. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>"
+                        + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>."
                 )
             );
 
