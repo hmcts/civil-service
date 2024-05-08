@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Optional.ofNullable;
 
 public class JudgmentsOnlineHelper {
 
