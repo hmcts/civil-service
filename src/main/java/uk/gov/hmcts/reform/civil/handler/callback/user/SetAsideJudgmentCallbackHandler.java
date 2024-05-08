@@ -80,7 +80,6 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
-        String nextState;
 
         CaseData caseData = callbackParams.getCaseData();
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
@@ -97,6 +96,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
         }
 
+        String nextState;
         if (featureToggleService.isJudgmentOnlineLive() && caseData.getJoSetAsideOrderType().equals(
             JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)) {
             nextState = CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
