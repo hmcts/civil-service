@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -123,8 +125,6 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
     @BeforeEach
     void setup() {
-        ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", true);
-
         given(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(
             DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG
                 .getDocumentTitle(), LETTER_CONTENT, DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)))
@@ -173,10 +173,26 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                                         .contactInformation(List.of(CONTACT_INFORMATION_ORG_2)).build()));
     }
 
+    @Test
+    void shouldReturnEmptyIfStitchingIsDisabled() {
+        // given
+        ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build();
+
+        // when
+        byte[] output = defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, BEARER_TOKEN, false);
+
+        // then
+        assertThat(output).isEqualTo(new byte[0]);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean toSecondDefendantLegalOrg) {
         // given
+        ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", true);
+
         OrganisationPolicy organisation1Policy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("1234").build()).build();
         OrganisationPolicy organisation2Policy = OrganisationPolicy.builder()

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -17,7 +18,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.areRespondentLegalOrgsEqual;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Present;
 
@@ -26,8 +28,9 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Pre
 public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        SEND_COVER_LETTER_DEFENDANT_LR);
-    public static final String TASK_ID = "SendCoverLetterToDefendantLR";
+        POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1, POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2);
+    public static final String TASK_ID_DEFENDANT_1 = "PostDjLetterDefendant1";
+    public static final String TASK_ID_DEFENDANT_2 = "PostDjLetterDefendant2";
     private final DefaultJudgmentCoverLetterGenerator defaultJudgmentCoverLetterGenerator;
 
     @Override
@@ -40,7 +43,14 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1.equals(caseEvent)) {
+            return TASK_ID_DEFENDANT_1;
+        } else if (POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2.equals(caseEvent)) {
+            return TASK_ID_DEFENDANT_2;
+        } else {
+            throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
     }
 
     @Override
@@ -58,9 +68,15 @@ public class DefaultJudgmentDefendantLrCoverLetterHandler extends CallbackHandle
 
     private void generateCoverLetterDefendantLrLegalOrganisations(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
-        if (respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData)) {
-            defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
+        String taskId = camundaActivityId(callbackParams);
+        if (taskId.equals(TASK_ID_DEFENDANT_1)) {
+            defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(
+                caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false);
+        } else {
+            if (respondent2Present(caseData) && !areRespondentLegalOrgsEqual(caseData)) {
+                defaultJudgmentCoverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(
+                    caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true);
+            }
         }
     }
 }

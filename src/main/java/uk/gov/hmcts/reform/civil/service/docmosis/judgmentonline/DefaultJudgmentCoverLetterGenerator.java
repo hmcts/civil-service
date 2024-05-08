@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,7 +153,10 @@ public class DefaultJudgmentCoverLetterGenerator {
 
         Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getDefaultJudgmentDocuments().stream()
             .filter(defaultJudgmentDocument -> defaultJudgmentDocument.getValue()
-                .getDocumentType().equals(requiredDocumentType)).findAny();
+                .getDocumentType().equals(requiredDocumentType)).sorted(Comparator.comparing(
+                caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+                Comparator.reverseOrder()
+            )).findFirst();
 
         optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
             caseDocumentElement.getValue().getDocumentLink(),

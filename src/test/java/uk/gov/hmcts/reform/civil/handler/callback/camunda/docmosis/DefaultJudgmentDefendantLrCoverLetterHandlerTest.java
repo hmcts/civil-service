@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,7 +31,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_COVER_LETTER_DEFENDANT_LR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.DefaultJudgmentDefendantLrCoverLetterHandler.TASK_ID_DEFENDANT_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.DefaultJudgmentDefendantLrCoverLetterHandler.TASK_ID_DEFENDANT_2;
 
 @SpringBootTest(classes = {
     DefaultJudgmentDefendantLrCoverLetterHandler.class,
@@ -48,19 +53,53 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(SEND_COVER_LETTER_DEFENDANT_LR);
+        assertThat(handler.handledEvents()).contains(POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1);
+        assertThat(handler.handledEvents()).contains(POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = CaseEvent.class,
+        names = {"POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1", "POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2"})
+    void shouldReturnCorrectCamundaActivityId_whenInvoked(CaseEvent caseEvent) {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                caseEvent.name()).build()).build())).isEqualTo(
+                    caseEvent.name()
+                        .equals("POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1") ? TASK_ID_DEFENDANT_1 : TASK_ID_DEFENDANT_2);
     }
 
     @Test
-    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                SEND_COVER_LETTER_DEFENDANT_LR.name()).build())
-                                                 .build())).isEqualTo(TASK_ID);
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendant1() {
+        // given
+        OrganisationPolicy organisation1Policy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("1234").build()).build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+            .respondent2(Party.builder().partyName("Respondent2 name").type(Party.Type.INDIVIDUAL).build())
+            .addRespondent2(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .respondent1OrganisationPolicy(organisation1Policy)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT1.name());
+
+        when(coverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(eq(caseData), any(), eq(false)))
+            .thenReturn(new byte[]{50});
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(coverLetterGenerator, times(1)).generateAndPrintDjCoverLettersPlusDocument(
+            caseData, params.getParams().get(BEARER_TOKEN).toString(), false);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean sameLegalOrgs) {
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendant2(boolean sameLegalOrgs) {
         // given
         OrganisationPolicy organisation1Policy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("1234").build()).build();
@@ -78,10 +117,7 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
                 .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_COVER_LETTER_DEFENDANT_LR.name());
-
-        when(coverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(eq(caseData), any(), eq(false)))
-            .thenReturn(new byte[]{50});
+        params.getRequest().setEventId(POST_DJ_NON_DIVERGENT_LETTER_DEFENDANT2.name());
 
         when(coverLetterGenerator.generateAndPrintDjCoverLettersPlusDocument(eq(caseData), any(), eq(true)))
             .thenReturn(new byte[]{20});
@@ -91,9 +127,6 @@ public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallba
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(coverLetterGenerator, times(1)).generateAndPrintDjCoverLettersPlusDocument(
-            caseData, params.getParams().get(BEARER_TOKEN).toString(), false);
-
         verify(coverLetterGenerator, times(sameLegalOrgs ? 0 : 1)).generateAndPrintDjCoverLettersPlusDocument(
             caseData, params.getParams().get(BEARER_TOKEN).toString(), true);
     }
