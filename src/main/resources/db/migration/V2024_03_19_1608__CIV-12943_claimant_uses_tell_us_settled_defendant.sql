@@ -46,7 +46,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         'The claim is settled',
-        'The claim is settled',
+        'Mae’r hawliad wedi’i setlo',
         '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
-        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateCy}.</p>',
+        '<p class="govuk-body">Mae ${applicant1PartyName} wedi cadarnhau eich bod wedi talu ar ${applicant1ClaimSettledDateCy}.</p>',
         'DEFENDANT');

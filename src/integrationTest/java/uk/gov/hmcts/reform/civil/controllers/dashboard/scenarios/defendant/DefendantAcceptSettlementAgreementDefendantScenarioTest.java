@@ -42,10 +42,15 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Das
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You have accepted the  "
+                        "<p class=\"govuk-body\">You have accepted the "
                             + "<a href={VIEW_SETTLEMENT_AGREEMENT} target=\"_blank\" class=\"govuk-link\"> settlement"
                             + " agreement</a>. </p><p class=\"govuk-body\">The claimant cannot request a County Court "
-                            + "Judgment, unless you break the terms of the agreement.</p>")
+                            + "Judgment, unless you break the terms of the agreement.</p>"),
+                jsonPath("$[0].titleCy").value("Cytundeb setlo"),
+                jsonPath("$[0].descriptionCy")
+                    .value(
+                        "<p class=\"govuk-body\">Rydych wedi derbyn y <a href={VIEW_SETTLEMENT_AGREEMENT} target=\"_blank\" class=\"govuk-link\"> cytundeb setlo</a>. </p>" +
+                            "<p class=\"govuk-body\">Ni all yr hawlydd wneud cais am Ddyfarniad Llys Sirol (CCJ) oni bai eich bod yn torri telerau’r cytundeb.</p>")
             );
     }
 }

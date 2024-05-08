@@ -48,7 +48,15 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                         + defendantName
                         + " will no longer be able to respond to your claim online. Any further updates will be by post.</p>"
                         + "<p class=\"govuk-body\">If a postal response is received before the judgment is issued, your request will be rejected.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>")
+                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Cais am Ddyfarniad Llys Sirol (CCJ) wedi’i wneud"),
+                 jsonPath("$[0].descriptionCy").value(
+                "<p class=\"govuk-body\">Byddwn yn prosesu eich cais ac yn anfon copi o’r dyfarniad drwy’r post atoch chi a "
+                    + defendantName + ". Fe ymdrechwn at wneud hyn cyn gynted â phosibl.</p>"
+                    + "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru, ac ni fydd "
+                    + defendantName + " yn gallu ymateb i’ch hawliad ar-lein mwyach. Byddwch yn cael eich hysbysu drwy’r post am unrhyw ddiweddariadau pellach.</p>"
+                    + "<p class=\"govuk-body\">Os derbynnir ymateb drwy’r post cyn cyhoeddi’r dyfarniad, bydd eich cais yn cael ei wrthod.</p>"
+                    + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
             );
 
         //Verify task Item is created

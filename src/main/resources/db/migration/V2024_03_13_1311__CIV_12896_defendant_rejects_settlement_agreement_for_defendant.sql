@@ -11,7 +11,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Defe
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Defendant', 'Settlement agreement', 'Settlement agreement',
+VALUES ('Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Defendant', 'Settlement agreement', 'Cytundeb setlo',
         '<p class="govuk-body">${applicant1PartyName} can request a County Court Judgment (CCJ), which would order you to repay the money in line with the agreement. The court believes you can afford this.</p> <p class="govuk-body">If the claimant requests a CCJ then you can ask a judge to consider changing the plan, based on your financial details.</p>',
         '<p class="govuk-body">${applicant1PartyName} can request a County Court Judgment (CCJ), which would order you to repay the money in line with the agreement. The court believes you can afford this.</p> <p class="govuk-body">If the claimant requests a CCJ then you can ask a judge to consider changing the plan, based on your financial details.</p>',
         'DEFENDANT');
