@@ -45,7 +45,6 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT");
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
             .andExpect(status().isOk())
             .andExpectAll(
