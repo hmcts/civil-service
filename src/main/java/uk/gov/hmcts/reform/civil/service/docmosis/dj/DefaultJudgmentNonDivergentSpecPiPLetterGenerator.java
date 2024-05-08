@@ -80,8 +80,8 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
-            .caseSubmittedDate(caseData.getSubmittedDate().toLocalDate()) // TODO: Confirm with the team
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode()) // TODO: Confirm with the Omaira if this is still needed
+            .caseSubmittedDate(caseData.getSubmittedDate().toLocalDate())
+            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
             .build();
     }
