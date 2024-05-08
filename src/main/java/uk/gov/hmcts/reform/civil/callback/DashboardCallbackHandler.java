@@ -81,8 +81,4 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
     protected FeatureToggleService getFeatureToggleService() {
         return featureToggleService;
     }
-
-    protected void recordScenario(CaseData caseData, String authtoken, String scenario) {
-
-    }
 }
