@@ -59,6 +59,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT("Scenario.AAA6.ClaimantIntent.Mediation.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant"),
     SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT("Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithClaimant.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM("Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM("Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant"),
     SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT("Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant"),
     SCENARIO_AAA6_DEFRESPONSE_MORETIMEREQUESTED_DEFENDANT("Scenario.AAA6.DefResponse.MoreTimeRequested.Defendant"),
@@ -71,6 +73,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC("Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC("Scenario.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant"),
+    SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE("Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE("Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT(
         "Scenario.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM("Scenario.AAA6.ClaimantIntent.Mediation.CARM.Claimant"),
@@ -95,10 +99,14 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_FAST_TRACK_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Upload.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Upload.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant"),
+    SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT("Scenario.AAA6.CP.OrderMade.Claimant"),
+    SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT("Scenario.AAA6.CP.OrderMade.Defendant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant"),
     SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT(
@@ -113,13 +121,18 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF("Scenario.AAA6.CP.HearingFee.HWF.InvalidRef"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED("Scenario.AAA6.CP.HearingFee.HWF.InfoRequired"),
     SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED("Scenario.AAA6.CP.HearingFee.HWF.Updated"),
     SCENARIO_AAA6_HEARING_FEE_HWF_PART_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.PartRemission"),
     SCENARIO_AAA6_HEARING_FEE_HWF_NO_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.Rejected"),
-    SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission");
+    SCENARIO_AAA6_HEARING_FEE_HWF_FULL_REMISSION("Scenario.AAA6.CP.HearingFee.HWF.FullRemission"),
+    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant"),
+    SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT("Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant");
 
     private final String scenario;
 

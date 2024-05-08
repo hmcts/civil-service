@@ -39,7 +39,8 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("James")
+                    .individualLastName("John").type(Party.Type.INDIVIDUAL).build())
             .respondent1RepaymentPlan(RepaymentPlanLRspec
                                           .builder()
                                           .repaymentFrequency(frequency)
@@ -57,12 +58,12 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has offered to pay "
+                    "<p class=\"govuk-body\">James John has offered to pay you "
                         + "£" + totalAmount + " in "
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " " + frequency.getDashboardLabel() + " starting "
+                        + " " + frequency.getDashboardLabel() + ". They are offering to do this starting from "
                         + DateUtils.formatDate(firstPaymentDate)
                         + ".</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"

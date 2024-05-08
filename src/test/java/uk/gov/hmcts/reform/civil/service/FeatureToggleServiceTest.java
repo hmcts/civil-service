@@ -166,6 +166,24 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
+        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
+        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
+
+        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
+        givenToggle(mintiKey, toggleStat);
+
+        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
@@ -181,6 +199,22 @@ class FeatureToggleServiceTest {
         }
 
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
+        var caseFileKey = "multi-or-intermediate-track";
+        givenToggle(mintiKey, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build();
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {
