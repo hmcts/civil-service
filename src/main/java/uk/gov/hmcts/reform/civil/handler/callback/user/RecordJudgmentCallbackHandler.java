@@ -35,7 +35,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper();
+    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper = new RecordJudgmentOnlineMapper();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -96,7 +96,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
-        caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+        caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));

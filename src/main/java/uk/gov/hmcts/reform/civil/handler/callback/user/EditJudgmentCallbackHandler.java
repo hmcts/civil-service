@@ -36,7 +36,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EDIT_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final EditJudgmentOnlineMapper judgmentOnlineMapper = new EditJudgmentOnlineMapper();
+    private final EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -85,7 +85,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         if (caseData.getActiveJudgment() != null) {
-            caseData.setActiveJudgment(judgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+            caseData.setActiveJudgment(editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         } else {
             errors.add("There is no active judgment to edit");
         }

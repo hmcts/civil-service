@@ -20,8 +20,6 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
-        //TODO Will there be a case where we will edit existing judgments after going live ?
-        // in that case Ill have to chec activeJudgment exists or not
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         return activeJudgment.toBuilder()
             .state(getJudgmentState(caseData))
@@ -32,7 +30,6 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
-        //TODO assuming set aside defence received mean JUDGE order
         return JudgmentSetAsideReason.JUDGE_ORDER
             .equals(caseData.getJoSetAsideReason()) ? JudgmentState.SET_ASIDE : JudgmentState.SET_ASIDE_ERROR;
     }
