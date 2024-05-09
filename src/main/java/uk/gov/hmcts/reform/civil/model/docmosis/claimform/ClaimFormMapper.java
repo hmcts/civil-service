@@ -71,8 +71,7 @@ public class ClaimFormMapper {
             .totalClaimAmount(totalClaimAmount)
             .interestAmount(interest != null ? interest.toString() : null)
             .claimAmount(caseData.getClaimAmountBreakupDetails())
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence())
-                          .toString())
+            .claimFee(getClaimFee(caseData).toString())
             .totalAmountOfClaim(calculateTotalAmountOfClaim(caseData, interest))
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .claimant(claimant)
@@ -136,12 +135,21 @@ public class ClaimFormMapper {
 
     private String calculateTotalAmountOfClaim(CaseData caseData, BigDecimal interest) {
         if (interest != null) {
-            return Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
+            return (Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
                 .add(interest)
-                .add(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence())).toString();
+                .add(getClaimFee(caseData))).setScale(2).toString();
         }
-        return Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
-            .add(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence())).toString();
+        return (Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
+            .add(getClaimFee(caseData))).setScale(2).toString();
+    }
+
+    private BigDecimal getClaimFee(CaseData caseData) {
+        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
+        if (caseData.isHelpWithFees()
+            && caseData.getOutstandingFeeInPounds() != null) {
+            claimFee = caseData.getOutstandingFeeInPounds();
+        }
+        return claimFee;
     }
 
     @JsonIgnore
