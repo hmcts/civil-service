@@ -1,28 +1,54 @@
 package uk.gov.hmcts.reform.civil.enums.caseprogression;
 
 public enum EvidenceUploadFiles {
+    DISCLOSURE_LIST("Disclosure List"),
+    DOCUMENTS_FOR_DISCLOSURE("Document for disclosure"),
+    EXPERT_REPORT("Expert Report"),
+    JOINT_STATEMENT("Joint Statement"),
+    QUESTIONS_FOR_EXPERTS("Expert Questions"),
+    ANSWERS_FOR_EXPERTS("Expert Answers"),
+    CASE_SUMMARY("Case Summary"),
+    SKELETON_ARGUMENT("Skeleton Argument"),
+    AUTHORITIES("Authorities"),
+    COSTS("Costs"),
+    DOCUMENTARY("Documentary"),
+    WITNESS_STATEMENT("Witness Statement"),
+    WITNESS_SUMMARY("Witness Summary"),
+    NOTICE_OF_INTENTION("Notice of Intention"),
+    DOCUMENTS_REFERRED("Documents Referred");
 
-    DISCLOSURE_LIST("Disclosure List", "Disclosure list"),
-    DOCUMENTS_FOR_DISCLOSURE("Document for disclosure", "Disclosure list"),
-    EXPERT_REPORT("Expert Report", "Expert evidence"),
-    JOINT_STATEMENT("Joint Statement", "Expert evidence"),
-    QUESTIONS_FOR_EXPERTS("Expert Questions", "Expert evidence"),
-    ANSWERS_FOR_EXPERTS("Expert Answers", "Expert evidence"),
-    CASE_SUMMARY("Case Summary", "Trial documents"),
-    SKELETON_ARGUMENT("Skeleton Argument", "Trial documents"),
-    AUTHORITIES("Authorities", "Trial documents"),
-    COSTS("Costs", "Trial documents"),
-    DOCUMENTARY("Documentary", "Trial documents"),
-    WITNESS_STATEMENT("Witness Statement", "Witness evidence"),
-    WITNESS_SUMMARY("Witness Summary", "Witness evidence"),
-    NOTICE_OF_INTENTION("Notice of Intention", "Witness evidence"),
-    DOCUMENTS_REFERRED("Documents Referred", "Witness evidence");
+    private static final String WITNESS_EVIDENCE = "Witness evidence";
+    private static final String DISCLOSURE_LIST_TYPE = "Disclosure list";
+    private static final String TRIAL_DOCUMENTS = "Trial documents";
+    private static final String WITNESS_EVIDENCE_TYPE = "Witness evidence";
+
     String displayName;
     String documentTypeDisplayName;
 
-    EvidenceUploadFiles(String displayName, String documentTypeDisplayName) {
+    EvidenceUploadFiles(String displayName) {
         this.displayName = displayName;
-        this.documentTypeDisplayName = documentTypeDisplayName;
+        this.documentTypeDisplayName = determineDocumentType(displayName);
+    }
+
+    private String determineDocumentType(String displayName) {
+        switch (displayName) {
+            case "Disclosure List":
+            case "Document for disclosure":
+                return DISCLOSURE_LIST_TYPE;
+            case "Case Summary":
+            case "Skeleton Argument":
+            case "Authorities":
+            case "Costs":
+            case "Documentary":
+                return TRIAL_DOCUMENTS;
+            case "Witness Statement":
+            case "Witness Summary":
+            case "Notice of Intention":
+            case "Documents Referred":
+                return WITNESS_EVIDENCE_TYPE;
+            default:
+                throw new IllegalArgumentException("Unsupported display name: " + displayName);
+        }
     }
 
     public String getDisplayName() {
@@ -32,5 +58,4 @@ public enum EvidenceUploadFiles {
     public String getDocumentTypeDisplayName() {
         return documentTypeDisplayName;
     }
-
 }

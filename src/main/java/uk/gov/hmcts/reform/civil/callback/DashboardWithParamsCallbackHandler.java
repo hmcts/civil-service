@@ -31,6 +31,7 @@ public abstract class DashboardWithParamsCallbackHandler extends CallbackHandler
 
     protected abstract String getScenario(CaseData caseData, CallbackParams callbackParams);
 
+    @SuppressWarnings("java:S1172") // Ignore unused parameter warning
     protected boolean shouldRecordScenario(CaseData caseData) {
         return true;
     }

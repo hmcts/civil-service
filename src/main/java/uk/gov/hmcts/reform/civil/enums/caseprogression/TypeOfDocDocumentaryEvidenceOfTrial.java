@@ -21,13 +21,12 @@ public enum TypeOfDocDocumentaryEvidenceOfTrial {
 
     public static List<String> getAllDocsDisplayNames() {
         List<TypeOfDocDocumentaryEvidenceOfTrial> list =
-            new ArrayList<TypeOfDocDocumentaryEvidenceOfTrial>(Arrays.asList(values()));
+            new ArrayList<>(Arrays.asList(values()));
         List<List<String>> listOfDocTypes =
-            list.stream().map(typeOfDocDocumentaryEvidenceOfTrial -> typeOfDocDocumentaryEvidenceOfTrial.getDisplayNames()).collect(
-            Collectors.toList());
+            list.stream().map(TypeOfDocDocumentaryEvidenceOfTrial::getDisplayNames).toList();
         return listOfDocTypes.stream()
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     TypeOfDocDocumentaryEvidenceOfTrial(String... displayName) {

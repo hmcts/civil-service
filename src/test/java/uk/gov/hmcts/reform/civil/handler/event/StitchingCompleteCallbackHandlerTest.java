@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASYNC_STITCHING_COMPLETE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -39,7 +39,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(asyncStitchingComplete);
+        assertThat(handler.handledEvents()).contains(ASYNC_STITCHING_COMPLETE);
     }
 
     @Test

@@ -45,7 +45,7 @@ public class NoOngoingBusinessProcessAspect {
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
             || generalAppsOrSDOOrReferToJudge(callbackParams)
-            || caseEvent.equals(CaseEvent.migrateCase)
+            || caseEvent.equals(CaseEvent.MIGRATE_CASE)
         ) {
             return joinPoint.proceed();
         }

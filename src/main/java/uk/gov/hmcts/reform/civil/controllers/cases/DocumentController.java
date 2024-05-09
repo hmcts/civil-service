@@ -62,8 +62,7 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/downloadDocument/{documentId}")
-    public @ResponseBody
-    ResponseEntity<Resource> downloadDocumentById(
+    public ResponseEntity<Resource> downloadDocumentById(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @NotNull @PathVariable String documentId) {
         DownloadedDocumentResponse documentResponse = claimFormService.downloadDocumentById(authorisation, documentId);

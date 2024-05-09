@@ -20,14 +20,14 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASYNC_STITCHING_COMPLETE;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class StitchingCompleteCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(asyncStitchingComplete);
+    private static final List<CaseEvent> EVENTS = List.of(ASYNC_STITCHING_COMPLETE);
     private final ObjectMapper objectMapper;
 
     @Override

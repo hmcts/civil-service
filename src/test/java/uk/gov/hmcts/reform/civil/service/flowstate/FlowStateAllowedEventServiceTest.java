@@ -75,7 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOT_SUITABLE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
@@ -93,10 +93,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_INFO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASYNC_STITCHING_COMPLETE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MIGRATE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -202,7 +202,7 @@ class FlowStateAllowedEventServiceTest {
                     DRAFT,
                     new CaseEvent[]{
                         CREATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
 
@@ -212,8 +212,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
-                        migrateCase,
+                        NOT_SUITABLE_SDO,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -227,8 +227,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
-                        migrateCase,
+                        NOT_SUITABLE_SDO,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -240,8 +240,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
-                        migrateCase,
+                        NOT_SUITABLE_SDO,
+                        MIGRATE_CASE,
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         TRANSFER_ONLINE_CASE
@@ -265,12 +265,12 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         EVIDENCE_UPLOAD_JUDGE,
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         EVIDENCE_UPLOAD_APPLICANT,
-                        migrateCase,
+                        MIGRATE_CASE,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         TRANSFER_ONLINE_CASE,
                         INVALID_HWF_REFERENCE
@@ -292,12 +292,12 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD_APPLICANT,
-                        migrateCase,
+                        MIGRATE_CASE,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         TRANSFER_ONLINE_CASE
                     }
@@ -319,7 +319,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
@@ -333,13 +333,13 @@ class FlowStateAllowedEventServiceTest {
                         SERVICE_REQUEST_RECEIVED,
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD_APPLICANT,
-                        migrateCase,
+                        MIGRATE_CASE,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete,
+                        ASYNC_STITCHING_COMPLETE,
                         COURT_OFFICER_ORDER
                     }
                 ),
@@ -360,11 +360,11 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
@@ -391,10 +391,10 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
@@ -422,10 +422,10 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TAKE_CASE_OFFLINE,
                         TRANSFER_ONLINE_CASE,
                         GENERATE_DIRECTIONS_ORDER,
@@ -461,8 +461,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
-                        migrateCase,
+                        NOT_SUITABLE_SDO,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -484,8 +484,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
-                        migrateCase,
+                        NOT_SUITABLE_SDO,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -505,9 +505,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         CLAIMANT_RESPONSE_CUI,
                         TRANSFER_ONLINE_CASE
                     }
@@ -524,9 +524,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         CLAIMANT_RESPONSE_CUI,
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         TRANSFER_ONLINE_CASE
@@ -545,9 +545,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         TRANSFER_ONLINE_CASE
                     }
@@ -564,9 +564,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -574,7 +574,7 @@ class FlowStateAllowedEventServiceTest {
                     DIVERGENT_RESPOND_GO_OFFLINE,
                     new CaseEvent[]{
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
@@ -591,7 +591,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         HEARING_SCHEDULED,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
@@ -600,7 +600,7 @@ class FlowStateAllowedEventServiceTest {
                         MOVE_TO_DECISION_OUTCOME,
                         SERVICE_REQUEST_RECEIVED,
                         REFER_TO_JUDGE,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
@@ -615,7 +615,7 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete,
+                        ASYNC_STITCHING_COMPLETE,
                         CLAIMANT_RESPONSE_CUI,
                         REQUEST_FOR_RECONSIDERATION,
                         DECISION_ON_RECONSIDERATION_REQUEST,
@@ -635,9 +635,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         REFER_TO_JUDGE,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -648,10 +648,10 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         REFER_TO_JUDGE,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -661,11 +661,11 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         CREATE_SDO,
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -687,8 +687,8 @@ class FlowStateAllowedEventServiceTest {
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase,
-                        NotSuitable_SDO,
+                        MIGRATE_CASE,
+                        NOT_SUITABLE_SDO,
                         CREATE_SDO,
                         TRANSFER_ONLINE_CASE
                     }
@@ -700,9 +700,9 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         REFER_TO_JUDGE,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -713,9 +713,9 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         REFER_TO_JUDGE,
-                        migrateCase,
+                        MIGRATE_CASE,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -723,9 +723,9 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM,
-                        migrateCase,
+                        MIGRATE_CASE,
                         CREATE_SDO,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -733,49 +733,49 @@ class FlowStateAllowedEventServiceTest {
                     TAKEN_OFFLINE_BY_STAFF,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[]{
                         ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        MIGRATE_CASE
                     }
                 ),
                 of(
@@ -811,7 +811,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
-                        NotSuitable_SDO,
+                        NOT_SUITABLE_SDO,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_FEE_UNPAID,
@@ -822,13 +822,13 @@ class FlowStateAllowedEventServiceTest {
                         MOVE_TO_DECISION_OUTCOME,
                         SERVICE_REQUEST_RECEIVED,
                         EVIDENCE_UPLOAD_APPLICANT,
-                        migrateCase,
+                        MIGRATE_CASE,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
-                        asyncStitchingComplete,
+                        ASYNC_STITCHING_COMPLETE,
                         TRANSFER_ONLINE_CASE,
                         INVALID_HWF_REFERENCE,
                         COURT_OFFICER_ORDER
@@ -1141,7 +1141,7 @@ class FlowStateAllowedEventServiceTest {
         CaseDetails caseDetails =
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MIGRATE_CASE))
             .isEqualTo(true);
     }
 
@@ -1164,11 +1164,11 @@ class FlowStateAllowedEventServiceTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingInfo() {
+    void shouldReturnTrue_whenCaseEventIsUPDATE_NEXT_HEARING_INFO() {
         CaseDetails caseDetails =
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_INFO))
             .isEqualTo(true);
     }
 

@@ -43,7 +43,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 
@@ -60,13 +60,13 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Nested
-        class UpdateNextHearingInfo {
+        class UPDATE_NEXT_HEARING_INFO {
             @Test
             void shouldSetNextHearingDetails() {
                 CaseData caseData = CaseDataBuilder.builder().build();
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UpdateNextHearingInfo,
+                    CaseEvent.UPDATE_NEXT_HEARING_INFO,
                     ABOUT_TO_START
                 );
 

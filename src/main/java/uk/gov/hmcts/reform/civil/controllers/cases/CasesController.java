@@ -230,11 +230,7 @@ public class CasesController {
             .userId(userId)
             .searchCriteria(Map.of("case.sdtRequestIdFromSdt", searchParam)).build();
         List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
-
-        if (caseDetails.size() < 1 && caseDetails.isEmpty()) {
-            return true;
-        }
-        return false;
+        return caseDetails.isEmpty();
     }
 
     @GetMapping(path = "/caseworker/validatePin")
@@ -242,8 +238,7 @@ public class CasesController {
     public List<String> validatePostCode(
         @RequestParam(name = "postCode") String postCode
     ) {
-        List<String> errors =  postcodeValidator.validate(postCode);
-        return errors;
+        return postcodeValidator.validate(postCode);
     }
 
     @GetMapping(path = "/{caseId}/userCaseRoles")
