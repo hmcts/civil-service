@@ -49,8 +49,8 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p> <p class=\"govuk-body\">They said no to mediation.</p> " +
-                            "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p> <p class=\"govuk-body\">You can <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">view your" +
+                        "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.They said no to mediation." +
+                            "The case will be referred to a judge who will decide what should happen next.</p> <p class=\"govuk-body\">You can <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">view your" +
                             " response</a> or <a target=\"_blank\" href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\" class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionCy")
