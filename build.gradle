@@ -254,9 +254,9 @@ task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features
     return System.env.ENVIRONMENT == 'preview' && System.env.PR_FT_GROUPS != null
   }
   if (System.env.PR_FT_GROUPS != null){
-    for (String ftGroup : System.env.PR_FT_GROUPS.split(",")) {
-      logger.lifecycle('Run FT group' + ftGroup)
-//    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-group-' + ftGroup
+    for (String ftGroup : System.env.PR_FT_GROUPS.toLowerCase().split(",")) {
+      logger.lifecycle('Run FT group ' + ftGroup)
+      commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-' + ftGroup
     }
   }
 }
