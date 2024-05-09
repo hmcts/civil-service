@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationMediationUnsuccessfulClaimantLRHandler.TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
 
 @SpringBootTest(classes = {
     NotificationMediationUnsuccessfulClaimantLRHandler.class,
@@ -116,6 +117,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             given(notificationsProperties.getMediationUnsuccessfulLIPTemplate()).willReturn(CARM_LIP_MAIL_TEMPLATE);
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
             given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
         }
 
         @Test
@@ -170,6 +172,42 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_LIP_TEMPLATE);
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_LIP_MAP);
+        }
+
+        @Test
+        void shouldSendNotificationToClaimantLip_whenEventIsCalledClaimIssueInBilingual() {
+            //Given
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
+                                .partyEmail(CLAIMANT_EMAIL_ADDRESS)
+                                .build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
+            //When
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_LIP_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_LIP_MAP);
+        }
+
+        @Test
+        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+            assertThat(notificationHandler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build())).isEqualTo(TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR);
         }
 
         @Nested
