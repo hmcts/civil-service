@@ -54,8 +54,8 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae James John wedi gwrthod yr hawliad ac wedi gwrthod cyfryngu.<br>Mae angen i chi ymateb erbyn 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation. You need to respond by 21 March 2024.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae James John wedi gwrthod yr hawliad ac wedi gwrthod cyfryngu. Mae angen i chi ymateb erbyn 21 Mawrth 2024.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
     }
 }
