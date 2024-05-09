@@ -58,15 +58,15 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Company one has offered to pay you £1000 by "
-                      +  DateUtils.formatDate(responseDeadline) + ".</p><p class=\"govuk-body\">"
-                      +  "The defendant needs to send you their financial details.<br>"
-                      +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                      +  DateUtils.formatDate(responseDeadline)
+                      +  ". The defendant needs to send you their financial details."
+                      +  "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Company one wedi cynnig talu £1000 i chi erbyn "
-                     +   DateUtils.formatDateInWelsh(responseDeadline) + ".</p><p class=\"govuk-body\">"
-                     +   "Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.<br>"
-                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
+                     +   DateUtils.formatDateInWelsh(responseDeadline)
+                     +   ". Mae angen i’r diffynnydd anfon eu manylion ariannol atoch."
+                     +   "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 
         //Verify task Item is created

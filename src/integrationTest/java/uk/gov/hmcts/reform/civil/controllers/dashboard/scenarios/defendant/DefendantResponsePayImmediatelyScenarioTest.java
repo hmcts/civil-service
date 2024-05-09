@@ -62,13 +62,13 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(responseDeadline) + ". " +
                         "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>"
                 ),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
                         DateUtils.formatDateInWelsh(responseDeadline) + ". " +
                         "Rhaid i’r taliad fod yng nghyfrif John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>."
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>.</p>"
                 )
 
             );
@@ -114,11 +114,18 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ". " +
                         "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>."
+                ),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ". " +
+                        "Rhaid i’r taliad fod yng nghyfrif Claimant John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a>.</p>"
                 )
             );
 
