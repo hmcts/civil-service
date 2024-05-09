@@ -17,6 +17,7 @@ public enum AllocatedTrack {
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,
                                                              FeatureToggleService featureToggleService, CaseData caseData) {
+        log.info("NEW ALLOCATED TRACK LOGIC");
         Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && intermediateOrMultiTrackValue.equals(true)) {
             log.info("isMultiOrIntermediateTrackEnabled toggle is on, for case {}, claim value {}",

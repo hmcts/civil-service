@@ -118,9 +118,11 @@ public class FeatureToggleService {
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
+        log.info("ALLOCATED TRACK TOGGLE");
         if (caseData.getSubmittedDate() == null) {
             epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
         } else {
+            log.info("ALLOCATED TRACK TOGGLE NOT NULL");
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
         return featureToggleApi.isFeatureEnabled("minti")
