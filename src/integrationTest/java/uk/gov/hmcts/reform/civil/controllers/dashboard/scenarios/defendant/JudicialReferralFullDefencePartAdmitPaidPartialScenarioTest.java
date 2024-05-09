@@ -48,10 +48,10 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p>"
-                               + "<p class=\"govuk-body\">They rejected your admission of £3000 although they accept you have already paid it.</p>"
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim."
+                               + "They rejected your admission of £3000 although they accept you have already paid it."
                                +
-                               "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>"
+                               "The case will be referred to a judge who will decide what should happen next.</p>"
                                +
                                "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
                                + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\"  rel=\"noopener noreferrer\" "

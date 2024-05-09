@@ -48,10 +48,10 @@ public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTe
                 jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim.</p>"
-                            + "<p class=\"govuk-body\">They said you have not paid the £1000 you admit you owe.</p>"
+                        "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim."
+                            + "They said you have not paid the £1000 you admit you owe."
                             +
-                            "<p class=\"govuk-body\">The case will be referred to a judge who will decide what should happen next.</p>"
+                            "The case will be referred to a judge who will decide what should happen next.</p>"
                             +
                             "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
                             +

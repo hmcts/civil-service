@@ -13,8 +13,8 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant',
         'Wait for the court to review the case', 'Aros i’r llys adolygu’r achos',
-        '<p class="govuk-body">${applicant1PartyName} wants to proceed with the claim.</p>'
-          '<p class="govuk-body">The case will be referred to a judge who will decide what should happen next.</p>'
+        '<p class="govuk-body">${applicant1PartyName} wants to proceed with the claim.'
+          'The case will be referred to a judge who will decide what should happen next.</p>'
           '<p class="govuk-body">You can <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">view your response</a> or '
           '<a href="{VIEW_CLAIMANT_HEARING_REQS}" rel="noopener noreferrer" class="govuk-link" target="_blank">view the claimant''s hearing requirements</a>.</p>',
         '<p class="govuk-body">Mae ${applicant1PartyName} eisiau parhau â’r hawliad.</p>'
