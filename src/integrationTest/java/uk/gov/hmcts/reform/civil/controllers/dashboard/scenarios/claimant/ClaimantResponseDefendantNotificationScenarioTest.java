@@ -78,16 +78,16 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                 jsonPath("$[0].descriptionEn")
                     .value(
                         "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days.</p>" +
-                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab)</a>.<p/>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab)</a><p/>" +
                             "<p class=\"govuk-body\">They've also sent us their hearing requirements. " +
                             "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">You can view their hearing requirements here (opens in new tab)</a>.</p>"),
-                jsonPath("$[0].titleCy").value("Mae Mr. John Rambo wedi gwrthod eich ymateb"),
+                jsonPath("$[0].titleCy").value("Mr. John Rambo rejected your response"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Bydd eich achos yn cael ei gyfeirio at y gwasanaeth cyfryngu. Bydd eich apwyntiad cyfryngu yn cael ei drefnu o fewn 28 diwrnod.</p>" +
-                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Rhagor o wybodaeth am sut mae cyfryngu yn gweithio (yn agor mewn tab newydd)</a>.<p/>" +
-                            "<p class=\"govuk-body\">Maent hefyd wedi anfon atom eu gofynion ar gyfer y gwrandawiad. " +
-                            "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Gallwch weld eu gofynion ar gyfer y gwrandawiad yma (yn agor mewn tab newydd)</a>.</p>")
+                        "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days.</p>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab)</a><p/>" +
+                            "<p class=\"govuk-body\">They've also sent us their hearing requirements. " +
+                            "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">You can view their hearing requirements here (opens in new tab)</a>.</p>")
             );
     }
 }
