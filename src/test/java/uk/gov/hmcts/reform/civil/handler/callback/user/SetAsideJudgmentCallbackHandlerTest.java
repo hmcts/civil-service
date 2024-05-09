@@ -61,22 +61,22 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         LocalDateTime timeExtensionDate;
-        LocalDate extensionDateRespondent1;
+        LocalDate respondent1ResponseDeadline;
 
         @BeforeEach
         void setup() {
             timeExtensionDate = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(timeExtensionDate);
-            extensionDateRespondent1 = now().plusDays(28);
-            when(deadlinesCalculator.calculateFirstWorkingDay(extensionDateRespondent1))
-                .thenReturn(extensionDateRespondent1);
+            respondent1ResponseDeadline = now().plusDays(28);
+            when(deadlinesCalculator.calculateFirstWorkingDay(respondent1ResponseDeadline))
+                .thenReturn(respondent1ResponseDeadline);
 
         }
 
         @Test
         void shouldPopulateSetAsideDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
+            LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
