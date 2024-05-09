@@ -72,7 +72,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Company One wedi cynnig talu "
                         + "£" + totalAmount
-                        + "i chi mewn rhandaliadau o £"
+                        + " i chi mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
