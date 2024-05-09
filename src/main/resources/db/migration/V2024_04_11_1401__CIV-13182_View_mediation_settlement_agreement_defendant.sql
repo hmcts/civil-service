@@ -19,9 +19,9 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>View mediation documents</a>',
   'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 7),
 
-('<a>View hearings</a>',
+('<a>View the hearing</a>',
   'Hearings',
-  '<a>View hearings</a>',
+  '<a>View the hearing</a>',
   'Hearings', 'Hearing.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 8),
 
 ('<a>Upload hearing documents</a>',
