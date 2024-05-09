@@ -75,15 +75,15 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
                     "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View hearings</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View hearings</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()),
+                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld y gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
                 jsonPath("$[1].reference").value(caseId.toString()),
                 jsonPath("$[1].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[1].taskNameCy").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gorchmynion a rhybuddion</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
 
             );
     }
