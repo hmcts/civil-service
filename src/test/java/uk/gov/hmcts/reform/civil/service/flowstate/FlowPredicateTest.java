@@ -1997,8 +1997,20 @@ class FlowPredicateTest {
                 .atStateClaimDismissed()
                 .respondent1ResponseDate(null)
                 .respondent2ResponseDate(null)
+                .takenOfflineByStaffDate(null)
                 .build();
             assertTrue(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissed()
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
 
         @Test
@@ -3420,5 +3432,14 @@ class FlowPredicateTest {
             .build();
 
         assertTrue(reasonNotSuitableForSdo.test(caseData));
+    }
+
+    @Test
+    void reasonNotSuitableForSdoExt() {
+        CaseData caseData = CaseData.builder()
+            .reasonNotSuitableSDO(null)
+            .build();
+
+        assertFalse(reasonNotSuitableForSdo.test(caseData));
     }
 }
