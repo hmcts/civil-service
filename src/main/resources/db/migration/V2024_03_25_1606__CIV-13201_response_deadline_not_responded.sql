@@ -13,7 +13,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant',
         'Response to the claim', 'Ymateb i’r hawliad',
-        '<p class="govuk-body">Nid yw ${respondent1PartyName} has not responded to the claim.</p>'
+        '<p class="govuk-body">${respondent1PartyName} has not responded to the claim.</p>'
           '<p class="govuk-body">You can now request a county court judgment.<p/>'
           '<p class="govuk-body">The defendant can still respond to the claim before you ask for a judgment.</p>'
           '<p class="govuk-body"><a href="{REQUEST_CCJ_URL}" class="govuk-link">Request a CCJ</a></p>',

@@ -52,7 +52,7 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                     "<p class=\"govuk-body\">The defendant can still respond to the claim before you ask for a judgment.</p>" +
                     "<p class=\"govuk-body\"><a href=\"{REQUEST_CCJ_URL}\" class=\"govuk-link\">Request a CCJ</a></p>"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
-                jsonPath("$[0].descriptionEn").value(
+                jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Nid yw James John wedi ymateb i’r hawliad.</p>" +
                         "<p class=\"govuk-body\">Gallwch nawr wneud cais am ddyfarniad llys sirol.<p/>" +
                         "<p class=\"govuk-body\">Gall y diffynnydd dal ymateb i’r hawliad cyn i chi ofyn am ddyfarniad.</p>" +
