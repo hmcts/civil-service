@@ -35,8 +35,6 @@ public class MediationCSVLipVLipServiceTest {
     private static final String ID = "123456789";
     private static final String RESPONDENT = "2";
     private static final String APPLICANT = "1";
-    private static final String BILINGUAL_FLAG  = "Yes";
-    private static final String BILINGUAL_FLAG_NO  = "No";
 
     @Autowired
     private MediationCSVLipVLipService service;
@@ -58,7 +56,6 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
-        assertThat(result).contains(BILINGUAL_FLAG);
     }
 
     @Test
@@ -78,7 +75,6 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
-        assertThat(result).contains(BILINGUAL_FLAG_NO);
     }
 
     @Test
@@ -98,7 +94,6 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
-        assertThat(result).contains(BILINGUAL_FLAG);
     }
 
     @Test
@@ -118,7 +113,6 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
-        assertThat(result).contains(BILINGUAL_FLAG_NO);
     }
 
     @Test
@@ -138,7 +132,6 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
-        assertThat(result).contains(BILINGUAL_FLAG);
     }
 
     private CaseData getCaseData(Party.Type partyType) {

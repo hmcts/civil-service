@@ -44,7 +44,6 @@ public class MediationCSVLrvLrServiceTest {
     private static final String ID = "123456789";
     private static final String APP_LR_ORG_ID = "123";
     private static final String DEF_LR_ORG_ID = "456";
-    private static final boolean r2FlagEnabled = false;
 
     @Mock
     private uk.gov.hmcts.reform.civil.prd.model.Organisation applicantOrganisation;

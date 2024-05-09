@@ -40,7 +40,6 @@ public class MediationCSVLrvLipServiceTest {
     private static final String TOTAL_AMOUNT = "9000";
     private static final String ID = "123456789";
     private static final String RESPONDENT = "2";
-    private static final boolean r2FlagEnabled = false;
 
     @Mock
     private uk.gov.hmcts.reform.civil.prd.model.Organisation organisation;
