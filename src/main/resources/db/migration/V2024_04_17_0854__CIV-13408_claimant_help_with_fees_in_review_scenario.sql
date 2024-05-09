@@ -24,7 +24,7 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     template_name, scenario_name, task_status_sequence, role, task_order,
                                     hint_text_en, hint_text_cy)
 values ('<a>Pay the hearing fee</a>', 'Hearing',
-        '<a>Pay the hearing fee</a>', 'Hearing',
+        '<a>Talu ffi''r gwrandawiad</a>', 'Gwrandawiad',
         'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant',
         '{6, 6}', 'CLAIMANT', 11,
         'Deadline is 12am on ${hearingDueDateEn}', 'Deadline is 12am on ${hearingDueDateCy}');

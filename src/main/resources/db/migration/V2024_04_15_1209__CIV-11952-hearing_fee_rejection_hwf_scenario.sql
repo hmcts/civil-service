@@ -21,5 +21,5 @@ VALUES ('Notice.AAA6.CP.HearingFee.HWF.Rejected', 'Your help with fees applicati
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
-values ('<a href={PAY_HEARING_FEE} class="govuk-link">Pay the hearing fee</a>', 'Hearings' ,'<a href={PAY_HEARING_FEE} class="govuk-link">Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.Rejected', '{5, 5}', 'CLAIMANT', 8, 'Deadline is 12am on ${hearingDueDateEn}', 'Deadline is 12am on ${hearingDueDateCy}');
+values ('<a href={PAY_HEARING_FEE} class="govuk-link">Pay the hearing fee</a>', 'Hearing' ,'<a href={PAY_HEARING_FEE} class="govuk-link">Talu ffi''r gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.HWF.Rejected', '{5, 5}', 'CLAIMANT', 8, 'Deadline is 12am on ${hearingDueDateEn}', 'Deadline is 12am on ${hearingDueDateCy}');
