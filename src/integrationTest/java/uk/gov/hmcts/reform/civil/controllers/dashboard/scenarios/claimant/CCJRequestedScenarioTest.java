@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CCJRequestedDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -92,6 +93,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendantSpec().build()
             .toBuilder().respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .legacyCaseReference("reference")
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 
@@ -103,11 +105,11 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             jsonPath("$[0].titleEn").value(
                 "You requested a County Court Judgment against Mr. Sole Trader"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>"),
+                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>.</p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
-                "You requested a County Court Judgment against Mr. Sole Trader"),
-            jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan.</a></p><p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>")
+                "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader"),
+            jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>.</p>" +
+                                                     "<p class=\"govuk-body\">Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
         );
     }
 }
