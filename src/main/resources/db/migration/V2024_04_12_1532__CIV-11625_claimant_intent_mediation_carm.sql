@@ -3,7 +3,14 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
-        '{"Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant"}',
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant",
+         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant",
+         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Claimant",
+         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant",
+         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant",
+         "Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant",
+         "Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant",
+         "Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant" : []}');
 
 /**
@@ -23,7 +30,13 @@ VALUES ('Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Defendant',
-        '{"Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant"}',
+        '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant",
+         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant",
+         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant",
+         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant",
+         "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant",
+         "Notice.AAA6.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant",
+         "Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant" : []}');
 
 /**
