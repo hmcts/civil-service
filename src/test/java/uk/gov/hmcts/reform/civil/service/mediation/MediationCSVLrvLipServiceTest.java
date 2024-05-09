@@ -63,7 +63,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -78,7 +78,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.ORGANISATION);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -93,7 +93,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.INDIVIDUAL);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -108,7 +108,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -123,7 +123,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(LR_COMPANY_NAME);
         assertThat(result).contains(LR_COMPANY_EMAIL);

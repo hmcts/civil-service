@@ -75,7 +75,7 @@ public class MediationCSVLrvLrServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(LR_APPLICANT_COMPANY_NAME);
         assertThat(result).contains(LR_APPLICANT_COMPANY_EMAIL);
@@ -87,7 +87,7 @@ public class MediationCSVLrvLrServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(LR_DEFENDANT_COMPANY_NAME);
         assertThat(result).contains(LR_DEFENDANT_COMPANY_EMAIL);
@@ -99,7 +99,7 @@ public class MediationCSVLrvLrServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(APPLICANT_COMPANY_NAME);
     }
@@ -109,7 +109,7 @@ public class MediationCSVLrvLrServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(RESPONDENT_COMPANY_NAME);
     }
@@ -119,7 +119,7 @@ public class MediationCSVLrvLrServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData, r2FlagEnabled);
+        String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(TOTAL_AMOUNT);
     }
