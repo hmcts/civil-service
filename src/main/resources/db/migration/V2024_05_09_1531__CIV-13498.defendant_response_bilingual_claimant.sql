@@ -28,4 +28,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
         'The response',
         '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
-        'The response', 'Response.View', 'Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant', '{3, 3}', 'DEFENDANT', 3);
+        'The response', 'Response.View', 'Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant', '{3, 3}', 'CLAIMANT', 3);
