@@ -94,7 +94,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDefenceReceivedDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
+            LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -112,7 +112,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
+            LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
@@ -130,7 +130,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateOrderType() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            LocalDateTime nextDeadline = extensionDateRespondent1.atTime(16, 0);
+            LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
