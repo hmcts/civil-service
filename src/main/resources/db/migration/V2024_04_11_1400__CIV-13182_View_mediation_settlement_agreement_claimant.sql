@@ -24,35 +24,33 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>View the hearing</a>',
   'Hearings', 'Hearing.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 8),
 
+('<a>Pay the hearing fee</a>',
+  'Hearings',
+  '<a>Pay the hearing fee</a>',
+  'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 9),
 
 ('<a>Upload hearing documents</a>',
   'Hearings',
   '<a>Upload hearing documents</a>',
-  'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 9),
+  'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 10),
 
 ('<a>Add the trial arrangements</a>',
   'Hearings',
   '<a>Add the trial arrangements</a>',
-  'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 10),
-
-('<a>Pay the hearing fee</a>',
-  'Hearings',
-  '<a>Pay the hearing fee</a>',
-  'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 11),
-
+  'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 12),
 
 ('<a>View the bundle</a>',
   'Hearings',
   '<a>View the bundle</a>',
-  'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 12),
+  'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
 
 ('<a>View the judgment</a>',
   'Judgments from the court',
   '<a>View the judgment</a>',
-  'Judgments from the court', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
+  'Judgments from the court', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 14),
 
 ('<a>View applications</a>',
   'Applications',
   '<a>View applications</a>',
-  'Applications', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 14);
+  'Applications', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 15);
 
