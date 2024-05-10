@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -27,11 +28,13 @@ import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
     public static final String ORDER_DOCUMENT = "orderDocument";
+    private final FeatureToggleService featureToggleService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -41,6 +44,12 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
+
+        if (featureToggleService.isGeneralApplicationsEnabled()) {
+            params.put("djDefendantNotificationMessage", "<a href=\"{SERVICE_REQUEST_UPDATE}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+        } else {
+            params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+        }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
             LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
