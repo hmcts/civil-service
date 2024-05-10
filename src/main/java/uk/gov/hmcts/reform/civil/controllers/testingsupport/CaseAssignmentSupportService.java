@@ -25,6 +25,7 @@ public class CaseAssignmentSupportService {
     public void unAssignUserFromCases(List<String> caseIds, String organisationId, String userId) {
         String authToken = authTokenGenerator.generate();
         String caaAccessToken = getCaaAccessToken();
+        System.out.println("unAssignUserFromCases");
 
         List<CaseAssignedUserRole> userRoles =
             caseAccessDataStoreApi.getUserRoles(caaAccessToken, authToken, caseIds).getCaseAssignedUserRoles().stream()

@@ -59,6 +59,7 @@ public class DefendantResponseApplicantForCuiNotificationHandler
     }
 
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
+        System.out.println("notifySolicitorsForDefendantResponse");
         CaseData caseData = callbackParams.getCaseData();
         boolean isLiPClaimant = caseData.isApplicantNotRepresented();
 

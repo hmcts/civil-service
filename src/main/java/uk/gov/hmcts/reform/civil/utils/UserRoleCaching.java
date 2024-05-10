@@ -19,6 +19,8 @@ public class UserRoleCaching {
 
     public List<String> getUserRoles(String bearerToken, String ccdCaseRef) {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
+        System.out.println("getUserRoles caching");
+
         return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
     }
 
