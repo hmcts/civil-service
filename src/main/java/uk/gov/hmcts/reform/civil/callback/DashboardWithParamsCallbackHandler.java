@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @RequiredArgsConstructor
-public abstract class DashboardCallbackHandler extends CallbackHandler {
+public abstract class DashboardWithParamsCallbackHandler extends CallbackHandler {
 
     protected final DashboardApiClient dashboardApiClient;
     protected final DashboardNotificationsParamsMapper mapper;
@@ -29,49 +29,23 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
-    protected abstract String getScenario(CaseData caseData);
+    protected abstract String getScenario(CaseData caseData, CallbackParams callbackParams);
 
-    protected String getExtraScenario(CaseData caseData) {
-        return null;
-    }
-
-    /**
-     * Depending on the case data, the scenario may or may not be applicable.
-     *
-     * @param caseData case's data
-     * @return true if the scenario/notification should be recorded
-     */
     protected boolean shouldRecordScenario(CaseData caseData) {
         return true;
-    }
-
-    protected boolean shouldRecordExtraScenario(CaseData caseData) {
-        return false;
     }
 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String scenario = getScenario(caseData);
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-            caseData)).build();
-
+        String scenario = getScenario(caseData, callbackParams);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 scenario,
                 authToken,
-                scenarioParams
-            );
-        }
-
-        scenario = getExtraScenario(caseData);
-        if (!Strings.isNullOrEmpty(scenario) && shouldRecordExtraScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
-                authToken,
-                scenarioParams
+                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
+                    caseData)).build()
             );
         }
 

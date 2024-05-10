@@ -121,6 +121,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant"),
+    SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"),
     SCENARIO_AAA6_HEARING_FEE_PAID_CLAIMANT("Scenario.AAA6.CP.HearingFee.Paid.Claimant"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INVALID_REF("Scenario.AAA6.CP.HearingFee.HWF.InvalidRef"),
     SCENARIO_AAA6_HEARING_FEE_HWF_INFO_REQUIRED("Scenario.AAA6.CP.HearingFee.HWF.InfoRequired"),
@@ -131,6 +133,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Claimant"),
     SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.TrialReady.Defendant"),
     SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT("Scenario.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant"),
+    SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT("Scenario.AAA6.ClaimIssue.Claimant.FastTrack"),
+    SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT("Scenario.AAA6.ClaimIssue.Defendant.FastTrack"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant");
 
     private final String scenario;
