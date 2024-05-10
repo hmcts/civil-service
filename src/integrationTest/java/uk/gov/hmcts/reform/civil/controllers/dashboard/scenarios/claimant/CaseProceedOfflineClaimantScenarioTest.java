@@ -46,7 +46,6 @@ public class CaseProceedOfflineClaimantScenarioTest extends DashboardBaseIntegra
                         jsonPath("$[0].titleCy").value("Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach"),
                         jsonPath("$[0].descriptionCy").value(
                                 "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach."
-                                        + " Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn cael eu hanfon atoch drwy'r post.</p>")
-                );
+                                        + " Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn cael eu hanfon atoch drwy'r post.</p>"));
     }
 }

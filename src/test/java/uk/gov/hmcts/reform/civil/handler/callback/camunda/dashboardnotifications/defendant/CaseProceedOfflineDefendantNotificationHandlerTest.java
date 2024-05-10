@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
@@ -35,6 +36,8 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
     private CaseProceedOfflineDefendantNotificationHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
+    @Mock
+    private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
@@ -70,6 +73,7 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             ).build();
             when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             // When
             handler.handle(params);
