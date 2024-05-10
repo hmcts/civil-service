@@ -89,7 +89,7 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
 
             handler.handle(params);
 
-            verify(notificationService, never()).sendMail(anyString(),anyString(), anyMap(),anyString());
+            verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
         }
     }
 }

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -35,6 +36,8 @@ public class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallb
     private CaseProceedOfflineClaimantNotificationHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
+    @Mock
+    private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCaseProceedOffline";
@@ -71,6 +74,7 @@ public class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallb
             ).build();
             when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             // When
             handler.handle(params);
