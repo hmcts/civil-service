@@ -17,6 +17,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediationUnavailability {
 
-    private String fromDate;
-    private String toDate;
+    private String dateFrom;
+    private String dateTo;
 }
