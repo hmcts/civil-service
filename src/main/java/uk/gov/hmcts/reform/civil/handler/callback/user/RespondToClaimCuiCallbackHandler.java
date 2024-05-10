@@ -63,6 +63,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
+        System.out.println("case data begin populateRespondentCopyObjects -> " + callbackParams.getCaseData());
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
@@ -75,6 +76,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = getUpdatedCaseData(callbackParams);
+        System.out.println("after getUpdatedCaseData -> " + caseData);
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         if (featureToggleService.isHmcEnabled()) {
@@ -104,12 +107,17 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         if (!responseLanguageIsBilingual) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
+        System.out.println("caseData aboutToSubmit-> " + caseData);
+        System.out.println("responseBuilder aboutToSubmit-> " + responseBuilder);
 
         return responseBuilder.build();
     }
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
+
+
         CaseData caseData = callbackParams.getCaseData();
+        System.out.println("getUpdatedCaseData -> " + caseData);
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -124,6 +132,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 allocatedTrack
             ))
             .build();
+        System.out.println("getUpdatedCaseData updatedData -> " + updatedData);
+
         return updatedData;
     }
 }
