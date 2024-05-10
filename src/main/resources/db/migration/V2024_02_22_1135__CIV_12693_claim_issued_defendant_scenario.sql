@@ -2,7 +2,8 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}');
+VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}'),
+       ('Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
@@ -41,7 +42,7 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
        ('<a>View documents</a>', 'Hearing' ,'<a>View documents</a>', 'Hearing',
         'Hearing.Document.View', 'Scenario.AAA6.ClaimIssue.Response.Required','{1, 1}', 'DEFENDANT', 10),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{1, 1}', 'DEFENDANT', 11),
        ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
         'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 12),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES}>View orders and notices</a>',

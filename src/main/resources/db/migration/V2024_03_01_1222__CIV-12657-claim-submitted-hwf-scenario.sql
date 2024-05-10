@@ -45,8 +45,6 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Hearing', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 10),
        ('<a>View documents</a>', 'Hearing' ,'<a>View documents</a>',
         'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested','{1, 1}', 'CLAIMANT', 11),
-       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 12),
        ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
         'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.HWF.Requested', '{1, 1}', 'CLAIMANT', 13),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,

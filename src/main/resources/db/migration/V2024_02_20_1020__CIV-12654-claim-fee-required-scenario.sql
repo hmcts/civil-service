@@ -3,7 +3,8 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{"Notice.AAA6.ClaimIssue.ClaimSubmit.Required"}',
-        '{"Notice.AAA6.ClaimIssue.ClaimFee.Required" : ["claimFee"]}');
+        '{"Notice.AAA6.ClaimIssue.ClaimFee.Required" : ["claimFee"]}'),
+       ('Scenario.AAA6.ClaimIssue.Claimant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
@@ -45,7 +46,7 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
        ('<a>View documents</a>', 'Hearing' ,'<a>View documents</a>',
         'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required','{1, 1}', 'CLAIMANT', 11),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 12),
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Claimant.FastTrack', '{1, 1}', 'CLAIMANT', 12),
        ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
         'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 13),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
