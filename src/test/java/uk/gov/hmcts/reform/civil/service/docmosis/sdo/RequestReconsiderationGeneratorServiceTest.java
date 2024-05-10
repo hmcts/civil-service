@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF;
 
 @ExtendWith(SpringExtension.class)
@@ -42,7 +42,7 @@ class RequestReconsiderationGeneratorServiceTest {
 
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
-        .documentType(SDO_ORDER)
+        .documentType(DECISION_MADE_ON_APPLICATIONS)
         .build();
 
     @Autowired
@@ -61,7 +61,7 @@ class RequestReconsiderationGeneratorServiceTest {
     void shouldGenerateReconsiderationUpheldDocument() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF)))
             .thenReturn(new DocmosisDocument(RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SDO_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DECISION_MADE_ON_APPLICATIONS)))
             .thenReturn(CASE_DOCUMENT);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
@@ -80,7 +80,7 @@ class RequestReconsiderationGeneratorServiceTest {
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SDO_ORDER));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DECISION_MADE_ON_APPLICATIONS));
     }
 
 }
