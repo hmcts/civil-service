@@ -3433,4 +3433,13 @@ class FlowPredicateTest {
 
         assertTrue(reasonNotSuitableForSdo.test(caseData));
     }
+
+    @Test
+    void reasonNotSuitableForSdoExt() {
+        CaseData caseData = CaseData.builder()
+            .reasonNotSuitableSDO(null)
+            .build();
+
+        assertFalse(reasonNotSuitableForSdo.test(caseData));
+    }
 }
