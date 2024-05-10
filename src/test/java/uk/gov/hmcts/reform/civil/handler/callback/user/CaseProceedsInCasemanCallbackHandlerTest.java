@@ -11,12 +11,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
@@ -39,6 +41,8 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private CaseProceedsInCasemanCallbackHandler handler;
@@ -97,6 +101,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(takenOfflineByStaffDate);
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(false);
         }
 
         @Test
@@ -119,6 +124,24 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+        }
+
+        @Test
+        void shouldAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent1Represented(YesOrNo.NO)
+                    .build();
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                    .extracting("previousCCDState").isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+            assertThat(response)
+                    .extracting("state").isEqualTo("PROCEEDS_IN_HERITAGE_SYSTEM");
+
         }
     }
 }

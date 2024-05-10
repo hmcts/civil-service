@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +54,7 @@ public class DashboardNotificationService {
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
         return dashboardNotificationsEntityList.stream()
+            .sorted(Comparator.comparing(t -> t.getDashboardNotificationsTemplates().getCreatedAt(), Comparator.reverseOrder()))
             .map(Notification::from)
             .collect(Collectors.toList());
     }

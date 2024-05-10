@@ -9,10 +9,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final Time time;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -68,8 +71,19 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
             .takenOfflineByStaffDate(time.now())
             .build();
 
+        CaseData updatedCaseData = addPreviousCaseSate(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(updatedCaseData.toMap(mapper))
+            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
             .build();
+    }
+
+    private CaseData addPreviousCaseSate(CaseData caseData) {
+        if (featureToggleService.isDashboardServiceEnabled()) {
+            return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+                    ? caseData.toBuilder().previousCCDState(caseData.getCcdState()).build() : caseData;
+        }
+        return caseData;
     }
 }

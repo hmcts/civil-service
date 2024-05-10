@@ -9,17 +9,22 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -36,6 +41,8 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private CaseProceedsInCasemanApplicantNotificationCallbackHandler handler;
 
@@ -45,6 +52,7 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -68,6 +76,20 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
+        }
+
+        @Test
+        void shouldNotNotifyApplicantLip_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .build();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(anyString(),anyString(), anyMap(),anyString());
         }
     }
 }
