@@ -24,11 +24,10 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
     void should_create_scenario_for_default_judgement() throws Exception {
 
         String caseId = "720111";
-        CaseData caseData = CaseDataBuilder.builder().build()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
                 .respondent1Represented(YesOrNo.NO)
                 .build();
 
