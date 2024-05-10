@@ -115,7 +115,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
 
-
         CaseData caseData = callbackParams.getCaseData();
         System.out.println("getUpdatedCaseData -> " + caseData);
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
