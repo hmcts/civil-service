@@ -15,15 +15,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHB
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 
 @Service
-public class DefendantResponseWelshDashboardNotificationHandler extends DashboardCallbackHandler {
+public class DefendantResponseWelshClaimantDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationDefendantResponseWelsh";
 
-    public DefendantResponseWelshDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                              DashboardNotificationsParamsMapper mapper,
-                                                              FeatureToggleService featureToggleService) {
+    public DefendantResponseWelshClaimantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+                                                                      DashboardNotificationsParamsMapper mapper,
+                                                                      FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 
