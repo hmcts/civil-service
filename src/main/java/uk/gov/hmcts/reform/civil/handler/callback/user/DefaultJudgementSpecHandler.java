@@ -77,6 +77,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeesService feesService;
     private final FeatureToggleService toggleService;
     BigDecimal theOverallTotal;
+    BigDecimal costs;
     private final Time time;
     private final FeatureToggleService featureToggleService;
 
@@ -321,6 +322,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             subTotal = subTotal.add(fixedCost);
         }
+        costs = costs.add(interest).add(claimFeePounds);
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
