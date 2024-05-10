@@ -278,44 +278,40 @@ public class MediationJsonService {
             .build();
     }
 
-    private void toMediationUnavailableDates(List<MediationUnavailability> toMediationUnavailability,
-                                             List<Element<UnavailableDate>> unavailableDatesForMediation) {
+    private List<MediationUnavailability> toMediationUnavailableDates(List<Element<UnavailableDate>> unavailableDatesForMediation) {
         List<UnavailableDate> unavailableDates = unwrapElements(unavailableDatesForMediation);
+        List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
         for (UnavailableDate unavailableDate : unavailableDates) {
             if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
                 toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .fromDate(formatDate(unavailableDate.getDate()))
-                                                  .toDate(formatDate(unavailableDate.getDate()))
+                                                  .dateFrom(formatDate(unavailableDate.getDate()))
+                                                  .dateTo(formatDate(unavailableDate.getDate()))
                                                   .build());
             }
             if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
                 toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .fromDate(formatDate(unavailableDate.getFromDate()))
-                                                  .toDate(formatDate(unavailableDate.getToDate()))
+                                                  .dateFrom(formatDate(unavailableDate.getFromDate()))
+                                                  .dateTo(formatDate(unavailableDate.getToDate()))
                                                   .build());
             }
         }
+        return toMediationUnavailability;
     }
 
     private List<MediationUnavailability> getDateRangeToAvoid(MediationAvailability mediationAvailability) {
         if (mediationAvailability != null) {
             if (YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
-                List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
-                toMediationUnavailableDates(
-                    toMediationUnavailability,
-                    mediationAvailability.getUnavailableDatesForMediation());
-                return toMediationUnavailability;
+                return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
             }
         }
         return List.of(MediationUnavailability.builder().build());
     }
 
     private List<MediationUnavailability> getDateRangeToAvoid(MediationLiPCarm mediationLiPCarm) {
-        List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
         if (YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
-            toMediationUnavailableDates(toMediationUnavailability, mediationLiPCarm.getUnavailableDatesForMediation());
+            return toMediationUnavailableDates(mediationLiPCarm.getUnavailableDatesForMediation());
         }
-        return toMediationUnavailability;
+        return List.of(MediationUnavailability.builder().build());
     }
 
     private String formatDate(LocalDate unavailableDate) {
