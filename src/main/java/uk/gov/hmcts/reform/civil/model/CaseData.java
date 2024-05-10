@@ -271,6 +271,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
 
     @Builder.Default
+    @JsonProperty("duplicateClaimantDefResponseDocs")
     private final List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
     private final List<ClaimAmountBreakup> claimAmountBreakup;
