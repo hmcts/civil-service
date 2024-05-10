@@ -115,7 +115,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getDebtAmount(caseData).setScale(2) : new BigDecimal(0);
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? getClaimFee(caseData).setScale(2) : new BigDecimal(0);
+            ? getClaimFee(caseData) : new BigDecimal(0);
 
         return DefaultJudgmentForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
@@ -139,7 +139,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                                        uk.gov.hmcts.reform.civil.model.Party party,
                                                        String event, String partyType) {
         BigDecimal debtAmount = getDebtAmount(caseData).setScale(2);
-        BigDecimal cost = getClaimFee(caseData).setScale(2);
+        BigDecimal cost = getClaimFee(caseData);
 
         DefaultJudgmentForm.DefaultJudgmentFormBuilder builder = DefaultJudgmentForm.builder();
         builder
@@ -283,10 +283,16 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private BigDecimal getClaimFee(CaseData caseData) {
         var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+
+        if (caseData.isHelpWithFees()
+            && caseData.getOutstandingFeeInPounds() != null) {
+            claimFeePounds = caseData.getOutstandingFeeInPounds();
+        }
+
         if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
         }
-        return claimFeePounds;
+        return claimFeePounds.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : claimFeePounds.setScale(2);
     }
 
     private BigDecimal getDebtAmount(CaseData caseData) {
