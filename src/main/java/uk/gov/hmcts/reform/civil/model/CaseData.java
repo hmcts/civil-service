@@ -643,6 +643,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
+    private CaseDocument decisionOnReconsiderationDocument;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
