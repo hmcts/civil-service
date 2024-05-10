@@ -46,9 +46,12 @@ public class ClaimIntentMediationSuccessfulDefendantScenarioTest extends Dashboa
                 jsonPath("$[0].titleCy").value("Rydych wedi setlo’r hawliad drwy gyfryngu"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Mi wnaethoch gytundeb sy’n golygu bod yr hawliad nawr ar ben. Mae’r cytundeb yn nodi’r telerau ar gyfer sut mae rhaid i chi ad-dalu Mr. John Rambo.</p> " +
-                            "<p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Lawrlwytho’r cytundeb</a></p> <p class=\"govuk-body\">" +
-                            "<a href=\"{CITIZEN_CONTACT_THEM_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Cysylltwch â Mr. John Rambo</a> ios oes arnoch angen eu manylion talu. Gwnewch yn siŵr eich bod yn cael derbynebau am unrhyw daliadau.</p>")
+                        "<p class=\"govuk-body\">Mi wnaethoch gytundeb sy’n golygu bod yr hawliad nawr ar ben. Mae’r " +
+                            "cytundeb yn nodi’r telerau ar gyfer sut mae rhaid i chi ad-dalu Mr. John Rambo.</p> " +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" target=\"_blank\" rel=\"noopener noreferrer\" " +
+                            "class=\"govuk-link\">Lawrlwytho’r cytundeb</a></p> <p class=\"govuk-body\">" +
+                            "<a href=\"{CITIZEN_CONTACT_THEM_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Cysylltwch â " +
+                            "Mr. John Rambo</a> ios oes arnoch angen eu manylion talu. Gwnewch yn siŵr eich bod yn cael derbynebau am unrhyw daliadau.</p>")
             );
     }
 }

@@ -47,8 +47,11 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends D
                     "to consider changing the plan, based on your financial details.</p>"),
             jsonPath("$[0].titleCy").value("Cytundeb setlo"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Gall Mr. John Rambo wneud cais am Ddyfarniad Llys Sirol (CCJ), a fyddai’n gorchymyn eich bod yn ad-dalu’r arian yn unol â’r cytundeb. Mae’r llys yn credu y gallwch fforddio hyn.</p>" +
-                    " <p class=\"govuk-body\"> Os bydd yr hawlydd yn gwneud cais am CCJ yna gallwch ofyn i farnwr ystyried newid y cynllun, yn seiliedig ar eich manylion ariannol.</p>")
+                "<p class=\"govuk-body\">Gall Mr. John Rambo wneud cais am Ddyfarniad Llys Sirol (CCJ), " +
+                    "a fyddai’n gorchymyn eich bod yn ad-dalu’r arian yn unol â’r cytundeb. Mae’r llys yn credu " +
+                    "y gallwch fforddio hyn.</p>" +
+                    " <p class=\"govuk-body\"> Os bydd yr hawlydd yn gwneud cais am CCJ yna gallwch ofyn i " +
+                    "farnwr ystyried newid y cynllun, yn seiliedig ar eich manylion ariannol.</p>")
         );
     }
 

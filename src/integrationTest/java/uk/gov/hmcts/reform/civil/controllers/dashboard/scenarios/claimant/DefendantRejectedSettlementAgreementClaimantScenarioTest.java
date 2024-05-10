@@ -37,13 +37,13 @@ public class DefendantRejectedSettlementAgreementClaimantScenarioTest extends Da
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">Dave Indent has rejected the settlement agreement.</p>"
-                    + "<p class=\"govuk-body\">You can  <a href={REQUEST_CCJ_URL} class=\"govuk-link\"> request a"
+                "<p class=\"govuk-body\">Dave Indent has rejected the settlement agreement."
+                    + " You can  <a href={REQUEST_CCJ_URL} class=\"govuk-link\">request a"
                     + " County Court Judgment (CCJ)</a>.</p>"),
             jsonPath("$[0].titleCy").value("Cytundeb setlo"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Mae Dave Indent wedi gwrthod y cytundeb setlo.</p><p class=\"govuk-body\">Gallwch  " +
-                    "<a href={REQUEST_CCJ_URL} class=\"govuk-link\"> wneud cais am Ddyfarniad Llys Sirol (CCJ)</a>.</p>")
+                "<p class=\"govuk-body\">Mae Dave Indent wedi gwrthod y cytundeb setlo. Gallwch " +
+                    "<a href={REQUEST_CCJ_URL} class=\"govuk-link\">wneud cais am Ddyfarniad Llys Sirol (CCJ)</a>.</p>")
 
         );
     }

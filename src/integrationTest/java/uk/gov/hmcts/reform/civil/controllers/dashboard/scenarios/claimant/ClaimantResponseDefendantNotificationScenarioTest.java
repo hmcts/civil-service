@@ -84,9 +84,12 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                 jsonPath("$[0].titleCy").value("Mae Mr. John Rambo wedi gwrthod eich ymateb"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Bydd eich achos yn cael ei gyfeirio at y gwasanaeth cyfryngu. Bydd eich apwyntiad cyfryngu yn cael ei drefnu o fewn 28 diwrnod.</p><p class=\"govuk-body\">" +
-                            "<a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Rhagor o wybodaeth am sut mae cyfryngu yn gweithio (yn agor mewn tab newydd)</a>.<p/>" +
-                            "<p class=\"govuk-body\">Maent hefyd wedi anfon atom eu gofynion ar gyfer y gwrandawiad. <a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" " +
+                        "<p class=\"govuk-body\">Bydd eich achos yn cael ei gyfeirio at y gwasanaeth cyfryngu." +
+                            " Bydd eich apwyntiad cyfryngu yn cael ei drefnu o fewn 28 diwrnod.</p><p class=\"govuk-body\">" +
+                            "<a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Rhagor " +
+                            "o wybodaeth am sut mae cyfryngu yn gweithio (yn agor mewn tab newydd)</a>.<p/>" +
+                            "<p class=\"govuk-body\">Maent hefyd wedi anfon atom eu gofynion ar gyfer y gwrandawiad. " +
+                            "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" " +
                             "target=\"_blank\">Gallwch weld eu gofynion ar gyfer y gwrandawiad yma (yn agor mewn tab newydd)</a>.</p>")
             );
     }

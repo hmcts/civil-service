@@ -57,8 +57,11 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi derbyn eich cynnig i dalu £100 ar unwaith fel setliad llawn a therfynol o’r hawliad.  Rhaid i’r arian fod yn " +
-                            "<a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">ei g/chyfrif</a> erbyn 1 Ionawr 2024.</p><p class=\"govuk-body\"> Os na fydd yr arian wedi cyrraedd erbyn hynny, gallant ofyn am Ddyfarniad Llys Sirol (CCJ).</p>")
+                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi derbyn eich cynnig i dalu £100 yn " +
+                            "llawn ar unwaith fel setliad llawn a therfynol o’r hawliad.  Rhaid i’r arian fod yn " +
+                            "<a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">ei g/chyfrif</a> erbyn 1 Ionawr 2024.</p>" +
+                            "<p class=\"govuk-body\"> Os na fydd yr arian wedi cyrraedd erbyn hynny, " +
+                            "gallant ofyn am Ddyfarniad Llys Sirol (CCJ).</p>")
             );
     }
 }

@@ -49,23 +49,17 @@ public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTe
                 jsonPath("$[0].descriptionEn")
                     .value(
                         "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim."
-                            + "They said you have not paid the £1000 you admit you owe."
-                            +
-                            "The case will be referred to a judge who will decide what should happen next.</p>"
-                            +
-                            "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
-                            +
-                            "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
+                            + " They said you have not paid the £1000 you admit you owe."
+                            + " The case will be referred to a judge who will decide what should happen next.</p>"
+                            + "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
+                            + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad.</p>"
-                            + "<p class=\"govuk-body\">Maent yn dweud nad ydych wedi talu £1000 sef y swm rydych yn cyfaddef sy’n ddyledus gennych.</p>"
-                            +
-                            "<p class=\"govuk-body\">Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>"
-                            +
-                            "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a> neu "
-                            +
-                            "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd</a>.</p>")
+                        "<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad."
+                            + " Maent yn dweud nad ydych wedi talu £1000 sef y swm rydych yn cyfaddef sy’n ddyledus gennych."
+                            + " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>"
+                            + "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a> neu "
+                            + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd</a>.</p>")
             );
     }
 }
