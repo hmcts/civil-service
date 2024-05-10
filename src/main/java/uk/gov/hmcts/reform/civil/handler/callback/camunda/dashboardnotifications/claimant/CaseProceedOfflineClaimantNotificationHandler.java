@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -45,8 +44,8 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return((CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getPreviousCCDState()
-               || CaseState.AWAITING_APPLICANT_INTENTION == caseData.getPreviousCCDState())
+        return ((CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getPreviousCCDState()
+                || CaseState.AWAITING_APPLICANT_INTENTION == caseData.getPreviousCCDState())
                 && caseData.isLipvLipOneVOne());
     }
 }
