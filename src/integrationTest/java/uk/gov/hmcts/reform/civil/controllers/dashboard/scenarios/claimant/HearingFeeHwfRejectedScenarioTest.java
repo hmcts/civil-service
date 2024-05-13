@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,9 +50,11 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 April 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been rejected"),
+                "Mae eich cais am help i dalu ffioedd wedi cael ei wrthod"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">We've rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class=\"govuk-link\">pay the full fee</a> of £455 by 4 Ebrill 2024. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>")
+                "<p class=\"govuk-body\">Rydym wedi gwrthod eich cais am help i dalu ffi'r gwrandawiad. Gweler yr e-bost am ragor o fanylion.<br>Rhaid i chi <a href={PAY_HEARING_FEE} class=\"govuk-link\">dalu'r ffi lawn</a> o £455 erbyn "
+                    + DateUtils.formatDateInWelsh(LocalDate.of(2024, 4, 4))
+                    + ". Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")

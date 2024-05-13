@@ -47,9 +47,9 @@ public class HearingFeeHwfNumberUpdatedScenarioTest extends DashboardBaseIntegra
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update from us within 5 to 10 working days.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been updated"),
+                "Mae eich cais am help i dalu ffioedd wedi cael ei ddiweddaru"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You've applied for help with the hearing fee. You'll receive an update from us within 5 to 10 working days.</p>")
+                "<p class=\"govuk-body\">Fe wnaethoch chi gais am help i dalu ffi'r gwrandawiad. Byddwch yn cael diweddariad gennym mewn 5 i 10 diwrnod gwaith.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
