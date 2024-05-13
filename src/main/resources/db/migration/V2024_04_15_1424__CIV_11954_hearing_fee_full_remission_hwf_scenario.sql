@@ -11,9 +11,10 @@ VALUES ('Scenario.AAA6.CP.HearingFee.HWF.FullRemission',
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.CP.HearingFee.HWF.FullRemission', 'Your help with fees application has been approved', 'Your help with fees application has been approved',
+VALUES ('Notice.AAA6.CP.HearingFee.HWF.FullRemission', 'Your help with fees application has been approved',
+        'Mae eich cais am help gyda ffioedd wedi''i gymeradwyo',
         '<p class="govuk-body">The full hearing fee of ${hearingFee} will be covered by fee remission. You do not need to make a payment.</p>',
-        '<p class="govuk-body">The full hearing fee of ${hearingFee} will be covered by fee remission. You do not need to make a payment.</p>',
+        '<p class="govuk-body">Telir ffi lawn y gwrandawiad o ${hearingFee}. Nid oes angen i chi wneud taliad.</p>',
         'CLAIMANT');
 
 /**
