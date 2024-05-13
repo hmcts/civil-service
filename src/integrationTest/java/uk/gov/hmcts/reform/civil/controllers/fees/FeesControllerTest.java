@@ -59,7 +59,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnGeneralApplicationFee() {
         Fee response = buildFeeResponse();
-        when(gaFeesService.getFeeForGA(GeneralApplicationTypes.EXTEND_TIME,true, false)).thenReturn(response);
+        when(gaFeesService.getFeeForGA(GeneralApplicationTypes.EXTEND_TIME, true, false)).thenReturn(response);
         mockMvc.perform(
             MockMvcRequestBuilders.get(FEES_GA_URL, GeneralApplicationTypes.EXTEND_TIME)
                 .queryParam("withConsent", "true")
