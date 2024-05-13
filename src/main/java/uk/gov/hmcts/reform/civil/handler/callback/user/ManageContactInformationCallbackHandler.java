@@ -91,10 +91,11 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addD
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapFormDataToIndividualsData;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapPartyFields;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.prepareLRIndividuals;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.prepareOrgIndividuals;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividuals;
@@ -294,35 +295,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getWitnesses());
         }
         return Collections.emptyList();
-    }
-
-    private List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
-        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
-            return mapPartyFields(caseData.getApplicant1OrgIndividuals());
-        }
-        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
-            return mapPartyFields(caseData.getApplicant2OrgIndividuals());
-        }
-        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
-            return mapPartyFields(caseData.getRespondent1OrgIndividuals());
-        }
-        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
-            return mapPartyFields(caseData.getRespondent2OrgIndividuals());
-        }
-        return new ArrayList<>();
-    }
-
-    private List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
-        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
-            return mapPartyFields(caseData.getApplicant1LRIndividuals());
-        }
-        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
-            return mapPartyFields(caseData.getRespondent1LRIndividuals());
-        }
-        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
-            return mapPartyFields(caseData.getRespondent2LRIndividuals());
-        }
-        return new ArrayList<>();
     }
 
     private String getPostCode(String partyChosen, CaseData caseData) {

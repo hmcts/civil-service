@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -497,7 +498,7 @@ public class ManageContactInformationUtils {
         list.add(dynamicElementFromCode(id, String.format("%s %s", party, EXPERTS)));
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapPartyFields(List<Element<PartyFlagStructure>> partyFields) {
+    public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
         return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
                         Element.<UpdatePartyDetailsForm>builder()
                                 .id(partyElement.getId())
@@ -506,10 +507,9 @@ public class ManageContactInformationUtils {
                                         .lastName(partyElement.getValue().getLastName())
                                         .emailAddress(partyElement.getValue().getEmail())
                                         .phoneNumber(partyElement.getValue().getPhone())
-                                        .partyId(partyElement.getValue().getPartyID())
                                         .build())
                                 .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
@@ -521,7 +521,7 @@ public class ManageContactInformationUtils {
                                 .map(existingParty -> existingParty.getValue())
                                 .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
@@ -531,5 +531,34 @@ public class ManageContactInformationUtils {
                 .email(form.getEmailAddress())
                 .phone(form.getPhoneNumber())
                 .build();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1OrgIndividuals());
+        }
+        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant2OrgIndividuals());
+        }
+        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1OrgIndividuals());
+        }
+        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2OrgIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1LRIndividuals());
+        }
+        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1LRIndividuals());
+        }
+        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2LRIndividuals());
+        }
+        return new ArrayList<>();
     }
 }
