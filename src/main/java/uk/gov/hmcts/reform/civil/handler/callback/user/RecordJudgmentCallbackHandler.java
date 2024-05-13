@@ -72,7 +72,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoAmountCostOrdered(null);
             caseData.setJoIsRegisteredWithRTL(null);
             caseData.setJoIssuedDate(null);
-            caseData.setJudgmentType(JudgmentType.DEFAULT_JUDGMENT);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -99,6 +98,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        caseData.setJudgmentType(JudgmentType.JUDGMENT_FOLLOWING_HEARING);
         caseData.setJoSetAsideOrderDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
         caseData.setJoSetAsideOrderType(null);
