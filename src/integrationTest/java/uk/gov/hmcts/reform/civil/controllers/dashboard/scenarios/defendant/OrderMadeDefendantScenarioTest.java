@@ -49,6 +49,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
