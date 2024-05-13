@@ -356,6 +356,62 @@ class HearingNoticeHmcGeneratorTest {
     }
 
     @Test
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-DRH")
+                                .build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoApplicants()
+            .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.SUCCESS)
+                                          .build())
+            .solicitorReferences(null)
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+        var expected = HearingNoticeHmc.builder()
+            .caseNumber(caseData.getCcdCaseReference())
+            .creationDate(LocalDate.now())
+            .claimant(caseData.getApplicant1().getPartyName())
+            .claimant2(caseData.getApplicant2().getPartyName())
+            .defendant(caseData.getRespondent1().getPartyName())
+            .feeAmount(null)
+            .hearingSiteName("VenueName")
+            .hearingLocation("SiteName - CourtAddress - Postcode")
+            .hearingDays("01 January 2023 at 00:00 for 12 hours")
+            .totalHearingDuration("2 days")
+            .hearingType("hearing")
+            .hearingDueDate(null)
+            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void shouldReturnListOfExpectedCaseDocuments() {
 
         var hearing = baseHearing.toBuilder()
