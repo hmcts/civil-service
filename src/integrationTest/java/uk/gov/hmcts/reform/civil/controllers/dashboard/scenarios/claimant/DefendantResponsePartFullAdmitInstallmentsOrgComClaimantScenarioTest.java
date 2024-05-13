@@ -76,7 +76,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
-                        + DateUtils.formatDate(firstPaymentDate)
+                        + DateUtils.formatDateInWelsh(firstPaymentDate)
                         + " ymlaen. Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
                         + "</a></p>"

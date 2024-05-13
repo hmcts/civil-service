@@ -53,7 +53,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
                                + " claim</a></p>"),
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">Nid ydych wedi ymateb i’r hawliad.</p>"
-                               + "<p class=\"govuk-body\">Gall Claimant John nawr wneud cais am ddyfarniad llys sirol. "
+                               + "<p class=\"govuk-body\">Gall Claimant John nawr wneud cais am ddyfarniad llys sirol."
                                + " Gallwch dal ymateb i’r hawliad cyn iddynt wneud cais am ddyfarniad.</p>"
                                + "<p class=\"govuk-body\">Gall Dyfarniad Llys Sirol olygu eich bod yn ei chael hi'n anodd cael credyd, fel morgais neu gontract ffôn symudol."
                                + " Gallai beilïaid hefyd gael eu hanfon i'ch cartref.</p>"
