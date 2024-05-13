@@ -661,40 +661,47 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private void updateLRIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        switch(partyId) {
+        switch (partyId) {
             case CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
                 builder.applicant1LRIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1LRIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+                return;
             }
             case DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
                 builder.respondent1LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1LRIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+                return;
             }
             case DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID: {
                 builder.respondent2LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2LRIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+                return;
             }
             default:
         }
     }
 
     private void updateOrgIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        switch(partyId) {
+        switch (partyId) {
             case CLAIMANT_ONE_ORG_INDIVIDUALS_ID: {
                 builder.applicant1OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1OrgIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+                return;
             }
             case CLAIMANT_TWO_ORG_INDIVIDUALS_ID: {
                 builder.applicant2OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant2OrgIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+                return;
             }
             case DEFENDANT_ONE_ORG_INDIVIDUALS_ID: {
                 builder.respondent1OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1OrgIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+                return;
             }
             case DEFENDANT_TWO_ORG_INDIVIDUALS_ID: {
                 builder.respondent2OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2OrgIndividuals(),
                         caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+                return;
             }
             default:
         }
