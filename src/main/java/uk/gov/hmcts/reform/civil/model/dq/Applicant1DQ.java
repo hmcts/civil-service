@@ -18,7 +18,7 @@ public class Applicant1DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts applicant1DQFixedRecoverableCosts;
-    private FixedRecoverableCostsIntermediateClaim applicant1DQFixedRecoverableCostsIntermediateClaim;
+    private FixedRecoverableCosts applicant1DQFixedRecoverableCostsIntermediateClaim;
     private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant1DQDisclosureReport;
