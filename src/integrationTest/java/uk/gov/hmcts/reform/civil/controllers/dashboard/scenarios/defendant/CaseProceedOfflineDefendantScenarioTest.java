@@ -28,7 +28,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)
-                .previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+                .previousCCDState(CaseState.AWAITING_APPLICANT_INTENTION)
                 .build();
 
         handler.handle(callbackParams(caseData));

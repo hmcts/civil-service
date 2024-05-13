@@ -119,13 +119,13 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
 
-                jsonPath("$[1].titleEn").value("You must pay the hearing fee"),
-                jsonPath("$[1].descriptionEn").value(
+                jsonPath("$[0].titleEn").value("You must pay the hearing fee"),
+                jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
                         + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
                         "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out."),
-                jsonPath("$[1].titleCy").value("Rhaid i chi dalu ffi'r gwrandawiad"),
-                jsonPath("$[1].descriptionCy").value(
+                jsonPath("$[0].titleCy").value("Rhaid i chi dalu ffi'r gwrandawiad"),
+                jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rhaid i chi naill ai <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">dalu ffi'r gwrandawiad</a> o £200 neu <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\">wneud cais am help i dalu ffioedd</a>. Mae'n rhaid i chi wneud hyn erbyn 1 Ebrill 2024. Os na fyddwch yn cymryd un o'r camau hyn, bydd eich hawliad yn cael ei ddileu.")
             );
 
