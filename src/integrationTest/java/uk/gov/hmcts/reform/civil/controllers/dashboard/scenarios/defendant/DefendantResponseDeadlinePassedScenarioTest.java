@@ -45,7 +45,7 @@ public class DefendantResponseDeadlinePassedScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You have not responded to the claim.</p>"
-                               + "<p class=\"govuk-body\">Claimant John can now request a county court judgment. "
+                               + "<p class=\"govuk-body\">Claimant John can now request a county court judgment."
                                + " You can still respond to the claim before they ask for a judgment.</p>"
                                + "<p class=\"govuk-body\">A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact."
                                + " Bailiffs could also be sent to your home.</p>"

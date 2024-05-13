@@ -12,7 +12,7 @@ VALUES ('Scenario.AAA6.DefResponse.ResponseTimeElapsed.Defendant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant',
-        'Response to the claim', 'Ymateb i’r hawliad  ',
+        'Response to the claim', 'Ymateb i’r hawliad',
         '<p class="govuk-body">You have not responded to the claim.</p>'
         '<p class="govuk-body">${applicant1PartyName} can now request a county court judgment. You can still respond to the claim before they ask for a judgment.</p>'
         '<p class="govuk-body">A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact. Bailiffs could also be sent to your home.</p>'

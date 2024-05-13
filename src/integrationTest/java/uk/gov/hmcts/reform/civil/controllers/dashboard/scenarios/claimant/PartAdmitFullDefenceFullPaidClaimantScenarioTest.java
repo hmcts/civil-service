@@ -66,9 +66,9 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £1000 yn barod ar " +
                          DateUtils.formatDateInWelsh(paymentDate) +
-                        " Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad." +
-                        " Mae angen i chi ymateb erbyn 4pm ar " +DateUtils.formatDateInWelsh(deadline)+ " neu ni fydd yr hawliad yn parhau.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"
+                        ". Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad." +
+                        " Mae angen i chi ymateb erbyn 4pm ar " +DateUtils.formatDateInWelsh(deadline) + " neu ni fydd yr hawliad yn parhau.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );
 
@@ -115,10 +115,18 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The defendant has said they already paid £1000 " +
-                        "on " + DateUtils.formatDate(paymentDate) + ".</p><p class=\"govuk-body\">You can confirm " +
-                        "payment and settle, or proceed with the claim.</p><p class=\"govuk-body\">You need to respond " +
+                        "on " + DateUtils.formatDate(paymentDate) + ". You can confirm " +
+                        "payment and settle, or proceed with the claim. You need to respond " +
                         "by 4pm on " + DateUtils.formatDate(deadline) + " or the claim will not continue.</p>" +
-                        "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a>"
+                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £1000 yn barod ar " +
+                        DateUtils.formatDateInWelsh(paymentDate) +
+                        ". Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad." +
+                        " Mae angen i chi ymateb erbyn 4pm ar " +DateUtils.formatDateInWelsh(deadline) + " neu ni fydd yr hawliad yn parhau.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );
 
