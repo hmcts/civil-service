@@ -538,10 +538,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             populateDQPartyIds(updatedData);
         }
 
-//        if (toggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-//            populateFixedRecoverableCosts(updatedData, caseData);
-//        }
-
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
         // casefileview changes need to assign documents into specific folders, this is help determine
@@ -872,22 +868,5 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
-    }
-
-    private void populateFixedRecoverableCosts(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
-        if (ofNullable(caseData.getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediateClaim()).isPresent()) {
-            builder.respondent1DQ(builder.build().getRespondent1DQ().toBuilder()
-                                      .respondent1DQFixedRecoverableCosts(
-                                          caseData.getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediateClaim())
-                                      .respondent1DQFixedRecoverableCostsIntermediateClaim(null)
-                                      .build());
-        }
-        if (ofNullable(caseData.getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediateClaim()).isPresent()) {
-            builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder()
-                                      .respondent2DQFixedRecoverableCosts(
-                                          caseData.getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediateClaim())
-                                      .respondent2DQFixedRecoverableCostsIntermediateClaim(null)
-                                      .build());
-        }
     }
 }
