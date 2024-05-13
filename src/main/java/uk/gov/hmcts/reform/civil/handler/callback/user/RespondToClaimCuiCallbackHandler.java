@@ -64,7 +64,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         System.out.println("case data begin populateRespondentCopyObjects -> " + callbackParams.getCaseData());
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = getUpdatedCaseData(callbackParams);
+
         System.out.println("after callbackParams.getCaseData() -> " + caseData);
 
         CaseData updatedData = caseData.toBuilder()
