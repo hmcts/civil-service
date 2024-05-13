@@ -67,12 +67,13 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         System.out.println("after callbackParams.getCaseData() -> " + caseData);
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1());
+        CaseData updatedData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .build();
         System.out.println("before  AboutToStartOrSubmitCallbackResponse");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(updatedData.toMap(objectMapper))
             .build();
     }
 
