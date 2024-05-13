@@ -43,12 +43,12 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The exact details of what you need to pay, and by when, are stated on the judgment. <br> " +
                                "If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can " +
-                               "<a href=\"{SERVICE_REQUEST_UPDATE}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>.</p>"),
+                               "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>.</p>"),
                 jsonPath("$[0].titleCy").value("A judgment has been made against you"),
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">The exact details of what you need to pay, and by when, are stated on the judgment. <br> " +
                                "If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can " +
-                               "<a href=\"{SERVICE_REQUEST_UPDATE}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>.</p>")
+                               "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>.</p>")
             );
     }
 }
