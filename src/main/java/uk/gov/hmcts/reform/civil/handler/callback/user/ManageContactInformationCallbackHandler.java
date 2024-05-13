@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -65,17 +64,24 @@ import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
@@ -84,6 +90,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addD
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapFormDataToIndividualsData;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapPartyFields;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
@@ -288,6 +296,35 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return Collections.emptyList();
     }
 
+    private List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
+            return mapPartyFields(caseData.getApplicant1OrgIndividuals());
+        }
+        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
+            return mapPartyFields(caseData.getApplicant2OrgIndividuals());
+        }
+        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
+            return mapPartyFields(caseData.getRespondent1OrgIndividuals());
+        }
+        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
+            return mapPartyFields(caseData.getRespondent2OrgIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
+            return mapPartyFields(caseData.getApplicant1LRIndividuals());
+        }
+        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
+            return mapPartyFields(caseData.getRespondent1LRIndividuals());
+        }
+        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
+            return mapPartyFields(caseData.getRespondent2LRIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
     private String getPostCode(String partyChosen, CaseData caseData) {
         switch (partyChosen) {
             case CLAIMANT_ONE_ID: {
@@ -395,6 +432,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .partyChosenType(partyChosenType)
             .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
             .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
+            .updateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData))
+            .updateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData))
             .build().toBuilder();
 
         builder.updateDetailsForm(formBuilder.build());
@@ -431,6 +470,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
+        updateLRIndividuals(partyChosenId, caseData, builder);
+        updateOrgIndividuals(partyChosenId, caseData, builder);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
@@ -616,6 +657,46 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedWitnesses)
             );
             builder.respondent2Witnesses(updatedRespondent2Witnesses);
+        }
+    }
+
+    private void updateLRIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        switch(partyId) {
+            case CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
+                builder.applicant1LRIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1LRIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+            }
+            case DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID: {
+                builder.respondent1LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1LRIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+            }
+            case DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID: {
+                builder.respondent2LRIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2LRIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateLRIndividualsForm()));
+            }
+            default:
+        }
+    }
+
+    private void updateOrgIndividuals(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        switch(partyId) {
+            case CLAIMANT_ONE_ORG_INDIVIDUALS_ID: {
+                builder.applicant1OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant1OrgIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+            }
+            case CLAIMANT_TWO_ORG_INDIVIDUALS_ID: {
+                builder.applicant2OrgIndividuals(mapFormDataToIndividualsData(caseData.getApplicant2OrgIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+            }
+            case DEFENDANT_ONE_ORG_INDIVIDUALS_ID: {
+                builder.respondent1OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent1OrgIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+            }
+            case DEFENDANT_TWO_ORG_INDIVIDUALS_ID: {
+                builder.respondent2OrgIndividuals(mapFormDataToIndividualsData(caseData.getRespondent2OrgIndividuals(),
+                        caseData.getUpdateDetailsForm().getUpdateOrgIndividualsForm()));
+            }
+            default:
         }
     }
 

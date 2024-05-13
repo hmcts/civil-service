@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
@@ -493,5 +495,41 @@ public class ManageContactInformationUtils {
 
     private static void addExperts(List<DynamicListElement> list, String id, String party) {
         list.add(dynamicElementFromCode(id, String.format("%s %s", party, EXPERTS)));
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapPartyFields(List<Element<PartyFlagStructure>> partyFields) {
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
+                        Element.<UpdatePartyDetailsForm>builder()
+                                .id(partyElement.getId())
+                                .value(UpdatePartyDetailsForm.builder()
+                                        .firstName(partyElement.getValue().getFirstName())
+                                        .lastName(partyElement.getValue().getLastName())
+                                        .emailAddress(partyElement.getValue().getEmail())
+                                        .phoneNumber(partyElement.getValue().getPhone())
+                                        .partyId(partyElement.getValue().getPartyID())
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
+    }
+
+    public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
+                                                                           List<Element<UpdatePartyDetailsForm>> updatedData) {
+        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
+                        .id(updatedParty.getId())
+                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
+                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                                .map(existingParty -> existingParty.getValue())
+                                .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
+        return  individual.toBuilder()
+                .firstName(form.getFirstName())
+                .lastName(form.getLastName())
+                .email(form.getEmailAddress())
+                .phone(form.getPhoneNumber())
+                .build();
     }
 }
