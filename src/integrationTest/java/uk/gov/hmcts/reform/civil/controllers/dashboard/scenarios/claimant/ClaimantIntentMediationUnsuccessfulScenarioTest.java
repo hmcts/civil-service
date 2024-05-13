@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
 public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBaseIntegrationTest {
 
@@ -62,22 +63,13 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
     }
 
     @Test
-    void shouldCreateMediationUnsuccessfulForCarm() throws Exception {
+    void shouldCreateMediationUnsuccessfulForCarmWhenMediatorSelectOtherOptions() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "323491";
-        Party respondent1 = new Party();
-        MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
-        respondent1.toBuilder().partyName("John Doe").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .ccdCaseReference(Long.valueOf(323491))
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+        CaseData caseData = createCaseData(caseId, APPOINTMENT_NO_AGREEMENT);
+
+        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListWithInactive("CLAIMANT", caseId);
 
         handler.handle(callbackParams(caseData));
 
@@ -94,26 +86,24 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
                         + "class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
+
     }
 
     @Test
-    void shouldCreateMediationUnsuccessfulForCarmClaimantNonAttendance() throws Exception {
+    void shouldCreateMediationUnsuccessfulForCarmClaimantNotContactable() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "323491";
         final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListMock("CLAIMANT", caseId);
-        Party respondent1 = new Party();
-        MediationUnsuccessfulReason reason = NOT_CONTACTABLE_CLAIMANT_ONE;
-        respondent1.toBuilder().partyName("John Doe").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .ccdCaseReference(Long.valueOf(323491))
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+        CaseData caseData = createCaseData(caseId, NOT_CONTACTABLE_CLAIMANT_ONE);
 
         handler.handle(callbackParams(caseData));
 
@@ -142,5 +132,53 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
         List<TaskList> response = toTaskList(result);
         Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
         Evaluations.evaluateMediationTasklist(response, taskListExpected);
+    }
+
+    @Test
+    void shouldCreateMediationUnsuccessfulForCarmDefendantNotContactable() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        String caseId = String.valueOf(System.currentTimeMillis());;
+        final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock("CLAIMANT", caseId);
+        CaseData caseData = createCaseData(caseId, NOT_CONTACTABLE_DEFENDANT_ONE);
+
+        handler.handle(callbackParams(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("Mediation appointment unsuccessful"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> " +
+                        "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
+                jsonPath("$[0].titleCy").value("Mediation appointment unsuccessful"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> " +
+                        "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>")
+            );
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
+    }
+
+    private static CaseData createCaseData(String caseId, MediationUnsuccessfulReason appointmentNoAgreement) {
+        MediationUnsuccessfulReason reason = appointmentNoAgreement;
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
+            .toBuilder()
+            .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                             .type(Party.Type.INDIVIDUAL).build())
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+            .build();
+        return caseData;
     }
 }
