@@ -56,7 +56,7 @@ public final class SdoR2UiConstantSmallClaim {
     public static final String RESTRICT_NUMBER_PAGES_TEXT1 = "Each witness statement should be no more than";
     public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should" +
         " be double spaced using a font size of 12.";
-    public static final String BUNDLE_TEXT = "The Claimant shall deliver to the court a physical copy of the court generated bundle no later than 10 days before the trial.";
+    public static final String BUNDLE_TEXT = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
     public static final String IMP_NOTES_TEXT = "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +
         " Any such application must be received by the Court" +
         " (together with the appropriate fee) by 4pm on";

@@ -409,6 +409,9 @@ notifications:
   notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
   notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
 
+  notifyDJNonDivergentSpecClaimantTemplate: "7c4be349-fe65-4e65-abed-802a81ba60d1"
+  notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
