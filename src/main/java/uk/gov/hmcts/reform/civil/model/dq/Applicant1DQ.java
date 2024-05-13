@@ -64,9 +64,19 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("applicant1DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return applicant1DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return null;
     }
 
     @Override

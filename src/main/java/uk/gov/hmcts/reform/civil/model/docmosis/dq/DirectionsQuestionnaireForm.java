@@ -60,7 +60,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final FurtherInformation furtherInformation;
     private final WelshLanguageRequirements welshLanguageRequirements;
     private final StatementOfTruth statementOfTruth;
-    private final AllocatedTrack allocatedTrack;
+    private final String allocatedTrack;
     private final DisclosureReport disclosureReport;
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;

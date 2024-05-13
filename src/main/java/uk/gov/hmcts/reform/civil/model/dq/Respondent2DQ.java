@@ -70,9 +70,19 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("respondent2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return respondent2DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return null;
     }
 
     @Override
