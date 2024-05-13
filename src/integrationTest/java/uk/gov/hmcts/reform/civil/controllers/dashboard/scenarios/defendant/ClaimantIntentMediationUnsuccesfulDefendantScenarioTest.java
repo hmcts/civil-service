@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
             .ccdCaseReference(Long.valueOf(32341))
             .respondent1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
+                            .type(Party.Type.INDIVIDUAL).build())
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -56,27 +57,19 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                     "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements.</a></p>"),
                 jsonPath("$[0].titleCy").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements.</a></p>"));
+                    "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements.</a></p>")
+            );
 
     }
 
     @Test
-    void should_create_mediation_unsuccessful_scenario_for_carm() throws Exception {
+    void should_create_mediation_unsuccessful_scenario_for_carm_mediator_select_other_options() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "32341";
-        Party respondent1 = new Party();
-        respondent1.toBuilder().partyName("John Doe").build();
-        MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .ccdCaseReference(Long.valueOf(32341))
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+        CaseData caseData = createCaseData(caseId, APPOINTMENT_NO_AGREEMENT);
+
+        final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListWithInactive("DEFENDANT", caseId);
 
         handler.handle(callbackParams(caseData));
 
@@ -92,28 +85,27 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                 jsonPath("$[0].titleCy").value("Mediation appointment unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> "
-                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>"));
+                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>")
+            );
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
 
     }
 
     @Test
-    void should_create_mediation_unsuccessful_scenario_for_carm_defandant_nonattendance() throws Exception {
+    void should_create_mediation_unsuccessful_scenario_for_carm_defendant_not_contactable() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         String caseId = "32341";
+        CaseData caseData = createCaseData(caseId, NOT_CONTACTABLE_DEFENDANT_ONE);
+
         final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListMock("DEFENDANT", caseId);
-        Party respondent1 = new Party();
-        respondent1.toBuilder().partyName("John Doe").build();
-        MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .ccdCaseReference(Long.valueOf(32341))
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
 
         handler.handle(callbackParams(caseData));
 
@@ -133,7 +125,8 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                     "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
                         + "a penalty against you. Your case will not be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
-                        + "attend your appointment.</a></p>"));
+                        + "attend your appointment.</a></p>")
+            );
 
         //Verify dashboard information
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
@@ -142,5 +135,57 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
         List<TaskList> response = toTaskList(result);
         Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
         Evaluations.evaluateMediationTasklist(response, taskListExpected);
+    }
+
+    @Test
+    void should_create_mediation_unsuccessful_scenario_for_carm_claimant_not_contactable() throws Exception {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        String caseId = String.valueOf(System.currentTimeMillis());
+        CaseData caseData = createCaseData(caseId, NOT_CONTACTABLE_CLAIMANT_ONE);
+
+        final List<TaskList> taskListExpected = MockTaskList.getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock(
+            "DEFENDANT",
+            caseId
+        );
+
+        handler.handle(callbackParams(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("Mediation appointment unsuccessful"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
+                        + "class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
+                jsonPath("$[0].titleCy").value("Mediation appointment unsuccessful"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
+                        + "class=\"govuk-body\">This case will now be reviewed by the court.</p>")
+            );
+
+        //Verify dashboard information
+        String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        List<TaskList> response = toTaskList(result);
+        Evaluations.evaluateSizeOfTasklist(response.size(), taskListExpected.size());
+        Evaluations.evaluateMediationTasklist(response, taskListExpected);
+    }
+
+    private static CaseData createCaseData(String caseId, MediationUnsuccessfulReason appointmentNoAgreement) {
+        MediationUnsuccessfulReason reason = appointmentNoAgreement;
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
+            .toBuilder()
+            .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                             .type(Party.Type.INDIVIDUAL).build())
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+            .build();
+        return caseData;
     }
 }
