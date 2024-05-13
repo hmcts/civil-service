@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
