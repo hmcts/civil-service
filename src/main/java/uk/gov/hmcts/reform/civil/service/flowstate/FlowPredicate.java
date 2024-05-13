@@ -1065,13 +1065,13 @@ public class FlowPredicate {
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
     public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.isLipvLipOneVOne() ?
-                caseData.hasApplicantAcceptedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantAcceptedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
                 : caseData.hasApplicantAcceptedRepaymentPlan();
 
     public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.isLipvLipOneVOne() ?
-                caseData.hasApplicantRejectedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantRejectedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
                 : caseData.hasApplicantRejectedRepaymentPlan();
 
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
