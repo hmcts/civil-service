@@ -58,8 +58,8 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View the hearing</a>")
-                .taskNameEn("<a>View the hearing</a>")
+                .taskNameCy("<a>View hearings</a>")
+                .taskNameEn("<a>View hearings</a>")
                 .categoryCy("Hearings")
                 .categoryEn("Hearings")
                 .role(role)
