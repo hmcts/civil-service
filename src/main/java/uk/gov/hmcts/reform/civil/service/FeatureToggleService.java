@@ -19,6 +19,9 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
+        if (feature.equals("isSdoR2Enabled")) {
+            return true;
+        }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
@@ -95,7 +98,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+        return true; //featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
     }
 
     public boolean isJudgmentOnlineLive() {

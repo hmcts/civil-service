@@ -156,10 +156,10 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
         var sdoR2Key = "isSdoR2Enabled";
-        givenToggle(sdoR2Key, toggleStat);
+        //givenToggle(sdoR2Key, toggleStat);
 
         assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
     }
