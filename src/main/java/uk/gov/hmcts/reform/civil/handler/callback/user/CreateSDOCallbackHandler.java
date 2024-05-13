@@ -1188,7 +1188,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
      *
      * @param updatedData         updated case data
      * @param preferredCourt      (optional) preferred court if any
-     * @param locations
+     * @param locations            locations from refdata
      * @return dynamic list, with a value selected if appropriate and possible
      */
     private DynamicList getLocationList(CaseData.CaseDataBuilder<?, ?> updatedData,
