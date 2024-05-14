@@ -140,7 +140,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant");
 
-
     private final String scenario;
 
     DashboardScenarios(String scenario) {

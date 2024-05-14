@@ -42,6 +42,6 @@ VALUES ('<a>View the response to the claim</a>', 'The response',
        ('<a>View the bundle</a>', 'Hearing',
         '<a>View the bundle</a>', 'Hearing',
         'Hearing.Bundle.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant', '{2, 2}', 'CLAIMANT', 10),
-       ('<a>View the judgment</a>', 'Judgments from the court',
-        '<a>View the judgment</a>', 'Judgments from the court',
+       ('<a href="{VIEW_JUDGEMENT}" class="govuk-link">View the judgment</a>', 'Judgments from the court',
+        '<a href="{VIEW_JUDGEMENT}" class="govuk-link">View the judgment</a>', 'Judgments from the court',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant', '{3, 3}', 'CLAIMANT', 12);
