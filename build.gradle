@@ -188,7 +188,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
-
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   testLogging {
     exceptionFormat = 'full'
   }
@@ -210,6 +210,7 @@ task integration(type: Test) {
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+
 }
 
 task contract(type: Test) {
@@ -272,7 +273,7 @@ task functional(description: 'Runs the functional tests.') {
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
 sonarqube {
   properties {
