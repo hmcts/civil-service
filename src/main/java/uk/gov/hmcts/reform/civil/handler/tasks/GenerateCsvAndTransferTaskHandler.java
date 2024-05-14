@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,9 +86,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String generateCsvContent(CaseData caseData) {
-        boolean isR2FlagEnabled = toggleService.isLipVLipEnabled();
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);
-        return mediationCSVService.generateCSVContent(caseData, isR2FlagEnabled);
+        return mediationCSVService.generateCSVContent(caseData);
     }
 
     private String generateCSVRow(String[] row) {
@@ -104,13 +102,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String[] getCSVHeaders() {
-        String[] csvHeaders = new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
-        if (toggleService.isLipVLipEnabled()) {
-            String[] additionalCsvHeaders = Arrays.copyOf(csvHeaders, csvHeaders.length + 1);
-            additionalCsvHeaders[csvHeaders.length] = "WELSH_FLAG";
-            return additionalCsvHeaders;
-        }
+        String[] csvHeaders = new String[] {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
+            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT"};
         return csvHeaders;
     }
 }
