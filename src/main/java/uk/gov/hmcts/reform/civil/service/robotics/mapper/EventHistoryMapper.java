@@ -1838,7 +1838,7 @@ public class EventHistoryMapper {
                                     "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent1().getPartyName(),
-                                    caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                                    caseData.getRespondent1ClaimResponseIntentionType() == null ? "" : caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                                 )
                             ),
                             buildAcknowledgementOfServiceEvent(
@@ -1846,7 +1846,7 @@ public class EventHistoryMapper {
                                     "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                                    caseData.getRespondent2ClaimResponseIntentionType() == null ? "" : caseData.getRespondent2ClaimResponseIntentionType().getLabel()
                                 )
                             )
                         ));
