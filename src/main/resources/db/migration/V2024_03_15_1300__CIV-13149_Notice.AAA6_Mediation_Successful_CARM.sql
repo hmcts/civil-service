@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationSuccessful.CARM.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant", "Notice.AAA6.ClaimantIntent.MediationSuccessful.Claimant"}',
         '{"Notice.AAA6.MediationSuccessful.CARM.Claimant": []}');
 
 /**
@@ -23,7 +23,7 @@ VALUES ('Notice.AAA6.MediationSuccessful.CARM.Claimant',
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationSuccessful.CARM.Defendant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant", "Notice.AAA6.ClaimantIntent.MediationSuccessful.Defendant"}',
         '{"Notice.AAA6.MediationSuccessful.CARM.Defendant" : []}');
 
 /**

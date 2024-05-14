@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant"}',
         '{"Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant": []}');
 
 /**
@@ -23,7 +23,7 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claim
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"}',
         '{"Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant": []}');
 
 /**
