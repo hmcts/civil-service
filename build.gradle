@@ -324,6 +324,7 @@ configurations.all {
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
 }
 
+dependencies {
   implementation 'com.github.hmcts:civil-commons:1.0.81_DTSSCI_202'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
