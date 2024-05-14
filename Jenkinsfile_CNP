@@ -170,6 +170,7 @@ withPipeline(type, product, component) {
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
     env.AAC_API_URL="https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+    env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
   afterAlways('functionalTest:aat') {
