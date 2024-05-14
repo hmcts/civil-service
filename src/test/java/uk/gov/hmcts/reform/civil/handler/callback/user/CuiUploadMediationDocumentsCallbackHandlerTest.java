@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 
 import java.util.List;
 
@@ -52,10 +53,7 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    private DashboardApiClient dashboardApiClient;
-
-    @MockBean
-    private DashboardNotificationsParamsMapper mapper;
+    private UploadMediationService uploadMediationService;
 
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
     private static final List<MediationDocumentsType> DOCUMENTS_REFERRED_OPTION = List.of(REFERRED_DOCUMENTS);
@@ -96,8 +94,8 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
-                verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-                verify(mapper, times(0)).mapCaseDataToParams(any());
+                verify(uploadMediationService, times(0)).recordScenarios(any(), any(), any());
+                verify(uploadMediationService, times(0)).getScenarios();
 
             }
 
@@ -117,9 +115,8 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
-                verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
-                verify(mapper, times(2)).mapCaseDataToParams(any());
-
+                verify(uploadMediationService, times(1)).recordScenarios(any(), any(), any());
+                verify(uploadMediationService, times(1)).getScenarios();
             }
         }
 
@@ -139,9 +136,8 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
-                verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-                verify(mapper, times(0)).mapCaseDataToParams(any());
-
+                verify(uploadMediationService, times(0)).recordScenarios(any(), any(), any());
+                verify(uploadMediationService, times(0)).getScenarios();
             }
 
             @Test
@@ -160,8 +156,8 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
-                verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
-                verify(mapper, times(2)).mapCaseDataToParams(any());
+                verify(uploadMediationService, times(1)).recordScenarios(any(), any(), any());
+                verify(uploadMediationService, times(1)).getScenarios();
 
             }
 
