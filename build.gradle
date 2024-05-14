@@ -16,16 +16,16 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit              : '5.10.2',
-  junitPlatform      : '1.10.2',
-  springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '4.0.0',
-  lombok             : '1.18.32',
-  pact               : '3.5.24',
-  springSecurity     : '5.8.12',
-  camunda            : '7.19.0',
-  jackson            : '2.17.1',
-  testcontainers     : '1.19.8'
+  junit             : '5.10.2',
+  junitPlatform     : '1.10.2',
+  springBoot        : springBoot.class.package.implementationVersion,
+  springStatemachine: '4.0.0',
+  lombok            : '1.18.32',
+  pact              : '3.5.24',
+  springSecurity    : '5.8.12',
+  camunda           : '7.19.0',
+  jackson           : '2.17.1',
+  testcontainers    : '1.19.8'
 ]
 
 allprojects {
@@ -88,7 +88,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-     dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
         entry 'guava'
       }
 
@@ -221,7 +221,7 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
 }
 
-task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
+task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
   getMainClass().set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -244,14 +244,17 @@ task runProdApiTests(type: Exec, description: 'Runs Prod features in functional 
 }
 
 task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
-  logger.info('FT groups set to run: ' + ftGroups)
-  for (ftGroup in ftGroups.toLowerCase().split(",")) {
-    doLast {
-      commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup.execute()
+  doLast {
+    onlyIf {
+      return System.env.ENVIRONMENT == 'preview'
+    }
+
+    def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
+    for (ftGroup in ftGroups.toLowerCase().split(",")) {
+      exec {
+        logger.info('Running FT group: ' + ftGroup)
+        commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
+      }
     }
   }
 }
@@ -489,7 +492,7 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runAndPublishConsumerPactTests(type: Test){
+task runAndPublishConsumerPactTests(type: Test) {
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
@@ -508,7 +511,7 @@ pact {
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
+    if (pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
       excludes = ['civil_service-Idam_api']
       pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
     }
