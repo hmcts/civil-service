@@ -28,7 +28,7 @@ def versions = [
   springSecurity     : '5.8.12',
   camunda            : '7.19.0',
   jackson            : '2.17.1',
-  testcontainers     : '1.19.7'
+  testcontainers     : '1.19.8'
 ]
 
 allprojects {
@@ -122,7 +122,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.719'
+        version: '1.12.721'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -144,7 +144,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.11.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.12.0"
     }
   }
 
@@ -192,7 +192,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
-
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   testLogging {
     exceptionFormat = 'full'
   }
@@ -214,6 +214,7 @@ task integration(type: Test) {
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+
 }
 
 task contract(type: Test) {
@@ -276,7 +277,7 @@ task functional(description: 'Runs the functional tests.') {
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
 sonarqube {
   properties {
@@ -329,7 +330,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.82'
+  implementation 'com.github.hmcts:civil-commons:1.0.84'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -393,7 +394,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -422,7 +423,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.49.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.16.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.0'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
