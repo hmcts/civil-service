@@ -286,8 +286,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                      .fetchSolicitorReferences(caseData))
             .respondents(getRespondents(caseData, null))
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack());
+            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack());
 
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
@@ -315,10 +315,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                 dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                    dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                 ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                    ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
@@ -605,10 +605,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                 dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                    dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                 ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                    ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -619,8 +619,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
+            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
             .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
@@ -637,10 +637,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                 dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                                    dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                 ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                    ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -651,8 +651,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
-                                caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
+            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
             .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
