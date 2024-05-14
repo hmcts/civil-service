@@ -24,12 +24,6 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing documents</a>', 'Hearing',
         '<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing documents</a>', 'Hearing',
         'Hearing.Document.Upload', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
-        '{5, 5}', 'CLAIMANT', 2,
+        '{5, 5}', 'CLAIMANT', 10,
         'Deadline is 4pm on ${sdoDocumentUploadRequestedDateEn}',
         'Deadline is 4pm on ${sdoDocumentUploadRequestedDateCy}');
-
-INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role, task_order)
-values ('<a>View documents</a>', 'Hearing' ,'<a>View documents</a>', 'Hearing',
-        'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
-        '{1, 1}', 'CLAIMANT', 3);
