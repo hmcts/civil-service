@@ -13,12 +13,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -80,7 +82,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -103,7 +105,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService, never()).complete(mockTask, null);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -118,11 +120,13 @@ class CvpJoinLinkSchedulerHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
-            .when(externalTaskService).complete(mockTask);
+            .when(externalTaskService).complete(mockTask, null);
 
-        handler.execute(mockTask, externalTaskService);
+        assertThrows(
+            CompleteTaskException.class,
+            () -> handler.execute(mockTask, externalTaskService));
 
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),
