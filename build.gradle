@@ -248,9 +248,9 @@ task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in function
     return System.env.ENVIRONMENT == 'preview'
   }
   def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
+  logger.info('FT groups set to run: ' + ftGroups)
   for (ftGroup in ftGroups.toLowerCase().split(",")) {
     doLast {
-      logger.info('Running FT group ' + ftGroup).execute()
       commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup.execute()
     }
   }
