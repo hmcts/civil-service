@@ -75,7 +75,7 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
