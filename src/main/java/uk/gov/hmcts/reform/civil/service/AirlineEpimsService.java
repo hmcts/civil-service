@@ -19,4 +19,13 @@ public class AirlineEpimsService {
             .map(AirlineEpimsId::getEpimsID)
             .orElseThrow(() -> new IllegalStateException("Unable to find epims ID for airline: " + airline));
     }
+
+    public String getEpimsIdForAirlineIgnoreCase(String airline) {
+        AirlineEpimsId airlineEpimsID = airlineEpimsDataLoader.getAirlineEpimsIDList()
+            .stream().filter(item -> item.getAirline().equalsIgnoreCase(airline)).findFirst().orElse(null);
+
+        return Optional.ofNullable(airlineEpimsID)
+            .map(AirlineEpimsId::getEpimsID)
+            .orElse(null);
+    }
 }

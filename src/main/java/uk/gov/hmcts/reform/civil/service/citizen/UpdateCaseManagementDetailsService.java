@@ -11,13 +11,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ public class UpdateCaseManagementDetailsService {
     private final LocationHelper locationHelper;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final AirlineEpimsService airlineEpimsService;
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
     public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
@@ -72,10 +72,8 @@ public class UpdateCaseManagementDetailsService {
     private void updateFlightDelayCaseManagementLocation(
         CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getFlightDelayDetails())
-            .map(FlightDelayDetails::getAirlineList)
-            .map(DynamicList::getValue)
-            .map(DynamicListElement::getCode)
-            .map(airline -> mapToLocation(airline, caseData.getFlightDelayDetails(), availableLocations))
+            .map(FlightDelayDetails::getNameOfAirline)
+            .map(airline -> mapToLocation(airline, availableLocations))
             .ifPresent(caseLocationCivil -> setCaseManagementLocation(builder, caseLocationCivil, availableLocations));
     }
 
@@ -90,19 +88,21 @@ public class UpdateCaseManagementDetailsService {
             .ifPresent(builder::locationName);
     }
 
-    private CaseLocationCivil mapToLocation(String airlineName, FlightDelayDetails flightDelayDetails, List<LocationRefData> availableLocations) {
-        if ("OTHER".equals(airlineName)) {
-            return availableLocations.stream()
-                .filter(locationRefData -> LIVERPOOL_SITE_NAME.equals(locationRefData.getSiteName()))
-                .findFirst()
-                .map(locationRefData -> CaseLocationCivil.builder()
-                    .region(locationRefData.getRegionId())
-                    .baseLocation(locationRefData.getEpimmsId())
-                    .build())
-                .orElse(null);
-        } else {
-            return flightDelayDetails.getFlightCourtLocation();
-        }
+    private CaseLocationCivil mapToLocation(String airlineName, List<LocationRefData> availableLocations) {
+        return Optional.ofNullable(airlineEpimsService.getEpimsIdForAirlineIgnoreCase(airlineName))
+            .map(locationEpimmsId -> availableLocations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList())
+            .filter(matchedLocations -> !matchedLocations.isEmpty())
+            .map(matchedLocations -> CaseLocationCivil.builder()
+                .region(matchedLocations.get(0).getRegionId())
+                .baseLocation(matchedLocations.get(0).getEpimmsId()).build())
+            .orElse(availableLocations.stream()
+                        .filter(locationRefData -> LIVERPOOL_SITE_NAME.equals(locationRefData.getSiteName()))
+                        .findFirst()
+                        .map(locationRefData -> CaseLocationCivil.builder()
+                            .region(locationRefData.getRegionId())
+                            .baseLocation(locationRefData.getEpimmsId())
+                            .build())
+                        .orElse(null));
     }
 
     private void updateApplicant1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {

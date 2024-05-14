@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -85,6 +86,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LocationHelper locationHelper;
     @MockBean
     private LocationRefDataService locationRefDataService;
+    @MockBean
+    private AirlineEpimsService airlineEpimsService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
@@ -398,6 +401,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -405,12 +409,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder()
-                    .airlineList(DynamicList.builder()
-                        .value(DynamicListElement.builder().code("Sri Lankan").build()).build())
-                    .flightCourtLocation(CaseLocationCivil.builder()
-                        .baseLocation("111")
-                        .region("region 1")
-                        .build())
+                    .nameOfAirline("Sri Lankan")
                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -422,9 +421,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCaseManagementLocationForFlightDelayClaimOtherAirline() {
+        void shouldUpdateCaseManagementLocationForFlightDelayClaimInvalidAirline() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -432,8 +432,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder()
-                    .airlineList(DynamicList.builder()
-                        .value(DynamicListElement.builder().code("OTHER").build()).build())
+                    .nameOfAirline("INVALID_AIRLINE")
                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
