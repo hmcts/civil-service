@@ -649,6 +649,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(actual).containsExactly(getExpectedReferredDocsOne(APP1_CATEGORY_ID), getExpectedReferredDocsTwo(APP1_CATEGORY_ID));
 
             }
+
             @Test
             void shouldUploadApplicant1Documents_whenInvokedForDocumentsReferredWhenCarmIsEnable() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()

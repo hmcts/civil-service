@@ -13,15 +13,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 @AllArgsConstructor
 public class UploadMediationService {
+
     private final DashboardNotificationsParamsMapper mapper;
     private final DashboardApiClient dashboardApiClient;
 
     public String[] getScenarios() {
-            return new String[]{
-                SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-                SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
-            };
-        }
+        return new String[]{
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
+        };
+    }
 
     public void recordScenarios(String[] scenarios, CaseData caseData, String authToken) {
         for (String scenario : scenarios) {
