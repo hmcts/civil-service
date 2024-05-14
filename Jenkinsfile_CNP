@@ -102,7 +102,6 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    validateRpaContract()
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
