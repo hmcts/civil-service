@@ -250,7 +250,7 @@ task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features
   def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
   for (String ftGroup : ftGroups.toLowerCase().split(",")) {
     logger.lifecycle('Run FT group ' + ftGroup)
-    commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
+    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-' + ftGroup
   }
 }
 
