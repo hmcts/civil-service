@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.721'
+        version: '1.12.720'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -249,8 +249,10 @@ task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features
   }
   def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
   for (ftGroup in ftGroups.toLowerCase().split(",")) {
-    logger.info('Running FT group ' + ftGroup)
-    commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
+    exec {
+      logger.lifecycle('Running FT group ' + ftGroup)
+      commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
+    }
   }
 }
 
@@ -401,7 +403,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.89'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.24'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.21'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
