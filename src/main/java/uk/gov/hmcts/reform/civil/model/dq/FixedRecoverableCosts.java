@@ -18,6 +18,5 @@ public class FixedRecoverableCosts {
     private YesOrNo complexityBandingAgreed;
     private String reasons;
     // below used in intermediate claim FRC
-    private YesOrNo agreedWithOtherParty;
     private Document frcSupportingDocument;
 }
