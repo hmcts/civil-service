@@ -35,7 +35,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Defendant',
          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant",
          "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant",
          "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant",
-         "Notice.AAA6.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant",
+         "Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant",
          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant" : []}');
 
