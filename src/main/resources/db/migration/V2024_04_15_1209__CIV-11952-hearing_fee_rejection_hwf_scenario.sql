@@ -11,9 +11,9 @@ VALUES ('Scenario.AAA6.CP.HearingFee.HWF.Rejected', '{"Notice.AAA6.CP.HearingFee
 INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, title_Cy, description_En, description_Cy
                                                   , notification_role)
 VALUES ('Notice.AAA6.CP.HearingFee.HWF.Rejected', 'Your help with fees application has been rejected',
-        'Your help with fees application has been rejected',
+        'Mae eich cais am help i dalu ffioedd wedi cael ei wrthod',
         '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateEn}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
-        '<p class="govuk-body">We''ve rejected your application for help with the hearing fee. See the email for further details.<br>You must <a href={PAY_HEARING_FEE} class="govuk-link">pay the full fee</a> of ${hearingFee} by ${hearingDueDateCy}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay your claim will be struck out.</p>',
+        '<p class="govuk-body">Rydym wedi gwrthod eich cais am help i dalu ffi''r gwrandawiad. Gweler yr e-bost am ragor o fanylion.<br>Rhaid i chi <a href={PAY_HEARING_FEE} class="govuk-link">dalu''r ffi lawn</a> o ${hearingFee} erbyn ${hearingDueDateCy}. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>',
         'CLAIMANT');
 
 /**
