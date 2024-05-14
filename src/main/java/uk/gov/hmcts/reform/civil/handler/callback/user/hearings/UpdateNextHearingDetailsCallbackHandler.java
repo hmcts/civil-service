@@ -71,6 +71,11 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
+        if (aboutToSubmitForUpdateNextHearingInfo(callbackParams)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(callbackParams.getCaseData().toMap(objectMapper)).build();
+        }
+
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         HearingsResponse hearingsResponse = getHearings(caseId);
@@ -98,12 +103,6 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             caseDataBuilder.nextHearingDetails(null);
         }
 
-        NextHearingDetails latestNextHearingDetails = caseDataBuilder.build().getNextHearingDetails();
-        log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating nextHearingDetails with"
-                     + " hearingId [{}] and hearingDateTime [{}]",
-                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus(),
-                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingID() : "Null",
-                 latestNextHearingDetails != null ? latestNextHearingDetails.getHearingDateTime() : "Null");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -125,5 +124,9 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .orElse(HearingDaySchedule.builder().build())
             .getHearingStartDateTime();
+    }
+
+    private boolean aboutToSubmitForUpdateNextHearingInfo(CallbackParams params) {
+        return params.getRequest().getEventId().equals(UpdateNextHearingInfo) && params.getType().equals(ABOUT_TO_SUBMIT);
     }
 }
