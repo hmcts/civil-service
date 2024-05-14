@@ -243,15 +243,15 @@ task runProdApiTests(type: Exec, description: 'Runs Prod features in functional 
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
-task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features in functional tests.') {
+task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
   def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
   for (ftGroup in ftGroups.toLowerCase().split(",")) {
-    exec {
-      logger.lifecycle('Running FT group ' + ftGroup)
-      commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
+    doLast {
+      logger.info('Running FT group ' + ftGroup).execute()
+      commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup.execute()
     }
   }
 }
