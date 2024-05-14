@@ -43,6 +43,6 @@ public class DefaultJudgementIssuedClaimantNotificationHandler extends Dashboard
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantLiP();
+        return caseData.isApplicant1NotRepresented();
     }
 }

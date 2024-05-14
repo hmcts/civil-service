@@ -5,7 +5,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant',
         '{"Notice.AAA6.ClaimantIntent.CCJ.Requested.Claimant"}',
-        '{"Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant": []}');
+        '{"Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant": ["djClaimantNotificationMessage"]}');
 
 /**
  * Add notification template
@@ -15,8 +15,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant',
         'A judgment against the defendant has been made',
         'A judgment against the defendant has been made',
-        '<p class="govuk-body">The defendant should now pay you according to the terms of the judgment. <br> Once they do, you should <u>confirm that they’ve paid you the full amount that you’re owed</u>.<br>If they do not pay you by the date on the judgment, you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, such as the instalments you had previously agreed, you can <u>make an application to vary the judgment</u>.</p>',
-        '<p class="govuk-body">The defendant should now pay you according to the terms of the judgment. <br> Once they do, you should <u>confirm that they’ve paid you the full amount that you’re owed</u>.<br>If they do not pay you by the date on the judgment, you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, such as the instalments you had previously agreed, you can <u>make an application to vary the judgment</u>.</p>',
+        '<p class="govuk-body">The defendant should now pay you according to the terms of the judgment. <br> Once they do, you should <a href="{CONFIRM_YOU_HAVE_BEEN_PAID_URL}" class="govuk-link">confirm that they’ve paid you the full amount that you’re owed</a>.<br>If they do not pay you by the date on the judgment, you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, such as the instalments you had previously agreed, you can ${djClaimantNotificationMessage}.</p>',
+        '<p class="govuk-body">The defendant should now pay you according to the terms of the judgment. <br> Once they do, you should <a href="{CONFIRM_YOU_HAVE_BEEN_PAID_URL}" class="govuk-link">confirm that they’ve paid you the full amount that you’re owed</a>.<br>If they do not pay you by the date on the judgment, you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, such as the instalments you had previously agreed, you can ${djClaimantNotificationMessage}.</p>',
         'CLAIMANT');
 
 /**
