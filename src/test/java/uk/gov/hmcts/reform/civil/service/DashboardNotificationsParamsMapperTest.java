@@ -98,6 +98,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<u>make an application to set aside (remove) or vary the judgment</u>");
+
         assertThat(result).extracting("djClaimantNotificationMessage.").isEqualTo("<u>make an application to vary the judgment</u>");
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -168,6 +170,8 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{SERVICE_REQUEST_UPDATE}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
 
         assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
     }
