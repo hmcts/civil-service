@@ -605,8 +605,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
+                                                 dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
+                                                    dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -635,8 +637,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
+            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
+                                                 dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
+            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ?
+                                                    dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))

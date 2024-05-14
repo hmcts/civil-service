@@ -25,13 +25,10 @@ public class Respondent1DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts respondent1DQFixedRecoverableCosts;
-
     private DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
     private DisclosureOfElectronicDocuments specRespondent1DQDisclosureOfElectronicDocuments;
-
     private DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
     private DisclosureOfNonElectronicDocuments specRespondent1DQDisclosureOfNonElectronicDocuments;
-
     private DisclosureReport respondent1DQDisclosureReport;
     private Experts respondent1DQExperts;
     private ExpertDetails respondToClaimExperts;
