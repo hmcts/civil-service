@@ -47,9 +47,9 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been approved"),
+                "Mae eich cais am help gyda ffioedd wedi'i gymeradwyo"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">The full hearing fee of £455 will be covered by fee remission. You do not need to make a payment.</p>")
+                "<p class=\"govuk-body\">Telir ffi lawn y gwrandawiad o £455. Nid oes angen i chi wneud taliad.</p>")
         );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
