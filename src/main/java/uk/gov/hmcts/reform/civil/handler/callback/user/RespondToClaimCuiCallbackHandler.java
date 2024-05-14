@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -86,6 +87,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
             Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
@@ -101,7 +104,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!responseLanguageIsBilingual) {
+        if (!caseData.isRespondentResponseBilingual()) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
