@@ -99,7 +99,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 .respondent1Copy(null);
         }
 
-        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));

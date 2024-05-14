@@ -127,6 +127,6 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     }
 
     private boolean aboutToSubmitForUpdateNextHearingInfo(CallbackParams params) {
-        return params.getRequest().getEventId().equals(UpdateNextHearingInfo) && params.getType().equals(ABOUT_TO_SUBMIT);
+        return params.getRequest().getEventId().equals(UpdateNextHearingInfo.name()) && params.getType().equals(ABOUT_TO_SUBMIT);
     }
 }
