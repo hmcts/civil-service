@@ -91,9 +91,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
-            Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .flags(caseData.getRespondent1Copy().getFlags())
-                .partyID(caseData.getRespondent1Copy().getPartyID())
+            CaseData latestData = builder.build();
+            Party updatedRespondent1 = latestData.getRespondent1().toBuilder()
+                .flags(latestData.getRespondent1Copy().getFlags())
+                .partyID(latestData.getRespondent1Copy().getPartyID())
                 .build();
             builder.respondent1(updatedRespondent1)
                 .respondent1Copy(null);
