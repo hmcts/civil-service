@@ -57,8 +57,6 @@ public class ClaimFormMapper {
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toString)
             .orElse("0");
-        FlightDelayDetails obj = FlightDelayDetails.builder().flightNumber("BA1234").nameOfAirline("British Airways").scheduledDate(LocalDate.now()).build();
-        caseData.setFlightDelayDetails(obj);
         return ClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
