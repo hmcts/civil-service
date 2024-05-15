@@ -30,6 +30,7 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
                 .respondent1Represented(YesOrNo.NO)
                 .build();
 
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
