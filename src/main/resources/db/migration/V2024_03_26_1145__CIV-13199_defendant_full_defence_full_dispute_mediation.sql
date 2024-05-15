@@ -12,13 +12,13 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.De
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant',
-        'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation. '
-        'The court will contact you when they respond. '
+        'Response to the claim', 'Ymateb i’r hawliad',
+        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation.'
+        ' The court will contact you when they respond. '
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
-        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation. '
-        'The court will contact you when they respond. '
-        '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
+        '<p class="govuk-body">Rydych wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gall ${applicant1PartyName} wrthod neu gytuno i gyfryngu.'
+        ' Bydd y llys yn cysylltu â chi pan fyddant yn ymateb. '
+        '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">Gweld eich ymateb</a></p>',
         'DEFENDANT');
 
 /**
