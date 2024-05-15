@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
@@ -453,6 +454,34 @@ class ClaimFormMapperTest {
         ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getClaimNumber()).isEqualTo("000MC038");
+    }
+
+    @Test
+    void shouldMapFlightDelayDetails() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+                .respondent1(Party.builder()
+                        .companyName(COMPANY)
+                        .partyEmail(EMAIL)
+                        .type(Party.Type.COMPANY)
+                        .build())
+                .flightDelayDetails(FlightDelayDetails.builder()
+                        .flightNumber("BA123")
+                        .nameOfAirline("BATestAirLine")
+                        .scheduledDate(LocalDate.now()).build()).build();
+        //When
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
+        //Then
+        assertThat(form.getFlightDelayDetails()).isNotNull();
+        assertThat(form.getFlightDelayDetails().getFlightNumber()).isEqualTo("BA123");
+    }
+
+    @Test
+    void shouldNotMapFlightDelayDetailsIfDefendantTypeIsNotCompany() {
+        //When
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getFlightDelayDetails()).isNull();
     }
 
     private static CaseData getCaseData() {
