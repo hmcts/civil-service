@@ -581,6 +581,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
+    // GA for LIP
+    private final YesOrNo isGaApplicantLip;
+    private final YesOrNo isGaRespondentOneLip;
+    private final YesOrNo isGaRespondentTwoLip;
+
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentWithName>> documentAndNameToAdd;
@@ -651,6 +656,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
+    private CaseDocument decisionOnReconsiderationDocument;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
