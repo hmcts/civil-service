@@ -13,8 +13,8 @@ VALUES ('Scenario.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}.</p><p class="govuk-body">The defendant needs to send you their financial details.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}.</p><p class="govuk-body">The defendant needs to send you their financial details.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. The defendant needs to send you their financial details. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}. The defendant needs to send you their financial details. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
 /**

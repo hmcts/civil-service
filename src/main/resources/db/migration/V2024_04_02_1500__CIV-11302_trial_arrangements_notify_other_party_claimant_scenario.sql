@@ -13,8 +13,8 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role, time_to_live)
 VALUES ('Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant',
         'The other side has confirmed their trial arrangements', 'Mae''r parti arall wedi cadarnhau eu trefniadau treial',
-        '<p class="govuk-body">You can <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">view the arrangements that they''ve confirmed.</a></p>',
-        '<p class="govuk-body">Gallwch <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">weld y trefniadau y maent wedi''u cadarnhau.</a></p>',
+        '<p class="govuk-body">You can <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">view the arrangements that they''ve confirmed</a>.</p>',
+        '<p class="govuk-body">Gallwch <a href="{VIEW_ORDERS_AND_NOTICES_REDIRECT}" class="govuk-link">weld y trefniadau y maent wedi''u cadarnhau</a>.</p>',
         'CLAIMANT','Session');
 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,

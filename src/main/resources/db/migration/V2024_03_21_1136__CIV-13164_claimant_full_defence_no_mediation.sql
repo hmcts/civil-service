@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Clai
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant', 'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and refused mediation.<br>You need to respond by ${applicant1ResponseDeadlineEn}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and refused mediation.<br>You need to respond by ${applicant1ResponseDeadlineCy}.<br><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and refused mediation. You need to respond by ${applicant1ResponseDeadlineEn}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and refused mediation. You need to respond by ${applicant1ResponseDeadlineCy}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
         'CLAIMANT');
 
 /**

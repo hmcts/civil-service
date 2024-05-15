@@ -13,11 +13,11 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant',
         'Response to the claim', 'Response to the claim',
-        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation.<br>'
-        'The court will contact you when they respond.<br>'
+        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation. '
+        'The court will contact you when they respond. '
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
-        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation.<br>'
-        'The court will contact you when they respond.<br>'
+        '<p class="govuk-body">You have rejected the claim and suggested mediation. ${applicant1PartyName} can reject or agree to mediation. '
+        'The court will contact you when they respond. '
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
         'DEFENDANT');
 

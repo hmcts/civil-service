@@ -14,8 +14,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant',
         'You did not attend mediation',
         'You did not attend mediation',
-        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
-        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
+        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment</a>.</p>',
+        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment</a>.</p>',
         'CLAIMANT');
 
 /**
@@ -55,8 +55,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant',
         'You did not attend mediation',
         'You did not attend mediation',
-        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
-        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment.</a></p>',
+        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment</a>.</p>',
+        '<p class="govuk-body">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will not be reviewed by the court. <a href="{UPLOAD_MEDIATION_DOCUMENTS}" class="govuk-link">Explain why you did not attend your appointment</a>.</p>',
         'DEFENDANT');
 
 /**
