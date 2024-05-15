@@ -13,13 +13,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +35,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
+    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper = new RecordJudgmentOnlineMapper();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -63,9 +62,8 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         // If first time (IsLiveJudgmentExists = null) do not clear them
         if (caseData.getJoIsLiveJudgmentExists() != null) {
             caseData.setJoOrderMadeDate(null);
-            caseData.setJoJudgmentStatusDetails(null);
-            caseData.setJoPaymentPlanSelection(null);
-            caseData.setJoJudgmentInstalmentDetails(null);
+            caseData.setJoPaymentPlan(null);
+            caseData.setJoInstalmentDetails(null);
             caseData.setJoJudgmentRecordReason(null);
             caseData.setJoAmountOrdered(null);
             caseData.setJoAmountCostOrdered(null);
@@ -88,14 +86,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
-        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
-            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
-        }
-        caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setJoSetAsideOrderDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
@@ -103,6 +93,10 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoSetAsideReason(null);
         caseData.setJoSetAsideJudgmentErrorText(null);
         caseData.setJoJudgmentPaidInFull(null);
+        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
+            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
+        }
+        caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(RECORD_JUDGMENT_NOTIFICATION));
