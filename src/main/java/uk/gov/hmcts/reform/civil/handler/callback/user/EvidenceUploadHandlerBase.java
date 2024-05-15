@@ -799,7 +799,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
         caseDataBuilder.notificationText(notificationString.toString());
 
-        if(featureToggleService.isCaseProgressionEnabled()) {
+        if (featureToggleService.isCaseProgressionEnabled()) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
         }
 
