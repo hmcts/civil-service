@@ -28,15 +28,15 @@ VALUES ('Notice.AAA6.CP.Hearing.Scheduled.Claimant', 'A hearing has been schedul
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View hearings</a>', 'Hearing',
-        '<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View hearings</a>',
-        'Hearing', 'Hearing.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Claimant', '{3, 3}', 'CLAIMANT', 5),
+values ('<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View the hearing</a>', 'Hearing',
+        '<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View the hearing</a>',
+        'Hearing', 'Hearing.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Claimant', '{3, 3}', 'CLAIMANT', 8),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
         '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Claimant', '{3, 3}', 'CLAIMANT', 10),
-       ('<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View hearings</a>', 'Hearing',
-        '<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View hearings</a>',
-        'Hearing', 'Hearing.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Defendant', '{3, 3}', 'DEFENDANT', 5),
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Claimant', '{3, 3}', 'CLAIMANT', 14),
+       ('<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View the hearing</a>', 'Hearing',
+        '<a href={VIEW_HEARINGS}  rel="noopener noreferrer" class="govuk-link">View the hearing</a>',
+        'Hearing', 'Hearing.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Defendant', '{3, 3}', 'DEFENDANT', 8),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
         '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Defendant', '{3, 3}', 'DEFENDANT', 10);
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.CP.Hearing.Scheduled.Defendant', '{3, 3}', 'DEFENDANT', 13);
