@@ -121,7 +121,9 @@ public class GeneralAppFeesService {
         FeeLookupResponseDto feeLookupResponseDto;
         try {
             uri = builder.buildAndExpand(new HashMap<>()).toUri();
+            log.info("Calling fee service uri: {}", uri);
             feeLookupResponseDto = restTemplate.getForObject(uri, FeeLookupResponseDto.class);
+            log.info("Received fee service response, amount: {}", feeLookupResponseDto.getFeeAmount());
         } catch (Exception e) {
             log.error("Fee Service Lookup Failed - " + e.getMessage(), e);
             throw new RuntimeException(e);
