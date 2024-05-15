@@ -998,10 +998,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                         LocalDate.now().plusDays(70))
                                                                                    .listFrom(LocalDate.now().plusDays(56)).build())
                                                 .hearingCourtLocationList(courtList)
-                                                .altHearingCourtLocationList(getLocationList(callbackParams,
-                                                                                             updatedData,
-                                                                                             preferredCourt.orElse(null),
-                                                                                             true
+                                                .altHearingCourtLocationList(getLocationList(
+                                                    callbackParams,
+                                                    updatedData,
+                                                    preferredCourt.orElse(null),
+                                                    true
                                                 ))
                                                 .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder()
                                                                                   .physicalBundlePartyTxt(
@@ -1089,10 +1090,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          .dateTo(LocalDate.now().plusDays(455))
                                                          .build())
                                    .hearingCourtLocationList(DynamicList.builder()
-                                                                 .listItems(getCourtLocationForSdoR2(callbackParams,
-                                                                                                     updatedData,
-                                                                                                     preferredCourt
-                                                                                                         .orElse(null)
+                                                                 .listItems(getCourtLocationForSdoR2(
+                                                                     callbackParams,
+                                                                     updatedData,
+                                                                     preferredCourt
+                                                                         .orElse(null)
                                                                  ).getListItems())
                                                                  .value(getCourtLocationForSdoR2(
                                                                      callbackParams,
@@ -1227,18 +1229,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             matchingLocation = Optional.empty();
         }
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 matchingLocation.get(),
-                                                 true
+            locationsList = DynamicList.fromList(
+                locations,
+                this::getLocationEpimms,
+                LocationRefDataService::getDisplayEntry,
+                matchingLocation.get(),
+                true
             );
         } else {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 null,
-                                                 true
+            locationsList = DynamicList.fromList(
+                locations,
+                this::getLocationEpimms,
+                LocationRefDataService::getDisplayEntry,
+                null,
+                true
             );
         }
         return locationsList;
@@ -1594,7 +1598,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
-        log.info("isEarlyAdoptersEnabled value", featureToggleService.isEarlyAdoptersEnabled());
+        log.info("isEarlyAdoptersEnabled value  " + featureToggleService.isEarlyAdoptersEnabled());
         if (featureToggleService.isEarlyAdoptersEnabled()) {
             // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
             // ToDo: remove LiP check for CUI R2
@@ -1606,14 +1610,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
-                System.out.println("*****************INSIDE Not caseContainsLiP***********");
+                log.info("*****************INSIDE Not caseContainsLiP***********");
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(NO);
-                System.out.println("*****************INSIDE caseContainsLiP***********");
+                log.info("*****************INSIDE caseContainsLiP***********");
             }
         }
-        log.info("dataBuilder", dataBuilder);
+        log.info("dataBuilder " + dataBuilder);
+        log.info("***************" + featureToggleService.isEarlyAdoptersEnabled() + "***************");
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
             caseData.getDisposalHearingMethodInPerson()));
         dataBuilder.fastTrackMethodInPerson(deleteLocationList(
