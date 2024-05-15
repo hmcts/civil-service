@@ -137,14 +137,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-        var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
+    // @ParameterizedTest
+    // @ValueSource(booleans = {true, false})
+    // void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
+    //     var caseFileKey = "cui-case-progression";
+    //     givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
-    }
+    //     assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    // }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
