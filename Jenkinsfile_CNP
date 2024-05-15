@@ -14,6 +14,15 @@ def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
 
+def getFunctionalTestsGroups() {
+  def githubApi = new GithubAPI(this)
+  def functionalTestGroups = []
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_") ) {
+    functionalTestGroups.add(label.substring(6, label.length()))
+  }
+  return functionalTestGroups.join(",")
+}
+
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
    secretType : 'Secret',
@@ -125,6 +134,7 @@ withPipeline(type, product, component) {
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
   afterAlways('functionalTest:preview') {
