@@ -211,6 +211,9 @@ public class InitiateGeneralApplicationService {
 
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .isGaApplicantLip(caseData.isApplicantNotRepresented() == true ? YES : NO)
+            .isGaRespondentOneLip(caseData.isRespondent1LiP() == true ? YES : NO)
+            .isGaRespondentTwoLip(caseData.isRespondent2LiP() == true ? YES : NO)
             .generalAppType(caseData.getGeneralAppType())
             .generalAppHearingDate(caseData.getGeneralAppHearingDate())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
