@@ -3,16 +3,17 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{"Notice.AAA6.ClaimIssue.ClaimSubmit.Required"}',
-        '{"Notice.AAA6.ClaimIssue.ClaimFee.Required" : ["claimFee"]}');
+        '{"Notice.AAA6.ClaimIssue.ClaimFee.Required" : ["claimFee"]}'),
+       ('Scenario.AAA6.ClaimIssue.Claimant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'You need to pay your claim fee',
+VALUES ('Notice.AAA6.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'Mae angen i chi dalu ffi eich hawliad',
         '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
-        '<p class="govuk-body">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Pay the claim fee</a>.</p>',
+        '<p class="govuk-body">Nid yw eich hawliad wedi''i gyhoeddi eto, er mwyn bwrw ymlaen, rhaid i chi dalu ffi’r hawliad o ${claimFee}. <a href={CLAIM_FEE_URL}  rel="noopener noreferrer" class="govuk-link">Talu ffi’r hawliad</a>.</p>',
         'CLAIMANT');
 
 /**
@@ -36,16 +37,16 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 6),
        ('<a>View mediation documents</a>', 'Mediation','<a>View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 7),
-       ('<a>View hearings</a>', 'Hearings','<a>View hearings</a>',
-        'Hearings', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 8),
-       ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>',
-        'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 9),
-       ('<a>Add the trial arrangements</a>', 'Hearings' ,'<a>Add the trial arrangements</a>',
-        'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 10),
-       ('<a>Pay the hearing fee</a>', 'Hearings' ,'<a>Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 11),
-       ('<a>View the bundle</a>', 'Hearings' ,'<a>View the bundle</a>',
-        'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 12),
+       ('<a>View hearings</a>', 'Hearing','<a>View hearings</a>',
+        'Hearing', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 8),
+       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Upload hearing documents</a>',
+        'Hearing', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 9),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Claimant.FastTrack', '{1, 1}', 'CLAIMANT', 10),
+       ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Pay the hearing fee</a>',
+        'Hearing', 'Hearing.Fee.Pay', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 11),
+       ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
+        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 12),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
         '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
         'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.ClaimFee.Required', '{3, 3}', 'CLAIMANT', 13),

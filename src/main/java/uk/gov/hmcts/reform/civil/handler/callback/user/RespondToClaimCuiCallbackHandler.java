@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -26,11 +27,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Slf4j
 @Service
@@ -48,7 +52,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::populateRespondentCopyObjects,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -59,6 +63,17 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
@@ -66,10 +81,25 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(builder);
+            addEventAndDateAddedToRespondentWitnesses(builder);
+        }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
 
+        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
+            Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
+                .flags(caseData.getRespondent1Copy().getFlags())
+                .partyID(caseData.getRespondent1Copy().getPartyID())
+                .build();
+            builder.respondent1(updatedRespondent1)
+                .respondent1Copy(null);
+        }
+
+        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));

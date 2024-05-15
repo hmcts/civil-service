@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
@@ -33,15 +34,16 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
@@ -99,6 +101,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -176,7 +179,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
-import static uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod.fastTrackMethodInPerson;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
@@ -483,6 +485,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
+            Category category = Category.builder().categoryKey("HearingChannel").key(HearingSubChannel.INTER.name())
+                .valueEn(HearingMethod.IN_PERSON.getLabel()).activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
@@ -548,9 +554,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("lengthList").asString().isEqualTo(FIVE_HOURS.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("methodOfHearing").asString().isEqualTo(fastTrackMethodInPerson.toString());
+                .extracting("methodOfHearing").extracting("value").extracting("label").asString().isEqualTo(
+                    HearingMethod.IN_PERSON.getLabel());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
+                .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.PARTY.toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("sdoR2TrialFirstOpenDateAfter").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
@@ -668,6 +675,53 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2ScheduleOfLossToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2SeparatorUploadOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoR2TrialToggle").asString().isEqualTo("[INCLUDE]");
+        }
+
+        @Test
+        void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getText()).isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
+                .isEqualTo("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                               + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
+                               + " the hearing.");
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictWitness()).isEqualTo(NO);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictPages()).isEqualTo(NO);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
+                           .getPartyIsCountedAsWitnessTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getFontDetails()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getWitnessShouldNotMoreThanTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
+            assertThat(data.getSdoR2SmallClaimsWitnessStatementOther()
+                           .getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
+
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoStatementOfWitness()).isEqualTo(
+                SdoR2UiConstantFastTrack.STATEMENT_WITNESS);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getIsRestrictWitness()).isEqualTo(
+                NO);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant()).isEqualTo(3);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant()).isEqualTo(3);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getPartyIsCountedAsWitnessTxt())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getIsRestrictPages()).isEqualTo(NO);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getWitnessShouldNotMoreThanTxt())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages()).isEqualTo(12);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getFontDetails())
+                .isEqualTo(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadline()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE);
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate()).isEqualTo(LocalDate.now().plusDays(70));
+            assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineText()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
         }
 
         @ParameterizedTest
@@ -2068,52 +2122,99 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "in a separate paginated bundle by the claimant's solicitors and kept up to date. "
                                + "All references to medical notes are to be made by reference "
                                + "to the pages in that bundle.");
-
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
-                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                               + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                               + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                               + "commencement of hire until the earlier of:\n "
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                               + " months prior to the commencement of hire until the earlier of:\n"
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                               + "claimant.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
-                .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                               + "a) the need to hire a replacement vehicle; and\n"
-                               + "b) impecuniosity");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
-                .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
-                               + "from asserting need or relying on impecuniosity as the case may be at the final "
-                               + "hearing, save with permission of the Trial Judge.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
-                .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                               + "later than 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
-                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
-                               + " the paragraph above, each party may rely upon written evidence by way of witness"
-                               + " statement of one witness to provide evidence of basic hire rates available within"
-                               + " the claimant's geographical location, from a mainstream supplier, or a local"
-                               + " reputable supplier if none is available.");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
-                .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
-                .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
-                .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
-
+            if (featureToggleService.isSdoR2Enabled()) {
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
+                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
+                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                                   + "commencement of hire until the earlier of:\n "
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
+                                   + " months prior to the commencement of hire until the earlier of:\n"
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
+                                   + "claimant.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input2")
+                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                                   + "a) the need to hire a replacement vehicle; and\n"
+                                   + "b) impecuniosity");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("date1")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input3")
+                    .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
+                                   + "from asserting need or relying on impecuniosity as the case may be at the final "
+                                   + "hearing, save with permission of the Trial Judge.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("input4")
+                    .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                                   + "later than 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("sdoR2FastTrackCreditHireDetails").extracting("date2")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input5")
+                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
+                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
+                                   + " statement of one witness to provide evidence of basic hire rates available within"
+                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
+                                   + " reputable supplier if none is available.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input6")
+                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date3")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input7")
+                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date4")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input8")
+                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
+                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("detailsShowToggle")
+                    .isEqualTo(List.of(AddOrRemoveToggle.ADD));
+            } else {
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
+                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
+                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                                   + "commencement of hire until the earlier of:\n "
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
+                                   + " months prior to the commencement of hire until the earlier of:\n"
+                                   + "     i) 3 months after cessation of hire\n"
+                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
+                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
+                                   + "claimant.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
+                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                                   + "a) the need to hire a replacement vehicle; and\n"
+                                   + "b) impecuniosity");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
+                    .isEqualTo("A failure to comply with the paragraph above will result in the claimant being debarred "
+                                   + "from asserting need or relying on impecuniosity as the case may be at the final "
+                                   + "hearing, save with permission of the Trial Judge.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
+                    .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                                   + "later than 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
+                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
+                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
+                                   + " statement of one witness to provide evidence of basic hire rates available within"
+                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
+                                   + " reputable supplier if none is available.");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
+                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
+                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
+                    .isEqualTo(nextWorkingDayDate.toString());
+                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
+                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
+            }
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items in disrepair.");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
@@ -2433,6 +2534,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2445,6 +2548,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 )
                 .build();
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+
             assertThat(data.getSdoR2SmallClaimsJudgesRecital().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
             assertThat(data.getSdoR2SmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(21));
             assertThat(data.getSdoR2SmallClaimsPPI().getText()).isEqualTo(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
@@ -2462,9 +2568,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsWitnessStatements()
                            .getSdoR2SmallClaimsRestrictPages().getNoOfPages()).isEqualTo(12);
             assertThat(data.getSdoR2SmallClaimsHearing().getTrialOnOptions()).isEqualTo(HearingOnRadioOptions.OPEN_DATE);
-            assertThat(data.getSdoR2SmallClaimsHearing().getMethodOfHearing()).isEqualTo(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING);
+            DynamicList hearingMethodValuesDRH = data.getSdoR2SmallClaimsHearing().getMethodOfHearing();
+            List<String> hearingMethodValuesDRHActual = hearingMethodValuesDRH.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+            assertThat(hearingMethodValuesDRHActual).containsOnly(HearingMethod.IN_PERSON.getLabel());
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
-            assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO);
+            assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo()).isEqualTo(LocalDate.now().plusDays(70));
@@ -2473,6 +2583,27 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt()).isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
             assertThat(data.getSdoR2SmallClaimsImpNotes().getDate()).isEqualTo(LocalDate.now().plusDays(7));
+            assertThat(data.getSdoR2SmallClaimsMediationSectionStatement().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
+        }
+
+        @Test
+        void shouldPrePopulateDRHFields_CarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
         }
 
         @Test
@@ -2515,7 +2646,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPrePopulateToggleDRHFields() {
+        void shouldPrePopulateToggleDRHFields_CarmEnabled() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
@@ -2534,6 +2665,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2550,6 +2682,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearingToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsWitnessStatementsToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsPPIToggle()).isNull();
+            assertThat(response.getData()).extracting("sdoR2SmallClaimsMediationSectionToggle").isNotNull();
         }
 
         @Test

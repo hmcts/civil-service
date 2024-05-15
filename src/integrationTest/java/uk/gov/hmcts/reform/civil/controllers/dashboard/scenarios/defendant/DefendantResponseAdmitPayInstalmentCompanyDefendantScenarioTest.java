@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -37,6 +38,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .build())
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1Represented(YesOrNo.NO)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
@@ -57,8 +62,8 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
-                        "You've offered to do this starting from " +
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 every week. " +
+                        "You have offered to do this starting from " +
                         DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
@@ -88,6 +93,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1Represented(YesOrNo.NO)
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Claimant")
+                    .individualLastName("John")
+                    .build())
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                           .firstRepaymentDate(firstRepaymentDate)
                                           .paymentAmount(new BigDecimal(1000))
@@ -106,8 +115,8 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You've offered to pay £1000 in instalments of £10 every week. " +
-                        "You've offered to do this starting from " +
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 every week. " +
+                        "You have offered to do this starting from " +
                         DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
                         "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
                         "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"

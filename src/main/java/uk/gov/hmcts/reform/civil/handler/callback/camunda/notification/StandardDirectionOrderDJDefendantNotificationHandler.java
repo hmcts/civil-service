@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT;
 
@@ -56,7 +57,9 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
         CaseData caseData = callbackParams.getCaseData();
         if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
             || checkIfBothDefendants(caseData)) {
-            notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
+            notificationService.sendMail(caseData.isRespondent1NotRepresented()
+                                             ? caseData.getDefendantUserDetails().getEmail()
+                                             : caseData.getRespondentSolicitor1EmailAddress(),
                                          notificationsProperties.getStandardDirectionOrderDJTemplate(),
                                          addProperties(caseData),
                                          String.format(REFERENCE_TEMPLATE_SDO_DJ,
@@ -100,11 +103,13 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
+            Optional<Organisation> organisation = organisationService
+                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                                          .getOrganisation().getOrganisationID());
+            if (organisation.isPresent()) {
+                return organisation.get().getName();
+            }
         }
         return caseData.getApplicant1().getPartyName();
     }
@@ -122,6 +127,9 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return false;
+        }
         return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
     }
 

@@ -51,13 +51,13 @@ public class DashboardScenariosService {
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
 
-            //TODO create notifications based on notification template for given scenario Ref.
+            //create notifications based on notification template for given scenario Ref.
             createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
 
-            //TODO Create or update taskItem(s) based on task items template for given scenario ref.
+            //Create or update taskItem(s) based on task items template for given scenario ref.
             createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams);
 
-            //TODO Delete old notifications as notification template says for scenario ref (if exist for case ref)
+            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
             deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
         });
     }
@@ -93,6 +93,7 @@ public class DashboardScenariosService {
                     .descriptionEn(stringSubstitutor.replace(template.getDescriptionEn()))
                     .createdAt(OffsetDateTime.now())
                     .updatedOn(OffsetDateTime.now())
+                    .params(scenarioRequestParams.getParams())
                     .build();
 
                 log.info(
@@ -141,7 +142,7 @@ public class DashboardScenariosService {
                 .build();
 
             log.info(
-                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
+                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, HintTextEn = {}",
                 scenarioReference,
                 taskItemEntity.getId(),
                 taskItemEntity.getTaskNameEn(),

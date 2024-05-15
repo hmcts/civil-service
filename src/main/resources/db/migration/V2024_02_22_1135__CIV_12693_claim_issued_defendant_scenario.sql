@@ -2,16 +2,17 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}');
+VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}'),
+       ('Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.Response.Required', 'You haven´t responded to the claim', 'You haven´t responded to the claim',
+VALUES ('Notice.AAA6.ClaimIssue.Response.Required', 'You haven´t responded to the claim', 'Nid ydych wedi ymateb i''r hawliad',
         '<p class="govuk-body">You need to respond before ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a>.</p>',
-        '<p class="govuk-body">You need to respond before ${defaultRespondTime} on ${respondent1ResponseDeadlineCy}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a>.</p>',
+        '<p class="govuk-body">Mae angen i chi ymateb cyn ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Ymateb i''r hawliad</a>.</p>',
         'DEFENDANT');
 
 /**
@@ -34,14 +35,14 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 6),
        ('<a>View mediation documents</a>', 'Mediation','<a>View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 7),
-       ('<a>View hearings</a>', 'Hearings','<a>View hearings</a>',
-        'Hearings', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
-       ('<a>Upload hearing documents</a>', 'Hearings' ,'<a>Upload hearing documents</a>',
-        'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
-       ('<a>Add the trial arrangements</a>', 'Hearings' ,'<a>Add the trial arrangements</a>',
-        'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 10),
-       ('<a>View the bundle</a>', 'Hearings' ,'<a>View the bundle</a>',
-        'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
+       ('<a>View hearings</a>', 'Hearing','<a>View hearings</a>',
+        'Hearing', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
+       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Upload hearing documents</a>',
+        'Hearing', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{1, 1}', 'DEFENDANT', 10),
+       ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
+        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES}>View orders and notices</a>',
         'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 12),
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>View the judgment</a>',
