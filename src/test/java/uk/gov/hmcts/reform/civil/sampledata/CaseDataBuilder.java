@@ -1810,6 +1810,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder defaultJudgmentDocuments(List<Element<CaseDocument>> defaultJudgmentDocuments) {
+        this.defaultJudgmentDocuments = defaultJudgmentDocuments;
+        return this;
+    }
+
     public CaseDataBuilder atState(FlowState.Main flowState) {
         return atState(flowState, ONE_V_ONE);
     }
