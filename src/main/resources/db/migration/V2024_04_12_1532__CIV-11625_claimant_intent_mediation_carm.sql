@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
         '{"Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant",
-        "Notice.AAA6.ClaimantIntent.Mediation.Claimant"
+        "Notice.AAA6.ClaimantIntent.Mediation.Claimant",
         "Notice.AAA6.ClaimantIntent.GoToHearing.Claimant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant" : []}');
 
@@ -26,10 +26,10 @@ VALUES ('Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Defendant',
         '{"Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant",
-        Notice.AAA6.ClaimantIntent.Mediation.Defendant
-        "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant"
-        "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant"
-        "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant"
+        "Notice.AAA6.ClaimantIntent.Mediation.Defendant",
+        "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant",
+        "Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant",
+        "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant",
         "Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.NoMediation.Defendant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant" : []}');
 
