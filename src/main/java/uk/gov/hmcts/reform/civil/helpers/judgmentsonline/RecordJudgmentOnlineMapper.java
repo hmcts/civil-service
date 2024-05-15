@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -40,7 +41,7 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .issueDate(caseData.getJoOrderMadeDate())
             .orderedAmount(caseData.getJoAmountOrdered())
             .costs(caseData.getJoAmountCostOrdered())
-            .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())).toString())
+            .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(Optional.ofNullable(caseData.getJoAmountCostOrdered()).orElse("0"))).toString())
             .build();
     }
 

@@ -258,6 +258,7 @@ public class CaseDataBuilder {
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected YesOrNo respondent2Represented;
+    protected IdamUserDetails defendantUserDetails;
     protected YesOrNo defendant1LIPAtClaimIssued;
     protected YesOrNo defendant2LIPAtClaimIssued;
     protected String respondentSolicitor1EmailAddress;
@@ -1604,6 +1605,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder defendantUserDetails(IdamUserDetails defendantUserDetails) {
+        this.defendantUserDetails = defendantUserDetails;
         return this;
     }
 
@@ -7022,6 +7028,7 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .defendantUserDetails(defendantUserDetails)
             .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
             .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)

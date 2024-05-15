@@ -49,4 +49,28 @@ public class EditJudgmentsOnlineMapperTest {
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
     }
+
+    @Test
+    void testIfActiveJudgmentIsUpdated_scenario2() {
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+        caseData.setJoAmountCostOrdered(null);
+        caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
+
+        JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.MODIFIED, activeJudgment.getState());
+        assertEquals("1200", activeJudgment.getOrderedAmount());
+        assertEquals(null, activeJudgment.getCosts());
+        assertEquals("1200", activeJudgment.getTotalAmount());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
+        assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
+        assertEquals("0123", activeJudgment.getCourtLocation());
+        assertEquals(JudgmentType.JUDGMENT_FOLLOWING_HEARING, activeJudgment.getType());
+        assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
+        assertEquals(1, activeJudgment.getJudgmentId());
+        assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
+    }
 }

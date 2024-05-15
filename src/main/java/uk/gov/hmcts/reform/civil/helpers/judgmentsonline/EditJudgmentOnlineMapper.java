@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,7 +27,7 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 .issueDate(caseData.getJoOrderMadeDate())
                 .orderedAmount(caseData.getJoAmountOrdered())
                 .costs(caseData.getJoAmountCostOrdered())
-                .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())).toString())
+                .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(Optional.ofNullable(caseData.getJoAmountCostOrdered()).orElse("0"))).toString())
                 .build();
         }
         return activeJudgment;
