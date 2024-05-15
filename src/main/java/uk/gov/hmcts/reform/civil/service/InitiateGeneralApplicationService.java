@@ -122,7 +122,6 @@ public class InitiateGeneralApplicationService {
 
     private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
                                                 CaseData caseData, UserDetails userDetails, String authToken) {
-        CaseCategory caseType;
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -141,11 +140,10 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseType = CaseCategory.SPEC_CLAIM;
-        } else {
-            caseType = CaseCategory.UNSPEC_CLAIM;
-        }
+
+        final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? CaseCategory.SPEC_CLAIM
+            : CaseCategory.UNSPEC_CLAIM;
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
@@ -178,6 +176,10 @@ public class InitiateGeneralApplicationService {
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
+            caseLocation.getLeft().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+            caseLocation.getLeft().setRegion(caseData.getCaseManagementLocation().getRegion());
+        }
         //Setting Work Allocation location and location name
         if (Objects.isNull(caseLocation.getLeft().getSiteName())
             && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
@@ -209,6 +211,9 @@ public class InitiateGeneralApplicationService {
 
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .isGaApplicantLip(caseData.isApplicantNotRepresented() == true ? YES : NO)
+            .isGaRespondentOneLip(caseData.isRespondent1LiP() == true ? YES : NO)
+            .isGaRespondentTwoLip(caseData.isRespondent2LiP() == true ? YES : NO)
             .generalAppType(caseData.getGeneralAppType())
             .generalAppHearingDate(caseData.getGeneralAppHearingDate())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())

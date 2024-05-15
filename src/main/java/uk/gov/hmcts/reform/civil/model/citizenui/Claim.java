@@ -94,4 +94,27 @@ public interface Claim {
 
     boolean isPaymentPlanRejected();
 
+    boolean isPaymentPlanRejectedRequestedJudgeDecision();
+
+    boolean isHwFClaimSubmit();
+
+    boolean isHwFMoreInformationNeeded();
+
+    boolean isHwfNoRemission();
+
+    boolean isHwfPartialRemission();
+
+    boolean isHwfUpdatedRefNumber();
+
+    boolean isHwfInvalidRefNumber();
+
+    boolean isHwfPaymentOutcome();
+
+    boolean defendantRespondedWithPreferredLanguageWelsh();
+
+    boolean isWaitingForClaimantIntentDocUpload();
+
+    boolean isClaimSubmittedNotPaidOrFailedNotHwF();
+
+    boolean isClaimSubmittedWaitingTranslatedDocuments();
 }

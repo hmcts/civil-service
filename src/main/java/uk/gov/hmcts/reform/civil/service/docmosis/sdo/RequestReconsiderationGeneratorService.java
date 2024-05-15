@@ -53,7 +53,7 @@ public class RequestReconsiderationGeneratorService {
             new PDF(
                 getFileName(docmosisTemplate, caseData),
                 docmosisDocument.getBytes(),
-                DocumentType.SDO_ORDER
+                DocumentType.DECISION_MADE_ON_APPLICATIONS
             )
         );
     }
@@ -79,16 +79,6 @@ public class RequestReconsiderationGeneratorService {
                 SdoHelper.hasSharedVariable(caseData, "respondent2")
             )
             .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .smallClaims(caseData.getSmallClaims())
-            .hasCreditHire(
-                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire")
-            )
-            .hasRoadTrafficAccident(
-                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
-            )
             .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
 
         return desicionOnReconsiderationDocumentFormBuilder

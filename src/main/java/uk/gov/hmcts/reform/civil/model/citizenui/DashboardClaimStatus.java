@@ -24,17 +24,44 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
+    CLAIMANT_HWF_PARTIAL_REMISSION(
+        Claim::isHwfPartialRemission
+    ),
+    CLAIMANT_HWF_UPDATED_REF_NUMBER(
+        Claim::isHwfUpdatedRefNumber
+    ),
+    CLAIMANT_HWF_INVALID_REF_NUMBER(
+        Claim::isHwfInvalidRefNumber
+    ),
+    CLAIM_SUBMIT_HWF(
+        Claim::isHwFClaimSubmit
+    ),
+    HWF_MORE_INFORMATION_NEEDED(
+        Claim::isHwFMoreInformationNeeded
+    ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
     IN_MEDIATION(
         Claim::isMediationPending
     ),
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD(
+        Claim::isWaitingForClaimantIntentDocUpload
+    ),
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
     CLAIMANT_REJECTED_PAYMENT_PLAN(
         Claim::isPaymentPlanRejected
+    ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION(
+        Claim::isPaymentPlanRejectedRequestedJudgeDecision
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
@@ -60,6 +87,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::defendantRespondedWithPreferredLanguageWelsh
+    ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
@@ -79,7 +109,6 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -100,6 +129,12 @@ public enum DashboardClaimStatus {
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
+    ),
+    CLAIM_SUBMITTED_NOT_PAID_OR_FAILED(
+        Claim::isClaimSubmittedNotPaidOrFailedNotHwF
+    ),
+    CLAIM_SUBMITTED_WAITING_TRANSLATED_DOCUMENTS(
+        Claim::isClaimSubmittedWaitingTranslatedDocuments
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -125,7 +160,6 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
     ),

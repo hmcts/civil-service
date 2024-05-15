@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseFlags;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyFlagsModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +43,8 @@ public class CaseFlagsMapperTest {
                                .flagId("AB001")
                                .flagDescription("Vulnerable user")
                                .flagStatus("Active")
+                               .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                               .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                                .build(),
                            PartyFlagsModel.builder()
                                .partyID("res-1-party-id")
@@ -50,6 +53,8 @@ public class CaseFlagsMapperTest {
                                .flagId("SM001")
                                .flagDescription("Flight risk")
                                .flagStatus("Active")
+                               .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                               .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                                .build()))
             .build();
 

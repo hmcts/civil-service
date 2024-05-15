@@ -121,8 +121,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime notificationDateTime = time.now();
-        LocalDateTime currentDateTime = notificationDateTime;
-        LocalDate notificationDate = notificationDateTime.toLocalDate();
+        final LocalDateTime currentDateTime = notificationDateTime;
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
         caseData = saveCoSDetailsDoc(caseData, 1);
@@ -132,6 +131,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             multiPartyScenario = null;
         }
         CaseData updatedCaseData;
+        LocalDate notificationDate = notificationDateTime.toLocalDate();
 
         //Set R1 and R2 response deadlines, as both are represented
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {

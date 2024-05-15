@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -57,8 +58,12 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee() :
-            MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            return caseData.getOutstandingFeeInPounds();
+        }
+        return caseData.isLipvLipOneVOne()
+            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
+            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
@@ -72,7 +77,7 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentInterest(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-            caseData.getTotalInterest();
+            Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {

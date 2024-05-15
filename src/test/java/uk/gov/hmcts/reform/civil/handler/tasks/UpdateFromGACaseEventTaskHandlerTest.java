@@ -118,7 +118,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -432,7 +432,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -463,7 +463,38 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void testShouldAddGaAdditionalDocument() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithAdditionalDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithAddlDocStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
@@ -517,7 +548,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test
@@ -561,7 +592,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Nested
@@ -651,6 +682,36 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
         civilCaseDocumentList.add(documentElement);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldMergeBundle() {
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
+                .toBuilder()
+                .gaAddlDocBundle(singletonList(Element.<CaseDocument>builder()
+                        .id(UUID.fromString(uid))
+                        .value(pdfDocument).build())).build();
+        gaCaseData = handler.mergeBundle(gaCaseData);
+        assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(1);
+
+        List<Element<CaseDocument>> addlDoc = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
+                    .id(UUID.fromString(uid))
+                    .value(pdfDocument).build());
+            }};
+        List<Element<CaseDocument>> addlDocBundle = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
+                    .id(UUID.fromString(uid))
+                    .value(pdfDocument).build());
+            }};
+
+        gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
+                .toBuilder()
+                .gaAddlDoc(addlDoc)
+                .gaAddlDocBundle(addlDocBundle).build();
+        gaCaseData = handler.mergeBundle(gaCaseData);
+        assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(2);
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()

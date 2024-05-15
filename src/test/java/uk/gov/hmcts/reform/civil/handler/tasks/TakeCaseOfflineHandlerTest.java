@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +13,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -64,7 +67,7 @@ class TakeCaseOfflineHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new TakeCaseOfflineEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -87,13 +90,13 @@ class TakeCaseOfflineHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask);
+        verify(externalTaskService, never()).complete(mockTask, null);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(1000L)
+            eq(300000L)
         );
     }
 
@@ -101,11 +104,14 @@ class TakeCaseOfflineHandlerTest {
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
         String errorMessage = "there was an error";
 
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+        doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
+            .when(externalTaskService).complete(mockTask, null);
 
-        handler.execute(mockTask, externalTaskService);
+        assertThrows(
+            CompleteTaskException.class,
+            () -> handler.execute(mockTask, externalTaskService));
 
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),

@@ -12,11 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -509,8 +511,15 @@ class RoboticsNotificationServiceTest {
     void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
-                DJPaymentTypeSelection.SET_DATE).build();
+            .toBuilder()
+            .respondent1Represented(NO)
+            .applicant1Represented(NO)
+            .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
+                DJPaymentTypeSelection.SET_DATE)
+            .businessProcess(BusinessProcess.builder()
+                                 .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                                 .build())
+            .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";

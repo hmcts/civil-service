@@ -63,9 +63,11 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -238,6 +240,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
+            .respondent1ResponseDate(now())
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.NO)
@@ -263,6 +266,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
+            .respondent1ResponseDate(now())
             .respondent2(company("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.NO)
@@ -282,8 +286,10 @@ class SealedClaimLipResponseFormGeneratorTest {
     void partAdmitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
+            .respondent1ResponseDate(now())
             .respondent2(company("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent1ResponseDate(LocalDateTime.now())
             .specDefenceAdmittedRequired(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
@@ -309,6 +315,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     public void partAdmitPayByDate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
+            .respondent1ResponseDate(now())
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.NO)
@@ -442,6 +449,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
+            .respondent1ResponseDate(now())
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.NO)

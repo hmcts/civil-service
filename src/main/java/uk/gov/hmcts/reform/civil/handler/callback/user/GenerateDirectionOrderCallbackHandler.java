@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -108,6 +109,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final DocumentHearingLocationHelper locationHelper;
     private String ext = "";
     private final IdamClient idamClient;
+    private final WorkingDayIndicator workingDayIndicator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -232,11 +234,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return builder
             .orderOnCourtInitiative(FreeFormOrderValues.builder()
                                         .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
-                                        .onInitiativeSelectionDate(LocalDate.now().plusDays(7))
+                                        .onInitiativeSelectionDate(workingDayIndicator
+                                                                       .getNextWorkingDay(LocalDate.now().plusDays(7)))
                                         .build())
             .orderWithoutNotice(FreeFormOrderValues.builder()
                                     .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-                                    .withoutNoticeSelectionDate(LocalDate.now().plusDays(7))
+                                    .withoutNoticeSelectionDate(workingDayIndicator
+                                                                    .getNextWorkingDay(LocalDate.now().plusDays(7)))
                                     .build());
     }
 
@@ -268,11 +272,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
-        LocalDate advancedDate = LocalDate.now().plusDays(14);
-
         populateClaimant2Defendant2PartyNames(caseData);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
-                                                                               .builder().singleDate(LocalDate.now())
+                                                                               .builder().singleDate(workingDayIndicator
+                                                                                                         .getNextWorkingDay(LocalDate.now()))
                                                                                .build()).build())
             .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationComplex(ClaimantAndDefendantHeard
@@ -287,16 +290,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                     .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
                     .alternativeHearingList(getLocationsFromList(locations))
                     .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                                           .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
+                                           .datesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7))).build()).build())
             .orderMadeOnDetailsOrderCourt(
-                OrderMadeOnDetails.builder().ownInitiativeDate(
-                    LocalDate.now().plusDays(7)).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
+                OrderMadeOnDetails.builder().ownInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
+                    .ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
-                OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now().plusDays(7)).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+                OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
+                    .withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderCostsFirstDropdownDate(advancedDate)
-                                                  .assistedOrderAssessmentThirdDropdownDate(advancedDate)
+                                                  .assistedOrderCostsFirstDropdownDate(workingDayIndicator
+                                                                                           .getNextWorkingDay(LocalDate.now().plusDays(14)))
+                                                  .assistedOrderAssessmentThirdDropdownDate(workingDayIndicator
+                                                                                                .getNextWorkingDay(LocalDate.now().plusDays(14)))
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .makeAnOrderForCostsList(CLAIMANT)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
@@ -308,21 +313,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                          .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                            .appealChoiceSecondDropdownA(
                                                                                AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                             .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                                    .build())
                                                                            .appealChoiceSecondDropdownB(
                                                                                AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                                    .build())
                                                                            .build())
                                          .appealRefusedDropdown(AppealGrantedRefused.builder()
                                                                     .appealChoiceSecondDropdownA(
                                                                         AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                             .build())
                                                                     .appealChoiceSecondDropdownB(
                                                                         AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .appealGrantedRefusedDate(workingDayIndicator
+                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
                                                                             .build())
 
                                                                     .build()).build())

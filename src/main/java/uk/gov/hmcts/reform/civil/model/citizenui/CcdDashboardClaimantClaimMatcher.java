@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -15,6 +16,8 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -27,6 +30,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
         super(caseData);
         this.featureToggleService = featureToggleService;
+    }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return caseData.isApplicantNotRepresented()
+            && !caseData.isHWFTypeClaimIssued()
+            && ((caseData.getClaimIssuedPaymentDetails() == null && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED)
+            || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && caseData.isBilingual()
+            && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
     @Override
@@ -98,9 +116,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn())
-            || (null != caseData.getCcjPaymentDetails()
+        return (null != caseData.getCcjPaymentDetails()
             && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
@@ -229,9 +245,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
             && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
             || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -297,7 +313,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return  caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
@@ -307,6 +323,79 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isPaymentPlanRejected() {
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && caseData.hasApplicantRejectedRepaymentPlan());
+            && caseData.hasApplicantRejectedRepaymentPlan()
+            && !isIndividualORSoleTrader());
+    }
+
+    @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+                && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+                && caseData.hasApplicantRejectedRepaymentPlan()
+                && isIndividualORSoleTrader()
+                && isCourtDecisionRejected());
+    }
+
+    private boolean isCourtDecisionRejected() {
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1LiPResponse)
+                .orElse(null);
+
+        return applicant1Response != null
+                && applicant1Response.hasClaimantRejectedCourtDecision();
+    }
+
+    private boolean isIndividualORSoleTrader() {
+        return nonNull(caseData.getRespondent1())
+               ? caseData.getRespondent1().isIndividualORSoleTrader() : false;
+    }
+
+    @Override
+    public boolean isHwFClaimSubmit() {
+        return caseData.isHWFTypeClaimIssued()
+            && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && null == caseData.getHwFEvent();
+    }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF;
+    }
+
+    @Override
+    public boolean isHwfPartialRemission() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+    }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE;
+    }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
+    }
+
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence()
+                && caseData.getApplicant1ResponseDate() != null
+                && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+                && caseData.isBilingual();
     }
 }

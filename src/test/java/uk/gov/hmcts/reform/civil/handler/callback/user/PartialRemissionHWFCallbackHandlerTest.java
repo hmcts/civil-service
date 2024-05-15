@@ -37,14 +37,14 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
     private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
-
     @Mock
-    private HWFFeePaymentOutcomeService hwfService;
+    private HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfService);
+        objectMapper.findAndRegisterModules();
+        handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfFeePaymentOutcomeService);
     }
 
     @Test
@@ -56,48 +56,49 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
 
         @Test
-        void shouldCallPartialRemissionHwfEvent() {
+        void shouldCallPartialRemissionHwfEventWhenFeeTypeIsClaimIssued() {
             CaseData caseData = CaseData.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .remissionAmount(BigDecimal.valueOf(1000))
+                                           .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
                                            .build())
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(PARTIAL_REMISSION_HWF_GRANTED);
         }
 
         @Test
-        void shouldCallPartialRemissionHwfEventFoeHearingFee() {
+        void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
             CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                 .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(BigDecimal.valueOf(1000))
-                                           .build())
+                                       .remissionAmount(BigDecimal.valueOf(1000))
+                                       .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
+                                       .build())
                 .hwfFeeType(FeeType.HEARING)
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
+            assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(PARTIAL_REMISSION_HWF_GRANTED);
         }
     }
 
@@ -111,8 +112,8 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
                                        .remissionAmount(BigDecimal.valueOf(-1000))
                                        .build())
             .hwfFeeType(FeeType.CLAIMISSUED)
-
             .build();
+
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");
 
         //When

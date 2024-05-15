@@ -59,7 +59,7 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         void setUp() {
             when(notificationsProperties.getNotifyClaimantLrTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn("template-id-manual-determination");
-            given(organisationDetailsService.getApplicantLegalOrganizationName(any())).willReturn(ORGANISATION_NAME);
+            given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -107,7 +107,7 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData)
             );
         }
 

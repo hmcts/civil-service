@@ -199,7 +199,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
-        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(
+            OrganisationPolicy.builder()
                  .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                  .organisationID(value.getOrganisationIdentifier()).build())
                  .orgPolicyReference(null)
@@ -569,9 +570,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isSdoR2Enabled()) {
             ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
             dataBuilder.claimType(claimType);
-            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()));
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType, caseData.getPersonalInjuryType(),
+                                                         toggleService, caseData));
         } else {
-            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()));
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType(),
+                                                         toggleService, caseData));
         }
         dataBuilder.submittedDate(time.now());
 

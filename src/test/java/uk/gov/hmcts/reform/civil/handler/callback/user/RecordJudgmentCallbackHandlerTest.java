@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,15 +16,18 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -51,11 +56,16 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
-        @Test
-        void shouldPopulateAllJoFieldsAsNull() {
+        @ParameterizedTest
+        @EnumSource(YesOrNo.class)
+        void shouldPopulateAllJoFieldsAsNull(YesOrNo yesOrNo) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .joIsLiveJudgmentExists(yesOrNo)
+                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED)
+                                             .lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
+                .joIssuedDate(LocalDate.now())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -72,9 +82,27 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joAmountOrdered")).isNull();
             assertThat(response.getData().get("joAmountCostOrdered")).isNull();
             assertThat(response.getData().get("joIsRegisteredWithRTL")).isNull();
-            assertThat(response.getData().get("joAmountOrdered")).isNull();
-            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+            assertThat(response.getData().get("joIssuedDate")).isNull();
+        }
 
+        @Test
+        void shouldNotPopulateAllJoFieldsAsNull() {
+            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .joIsLiveJudgmentExists(null)
+                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED)
+                                             .lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
+                .joIssuedDate(LocalDate.now())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            //Then: it will return an empty callback
+            assertThat(response.getData()).isNull();
         }
     }
 
@@ -105,6 +133,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
@@ -130,13 +159,14 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -155,8 +185,22 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData()).containsEntry("joPaymentToBeMadeByDate", "2023-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+        }
+
+        @Test
+        void whenAboutToSubmit_andRTLNo_thenSetIssuedDateToNull() {
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+            caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("joIssuedDate")).isNull();
         }
     }
 
@@ -177,7 +221,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
@@ -214,5 +258,4 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertTrue(response.getConfirmationBody().contains("The judgment has been recorded"));
         }
     }
-
 }

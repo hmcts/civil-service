@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -75,7 +74,6 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
-            assertThat(response.getState()).isEqualTo(All_FINAL_ORDERS_ISSUED.name());
         }
     }
 

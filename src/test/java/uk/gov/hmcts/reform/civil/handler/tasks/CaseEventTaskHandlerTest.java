@@ -4,6 +4,7 @@ import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -173,7 +175,7 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(1000L)
+                eq(300000L)
             );
         }
 
@@ -209,7 +211,7 @@ class CaseEventTaskHandlerTest {
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
                 eq(2),
-                eq(1000L)
+                eq(300000L)
             );
         }
 
@@ -223,11 +225,14 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.startUpdate(any(), any()))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
-            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+            doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
+                .when(externalTaskService).complete(mockTask);
 
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
+            assertThrows(
+                CompleteTaskException.class,
+                () -> caseEventTaskHandler.execute(mockTask, externalTaskService));
 
-            verify(externalTaskService).handleFailure(
+            verify(externalTaskService, never()).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -636,6 +641,7 @@ class CaseEventTaskHandlerTest {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
@@ -649,10 +655,12 @@ class CaseEventTaskHandlerTest {
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                          FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                           FlowFlag.BULK_CLAIM_ENABLED.name(), false
                     );
         }
@@ -758,7 +766,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
@@ -778,7 +786,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
@@ -798,7 +806,7 @@ class CaseEventTaskHandlerTest {
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }

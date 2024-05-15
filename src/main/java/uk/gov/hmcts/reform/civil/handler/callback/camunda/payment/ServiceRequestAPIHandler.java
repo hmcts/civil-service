@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.isDisposalHearing;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Slf4j
@@ -75,16 +75,16 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
             String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
             HearingNoticeVariables camundaVars = camundaService.getProcessVariables(processInstanceId);
-            boolean isDisposalHearing = isDisposalHearing(camundaVars.getHearingType());
+            boolean requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
 
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails()) && !isDisposalHearing) {
+            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails()) && requiresHearingFee) {
                 try {
                     SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                         .fee(calculateAndApplyFee(
                             hearingFeesService,
                             caseData,
-                            caseData.getAllocatedTrack().name()));
+                            caseData.getAssignedTrack()));
                     caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
                 } catch (FeignException e) {
                     log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",

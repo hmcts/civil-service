@@ -21,8 +21,10 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -35,6 +37,7 @@ import static java.util.Optional.ofNullable;
 public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private static final String gaDocSuffix = "Document";
+    private static final String gaAddlDocSuffix = "Doc";
     private static final String civilDocStaffSuffix = "DocStaff";
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
@@ -102,11 +105,25 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, gaDraft);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaResp");
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
+            generalAppCaseData = mergeBundle(generalAppCaseData);
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
 
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         return output;
+    }
+
+    protected CaseData mergeBundle(CaseData generalAppCaseData) {
+        if (Objects.nonNull(generalAppCaseData.getGaAddlDocBundle())) {
+            List<Element<CaseDocument>> newGaAddlDoc = generalAppCaseData.getGaAddlDoc();
+            if (Objects.isNull(newGaAddlDoc)) {
+                newGaAddlDoc = new ArrayList<>();
+            }
+            newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
+            return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
+        }
+        return generalAppCaseData;
     }
 
     @SuppressWarnings("unchecked")
@@ -158,6 +175,10 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
         //staff collection will hold ga doc accessible for judge and staff
         String fromGaList = docFieldName + gaDocSuffix;
+        if (civilDocPrefix.equals("gaAddl")) {
+            fromGaList = docFieldName + gaAddlDocSuffix;
+        }
+
         String toCivilStaffList = civilDocPrefix + civilDocStaffSuffix;
         updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilStaffList);

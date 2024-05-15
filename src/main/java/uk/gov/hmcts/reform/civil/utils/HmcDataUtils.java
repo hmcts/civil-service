@@ -266,7 +266,7 @@ public class HmcDataUtils {
     @Nullable
     public static LocationRefData getLocationRefData(String hearingId, String venueId,
                                                      String bearerToken, LocationRefDataService locationRefDataService) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         if (matchedLocations.size() > 0) {
             return matchedLocations.get(0);

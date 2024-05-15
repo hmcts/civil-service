@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -98,9 +100,9 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getCourtLocationsForDefaultJudgments(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
+                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
-                                                                                             .siteName("SiteName")
+                                                                                             .venueName("VenueName")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
                                                                                              .postcode("Postcode")
@@ -169,7 +171,7 @@ class HearingNoticeHmcGeneratorTest {
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -223,7 +225,7 @@ class HearingNoticeHmcGeneratorTest {
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount("£1")
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -279,7 +281,7 @@ class HearingNoticeHmcGeneratorTest {
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .defendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
@@ -291,12 +293,16 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS",
+        "AAA7-DRH"
+    })
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType) {
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DIS")
+                                .hearingType(hearingType)
                                 .build())
             .build();
 
@@ -337,7 +343,63 @@ class HearingNoticeHmcGeneratorTest {
             .claimant2Reference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
-            .hearingSiteName("SiteName")
+            .hearingSiteName("VenueName")
+            .hearingLocation("SiteName - CourtAddress - Postcode")
+            .hearingDays("01 January 2023 at 00:00 for 12 hours")
+            .totalHearingDuration("2 days")
+            .hearingType("hearing")
+            .hearingDueDate(null)
+            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-DRH")
+                                .build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoApplicants()
+            .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.SUCCESS)
+                                          .build())
+            .solicitorReferences(null)
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+        var expected = HearingNoticeHmc.builder()
+            .caseNumber(caseData.getCcdCaseReference())
+            .creationDate(LocalDate.now())
+            .claimant(caseData.getApplicant1().getPartyName())
+            .claimant2(caseData.getApplicant2().getPartyName())
+            .defendant(caseData.getRespondent1().getPartyName())
+            .feeAmount(null)
+            .hearingSiteName("VenueName")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")

@@ -644,6 +644,38 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100000, so track is intermediate, as this is the upper limit
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+        }
+
+        @Test
+        public void shouldSetMultiAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100001, so track is multi
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100001))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.MULTI_CLAIM.name());
+        }
+
+        @Test
         public void testValidateLengthOfUnemploymentWithError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
@@ -1370,7 +1402,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         var testDocument = ResponseDocument.builder()
             .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl(
                 "binary-url").build()).build();
@@ -1404,7 +1435,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         var testDocument = ResponseDocument.builder()
             .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl(
                 "binary-url").build()).build();
@@ -1449,7 +1479,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         var testDocument = ResponseDocument.builder()
             .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl(
                 "binary-url").build()).build();
@@ -1506,7 +1535,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         var testDocument = ResponseDocument.builder()
             .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl(
                 "binary-url").build()).build();
@@ -1546,7 +1574,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldPopulateRespondent2Flag_WhenInvoked() {
         // Given
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
@@ -1571,7 +1598,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotPopulateRespondent2Flag_WhenInvoked() {
         // Given
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);

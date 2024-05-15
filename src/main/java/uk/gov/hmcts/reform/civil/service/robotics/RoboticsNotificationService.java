@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -152,7 +153,8 @@ public class RoboticsNotificationService {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-                if (nonNull(caseData.getPaymentTypeSelection())) {
+                if (nonNull(caseData.getPaymentTypeSelection())
+                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()

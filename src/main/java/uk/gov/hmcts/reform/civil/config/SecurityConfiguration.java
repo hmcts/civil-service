@@ -31,7 +31,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "caseworker",
         "caseworker-caa",
         "caseworker-approver",
-        "citizen"
+        "citizen",
+        "next-hearing-date-admin"
     };
 
     private static final String[] AUTH_WHITELIST = {
