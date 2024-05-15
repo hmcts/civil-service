@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -23,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.getRequiredDateBeforeFourPm;
@@ -55,7 +57,8 @@ public class ClaimFormMapper {
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toString)
             .orElse("0");
-
+        FlightDelayDetails obj = FlightDelayDetails.builder().flightNumber("BA1234").nameOfAirline("British Airways").scheduledDate(LocalDate.now()).build();
+        caseData.setFlightDelayDetails(obj);
         return ClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
@@ -83,6 +86,7 @@ public class ClaimFormMapper {
             .generationDate(LocalDateTime.now())
             .claimIssuedDate(caseData.getIssueDate())
             .claimNumber(caseData.getLegacyCaseReference())
+            .flightDelayDetails(getFlightDelayDetails(caseData))
             .build();
     }
 
@@ -164,5 +168,13 @@ public class ClaimFormMapper {
                 .toList())
             .orElse(Collections.emptyList());
 
+    }
+
+    @JsonIgnore
+    private FlightDelayDetails getFlightDelayDetails(CaseData caseData) {
+        return Objects.nonNull(caseData.getFlightDelayDetails()) && caseData.getRespondent1().isCompany()
+                ? FlightDelayDetails.builder().flightNumber(caseData.getFlightDelayDetails().getFlightNumber())
+                .nameOfAirline(caseData.getFlightDelayDetails().getNameOfAirline()).scheduledDate(caseData.getFlightDelayDetails().getScheduledDate()).build()
+                : null;
     }
 }
