@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -228,7 +229,7 @@ public class LocationHelper {
     public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
         return CaseLocationCivil.builder()
             .region(location.getRegionId())
-            .baseLocation(location.getEpimmsId())
+            .baseLocation(LocationRefDataUtil.getLiveCourtByEpimmsId(location.getEpimmsId()))
             .build();
     }
 

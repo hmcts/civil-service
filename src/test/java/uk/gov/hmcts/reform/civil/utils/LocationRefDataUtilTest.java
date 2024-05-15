@@ -17,13 +17,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class LocationRefDataUtilTest {
+class LocationRefDataUtilTest {
 
+    private static final String BEARER_TOKEN = "Bearer Token";
     @InjectMocks
     private LocationRefDataUtil locationRefDataUtil;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    private static final String BEARER_TOKEN = "Bearer Token";
 
     @BeforeEach
     void setup() {
@@ -32,7 +32,7 @@ public class LocationRefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPreferredCourtCodeFromRefDataWhenCaseLocationIsPresent() {
+    void shouldReturnPreferredCourtCodeFromRefDataWhenCaseLocationIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation()
             .build();
@@ -43,39 +43,56 @@ public class LocationRefDataUtilTest {
                                .epimmsId("000000").build());
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
-                                                                              BEARER_TOKEN, true);
+                                                                              BEARER_TOKEN, true
+        );
         assertEquals("121", preferredCourtCode);
     }
 
     @Test
-    public void shouldReturnApplicantPreferredCourtCodeWhenCaseLocationIsNotPresent() {
+    void shouldReturnApplicantPreferredCourtCodeWhenCaseLocationIsNotPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation_old()
             .build();
-        List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10").courtLocationCode("127")
-                               .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
-                                                                              BEARER_TOKEN, true);
+                                                                              BEARER_TOKEN, true
+        );
         assertEquals("127", preferredCourtCode);
     }
 
     @Test
-    public void shouldReturnEmptyStringWhenPreferredCourtCodeNotAvailableFromRefData() {
+    void shouldReturnEmptyStringWhenPreferredCourtCodeNotAvailableFromRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .courtLocation()
+            .build();
+        String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
+                                                                              BEARER_TOKEN, true
+        );
+        assertEquals("", preferredCourtCode);
+    }
+
+    @Test
+    void shouldReturnApplicantPreferredCourtCodeWhenCaseLocationIsNotPresentLive() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+            .courtLocationLive()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
         courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                                .courtTypeId("10")
-                               .epimmsId("121212").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+                               .courtLocationCode("223503")
+                               .epimmsId("425094").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any()))
+            .thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
-                                                                              BEARER_TOKEN, true);
-        assertEquals("", preferredCourtCode);
+                                                                              BEARER_TOKEN, true
+        );
+        assertEquals("223503", preferredCourtCode);
+    }
+
+    @Test
+    void getLiveEpimmsIdForCourt() {
+        assertEquals("223503", locationRefDataUtil.getLiveCourtByEpimmsId("425094"));
+        assertEquals("123456", locationRefDataUtil.getLiveCourtByEpimmsId("123456"));
     }
 }

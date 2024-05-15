@@ -21,7 +21,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
-public class LocationHelperTest {
+class LocationHelperTest {
 
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
@@ -29,7 +29,7 @@ public class LocationHelperTest {
     private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
 
     @Test
-    public void thereIsAMatchingLocation() {
+    void thereIsAMatchingLocation() {
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
         List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                       .courtLocationCode("123")
@@ -50,7 +50,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenSpecDefendantIsPerson_courtIsDefendants() {
+    void whenSpecDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
@@ -83,7 +83,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenSpecDefendantIsPersonAndDefendant2_courtIsDefendant2() {
+    void whenSpecDefendantIsPersonAndDefendant2_courtIsDefendant2() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
@@ -125,7 +125,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenLessThan1000_locationIsCcmcc() {
+    void whenLessThan1000_locationIsCcmcc() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -165,7 +165,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenLessThan1000_locationIsCcmccEvenUndef() {
+    void whenLessThan1000_locationIsCcmccEvenUndef() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(1000))
@@ -187,7 +187,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenDefendantIsPerson_courtIsDefendants() {
+    void whenDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -213,13 +213,13 @@ public class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
-        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court).isPresent();
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
             .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
     }
 
     @Test
-    public void whenSpecDefendantIsGroup_courtIsClaimants() {
+    void whenSpecDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
@@ -247,13 +247,13 @@ public class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
-        Assertions.assertThat(court.isPresent()).isTrue();
-        Assertions.assertThat(court.get())
-            .isEqualTo(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt());
+        Assertions.assertThat(court).isPresent();
+        Assertions.assertThat(court)
+            .contains(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt());
     }
 
     @Test
-    public void whenDefendantIsGroup_courtIsClaimants() {
+    void whenDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -279,13 +279,13 @@ public class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
-        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court).isPresent();
         Assertions.assertThat(court.get().getResponseCourtCode())
             .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
     }
 
     @Test
-    public void when1v2AnyIndividual_thenCourtIsIndividualDefendant() {
+    void when1v2AnyIndividual_thenCourtIsIndividualDefendant() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()

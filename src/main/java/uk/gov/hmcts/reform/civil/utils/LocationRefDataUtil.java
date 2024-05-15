@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
@@ -17,6 +19,18 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 public class LocationRefDataUtil {
 
     private final LocationRefDataService locationRefDataService;
+    /*
+    *  Below map holds the key = Closed court in ref data
+    *  and Value holds the live court against closed court
+    * */
+    public static final Map<String, String> liveEpimmsIdMap = Map.of("336348", "214320",
+                 "403751", "227860",
+                 "425094", "223503",
+                 "487294", "369145",
+                 "498443", "366796",
+                 "634542", "102050",
+                 "711798", "198592",
+                 "771467", "369145");
 
     @Autowired
     public LocationRefDataUtil(LocationRefDataService locationRefDataService) {
@@ -32,7 +46,7 @@ public class LocationRefDataUtil {
             return caseData.getCourtLocation().getApplicantPreferredCourt();
         } else {
             List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
-                authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+                authToken, getLiveCourtByEpimmsId(caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
             if (!courtLocations.isEmpty()) {
                 return courtLocations.stream()
                     .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
@@ -41,9 +55,13 @@ public class LocationRefDataUtil {
                         ? locationRefData.getCourtLocationCode() : locationRefData.getCourtName())
                     .orElse("");
             } else {
-                log.info("Court location not found");
+                log.info("Court location not found for caseId {}", caseData.getCcdCaseReference());
                 return "";
             }
         }
+    }
+
+    public static String getLiveCourtByEpimmsId(String epimmsId) {
+        return epimmsId != null ? Optional.ofNullable(liveEpimmsIdMap.get(epimmsId)).orElse(epimmsId) : epimmsId;
     }
 }

@@ -183,17 +183,17 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        public void thereIsAMatchingLocation() {
+        void thereIsAMatchingLocation() {
             CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
 
             helper.updateWithLocation(updatedData, LocationRefData.builder()
-                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
+                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("336348").build());
 
             Assertions.assertThat(updatedData.build().getCaseManagementLocation())
                 .isNotNull()
                 .isEqualTo(CaseLocationCivil.builder()
                                .region("regionId")
-                               .baseLocation("epimms")
+                               .baseLocation("214320")
                                .build());
         }
     }
