@@ -2,7 +2,8 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}');
+VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}'),
+       ('Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
@@ -34,17 +35,19 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 6),
        ('<a>View mediation documents</a>', 'Mediation','<a>View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 7),
-       ('<a>View hearings</a>', 'Hearing','<a>Gweld y gwrandawiad</a>',
+       ('<a>View the hearing</a>', 'Hearing','<a>Gweld y gwrandawiad</a>',
         'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
        ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
         'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
+       ('<a>View documents</a>', 'Hearing' ,'<a>Gweld y dogfennau</a>', 'Gwrandawiad',
+        'Hearing.Document.View', 'Scenario.AAA6.ClaimIssue.Response.Required','{1, 1}', 'DEFENDANT', 10),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 10),
+        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{1, 1}', 'DEFENDANT', 11),
        ('<a>View the bundle</a>', 'Hearing' ,'<a>Gweld y bwndel</a>',
-        'Gwrandawiad', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
+        'Gwrandawiad', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 12),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES}>Gweld gorchmynion a rhybuddion</a>',
-        'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 12),
-       ('<a>View the judgment</a>', 'Judgment from the court' ,'<a>Gweld y Dyfarniad</a>',
-        'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 13),
+        'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 13),
+       ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>Gweld y Dyfarniad</a>',
+        'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
        ('<a>View applications</a>', 'Applications' ,'<a>Gweld y cais i gyd</a>',
-        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14);
+        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 15);
