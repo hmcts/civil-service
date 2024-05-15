@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -105,6 +106,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -143,6 +146,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
     }
 
     @Test

@@ -26,6 +26,4 @@ values ('<a href="{UPLOAD_HEARING_DOCUMENTS}" class="govuk-link">Upload hearing 
         'Hearing.Document.Upload', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant',
         '{5, 5}', 'CLAIMANT', 10,
         'Deadline is 4pm on ${sdoDocumentUploadRequestedDateEn}',
-        'Deadline is 4pm on ${sdoDocumentUploadRequestedDateCy}'),
-       ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>',
-        'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Upload.Claimant','{3, 3}', 'CLAIMANT', 11, null, null);
+        'Deadline is 4pm on ${sdoDocumentUploadRequestedDateCy}');

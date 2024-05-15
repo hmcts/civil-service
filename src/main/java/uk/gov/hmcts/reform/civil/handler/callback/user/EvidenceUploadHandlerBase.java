@@ -1,5 +1,39 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FilenameUtils;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,39 +50,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.io.FilenameUtils;
-
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -56,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -75,6 +77,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final UserService userService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final FeatureToggleService featureToggleService;
 
     private static final String SPACE = " ";
     private static final String END = ".";
@@ -170,7 +173,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                         CaseDetailsConverter caseDetailsConverter,
                                         CoreCaseDataService coreCaseDataService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
-                                        String createShowCondition) {
+                                        String createShowCondition, FeatureToggleService featureToggleService) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
@@ -180,6 +183,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.userService = userService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.coreCaseDataService = coreCaseDataService;
+        this.featureToggleService = featureToggleService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
@@ -794,6 +798,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.trialSelectionEvidenceRes(null);
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
         caseDataBuilder.notificationText(notificationString.toString());
+
+        if(featureToggleService.isCaseProgressionEnabled()) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
