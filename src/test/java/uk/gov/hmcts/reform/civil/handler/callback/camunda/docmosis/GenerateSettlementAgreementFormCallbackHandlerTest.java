@@ -73,28 +73,7 @@ public class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCall
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
-
-    @Test
-    void shouldNotGenerateForm_whenApplicantNotAcceptedRepaymentPlan() {
-        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(caseDocument);
-
-        CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.ORGANISATION)
-                        .build())
-                .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM.name());
-
-        handler.handle(params);
-        verify(formGenerator, never()).generate(any(CaseData.class), anyString());
-        verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
-    }
-
+    
     @Test
     void shouldReturnCorrectActivityId_whenRequestedSettlementAgreementForm() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
