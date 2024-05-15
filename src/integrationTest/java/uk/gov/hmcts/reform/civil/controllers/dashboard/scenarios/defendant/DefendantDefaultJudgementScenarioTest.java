@@ -23,6 +23,7 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
 
     @Autowired
     private DefaultJudgementIssuedClaimantNotificationHandler defaultJudgementIssuedClaimantNotificationHandler;
+
     @Test
     void should_create_scenario_for_default_judgement() throws Exception {
 
@@ -55,6 +56,7 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
                                "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>.</p>")
             );
     }
+
     @Test
     void should_create_scenario_for_default_judgement_claimant() throws Exception {
 
