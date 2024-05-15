@@ -24,16 +24,12 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isJudgmentOnlineLive()
+        return featureToggleService.isDashboardServiceEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     protected abstract String getScenario(CaseData caseData);
-
-    protected String getExtraScenario(CaseData caseData) {
-        return null;
-    }
 
     /**
      * Depending on the case data, the scenario may or may not be applicable.
@@ -43,10 +39,6 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
      */
     protected boolean shouldRecordScenario(CaseData caseData) {
         return true;
-    }
-
-    protected boolean shouldRecordExtraScenario(CaseData caseData) {
-        return false;
     }
 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
@@ -65,20 +57,6 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
             );
         }
 
-        scenario = getExtraScenario(caseData);
-        if (!Strings.isNullOrEmpty(scenario) && shouldRecordExtraScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
-                authToken,
-                scenarioParams
-            );
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    protected FeatureToggleService getFeatureToggleService() {
-        return featureToggleService;
     }
 }
