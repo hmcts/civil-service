@@ -126,6 +126,9 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
+        if (isNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
+            return caseData.getRespondent1().getPartyName();
+        }
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
