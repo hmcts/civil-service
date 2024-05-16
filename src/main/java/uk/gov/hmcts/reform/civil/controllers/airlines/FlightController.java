@@ -19,16 +19,12 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(
-    path = "/airlines",
-    produces = MediaType.APPLICATION_JSON_VALUE
-)
 @AllArgsConstructor
 public class FlightController {
 
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
 
-    @GetMapping(path = {""})
+    @GetMapping(path = {"/airlines"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get airlines")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
