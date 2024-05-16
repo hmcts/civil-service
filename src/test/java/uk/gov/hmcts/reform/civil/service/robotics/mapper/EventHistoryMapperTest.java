@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -106,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapp
 class EventHistoryMapperTest {
 
     private static final Event EMPTY_EVENT = Event.builder().build();
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -156,7 +156,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -203,7 +203,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -265,7 +265,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -323,7 +323,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -367,7 +367,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -421,7 +421,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -484,7 +484,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -546,7 +546,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -589,7 +589,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -639,7 +639,7 @@ class EventHistoryMapperTest {
                     ))
                     .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -691,7 +691,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -748,7 +748,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -788,7 +788,7 @@ class EventHistoryMapperTest {
                         .eventDetailsText(expectedMiscText1)
                         .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -825,7 +825,7 @@ class EventHistoryMapperTest {
                         .eventDetailsText(expectedMiscText1)
                         .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -862,7 +862,7 @@ class EventHistoryMapperTest {
                     ))
                     .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -897,7 +897,7 @@ class EventHistoryMapperTest {
                         .format(DateTimeFormatter.ofPattern("dd MM yyyy")))
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -927,7 +927,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -953,7 +953,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -979,7 +979,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -1090,7 +1090,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1172,7 +1172,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1273,7 +1273,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1374,7 +1374,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build()
             );
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission.get(0), expectedReceiptOfAdmission.get(1));
@@ -1463,7 +1463,7 @@ class EventHistoryMapperTest {
                 );
             List<Event> expectedMiscellaneousEvents = List.of();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
@@ -1539,7 +1539,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -1591,7 +1591,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1642,7 +1642,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1691,7 +1691,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1765,7 +1765,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -1824,7 +1824,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -1943,7 +1943,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2048,7 +2048,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2191,7 +2191,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2327,7 +2327,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2419,7 +2419,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2491,7 +2491,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2590,7 +2590,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2691,7 +2691,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2780,7 +2780,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -2872,7 +2872,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -2990,7 +2990,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3109,7 +3109,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
@@ -3197,7 +3197,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3268,7 +3268,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3366,7 +3366,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3477,7 +3477,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3580,7 +3580,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3692,7 +3692,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3787,7 +3787,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3853,7 +3853,7 @@ class EventHistoryMapperTest {
                                                       mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
                                                   .preferredCourtName("").build()).build());
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3932,7 +3932,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("receiptOfAdmission").asList().containsExactly(
@@ -4010,7 +4010,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -4043,7 +4043,7 @@ class EventHistoryMapperTest {
                         .build();
                 }
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
 
                 assertEmptyEvents(
@@ -4136,7 +4136,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4231,7 +4231,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4327,7 +4327,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4400,14 +4400,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                           caseData,
-                                                          CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                          BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
                                         locationRefDataUtil.getPreferredCourtData(
                                                 caseData,
-                                                CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                                BEARER_TOKEN, true)
                         ))
                         .build();
                 List<Event> expectedMiscellaneousEvents = List.of(Event.builder().eventSequence(1).eventCode("999")
@@ -4455,7 +4455,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(expectedDirectionsQuestionnaireRespondent,
@@ -4502,14 +4502,14 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                          BEARER_TOKEN, true))
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                            BEARER_TOKEN, true)
                         ))
                     .build();
                 List<Event> expectedMiscellaneousEvents = List.of(
@@ -4559,7 +4559,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build()
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(
@@ -4635,7 +4635,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                          .asList().containsExactlyInAnyOrder(
@@ -4726,7 +4726,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -4734,7 +4734,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -4785,7 +4785,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build()
                 );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                     .containsExactly(expectedDefence1, expectedDefence2);
@@ -4922,7 +4922,7 @@ class EventHistoryMapperTest {
                             .build()
 
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                         .containsExactly(expectedDefence1, expectedDefence2);
@@ -5045,7 +5045,7 @@ class EventHistoryMapperTest {
                             .build()
 
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                         .containsExactly(expectedDefence1, expectedDefence2);
@@ -5131,7 +5131,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).extracting("miscellaneous").asList()
                     .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -5187,7 +5187,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
                     .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
                                      expectedMiscEvents.get(2)
@@ -5235,14 +5235,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                   caseData,
-                                                  CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                  BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
                                 locationRefDataUtil.getPreferredCourtData(
                                         caseData,
-                                        CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                        BEARER_TOKEN, true)
                         ))
                         .build();
                 Event expectedApplicant2DQ = Event.builder()
@@ -5254,14 +5254,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                   caseData,
-                                                  CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                  BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
                                 locationRefDataUtil.getPreferredCourtData(
                                         caseData,
-                                        CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                        BEARER_TOKEN, true)
                         ))
                         .build();
                 List<Event> expectedMiscEvents = List.of(
@@ -5312,7 +5312,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
@@ -5422,7 +5422,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
@@ -5483,7 +5483,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -5491,7 +5491,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -5545,7 +5545,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -5609,7 +5609,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -5617,7 +5617,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant2DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -5684,7 +5684,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5732,7 +5732,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5787,7 +5787,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5866,7 +5866,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5946,7 +5946,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6040,7 +6040,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6142,7 +6142,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -6209,7 +6209,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                     .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6266,7 +6266,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                     .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6311,7 +6311,7 @@ class EventHistoryMapperTest {
 
             Event defenceStruckOutJudgment = Event.builder().build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6356,7 +6356,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6413,7 +6413,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6499,7 +6499,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6583,7 +6583,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6680,7 +6680,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6790,7 +6790,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             // TODO Tobe done as part of RPA release
             /*
@@ -6847,7 +6847,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6912,7 +6912,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6973,7 +6973,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -7042,7 +7042,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -7125,7 +7125,7 @@ class EventHistoryMapperTest {
 
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0),
@@ -7196,7 +7196,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -7260,7 +7260,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -7321,7 +7321,7 @@ class EventHistoryMapperTest {
                               .build())
             .build();
 
-        var eventHistory = mapper.buildEvents(caseData);
+        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
         assertThat(eventHistory).isNotNull();
         assertThat(eventHistory)
@@ -7397,7 +7397,7 @@ class EventHistoryMapperTest {
                               .build())
             .build();
 
-        var eventHistory = mapper.buildEvents(caseData);
+        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
         assertThat(eventHistory).isNotNull();
         assertThat(eventHistory)
@@ -7432,7 +7432,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7452,7 +7452,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
@@ -7471,7 +7471,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
@@ -7490,7 +7490,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
@@ -7509,7 +7509,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7529,7 +7529,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
@@ -7548,7 +7548,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
@@ -7567,7 +7567,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
@@ -7586,7 +7586,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7613,7 +7613,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -7640,7 +7640,7 @@ class EventHistoryMapperTest {
                                                  .build())
                                       .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("interlocutoryJudgment").asList()
                 .extracting("eventCode").asString().contains("[252, 252]");
         }
@@ -7661,7 +7661,7 @@ class EventHistoryMapperTest {
                                                  .build())
                                       .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
         }
@@ -7699,7 +7699,7 @@ class EventHistoryMapperTest {
                                                      .build())
                                           .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("defaultJudgment").asList()
                 .extracting("eventCode").asString().contains("[230, 230]");
         }
@@ -7732,7 +7732,7 @@ class EventHistoryMapperTest {
                                                      .build())
                                           .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
 
@@ -7793,7 +7793,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -7814,7 +7814,7 @@ class EventHistoryMapperTest {
                 .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -7885,7 +7885,7 @@ class EventHistoryMapperTest {
                                               .preferredCourtName("")
                                               .build())
                             .build());
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -7964,7 +7964,7 @@ class EventHistoryMapperTest {
                             .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -8054,7 +8054,7 @@ class EventHistoryMapperTest {
                             .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -8095,7 +8095,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8143,7 +8143,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8193,7 +8193,7 @@ class EventHistoryMapperTest {
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8238,7 +8238,7 @@ class EventHistoryMapperTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8272,7 +8272,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
             //When
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             //Then
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventDetails").asList()
