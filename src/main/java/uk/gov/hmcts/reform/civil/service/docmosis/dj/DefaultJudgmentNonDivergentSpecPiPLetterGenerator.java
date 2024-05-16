@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.RecordJudgmentDeterminationOfMeansLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentNonDivergentSpecLipDefendantLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
@@ -20,44 +20,45 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
+public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
 
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     private final PinInPostConfiguration pipInPostConfiguration;
-    private static final String RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER = "record-judgment-determination-of-means-letter";
+    private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
 
-    public byte[] generateAndPrintRecordJudgmentDeterminationOfMeansLetter(CaseData caseData, String authorisation) {
-        DocmosisDocument recordJudgmentDeterminationOfMeansLetter = generate(caseData);
-        CaseDocument recordJudgmentDeterminationOfMeansLetterCaseDocument =  documentManagementService.uploadDocument(
+    public byte[] generateAndPrintDefaultJudgementSpecLetter(CaseData caseData, String authorisation) {
+        DocmosisDocument defaultJudgmentNonDivergentPinInLetter = generate(caseData);
+        CaseDocument defaultJudgmentNonDivergentPinInLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER.getDocumentTitle(),
-                recordJudgmentDeterminationOfMeansLetter.getBytes(),
-                DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER
+                DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(),
+                defaultJudgmentNonDivergentPinInLetter.getBytes(),
+                DocumentType.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER
             )
         );
-        String documentUrl = recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentUrl();
+
+        String documentUrl = defaultJudgmentNonDivergentPinInLetterCaseDocument.getDocumentLink().getDocumentUrl();
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
         byte[] letterContent;
         try {
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (IOException e) {
-            log.error("Failed getting letter content for Record Judgment Determination Of Means LiP Letter ");
-            throw new DocumentDownloadException(recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
+            log.error("Failed getting letter content for Default Judgment Non-Divergent PIN In Letter Defendant1 LiP");
+            throw new DocumentDownloadException(defaultJudgmentNonDivergentPinInLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
         }
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER, recipients);
+                                     caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF, recipients);
         return letterContent;
     }
 
@@ -68,17 +69,18 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
     private DocmosisDocument generate(CaseData caseData) {
         return documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
-            RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER
+            DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER
         );
     }
 
-    public RecordJudgmentDeterminationOfMeansLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return RecordJudgmentDeterminationOfMeansLiPDefendantLetter
+    public DefaultJudgmentNonDivergentSpecLipDefendantLetter getTemplateData(CaseData caseData) {
+        return DefaultJudgmentNonDivergentSpecLipDefendantLetter
             .builder()
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
+            .caseSubmittedDate(caseData.getSubmittedDate().toLocalDate())
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
             .build();
