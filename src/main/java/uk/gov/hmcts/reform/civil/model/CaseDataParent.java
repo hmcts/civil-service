@@ -502,6 +502,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
+    private final ResponseDocument applicant1DefenceResponseDocumentSpec;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
