@@ -74,13 +74,13 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
@@ -575,6 +575,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
+    // GA for LIP
+    private final YesOrNo isGaApplicantLip;
+    private final YesOrNo isGaRespondentOneLip;
+    private final YesOrNo isGaRespondentTwoLip;
+
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentWithName>> documentAndNameToAdd;
@@ -614,15 +619,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
-    private JudgmentStatusDetails joJudgmentStatusDetails;
     private LocalDate joOrderMadeDate;
     private LocalDate joIssuedDate;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
     private YesOrNo joIsRegisteredWithRTL;
-    private PaymentPlanSelection joPaymentPlanSelection;
-    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
-    private LocalDate joPaymentToBeMadeByDate;
+    private JudgmentPaymentPlan joPaymentPlan;
+    private JudgmentInstalmentDetails joInstalmentDetails;
     private YesOrNo joIsLiveJudgmentExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
     private JudgmentSetAsideReason joSetAsideReason;
@@ -630,8 +633,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentSetAsideOrderType joSetAsideOrderType;
     private LocalDate joSetAsideOrderDate;
     private LocalDate joSetAsideDefenceReceivedDate;
-
     private YesOrNo joShowRegisteredWithRTLOption;
+    private JudgmentDetails activeJudgment;
+    private List<Element<JudgmentDetails>> historicJudgment;
 
     private final TransferCaseDetails transferCaseDetails;
 
