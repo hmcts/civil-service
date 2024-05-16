@@ -39,11 +39,16 @@ public class EvidenceUploadedDefendantNotificationHandler extends DashboardCallb
 
     @Override
     protected String getScenario(CaseData caseData) {
-        return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT.getScenario();
+        if (nonNull(caseData.getCaseDocumentUploadDateRes())) {
+            return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_DEFENDANT.getScenario();
+        }
+        else {
+            return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_DEFENDANT.getScenario();
+        }
     }
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented() && nonNull(caseData.getCaseDocumentUploadDate());
+        return caseData.isRespondent1NotRepresented();
     }
 }

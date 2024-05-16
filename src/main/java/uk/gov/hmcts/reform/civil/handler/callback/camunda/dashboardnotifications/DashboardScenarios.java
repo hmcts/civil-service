@@ -140,8 +140,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
-    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant"),
-    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant");
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Claimant.Uploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Claimant.Uploaded.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Defendant.Uploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Defendant.Uploaded.Defendant");
 
     private final String scenario;
 
