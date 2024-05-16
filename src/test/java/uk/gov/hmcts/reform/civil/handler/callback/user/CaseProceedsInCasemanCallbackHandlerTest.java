@@ -141,5 +141,20 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                     .extracting("previousCCDState").isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
         }
+
+        @Test
+        void shouldNotAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .build();
+            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState(null);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                    .extracting("previousCCDState").isNull();
+        }
     }
 }
