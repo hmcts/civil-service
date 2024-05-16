@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -26,6 +27,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
@@ -35,11 +38,9 @@ import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -68,8 +69,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
@@ -126,6 +127,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+    private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
+        + "is assigned to the case.";
 
     @Test
     void shouldThrowError_whenLRVsLiP() {
@@ -157,6 +160,58 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_when_GaForLip_NotEnabled() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2Represented(NO)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
+        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors().get(0))
+            .isEqualTo("Sorry this service is not available, please raise an application manually.");
+    }
+
+    @Test
+    void shouldThrowError_whenDefendantIsNotAssigned_LIP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2Represented(NO)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors().get(0)).isEqualTo(RESP_NOT_ASSIGNED_ERROR_LIP);
+    }
+
+    @Test
+    void shouldNotThrowError_whenDefendantIsAssigned_LIP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("test@gmail.com").id("ID").build())
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
