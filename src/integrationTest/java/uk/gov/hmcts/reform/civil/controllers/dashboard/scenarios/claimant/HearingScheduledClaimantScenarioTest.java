@@ -76,15 +76,15 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                     "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the hearing</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the hearing</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()),
+                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld y gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
                 jsonPath("$[1].reference").value(caseId),
                 jsonPath("$[1].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[1].taskNameCy").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gorchmynion a rhybuddion</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
 
             );
     }
@@ -138,8 +138,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.ACTION_NEEDED.getName()),
                 jsonPath("$[1].taskNameCy").value(
-                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getName()),
+                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
                 jsonPath("$[1].hintTextEn").value("Deadline is 12am on 1 April 2024"),
                 jsonPath("$[1].hintTextCy").value("Deadline is 12am on 1 Ebrill 2024")
             );
