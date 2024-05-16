@@ -19,31 +19,6 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>View mediation documents</a>',
   'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 7),
 
-('<a>View hearings</a>',
-  'Hearings',
-  '<a>View hearings</a>',
-  'Hearings', 'Hearing.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 8),
-
-('<a>Upload hearing documents</a>',
-  'Hearings',
-  '<a>Upload hearing documents</a>',
-  'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 9),
-
-('<a>Add the trial arrangements</a>',
-  'Hearings',
-  '<a>Add the trial arrangements</a>',
-  'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 10),
-
-('<a>Pay the hearing fee</a>',
-  'Hearings',
-  '<a>Pay the hearing fee</a>',
-  'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 11),
-
-('<a>View the bundle</a>',
-  'Hearings',
-  '<a>View the bundle</a>',
-  'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 12),
-
 ('<a>View the judgment</a>',
   'Judgments from the court',
   '<a>View the judgment</a>',
