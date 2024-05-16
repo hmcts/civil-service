@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
@@ -146,9 +147,8 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
@@ -167,6 +167,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHireDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -256,6 +258,7 @@ public class CaseDataBuilder {
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected YesOrNo respondent2Represented;
+    protected IdamUserDetails defendantUserDetails;
     protected YesOrNo defendant1LIPAtClaimIssued;
     protected YesOrNo defendant2LIPAtClaimIssued;
     protected String respondentSolicitor1EmailAddress;
@@ -590,6 +593,9 @@ public class CaseDataBuilder {
     private MediationContactInformation resp2MediationContactInfo;
     private MediationAvailability resp1MediationAvailability;
     private MediationAvailability resp2MediationAvailability;
+
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
+    private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
 
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
@@ -1602,6 +1608,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder defendantUserDetails(IdamUserDetails defendantUserDetails) {
+        this.defendantUserDetails = defendantUserDetails;
+        return this;
+    }
+
     public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
         this.applicant1Represented = isRepresented;
         return this;
@@ -1796,6 +1807,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder reasonNotSuitableSDO(ReasonNotSuitableSDO reasonNotSuitableSDO) {
         this.reasonNotSuitableSDO = reasonNotSuitableSDO;
+        return this;
+    }
+
+    public CaseDataBuilder defaultJudgmentDocuments(List<Element<CaseDocument>> defaultJudgmentDocuments) {
+        this.defaultJudgmentDocuments = defaultJudgmentDocuments;
         return this;
     }
 
@@ -2604,6 +2620,47 @@ public class CaseDataBuilder {
                                      + "received by the Court (together with the appropriate fee) by 4pm "
                                      + "on %s.",
                                  LocalDate.parse("2022-01-30")))
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSdoFastTrackCreditHire() {
+        sdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
+            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "a) the need to hire a replacement vehicle; and\n"
+                        + "b) impecuniosity")
+            .date1(LocalDate.parse("2022-01-01"))
+            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                        + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                        + "save with permission of the Trial Judge.")
+            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                        + "later than 4pm on")
+            .date2(LocalDate.parse("2022-01-02"))
+            .build();
+        sdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
+            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                        + "disclosure as ordered earlier in this Order must include:\n"
+                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                        + "commencement of hire until the earlier of:\n "
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                        + "prior to the commencement of hire until the earlier of:\n"
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                        + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+                        + "one witness to provide evidence of basic hire rates available within the claimant's "
+                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                        + "is available.")
+            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+            .date3(LocalDate.parse("2022-01-01"))
+            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+            .date4(LocalDate.parse("2022-01-02"))
+            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+            .detailsShowToggle(List.of(AddOrRemoveToggle.ADD))
+            .sdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails)
             .build();
         return this;
     }
@@ -5799,14 +5856,15 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
-            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
-                                             .instalmentAmount("120")
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .startDate(LocalDate.of(2022, 12, 12))
+                                             .amount("120")
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5814,13 +5872,13 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
-            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
-                                             .instalmentAmount("120")
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .startDate(LocalDate.of(2022, 12, 12))
+                                             .amount("120")
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -5837,8 +5895,9 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IMMEDIATELY)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5848,16 +5907,16 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_BY_DATE)
+            .joPaymentPlan(JudgmentPaymentPlan.builder()
+                    .type(PaymentPlanSelection.PAY_BY_DATE)
+                    .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
-            .joIsRegisteredWithRTL(YES).build();
+            .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
@@ -5866,13 +5925,10 @@ public class CaseDataBuilder {
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
@@ -5881,7 +5937,7 @@ public class CaseDataBuilder {
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+            .build();
     }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
@@ -6396,6 +6452,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setClaimantMediationFlag(YesOrNo response) {
         respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder setDefendantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder setDefendant2MediationFlag(YesOrNo response) {
+        respondent2MediationRequired = response;
         return this;
     }
 
@@ -6967,6 +7033,7 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .defendantUserDetails(defendantUserDetails)
             .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
             .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)
@@ -7149,7 +7216,7 @@ public class CaseDataBuilder {
             .applicant1ClaimMediationSpecRequired(applicant1ClaimMediationSpecRequired)
             .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
             .responseClaimMediationSpecRequired(respondent1MediationRequired)
-            .responseClaimMediationSpec2Required(respondent1MediationRequired)
+            .responseClaimMediationSpec2Required(respondent2MediationRequired)
             .mediation(mediation)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
@@ -7289,6 +7356,7 @@ public class CaseDataBuilder {
             .resp2MediationContactInfo(resp2MediationContactInfo)
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
+            .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
             .build();
     }
 

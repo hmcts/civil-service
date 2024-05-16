@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
@@ -215,6 +216,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
     private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -316,6 +318,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
@@ -499,6 +502,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
+    private final ResponseDocument applicant1DefenceResponseDocumentSpec;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
@@ -557,4 +561,19 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
 
+    @JsonIgnore
+    public boolean applicant1SuggestedPayImmediately() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayBySetDate() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
+    }
 }
