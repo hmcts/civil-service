@@ -41,8 +41,7 @@ public class EvidenceUploadedClaimantNotificationHandler extends DashboardCallba
     protected String getScenario(CaseData caseData) {
         if (nonNull(caseData.getCaseDocumentUploadDate())) {
             return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_CLAIMANT.getScenario();
-        }
-        else {
+        } else {
             return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_CLAIMANT.getScenario();
         }
     }
