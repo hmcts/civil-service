@@ -69,21 +69,21 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
             .takenOfflineByStaffDate(time.now())
+            .previousCCDState(getPreviousCaseSate(callbackParams))
             .build();
 
-        CaseData updatedCaseData = addPreviousCaseSate(caseData);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(mapper))
-            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .data(caseData.toMap(mapper))
             .build();
     }
 
-    private CaseData addPreviousCaseSate(CaseData caseData) {
+    private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isDashboardServiceEnabled()) {
             return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
-                    ? caseData.toBuilder().previousCCDState(caseData.getCcdState()).build() : caseData;
+                    ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
+                    : null;
         }
-        return caseData;
+        return null;
     }
 }

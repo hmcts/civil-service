@@ -54,7 +54,7 @@ public class DashboardNotificationService {
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
         return dashboardNotificationsEntityList.stream()
-            .sorted(Comparator.comparing(t -> t.getDashboardNotificationsTemplates().getCreatedAt(), Comparator.reverseOrder()))
+            .sorted(Comparator.comparing(t -> t.getCreatedAt(), Comparator.reverseOrder()))
             .map(Notification::from)
             .collect(Collectors.toList());
     }

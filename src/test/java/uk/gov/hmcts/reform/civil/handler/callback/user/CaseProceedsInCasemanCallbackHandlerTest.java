@@ -133,15 +133,13 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
             AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                     .extracting("previousCCDState").isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
-            assertThat(response)
-                    .extracting("state").isEqualTo("PROCEEDS_IN_HERITAGE_SYSTEM");
-
         }
     }
 }
