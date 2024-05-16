@@ -137,23 +137,23 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
-    // @ParameterizedTest
-    // @ValueSource(booleans = {true, false})
-    // void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-    //     var caseFileKey = "cui-case-progression";
-    //     givenToggle(caseFileKey, toggleStat);
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
+        var caseFileKey = "cui-case-progression";
+        givenToggle(caseFileKey, toggleStat);
 
-    //     assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
-    // }
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    }
 
-    // @ParameterizedTest
-    // @ValueSource(booleans = {true, false})
-    // void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
-    //     var caseFileKey = "early-adopters";
-    //     givenToggle(caseFileKey, toggleStat);
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
+        var caseFileKey = "early-adopters";
+        givenToggle(caseFileKey, toggleStat);
 
-    //     assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
-    // }
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+    }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
