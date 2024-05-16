@@ -73,15 +73,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-
-        if (aboutToSubmitForUpdateNextHearingInfo(callbackParams)) {
-            log.info("About to submit UpdateNextHearingInfo - Case [{}] - nextHeairingDetals [{}]", caseId, callbackParams.getCaseData().getNextHearingDetails());
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(callbackParams.getCaseData().toMap(objectMapper)).build();
-        }
-
         HearingsResponse hearingsResponse = getHearings(caseId);
-
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
         log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
                  latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
