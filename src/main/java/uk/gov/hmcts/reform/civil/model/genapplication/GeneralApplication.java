@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,6 +60,10 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
     private final GAHearingDateGAspec generalAppHearingDate;
+    // GA for LIP
+    private final YesOrNo isGaApplicantLip;
+    private final YesOrNo isGaRespondentOneLip;
+    private final YesOrNo isGaRespondentTwoLip;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -102,7 +106,10 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
                        @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
-                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate) {
+                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
+                       @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
+                       @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
+                       @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -143,5 +150,8 @@ public class GeneralApplication implements MappableObject {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         this.generalAppN245FormUpload = generalAppN245FormUpload;
         this.generalAppHearingDate = generalAppHearingDate;
+        this.isGaApplicantLip = isGaApplicantLip;
+        this.isGaRespondentOneLip = isGaRespondentOneLip;
+        this.isGaRespondentTwoLip = isGaRespondentTwoLip;
     }
 }
