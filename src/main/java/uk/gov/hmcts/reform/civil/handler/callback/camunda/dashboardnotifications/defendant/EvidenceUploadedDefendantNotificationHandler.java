@@ -19,7 +19,7 @@ import static java.util.Objects.nonNull;
 public class EvidenceUploadedDefendantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT);
-    private static final String TASK_ID = "GenerateDashboardNotificationEvidenceUploadedClaimant";
+    private static final String TASK_ID = "GenerateDashboardNotificationEvidenceUploadedDefendant";
 
     public EvidenceUploadedDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                         DashboardNotificationsParamsMapper mapper,
@@ -44,6 +44,6 @@ public class EvidenceUploadedDefendantNotificationHandler extends DashboardCallb
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented() && nonNull(caseData.getCaseDocumentUploadDate()) && nonNull(caseData.getCaseDocumentUploadDateRes());
+        return caseData.isRespondent1NotRepresented() && nonNull(caseData.getCaseDocumentUploadDate());
     }
 }

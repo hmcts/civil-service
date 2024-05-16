@@ -44,6 +44,6 @@ public class EvidenceUploadedClaimantNotificationHandler extends DashboardCallba
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && nonNull(caseData.getCaseDocumentUploadDate()) && nonNull(caseData.getCaseDocumentUploadDateRes());
+        return caseData.isApplicantNotRepresented() && nonNull(caseData.getCaseDocumentUploadDate());
     }
 }
