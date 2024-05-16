@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -70,6 +71,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
+import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -459,7 +461,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
-                response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(caseData)) {
+                    response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                } else {
+                    response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                }
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
                     && ((caseData.hasClaimantNotAgreedToFreeMediation()
@@ -478,6 +484,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         return response.build();
+    }
+
+    private boolean  isNonDivergent(CaseData caseData) {
+        return (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+            && MultiPartyScenario.isOneVOne(caseData)
+            || (ofNullable(caseData.getRespondent2()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
