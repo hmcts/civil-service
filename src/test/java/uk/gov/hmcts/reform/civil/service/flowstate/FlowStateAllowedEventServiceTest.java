@@ -1004,7 +1004,7 @@ class FlowStateAllowedEventServiceTest {
 
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
-        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
+        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven() {
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
