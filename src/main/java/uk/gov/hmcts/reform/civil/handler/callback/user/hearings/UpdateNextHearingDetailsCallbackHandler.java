@@ -72,14 +72,14 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
 
         if (aboutToSubmitForUpdateNextHearingInfo(callbackParams)) {
-            log.info("About to submit UpdateNextHearingInfo - Case [{}]", caseId);
+            log.info("About to submit UpdateNextHearingInfo - Case [{}] - nextHeairingDetals [{}]", caseId, callbackParams.getCaseData().getNextHearingDetails());
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(callbackParams.getCaseData().toMap(objectMapper)).build();
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         HearingsResponse hearingsResponse = getHearings(caseId);
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
@@ -87,8 +87,6 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
                  latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
 
         if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
-            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Updating next hearing details",
-                     latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
             LocalDateTime nextHearingDate = getNextHearingDate(latestHearing);
             caseDataBuilder.nextHearingDetails(
                     nextHearingDate != null
@@ -97,6 +95,8 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
                             .hearingDateTime(nextHearingDate)
                             .build() : null)
                 .build();
+            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] nextHeairingDetals [{}] - Updating next hearing details",
+                     caseId, latestHearing.getHearingId(), caseDataBuilder.build().getNextHearingDetails());
         }
 
         if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
