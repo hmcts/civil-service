@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.airlines;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,10 @@ import java.util.List;
     path = "/airlines",
     produces = MediaType.APPLICATION_JSON_VALUE
 )
+@AllArgsConstructor
 public class FlightController {
 
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
-
-    @Autowired
-    public FlightController(AirlineEpimsDataLoader airlineEpimsDataLoader) {
-        this.airlineEpimsDataLoader = airlineEpimsDataLoader;
-    }
 
     @GetMapping(path = {""})
     @Operation(summary = "Get airlines")
