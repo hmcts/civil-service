@@ -63,6 +63,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
+    private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
+        + "is assigned to the case.";
     private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
@@ -109,10 +111,20 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
-        if (caseContainsLiP(caseData)) {
-            errors.add(LR_VS_LIP);
-        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (caseContainsLiP(caseData)) {
+            if (!featureToggleService.isGaForLipsEnabled()) {
+                errors.add(LR_VS_LIP);
+            } else {
+                /*
+                 * General Application can only be initiated if Defendant is assigned to the case
+                 * */
+                if (Objects.isNull(caseData.getDefendantUserDetails())) {
+                    errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
+                }
+            }
+        }
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
