@@ -142,8 +142,7 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
                 .thenReturn(STITCHED_DOC);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
-        CaseData caseData = CaseDataBuilder.builder()
-                .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+        CaseData caseData = CaseDataBuilder.builder().systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);

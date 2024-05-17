@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandler {
 
@@ -71,7 +73,9 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
         if (stitchEnabled && featureToggleService.isLipVLipEnabled()) {
+            log.info("-------- stitched enabled and it's lip vs lip -----------");
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            log.info("-------- Document stitched ----------- {}", documentMetaDataList.size());
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
@@ -79,10 +83,14 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                     sealedForm.getDocumentName(),
                     caseData
             );
+            log.info("-------- final stitched doc-----------");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
                     .systemGeneratedCaseDocuments(ElementUtils.wrapElements(stitchedDocument));
+            log.info("-------- final stitched doc------end-----");
+
         } else {
+            log.info("-------- else part-----");
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                             sealedForm,
