@@ -307,6 +307,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyClaimantCarmLipVLipNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
