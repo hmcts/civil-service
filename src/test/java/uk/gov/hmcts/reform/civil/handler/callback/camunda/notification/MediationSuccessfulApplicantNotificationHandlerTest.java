@@ -331,6 +331,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyClaimantCarmLipVLipNotifyApplicantWithBilingualNotification_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiPBilingual()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
