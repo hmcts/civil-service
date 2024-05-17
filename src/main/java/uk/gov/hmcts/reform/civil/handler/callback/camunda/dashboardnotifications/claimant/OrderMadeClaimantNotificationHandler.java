@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import org.apache.ibatis.annotations.Case;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT;
@@ -18,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
@@ -47,6 +50,10 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
+        if (isSDOEvent(callbackParams)
+            && isEligibleForReconsideration(caseData)) {
+            return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
+        }
         if (isCarmApplicableCase(caseData)
             && isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)
             && isSDOEvent(callbackParams)
@@ -61,11 +68,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         return caseData.isApplicant1NotRepresented();
     }
 
-    private boolean isCarmApplicableCase(CaseData caseData) {
-        return getFeatureToggleService().isCarmEnabledForCase(caseData)
-            && SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData));
-    }
-
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
     }
@@ -73,18 +75,5 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
-    }
-
-    private boolean hasTrackChanged(CaseData caseData) {
-        return SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData))
-            && !caseData.isSmallClaim();
-    }
-
-    private AllocatedTrack getPreviousAllocatedTrack(CaseData caseData) {
-        return AllocatedTrack.getAllocatedTrack(
-            caseData.getTotalClaimAmount(),
-            null,
-            null
-        );
     }
 }

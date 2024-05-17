@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
@@ -61,11 +62,6 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return caseData.isRespondent1NotRepresented();
     }
 
-    private boolean isCarmApplicableCase(CaseData caseData) {
-        return getFeatureToggleService().isCarmEnabledForCase(caseData)
-            && SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData));
-    }
-
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
     }
@@ -75,16 +71,4 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
     }
 
-    private boolean hasTrackChanged(CaseData caseData) {
-        return SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData))
-            && !caseData.isSmallClaim();
-    }
-
-    private AllocatedTrack getPreviousAllocatedTrack(CaseData caseData) {
-        return AllocatedTrack.getAllocatedTrack(
-            caseData.getTotalClaimAmount(),
-            null,
-            null
-        );
-    }
 }
