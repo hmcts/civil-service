@@ -23,6 +23,7 @@ public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts respondent2DQFixedRecoverableCosts;
+    private FixedRecoverableCosts respondent2DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;

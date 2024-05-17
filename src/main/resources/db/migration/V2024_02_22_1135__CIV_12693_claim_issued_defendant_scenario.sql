@@ -2,7 +2,8 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}');
+VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}'),
+       ('Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{}', '{}');
 
 /**
  * Add notification template
@@ -34,17 +35,19 @@ values ('<a href={VIEW_CLAIM_URL}  rel="noopener noreferrer" class="govuk-link">
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 6),
        ('<a>View mediation documents</a>', 'Mediation','<a>View mediation documents</a>',
         'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 7),
-       ('<a>View hearings</a>', 'Hearing','<a>View hearings</a>',
+       ('<a>View the hearing</a>', 'Hearing','<a>View the hearing</a>',
         'Hearing', 'Hearing.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
        ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Upload hearing documents</a>',
         'Hearing', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
+       ('<a>View documents</a>', 'Hearing' ,'<a>View documents</a>', 'Hearing',
+        'Hearing.Document.View', 'Scenario.AAA6.ClaimIssue.Response.Required','{1, 1}', 'DEFENDANT', 10),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Add the trial arrangements</a>',
-        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 10),
+        'Hearing', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.Defendant.FastTrack', '{1, 1}', 'DEFENDANT', 11),
        ('<a>View the bundle</a>', 'Hearing' ,'<a>View the bundle</a>',
-        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
+        'Hearing', 'Hearing.Bundle.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 12),
        ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 12),
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 13),
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>View the judgment</a>',
-        'Judgments from the court', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 13),
+        'Judgments from the court', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
        ('<a>View applications</a>', 'Applications' ,'<a>View applications</a>',
-        'Applications', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14);
+        'Applications', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 15);

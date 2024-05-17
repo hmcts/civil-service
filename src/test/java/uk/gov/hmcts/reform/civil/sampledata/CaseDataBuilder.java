@@ -258,6 +258,7 @@ public class CaseDataBuilder {
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected YesOrNo respondent2Represented;
+    protected IdamUserDetails defendantUserDetails;
     protected YesOrNo defendant1LIPAtClaimIssued;
     protected YesOrNo defendant2LIPAtClaimIssued;
     protected String respondentSolicitor1EmailAddress;
@@ -1607,6 +1608,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder defendantUserDetails(IdamUserDetails defendantUserDetails) {
+        this.defendantUserDetails = defendantUserDetails;
+        return this;
+    }
+
     public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
         this.applicant1Represented = isRepresented;
         return this;
@@ -1801,6 +1807,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder reasonNotSuitableSDO(ReasonNotSuitableSDO reasonNotSuitableSDO) {
         this.reasonNotSuitableSDO = reasonNotSuitableSDO;
+        return this;
+    }
+
+    public CaseDataBuilder defaultJudgmentDocuments(List<Element<CaseDocument>> defaultJudgmentDocuments) {
+        this.defaultJudgmentDocuments = defaultJudgmentDocuments;
         return this;
     }
 
@@ -7022,6 +7033,7 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .defendantUserDetails(defendantUserDetails)
             .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
             .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)

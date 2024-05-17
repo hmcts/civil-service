@@ -115,6 +115,10 @@ public class FeatureToggleService {
                                                         epoch, false);
     }
 
+    public boolean isGaForLipsEnabled() {
+        return featureToggleApi.isFeatureEnabled("GaForLips");
+    }
+
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
