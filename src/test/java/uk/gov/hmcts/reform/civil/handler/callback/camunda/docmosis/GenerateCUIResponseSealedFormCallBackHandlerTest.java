@@ -140,12 +140,13 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
         //Given
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(), any(CaseData.class)))
                 .thenReturn(STITCHED_DOC);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
-        CaseData caseData = CaseDataBuilder.builder().systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+        CaseData caseData = CaseDataBuilder.builder()
+                .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
 
         //When
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
