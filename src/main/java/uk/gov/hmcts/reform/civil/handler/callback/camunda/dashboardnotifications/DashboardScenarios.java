@@ -143,7 +143,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Claimant.Uploaded.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Claimant.Uploaded.Defendant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Defendant.Uploaded.Claimant"),
-    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Defendant.Uploaded.Defendant");
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Defendant.Uploaded.Defendant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant");
+
 
     private final String scenario;
 
