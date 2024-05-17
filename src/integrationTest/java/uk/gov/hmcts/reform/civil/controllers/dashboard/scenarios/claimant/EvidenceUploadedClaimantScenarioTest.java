@@ -49,7 +49,13 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Available")
+                jsonPath("$[0].currentStatusEn").value("Available"),
+                jsonPath("$[0].categoryEn").value("Hearing"),
+                jsonPath("$[0].role").value("CLAIMANT"),
+                jsonPath("$[0].taskOrder").value("11"),
+                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
+                jsonPath("$[0].currentStatusCy").value("Available"),
+                jsonPath("$[0].categoryCy").value("Hearing")
             );
     }
 
@@ -78,7 +84,13 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Available")
+                jsonPath("$[0].currentStatusEn").value("Available"),
+                jsonPath("$[0].categoryEn").value("Hearing"),
+                jsonPath("$[0].role").value("CLAIMANT"),
+                jsonPath("$[0].taskOrder").value("11"),
+                jsonPath("$[0].taskNameCy").value("<a href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\" class=\"govuk-link\">View documents</a>"),
+                jsonPath("$[0].currentStatusCy").value("Available"),
+                jsonPath("$[0].categoryCy").value("Hearing")
             );
     }
 

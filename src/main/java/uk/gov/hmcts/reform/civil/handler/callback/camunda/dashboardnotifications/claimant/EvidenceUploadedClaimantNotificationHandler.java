@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -14,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT;
 
 @Service
 public class EvidenceUploadedClaimantNotificationHandler extends DashboardCallbackHandler {
@@ -39,11 +40,8 @@ public class EvidenceUploadedClaimantNotificationHandler extends DashboardCallba
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (nonNull(caseData.getCaseDocumentUploadDate())) {
-            return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_CLAIMANT_UPLOADED_CLAIMANT.getScenario();
-        } else {
-            return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_DEFENDANT_UPLOADED_CLAIMANT.getScenario();
-        }
+        return nonNull(caseData.getCaseDocumentUploadDate()) ? SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT.getScenario() :
+        SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT.getScenario();
     }
 
     @Override
