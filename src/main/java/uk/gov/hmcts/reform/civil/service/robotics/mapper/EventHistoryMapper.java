@@ -1846,7 +1846,7 @@ public class EventHistoryMapper {
                                     "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
-                                    validateRespondent2IntentionType(caseData)
+                                    evaluateRespondent2IntentionType(caseData)
                                 )
                             )
                         ));
@@ -1890,7 +1890,7 @@ public class EventHistoryMapper {
         }
     }
 
-    public String validateRespondent2IntentionType(CaseData caseData) {
+    public String evaluateRespondent2IntentionType(CaseData caseData) {
         if (caseData.isRespondent2NotRepresented() && caseData.getRespondent2ClaimResponseIntentionType() != null) {
             return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
         }

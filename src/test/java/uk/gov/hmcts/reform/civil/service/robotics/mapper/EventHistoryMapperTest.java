@@ -8294,21 +8294,21 @@ class EventHistoryMapperTest {
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
 
-            assertEquals("Defend all of the claim", mapper.validateRespondent2IntentionType(caseData));
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData));
 
             CaseData caseData1 = CaseDataBuilder.builder()
                 .respondent2Represented(NO)
                 .respondent1Represented(YES)
                 .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
-            assertEquals("Defend all of the claim", mapper.validateRespondent2IntentionType(caseData1));
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData1));
 
             CaseData caseData2 = CaseDataBuilder.builder()
                 .respondent2Represented(YES)
                 .respondent1Represented(YES)
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
-            assertEquals("Defend part of the claim", mapper.validateRespondent2IntentionType(caseData2));
+            assertEquals("Defend part of the claim", mapper.evaluateRespondent2IntentionType(caseData2));
         }
     }
 }
