@@ -164,9 +164,14 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
             .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
             .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
-            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : caseData.getRepaymentSuggestion())
+            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
             .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
         return builder.build();
+    }
+
+    private String getInstallmentAmount(String amount) {
+        var regularRepaymentAmountPennies = new BigDecimal(amount);
+        return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
     }
 
     private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
