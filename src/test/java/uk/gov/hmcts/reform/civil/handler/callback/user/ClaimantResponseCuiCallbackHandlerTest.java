@@ -437,6 +437,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
+        
         @Test
         void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
             CaseData caseData = CaseDataBuilder.builder()
