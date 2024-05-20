@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -20,6 +22,10 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,6 +53,10 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final WorkingDayIndicator workingDayIndicator;
     private final DocumentHearingLocationHelper locationHelper;
+    private final CourtOfficerOrderGenerator courtOfficerOrderGenerator;
+    private final IdamClient idamClient;
+    private final AssignCategoryId assignCategoryId;
+    private String ext = "";
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
 
@@ -54,7 +64,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prePopulateValues,
-            callbackKey(MID, "validateValues"), this::validateFormValues,
+            callbackKey(MID, "validateValues"), this::validateFormValuesAndGenerateDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -113,7 +123,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
                             .toList());
     }
 
-    private CallbackResponse validateFormValues(CallbackParams callbackParams) {
+    private CallbackResponse validateFormValuesAndGenerateDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
@@ -121,7 +131,23 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             && caseData.getCourtOfficerFurtherHearingComplex().getListFromDate().isBefore(LocalDate.now())) {
             errors.add("List from date cannot be in the past");
         }
+
+        CaseDocument courtOfficerDocument = courtOfficerOrderGenerator
+            .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String officerName = userDetails.getFullName();
+        assignCategoryId.assignCategoryIdToCaseDocument(courtOfficerDocument, "caseManagementOrders");
+
+        StringBuilder updatedFileName = new StringBuilder();
+        ext = FilenameUtils.getExtension(courtOfficerDocument.getDocumentLink().getDocumentFileName());
+        courtOfficerDocument.getDocumentLink().setDocumentFileName(updatedFileName
+                                                                      .append(courtOfficerDocument.getCreatedDatetime().toLocalDate().toString())
+                                                                      .append("_").append(officerName).append(".").append(ext).toString());
+
+        caseDataBuilder.previewCourtOfficerOrder(courtOfficerDocument);
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
