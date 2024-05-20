@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
-public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
+public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHandler {
 
     protected OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
@@ -26,7 +26,7 @@ public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
         HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String scenario = getScenario(caseData);
+        String scenario = getScenario(caseData, callbackParams);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),

@@ -656,16 +656,29 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
-        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseIntentionType() == null
-            && caseData.getRespondent2AcknowledgeNotificationDate() == null
-            && caseData.getRespondent2TimeExtensionDate() == null
-            && caseData.getRespondent2ClaimResponseIntentionType() == null
-            && caseData.getRespondent1ResponseDate() == null
-            && caseData.getRespondent2ResponseDate() == null;
+    public static final Predicate<CaseData> caseDismissedAfterDetailNotified = FlowPredicate::getPredicateForCaseDismissedAfterDetailNotified;
+
+    private static boolean getPredicateForCaseDismissedAfterDetailNotified(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
+                caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+                    && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                    && caseData.getRespondent1TimeExtensionDate() == null
+                    && caseData.getRespondent1ClaimResponseIntentionType() == null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() == null
+                    && caseData.getRespondent2TimeExtensionDate() == null
+                    && caseData.getRespondent2ClaimResponseIntentionType() == null
+                    && caseData.getRespondent1ResponseDate() == null
+                    && caseData.getRespondent2ResponseDate() == null
+                    && caseData.getTakenOfflineByStaffDate() == null;
+            default -> caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ClaimResponseIntentionType() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getTakenOfflineByStaffDate() == null;
+        };
+    }
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotifiedExtension = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
@@ -1051,11 +1064,15 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan =
-        CaseData::hasApplicantAcceptedRepaymentPlan;
+    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantAcceptedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+                : caseData.hasApplicantAcceptedRepaymentPlan();
 
-    public static final Predicate<CaseData> rejectRepaymentPlan =
-        CaseData::hasApplicantRejectedRepaymentPlan;
+    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantRejectedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+                : caseData.hasApplicantRejectedRepaymentPlan();
 
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
@@ -1075,12 +1092,14 @@ public class FlowPredicate {
         && caseData.getListingOrRelisting() != null
         && caseData.getListingOrRelisting().equals(LISTING)
         && caseData.getCaseDismissedHearingFeeDueDate() == null
-        && caseData.getTakenOfflineDate() == null;
+        && caseData.getTakenOfflineDate() == null
+        && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 
     public static final Predicate<CaseData> reasonNotSuitableForSdo = caseData ->
-        StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
+        Objects.nonNull(caseData.getReasonNotSuitableSDO())
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
         Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())

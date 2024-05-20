@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLipVLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -69,8 +68,6 @@ class GenerateCsvAndTransferHandlerTest {
     private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     @MockBean
     private MediationCSVLrvLipService mediationCSVLrvLipService;
-    @MockBean
-    private MediationCSVLipVLipService mediationCSVLipvLipService;
     @MockBean
     private FeatureToggleService toggleService;
     @MockBean
@@ -154,20 +151,6 @@ class GenerateCsvAndTransferHandlerTest {
         inMediationCsvHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimNotToBeProcessed, false);
         verify(sendGridClient).sendEmail(anyString(), any());
-        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
-        when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLipvLipService);
-        when(searchService.getInMediationCases(claimToBeProcessed, false)).thenReturn(List.of(caseDetailsWithInMediationState));
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
-
-        inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimToBeProcessed, false);
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
     }

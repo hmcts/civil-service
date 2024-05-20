@@ -53,7 +53,7 @@ public class RequestReconsiderationGeneratorService {
             new PDF(
                 getFileName(docmosisTemplate, caseData),
                 docmosisDocument.getBytes(),
-                DocumentType.SDO_ORDER
+                DocumentType.DECISION_MADE_ON_APPLICATIONS
             )
         );
     }
