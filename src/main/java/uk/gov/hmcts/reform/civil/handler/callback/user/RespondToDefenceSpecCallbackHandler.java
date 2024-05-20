@@ -461,7 +461,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
-                if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(caseData)) {
+                if (featureToggleService.isJudgmentOnlineLive()
+                    && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+                    && caseData.isLRvLipOneVOne()) {
                     response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
                 } else {
                     response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
@@ -484,15 +486,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         return response.build();
-    }
-
-    private boolean  isNonDivergent(CaseData caseData) {
-        return (caseData.isPayByInstallment() || caseData.isPayBySetDate())
-            && MultiPartyScenario.isOneVOne(caseData)
-            || (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
