@@ -25,7 +25,7 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     scenario_name, task_status_sequence, role, task_order)
 VALUES ('<a>View the response to the claim</a>', 'The response',
         '<a>View the response to the claim</a>', 'The response',
-        'Response.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{2, 2}', 'DEFENDANT', 3),
+        'Response.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{3, 3}', 'DEFENDANT', 3),
        ('<a>View hearings</a>', 'Hearing',
         '<a>View hearings</a>', 'Hearing',
         'Hearing.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{2, 2}', 'DEFENDANT', 5),
@@ -41,6 +41,9 @@ VALUES ('<a>View the response to the claim</a>', 'The response',
        ('<a>View the bundle</a>', 'Hearing',
         '<a>View the bundle</a>', 'Hearing',
         'Hearing.Bundle.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{2, 2}', 'DEFENDANT', 10),
+       ('<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
+        '<a href={VIEW_ORDERS_AND_NOTICES}  rel="noopener noreferrer" class="govuk-link">View orders and notices</a>',
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{3, 3}', 'CLAIMANT', 14),
        ('<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
         '<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
         'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{3, 3}', 'DEFENDANT', 12);

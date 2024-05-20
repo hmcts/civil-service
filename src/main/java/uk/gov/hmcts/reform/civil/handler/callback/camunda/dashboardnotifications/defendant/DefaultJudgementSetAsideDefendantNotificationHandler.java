@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT;
 
 @Service
 public class DefaultJudgementSetAsideDefendantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
