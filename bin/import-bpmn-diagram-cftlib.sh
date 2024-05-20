@@ -12,6 +12,9 @@ if [[ ! -d civil-service || ! -d civil-ccd-definition || ! -d civil-camunda-bpmn
   exit 1
 fi
 
+cd $scriptPath
+serviceToken=$(utils/idam-lease-service-token-cftlib.sh civil_service)
+
 cd $camundaDiagramsPath
 for filePath in $(find $PWD -name '*.bpmn')
 do
@@ -19,6 +22,7 @@ do
   uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \
+    -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=${filename}" \
     -F "deploy-changed-only=true" \
     -F "tenant-id=civil" \

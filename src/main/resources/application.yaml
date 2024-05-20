@@ -175,7 +175,7 @@ civil:
 
 core_case_data:
   api:
-    url: http://localhost:4452
+    url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
 role-assignment-service:
   api:
     url: http://localhost:4096
@@ -531,16 +531,16 @@ serviceRequestClaimIssued:
 
 idam:
   web:
-    url: http://localhost:9002
+    url: ${IDAM_WEB_URL:http://localhost:9002}
   api:
-    url: http://localhost:5000
+    url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
-    url: http://localhost:4502
-    totp_secret: AABBCCDDEEFFGGHH
+    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
   client:
-    id: civil
-    redirect_uri: https://localhost:9000/oauth2/callback
-    secret: OOOOOOOOOOOOOOOO
+    id: civil-service
+    redirect_uri: https://localhost:3000/oauth2/callback
+    secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
 
 document_management:
   url: http://localhost:3453
@@ -626,26 +626,26 @@ management:
 
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: ${FEES_API_URL:http://fake-fees-register-api}
 
 genApp:
   lrd:
-    url: http://fake-rd-location-ref-api
+    url: ${GENAPP_LRD_URL:http://fake-rd-location-ref-api}
   jrd:
-    url: http://fake-rd-judicial-api
+    url: ${GENAPP_JRD_URL:http://fake-rd-judicial-api}
 
 payments:
   api:
-    url: http://fake-payment-register-api
+    url: ${PAYMENTS_API_URL:http://fake-payment-register-api}
 
 idam:
   web:
-    url: http://fake-idam-web
+    url: ${IDAM_WEB_URL:http://fake-idam-web}
   api:
-    url: http://fake-idam-api
+    url: ${IDAM_API_URL:http://fake-idam-api}
   s2s-auth:
-    url: http://fake-service-auth-provider-api
-    totp_secret: AABBCCDDEEFFGGHH
+    url: ${IDAM_S2S_AUTH_URL:http://fake-service-auth-provider-api}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
 
 core_case_data:
   api:
