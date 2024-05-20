@@ -87,7 +87,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
                             .hearingDateTime(nextHearingDate)
                             .build() : null)
                 .build();
-            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] nextHeairingDetals [{}] - Updating next hearing details",
+            log.info("Next Hearing Details Update - Case [{}] Hearing [{}] nextHearingDetals [{}] - Updating next hearing details",
                      caseId, latestHearing.getHearingId(), caseDataBuilder.build().getNextHearingDetails());
         }
 
@@ -97,8 +97,13 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             caseDataBuilder.nextHearingDetails(null);
         }
 
+        Map<String, Object> data = caseDataBuilder.build().toMap(objectMapper);
+        if (!data.containsKey("nextHearingDetails")) {
+            data.put("nextHearingDetails", null);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(data).build();
     }
 
     private HearingsResponse getHearings(Long caseId) {
