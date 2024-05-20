@@ -2,17 +2,17 @@ package uk.gov.hmcts.reform.dashboard.data;
 
 public enum TaskStatus {
 
-    NOT_AVAILABLE_YET("Not available yet", 1, "Not available yet"),
-    INACTIVE("Inactive", 2, "Inactive"),
-    AVAILABLE("Available", 3, "Available"),
+    NOT_AVAILABLE_YET("Not available yet", 1, "Ddim ar gael eto"),
+    INACTIVE("Inactive", 2, "Segur"),
+    AVAILABLE("Available", 3, "Ar gael"),
 
-    OPTIONAL("Optional", 4, "Optional"),
+    OPTIONAL("Optional", 4, "Dewisol"),
 
-    ACTION_NEEDED("Action needed", 5, "Action needed"),
+    ACTION_NEEDED("Action needed", 5, "Mae angen gweithredu"),
 
-    IN_PROGRESS("In progress", 6, "In progress"),
+    IN_PROGRESS("In progress", 6, "Yn mynd rhagddo"),
 
-    DONE("Done", 7, "Done");
+    DONE("Done", 7, "Wedi'i wneud");
 
     private String name;
     private String welshName;
