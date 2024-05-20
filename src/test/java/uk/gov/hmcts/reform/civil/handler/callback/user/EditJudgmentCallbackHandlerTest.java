@@ -17,17 +17,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -83,28 +81,23 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment_WITH_RTL_YES_TO_YES() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoJudgmentStatusDetails(JudgmentStatusDetails.builder()
-                                                    .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-                                                    .joRtlState(JudgmentRTLStatus.REGISTRATION.getRtlState())
-                                                    .lastUpdatedDate(LocalDateTime.now()).build());
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: judgmentOnline fields should be set correctly
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("judgmentStatusTypes").isEqualTo(
-                JudgmentStatusType.MODIFIED.name());
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isEqualTo("M");
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
-                JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
-                                                         PaymentPlanSelection.PAY_IN_INSTALMENTS.name());
-            assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("instalmentAmount").isEqualTo("120");
-            assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("paymentFrequency").isEqualTo("MONTHLY");
-            assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("firstInstalmentDate").isEqualTo("2022-12-12");
+            assertThat(response.getData()).containsEntry(
+                "joJudgmentRecordReason",
+                JudgmentRecordedReason.JUDGE_ORDER.name()
+            );
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_IN_INSTALMENTS.name());
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("amount").isEqualTo("120");
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("paymentFrequency").isEqualTo("MONTHLY");
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("startDate").isEqualTo("2022-12-12");
             assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
             assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
@@ -112,36 +105,64 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
             assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                "PAY_IN_INSTALMENTS");
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting(
+                "paymentFrequency").isEqualTo("MONTHLY");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting("amount").isEqualTo(
+                "120");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting("startDate").isEqualTo(
+                "2022-12-12");
         }
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately_RTL_NO_TO_YES() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
-            caseData.setJoJudgmentStatusDetails(JudgmentStatusDetails.builder()
-                                                    .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-                                                    .joRtlState(JudgmentRTLStatus.REGISTRATION.getRtlState())
-                                                    .lastUpdatedDate(LocalDateTime.now()).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
+
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: judgmentOnline fields should be set correctly
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("judgmentStatusTypes").isEqualTo(
-                JudgmentStatusType.MODIFIED.name());
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isEqualTo("R");
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
-                                                         JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
-                PaymentPlanSelection.PAY_IMMEDIATELY.name());
+            assertThat(response.getData()).containsEntry(
+                "joJudgmentRecordReason",
+                JudgmentRecordedReason.JUDGE_ORDER.name()
+            );
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_IMMEDIATELY.name());
             assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
             assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                PaymentPlanSelection.PAY_IMMEDIATELY.name());
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
         }
 
         @Test
@@ -149,9 +170,48 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
-            caseData.setJoJudgmentStatusDetails(JudgmentStatusDetails.builder()
-                                                    .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-                                                    .lastUpdatedDate(LocalDateTime.now()).build());
+            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: judgmentOnline fields should be set correctly
+            assertThat(response.getData()).containsEntry(
+                "joJudgmentRecordReason",
+                JudgmentRecordedReason.JUDGE_ORDER.name()
+            );
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_BY_DATE.name());
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData().get("joPaymentPlan")).extracting("paymentDeadlineDate").isEqualTo("2023-12-12");
+            assertThat(response.getData().get("joIssuedDate")).isNull();
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("No");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                PaymentPlanSelection.PAY_BY_DATE.name());
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting(
+                "paymentDeadlineDate").isEqualTo("2023-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
+        }
+
+        @Test
+        void shouldThrowErrorIfNoActiveJudgment() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -159,20 +219,9 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: judgmentOnline fields should be set correctly
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("judgmentStatusTypes").isEqualTo(
-                JudgmentStatusType.MODIFIED.name());
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isNull();
-            assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
-                                                         JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
-                PaymentPlanSelection.PAY_BY_DATE.name());
-            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
-            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
-            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
-            assertThat(response.getData()).containsEntry("joPaymentToBeMadeByDate", "2023-12-12");
-            assertThat(response.getData().get("joIssuedDate")).isNull();
-            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly("There is no active judgment to edit");
+
         }
     }
 
@@ -182,7 +231,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentInstalmentDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder().firstInstalmentDate(LocalDate.now().minusDays(2)).build());
+            caseData.setJoInstalmentDetails(JudgmentInstalmentDetails.builder().startDate(LocalDate.now().minusDays(2)).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
@@ -194,8 +243,6 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentPaidByDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
-            caseData.setJoPaymentToBeMadeByDate(LocalDate.now().minusDays(2));
-
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -219,7 +266,9 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
-            caseData.setJoPaymentToBeMadeByDate(LocalDate.now().plusDays(2));
+            caseData.setJoPaymentPlan(JudgmentPaymentPlan.builder()
+                                          .type(PaymentPlanSelection.PAY_BY_DATE)
+                                          .paymentDeadlineDate(LocalDate.now().plusDays(2)).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
