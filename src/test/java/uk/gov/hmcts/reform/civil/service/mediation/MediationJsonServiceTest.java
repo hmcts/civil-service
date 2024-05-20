@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -761,7 +762,7 @@ public class MediationJsonServiceTest {
 
         MediationCase mediationCase = service.generateJsonContent(caseData);
 
-        assertThat(mediationCase.getClaimValue()).isEqualTo("800");
+        assertThat(mediationCase.getClaimValue()).isEqualTo(BigDecimal.valueOf(800));
     }
 
     private HearingSupport supportRequired(YesOrNo option) {
