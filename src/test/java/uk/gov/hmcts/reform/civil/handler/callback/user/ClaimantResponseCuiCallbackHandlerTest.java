@@ -14,6 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -434,7 +437,52 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
+        @Test
+        void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseDataLip(
+                            CaseDataLiP.builder()
+                                    .applicant1LiPResponse(
+                                            ClaimantLiPResponse.builder()
+                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                                                    .build())
+                                    .build())
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                    .respondent1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("CLAIMANT_NAME")
+                            .build())
+                    .build();
+            given(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).willReturn(LocalDateTime.MAX);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
+        }
 
+        @Test
+        void shouldSetSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseDataLip(
+                            CaseDataLiP.builder()
+                                    .applicant1LiPResponse(
+                                            ClaimantLiPResponse.builder()
+                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                    .build())
+                                    .build())
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                    .respondent1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("CLAIMANT_NAME")
+                            .build())
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
+        }
     }
 
     @Test

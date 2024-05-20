@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
@@ -121,8 +122,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement()
-            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+            return isCourtDecisionInClaimantFavourImmediateRePayment(caseData, responseDate)
+                    ? deadlinesCalculator.getRespondentToImmediateSettlementAgreement(responseDate)
+                    : deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate);
+        }
+        return null;
     }
 
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
@@ -135,5 +140,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+    }
+
+    private boolean isCourtDecisionInClaimantFavourImmediateRePayment(CaseData caseData, LocalDateTime responseDate) {
+        return caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
+                && caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY);
     }
 }
