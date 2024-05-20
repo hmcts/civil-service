@@ -21,5 +21,5 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     scenario_name, task_status_sequence, role, task_order)
 values ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
         'The response',
-        '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
-        'The response', 'Response.View', 'Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant', '{3, 3}', 'DEFENDANT', 3);
+        '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">Gweld yr ymateb i''r hawliad</a>',
+        'Yr ymateb', 'Response.View', 'Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant', '{3, 3}', 'DEFENDANT', 3);
