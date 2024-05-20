@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,8 @@ public class HearingNoticeCamundaServiceTest {
     private ObjectMapper mapper;
     @MockBean
     private RuntimeService runtimeService;
+    @MockBean
+    private CamundaRuntimeClient runtimeClient;
     @Autowired
     private HearingNoticeCamundaService hearingNoticeCamundaService;
 
@@ -52,7 +55,7 @@ public class HearingNoticeCamundaServiceTest {
             .days(List.of(hearingDay))
             .build();
 
-        when(runtimeService.getVariables(PROCESS_INSTANCE_ID)).thenReturn(expected.toMap(mapper));
+        when(runtimeClient.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(expected.toMap(mapper));
         HearingNoticeVariables actual = hearingNoticeCamundaService.getProcessVariables(PROCESS_INSTANCE_ID);
 
         assertEquals(expected, actual);

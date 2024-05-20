@@ -17,8 +17,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -28,6 +30,7 @@ import java.time.LocalDateTime;
 
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -80,8 +83,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
-            caseData.setJoSetAsideOrderDate(LocalDate.of(2022,  12,  12));
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setActiveJudgment(JudgmentDetails.builder().build());
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -89,6 +95,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).containsEntry("joSetAsideOrderDate", "2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).isNull();
+            assertThat(response.getData().get("historicJudgment")).isNotNull();
+            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+            assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
+            assertEquals(caseData.getJoSetAsideOrderDate(), historicJudgment.getSetAsideDate());
         }
 
         @Test
@@ -98,8 +109,10 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
+            caseData.setActiveJudgment(JudgmentDetails.builder().build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -107,6 +120,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).containsEntry("joSetAsideDefenceReceivedDate", "2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).isNull();
+            assertThat(response.getData().get("historicJudgment")).isNotNull();
+            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+            assertEquals(JudgmentState.SET_ASIDE, historicJudgment.getState());
+            assertEquals(caseData.getJoSetAsideDefenceReceivedDate(), historicJudgment.getSetAsideDate());
         }
 
         @Test
@@ -118,6 +136,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
+            caseData.setActiveJudgment(JudgmentDetails.builder().build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -125,6 +144,12 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).containsEntry("joSetAsideJudgmentErrorText", "Some text");
+            assertThat(response.getData().get("activeJudgment")).isNull();
+            assertThat(response.getData().get("historicJudgment")).isNotNull();
+            JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
+            assertEquals(JudgmentState.SET_ASIDE_ERROR, historicJudgment.getState());
+            assertEquals(LocalDate.now(), historicJudgment.getSetAsideDate());
+
         }
 
         @Test
@@ -136,6 +161,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+            caseData.setActiveJudgment(JudgmentDetails.builder().build());
             caseData.setJoSetAsideOrderDate(now());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
