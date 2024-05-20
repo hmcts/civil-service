@@ -12,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 
 import java.math.BigDecimal;
@@ -32,6 +35,7 @@ import java.util.List;
 public class FeesController {
 
     private final FeesService feesService;
+    private final GeneralAppFeesService generalAppFeesService;
 
     @GetMapping("/ranges")
     @Operation(summary = "Gets a group of claim amount ranges and associated fees for those ranges")
@@ -60,6 +64,20 @@ public class FeesController {
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee> getHearingFee(@PathVariable("claimAmount") BigDecimal claimAmount) {
         Fee fee = feesService.getHearingFeeDataByTotalClaimAmount(claimAmount);
+        return new ResponseEntity<>(fee, HttpStatus.OK);
+    }
+
+    @GetMapping("/general-application/{applicationType}")
+    @Operation(summary = "Gets the general app fee associated with an application type")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<Fee> getGeneralApplicationFee(
+        @PathVariable("applicationType") GeneralApplicationTypes applicationType,
+        @RequestParam(name = "withConsent", required = false) Boolean withConsent,
+        @RequestParam(name = "withNotice", required = false) Boolean withNotice
+    ) {
+        Fee fee = generalAppFeesService.getFeeForGA(applicationType, withConsent, withNotice);
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 }

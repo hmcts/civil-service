@@ -138,7 +138,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT("Scenario.AAA6.ClaimIssue.Claimant.FastTrack"),
     SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT("Scenario.AAA6.ClaimIssue.Defendant.FastTrack"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant"),
-    SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant");
+    SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant");
 
     private final String scenario;
 
