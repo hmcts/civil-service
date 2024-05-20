@@ -157,7 +157,8 @@ class GeneralAppFeesServiceTest {
                 List.of(EXTEND_TIME),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
 
-        assertThat(feesService.isFreeApplication(caseData)).isFalse();
+        assertThat(feesService.isFreeApplication(
+            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData), feesService.getHearingDate(caseData))).isFalse();
     }
 
     @Test
@@ -166,7 +167,8 @@ class GeneralAppFeesServiceTest {
                 List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(14));
 
-        assertThat(feesService.isFreeApplication(caseData)).isFalse();
+        assertThat(feesService.isFreeApplication(
+            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData), feesService.getHearingDate(caseData))).isFalse();
     }
 
     @Test
@@ -175,7 +177,8 @@ class GeneralAppFeesServiceTest {
                 List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
 
-        assertThat(feesService.isFreeApplication(caseData)).isTrue();
+        assertThat(feesService.isFreeApplication(
+            caseData.getGeneralAppType().getTypes(), feesService.getRespondentAgreed(caseData), feesService.getHearingDate(caseData))).isTrue();
     }
 
     @Test
