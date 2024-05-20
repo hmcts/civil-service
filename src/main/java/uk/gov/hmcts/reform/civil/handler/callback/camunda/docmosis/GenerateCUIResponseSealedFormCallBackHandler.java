@@ -72,6 +72,8 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
+        log.info("-------- stitchEnabled ----------- {}", stitchEnabled);
+        log.info("-------- featureToggleService.isLipVLipEnabled() ----------- {}", featureToggleService.isLipVLipEnabled());
         if (stitchEnabled && featureToggleService.isLipVLipEnabled()) {
             log.info("-------- stitched enabled and it's lip vs lip -----------");
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
