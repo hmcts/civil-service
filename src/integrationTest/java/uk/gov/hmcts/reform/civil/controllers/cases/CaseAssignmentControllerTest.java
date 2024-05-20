@@ -96,7 +96,6 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
         when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(false);
         doGet("", DEFENDENT_LINK_CHECK_URL, "620MC123")
             .andExpect(status().isOk());
-
     }
 
     @Test
@@ -105,7 +104,6 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
         when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(true);
         doGet("", DEFENDENT_LINK_CHECK_URL, "620MC123")
             .andExpect(status().isOk());
-
     }
 
     private CaseDetails givenCaseIsFound() {
