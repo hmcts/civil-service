@@ -24,5 +24,5 @@ VALUES ('Notice.AAA6.CP.HearingFee.Paid.Claimant',
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
-values ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Pay the hearing fee</a>',
-        'Hearing', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.Paid.Claimant', '{7, 7}', 'CLAIMANT', 9, null, null);
+values ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.CP.HearingFee.Paid.Claimant', '{7, 7}', 'CLAIMANT', 9, null, null);
