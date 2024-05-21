@@ -23,17 +23,16 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class NotifySetAsideJudgementDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private DefaultJudgementSetAsideDefendantNotificationHandler handler;
+    private NotifySetAsideJudgementDashboardNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -66,7 +65,7 @@ public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends Ba
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
+    void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiPAndSetAsideError() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -91,5 +90,28 @@ public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends Ba
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    public void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiP() {
+        params.put("ccdCaseReference", "123");
+
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verifyNoInteractions(dashboardApiClient);
     }
 }

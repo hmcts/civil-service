@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
@@ -16,14 +15,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT;
 
 @Service
-public class DefaultJudgementSetAsideDefendantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
+public class NotifySetAsideJudgementDashboardNotificationHandler extends uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationSetAsideDefendant";
 
-    public DefaultJudgementSetAsideDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                                DashboardNotificationsParamsMapper mapper,
-                                                                FeatureToggleService featureToggleService) {
+    public NotifySetAsideJudgementDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+                                                               DashboardNotificationsParamsMapper mapper,
+                                                               FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 

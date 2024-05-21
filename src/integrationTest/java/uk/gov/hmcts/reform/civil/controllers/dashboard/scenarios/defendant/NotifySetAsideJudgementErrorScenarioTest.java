@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefaultJudgementSetAsideDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.NotifySetAsideJudgementDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -14,12 +14,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends DashboardBaseIntegrationTest {
+public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseIntegrationTest {
 
     public static final String DEFENDANT = "DEFENDANT";
 
     @Autowired
-    private DefaultJudgementSetAsideDefendantNotificationHandler defaultJudgementSetAsideDefendantNotificationHandler;
+    private NotifySetAsideJudgementDashboardNotificationHandler notifySetAsideJudgementDashboardNotificationHandler;
 
     @Test
     void should_create_scenario_for_default_judgement() throws Exception {
@@ -36,7 +36,7 @@ public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends Da
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
-        defaultJudgementSetAsideDefendantNotificationHandler.handle(callbackParams(caseData));
+        notifySetAsideJudgementDashboardNotificationHandler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
