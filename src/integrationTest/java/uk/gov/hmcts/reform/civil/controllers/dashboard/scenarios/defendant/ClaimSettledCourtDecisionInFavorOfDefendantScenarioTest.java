@@ -50,18 +50,19 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to "
+                    .value("<p class=\"govuk-body\">Mr. John Rambo has rejected your offer and asked you to "
                                + "sign a settlement agreement."
                                + "</p><p class=\"govuk-body\">"
-                               + "The claimant proposed a repayment plan, and the court "
+                               + "Mr. John Rambo proposed a repayment plan, and the court "
                                + "then responded with an alternative plan that was accepted."
                                + "</p><p class=\"govuk-body\">"
                                + " You must respond by " + DateUtils.formatDate(responseDeadline) + ". If you do not respond by then, "
-                               + "or reject the agreement, they can request a County Court Judgment.</p><p"
-                               + " class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" "
-                               + "class=\"govuk-link\">View the repayment plan</a><br><a "
+                               + "or reject the agreement, they can request a County Court Judgment (CCJ).</p><p"
+                               +
+                               " class=\"govuk-body\">You can <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" "
+                               + "class=\"govuk-link\">view the repayment plan</a> or <a "
                                + "href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener "
-                               + "noreferrer\" class=\"govuk-link\">View your response</a></p>")
+                               + "noreferrer\" class=\"govuk-link\">view your response</a>.</p>")
             );
     }
 }
