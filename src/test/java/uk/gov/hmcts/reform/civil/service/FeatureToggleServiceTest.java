@@ -141,7 +141,7 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
         var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
+        givenToggle(caseFileKey, false);
 
         assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
@@ -150,7 +150,7 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
         var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
+        givenToggle(caseFileKey, false);
 
         assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
     }
