@@ -30,13 +30,17 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.CUIIdamClientService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
@@ -65,6 +69,9 @@ class DefendantPinToPostLRspecServiceTest {
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+
+    @MockBean
+    private ClaimStoreService claimStoreService;
 
     @MockBean
     private IdamApi idamApi;
@@ -240,6 +247,24 @@ class DefendantPinToPostLRspecServiceTest {
 
         assertThat(resetPin.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(180));
         assertThat(resetPin.getAccessCode()).isEqualTo(initialPin.getAccessCode());
+    }
+
+    @Test
+    void shouldReturnTrueIfDefenentIsLinked() {
+        when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(DefendantLinkStatus.builder().linked(true).build());
+
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
+
+        assertTrue(status);
+    }
+
+    @Test
+    void shouldReturnFalseIfDefenentIsNotLinked() {
+        when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(DefendantLinkStatus.builder().linked(false).build());
+
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
+
+        assertFalse(status);
     }
 
     private LocalDate getDate180days() {
