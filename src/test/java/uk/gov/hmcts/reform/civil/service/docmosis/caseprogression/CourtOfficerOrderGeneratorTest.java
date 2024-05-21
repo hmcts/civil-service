@@ -82,6 +82,7 @@ class CourtOfficerOrderGeneratorTest {
         ));
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
     }
+
     @Test
     void shouldGenerateCourtOfficerOrder_whenInvoked1v1() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
