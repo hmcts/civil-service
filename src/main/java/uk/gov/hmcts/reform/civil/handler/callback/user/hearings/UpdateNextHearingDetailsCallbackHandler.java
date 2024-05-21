@@ -98,6 +98,10 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             caseDataBuilder.nextHearingDetails(null);
         }
 
+        // When the UpdateNextHearingInfo is triggered via a non caseworker and we have cleared nextHearingDetails field
+        // in the caseDataBuilder this change does not persist in database once submitted. This issue does not happen when event
+        // is triggered via caseworker CCD endpoint. Adding the field directly into the map and nulling it seems to resolve
+        // this problem.
         Map<String, Object> data = caseDataBuilder.build().toMap(objectMapper);
         if (!data.containsKey("nextHearingDetails")) {
             data.put("nextHearingDetails", null);
