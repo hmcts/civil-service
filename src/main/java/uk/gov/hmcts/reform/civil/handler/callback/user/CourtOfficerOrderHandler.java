@@ -125,7 +125,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private CallbackResponse validateFormValuesAndGenerateDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         if (nonNull(caseData.getCourtOfficerFurtherHearingComplex().getListFromDate())
             && caseData.getCourtOfficerFurtherHearingComplex().getListFromDate().isBefore(LocalDate.now())) {
@@ -134,7 +133,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
         CaseDocument courtOfficerDocument = courtOfficerOrderGenerator
             .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String officerName = userDetails.getFullName();
         assignCategoryId.assignCategoryIdToCaseDocument(courtOfficerDocument, "caseManagementOrders");
@@ -145,6 +143,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
                                                                       .append(courtOfficerDocument.getCreatedDatetime().toLocalDate().toString())
                                                                       .append("_").append(officerName).append(".").append(ext).toString());
 
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.previewCourtOfficerOrder(courtOfficerDocument);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

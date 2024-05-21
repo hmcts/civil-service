@@ -76,15 +76,12 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
             .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .claimantReference(nonNull(caseData.getSolicitorReferences())
-                                   ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .defendantReference(nonNull(caseData.getSolicitorReferences())
-                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .courtName(caseManagementLocationDetails.getVenueName())
             .courtLocation(getHearingLocationText(caseData, authorisation))
             .ordered(caseData.getCourtOfficerOrdered());
         return courtOfficerOrderBuilder.build();
     }
+
     private String getCaseManagementLocationText(CaseData caseData, String authorisation) {
         String locationEpimms = caseData.getCaseManagementLocation().getBaseLocation();
         List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
