@@ -12,12 +12,7 @@ VALUES ('Scenario.AAA6.MediationUploadDocuments.CARM.Claimant',
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
 
-values ('<a>View mediation settlement agreement</a>',
-        'Mediation',
-        '<a>View mediation settlement agreement</a>',
-        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{2, 2}', 'CLAIMANT', 5),
-
-       ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+values ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation',
         '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{6, 6}', 'CLAIMANT', 6),
@@ -43,12 +38,7 @@ VALUES ('Scenario.AAA6.MediationUploadDocuments.CARM.Defendant',
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
 
-values ('<a>View mediation settlement agreement</a>',
-        'Mediation',
-        '<a>View mediation settlement agreement</a>',
-        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{2, 2}', 'DEFENDANT', 5),
-
-       ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
+values ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation',
         '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{6, 6}', 'DEFENDANT', 6),

@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +37,7 @@ public class UploadMediationServiceTest {
         //Given
         String[] expectedScenarios =  new String[]{
             SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM.getScenario()
         };
         //When
         String[] scenarios = uploadMediationService.getScenarios();
@@ -50,7 +50,7 @@ public class UploadMediationServiceTest {
         //Given
         String[] expectedScenarios =  new String[]{
             SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAMANT_CARM.getScenario()
+            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM.getScenario()
         };
         params.put("ccdCaseReference", "123");
 

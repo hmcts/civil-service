@@ -44,8 +44,10 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            //if user is claimant
+
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            String[] scenarios = uploadMediationService.getScenarios();
+            String[] scenarios = uploadMediationService.getScenarios(callbackParams);
             uploadMediationService.recordScenarios(scenarios, caseData, authToken);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

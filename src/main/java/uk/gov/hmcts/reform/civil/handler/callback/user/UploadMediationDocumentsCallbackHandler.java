@@ -147,7 +147,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         //create dashboard scenarios
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            String[] scenarios = uploadMediationService.getScenarios();
+            String[] scenarios = uploadMediationService.getScenarios(callbackParams);
             uploadMediationService.recordScenarios(scenarios, caseData, authToken);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
