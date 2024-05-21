@@ -1171,7 +1171,7 @@ class FlowStateAllowedEventServiceTest {
     }
 
     @Test
-    void shouldReturnTrue_whenAddCaseNoteEventFor_mediationUnsuccessfulProceedFlowstate() {
+    void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
             .isEqualTo(true);
