@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
 import java.util.Collections;
@@ -59,15 +58,10 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
         if (caseData.hasApplicant1SignedSettlementAgreement()) {
-            return isCourtDecisionInClaimantFavour(caseData)
+            return caseData.isCourtDecisionInClaimantFavourImmediateRePayment()
                     ? deadlinesCalculator.getRespondentToImmediateSettlementAgreement(responseDate)
                     : deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate);
         }
         return null;
-    }
-
-    private boolean isCourtDecisionInClaimantFavour(CaseData caseData) {
-        return caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
-                && caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY);
     }
 }

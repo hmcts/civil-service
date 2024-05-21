@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -1464,5 +1465,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
+        return hasApplicant1CourtDecisionInFavourOfClaimant()
+                && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
     }
 }
