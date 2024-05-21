@@ -41,10 +41,10 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 March 2024.</p>"),
+                    "<p class=\"govuk-body\">Mr. John Rambo has confirmed that you settled on 19 March 2024.</p>"),
                 jsonPath("$[0].titleCy").value("The claim is settled"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 Mawrth 2024.</p>")
+                    "<p class=\"govuk-body\">Mr. John Rambo has confirmed that you settled on 19 Mawrth 2024.</p>")
             );
     }
 }
