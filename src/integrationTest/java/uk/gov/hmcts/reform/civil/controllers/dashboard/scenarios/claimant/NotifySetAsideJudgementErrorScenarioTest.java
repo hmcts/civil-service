@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.NotifySetAsideJudgementDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.mockito.Mockito.when;
@@ -29,6 +30,8 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
