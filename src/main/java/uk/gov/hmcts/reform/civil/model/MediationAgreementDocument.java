@@ -10,15 +10,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class MediationAgreementDocument {
 
-    private String name;
-    private DocumentType documentType;
-    private Document document;
-    @Builder.Default
+    private final String name;
+    private final DocumentType documentType;
+    private final Document document;
     private final LocalDateTime createdDatetime = LocalDateTime.now();
 
 }
