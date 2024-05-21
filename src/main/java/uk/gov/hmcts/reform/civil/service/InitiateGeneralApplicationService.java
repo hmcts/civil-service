@@ -211,9 +211,9 @@ public class InitiateGeneralApplicationService {
 
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
-            .isGaApplicantLip(caseData.isApplicantNotRepresented() == true ? YES : NO)
-            .isGaRespondentOneLip(caseData.isRespondent1LiP() == true ? YES : NO)
-            .isGaRespondentTwoLip(caseData.isRespondent2LiP() == true ? YES : NO)
+            .isGaApplicantLip(NO)
+            .isGaRespondentOneLip(NO)
+            .isGaRespondentTwoLip(NO)
             .generalAppType(caseData.getGeneralAppType())
             .generalAppHearingDate(caseData.getGeneralAppHearingDate())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
@@ -230,7 +230,7 @@ public class InitiateGeneralApplicationService {
                                        .build())
             .build();
 
-        return helper.setRespondentDetailsIfPresent(dataBuilder, generalApplication, caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
