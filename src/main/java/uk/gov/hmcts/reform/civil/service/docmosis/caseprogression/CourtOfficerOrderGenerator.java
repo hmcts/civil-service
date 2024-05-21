@@ -49,7 +49,7 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
             new PDF(
                 getFileName(docmosisTemplate),
                 docmosisDocument.getBytes(),
-                DocumentType.JUDGE_FINAL_ORDER
+                DocumentType.COURT_OFFICER_ORDER
             )
         );
     }
