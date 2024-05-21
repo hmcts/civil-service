@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultJudgementSetAsideDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     @InjectMocks
     private DefaultJudgementSetAsideDefendantNotificationHandler handler;
 
