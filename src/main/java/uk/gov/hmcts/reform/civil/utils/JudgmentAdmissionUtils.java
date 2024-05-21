@@ -19,4 +19,8 @@ public class JudgmentAdmissionUtils {
         return caseData.hasApplicant1AcceptedCcj()
             && (caseData.hasApplicant1AcceptedCourtDecision() || caseData.hasApplicant1CourtDecisionInFavourOfClaimant());
     }
+
+    public static boolean isLRvsLiPOnevOne(CaseData caseData) {
+        return caseData.isLRvLipOneVOne();
+    }
 }

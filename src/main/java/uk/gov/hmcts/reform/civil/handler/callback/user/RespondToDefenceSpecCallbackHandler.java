@@ -459,7 +459,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
-                if (featureToggleService.isJudgmentOnlineLive()
+                if (caseData.hasApplicantAcceptedRepaymentPlan() && featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
                     && caseData.isLRvLipOneVOne()) {
                     response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());

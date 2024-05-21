@@ -1300,7 +1300,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test
@@ -1343,7 +1343,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test

@@ -15,7 +15,6 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
 
     public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
-    public static final Predicate<CaseData> isLRvLIPOneVOneCase = CaseData::isLRvLipOneVOne;
 
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
 

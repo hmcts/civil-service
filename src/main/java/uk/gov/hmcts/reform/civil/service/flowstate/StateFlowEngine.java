@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.decli
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLRvLIPOneVOneCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
@@ -566,17 +565,11 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMIT_PAY_IMMEDIATELY).onlyIf(fullAdmitPayImmediately)
                 .transitionTo(FULL_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
-                .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan.and(isLRvLIPOneVOneCase.negate()))
+                .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
                     flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), false);
-                })
-                .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan.and(isLRvLIPOneVOneCase))
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                    flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), true);
+                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), JudgmentAdmissionUtils.isLRvsLiPOnevOne(c));
                 })
                 .transitionTo(FULL_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .set((c, flags) -> {
@@ -596,17 +589,11 @@ public class StateFlowEngine {
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
-                .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan.and(isLRvLIPOneVOneCase))
+                .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
                     flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), true);
-                })
-                .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan.and(isLRvLIPOneVOneCase.negate()))
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                    flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), false);
+                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), JudgmentAdmissionUtils.isLRvsLiPOnevOne(c));
                 })
                 .transitionTo(PART_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .set((c, flags) -> {
