@@ -42,9 +42,9 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The judgment against the defendant has been set aside (removed)"),
-                jsonPath("$[0].descriptionEn").value("<p>You’ll receive an update with information about next steps.</p>"),
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">You’ll receive an update with information about next steps.</p>"),
                 jsonPath("$[0].titleCy").value("The judgment against the defendant has been set aside (removed)"),
-                jsonPath("$[0].descriptionCy").value("<p>You’ll receive an update with information about next steps.</p>")
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">You’ll receive an update with information about next steps.</p>")
             );
     }
 }
