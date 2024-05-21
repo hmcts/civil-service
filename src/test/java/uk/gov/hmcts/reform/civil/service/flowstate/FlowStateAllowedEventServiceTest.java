@@ -89,8 +89,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
@@ -1169,6 +1167,13 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenAddCaseNoteEventFor_mediationUnsuccessfulProceedFlowstate() {
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
             .isEqualTo(true);
     }
 
