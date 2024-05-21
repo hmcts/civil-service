@@ -107,7 +107,7 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
             .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
