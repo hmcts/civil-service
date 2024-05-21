@@ -458,14 +458,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && isOneVOne(caseData)) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
-                if (caseData.hasApplicantAcceptedRepaymentPlan() && featureToggleService.isJudgmentOnlineLive()
+            } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+                if (featureToggleService.isJudgmentOnlineLive()
                     && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
                     && caseData.isLRvLipOneVOne()) {
                     response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
                 } else {
                     response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
                 }
+            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+                response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
                     && ((caseData.hasClaimantNotAgreedToFreeMediation()
