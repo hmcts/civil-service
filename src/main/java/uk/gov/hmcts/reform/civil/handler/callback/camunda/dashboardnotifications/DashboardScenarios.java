@@ -140,6 +140,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT("Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant");
 
     private final String scenario;
