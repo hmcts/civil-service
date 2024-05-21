@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
@@ -20,21 +22,28 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderHandler.HEADER;
 
 @ExtendWith(SpringExtension.class)
@@ -54,12 +63,28 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private LocationRefDataService locationRefDataService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
+    @MockBean
+    private CourtOfficerOrderGenerator courtOfficerOrderGenerator;
 
     private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
         .courtAddress("1").postcode("1")
         .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
+    public static final CaseDocument courtOfficerOrder = CaseDocument.builder()
+        .createdBy("Test")
+        .documentName("Court Officer Order test name")
+        .documentSize(0L)
+        .documentType(JUDGE_FINAL_ORDER)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name.pdf")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
 
     @BeforeEach
     void setup() {
@@ -97,6 +122,32 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "validateValues";
 
+        @BeforeEach
+        void setUp() {
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                        .forename("Court")
+                                                                        .surname("OfficerName")
+                                                                        .roles(Collections.emptyList()).build());
+            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(courtOfficerOrder);
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            String fileName = LocalDate.now() + "_Court OfficerName.pdf";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                       .listFromDate(null).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("previewCourtOfficerOrder")
+                .extracting("documentLink")
+                .extracting("document_filename")
+                .isEqualTo(fileName);
+        }
         @Test
         void shouldNotReturnError_whenNoDate() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
