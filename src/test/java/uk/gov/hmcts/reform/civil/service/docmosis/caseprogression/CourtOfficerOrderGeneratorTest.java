@@ -39,7 +39,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.config.JacksonConfiguration.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.COURT_OFFICER_ORDER_PDF;
 
@@ -51,9 +51,9 @@ class CourtOfficerOrderGeneratorTest {
 
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String courtOrderFileName = format(COURT_OFFICER_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final CaseDocument COURT_OFFICER_ORDER = CaseDocumentBuilder.builder()
+    private static final CaseDocument COURT_OFFICER_ORDER_DOC = CaseDocumentBuilder.builder()
         .documentName(courtOrderFileName)
-        .documentType(JUDGE_FINAL_ORDER)
+        .documentType(COURT_OFFICER_ORDER)
         .build();
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("12").postcode("34")
@@ -87,8 +87,8 @@ class CourtOfficerOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER);
+                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
+            .thenReturn(COURT_OFFICER_ORDER_DOC);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
@@ -99,7 +99,7 @@ class CourtOfficerOrderGeneratorTest {
 
         assertNotNull(caseDocument);
         verify(documentManagementService)
-            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER));
+            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER));
     }
 
     @Test
@@ -107,8 +107,8 @@ class CourtOfficerOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER);
+                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
+            .thenReturn(COURT_OFFICER_ORDER_DOC);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
@@ -119,7 +119,7 @@ class CourtOfficerOrderGeneratorTest {
 
         assertNotNull(caseDocument);
         verify(documentManagementService)
-            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER));
+            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER));
     }
 
     @Test
@@ -127,8 +127,8 @@ class CourtOfficerOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER);
+                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
+            .thenReturn(COURT_OFFICER_ORDER_DOC);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
@@ -139,7 +139,7 @@ class CourtOfficerOrderGeneratorTest {
 
         assertNotNull(caseDocument);
         verify(documentManagementService)
-            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER));
+            .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER));
     }
 
     @Test
@@ -147,8 +147,8 @@ class CourtOfficerOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER);
+                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
+            .thenReturn(COURT_OFFICER_ORDER_DOC);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1111111").build())
@@ -165,8 +165,8 @@ class CourtOfficerOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, JUDGE_FINAL_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER);
+                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
+            .thenReturn(COURT_OFFICER_ORDER_DOC);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(caseManagementLocation)
             .build();;

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -42,8 +43,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderHandler.HEADER;
 
 @ExtendWith(SpringExtension.class)
@@ -77,7 +77,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         .createdBy("Test")
         .documentName("Court Officer Order test name")
         .documentSize(0L)
-        .documentType(JUDGE_FINAL_ORDER)
+        .documentType(COURT_OFFICER_ORDER)
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
@@ -206,7 +206,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).containsOnly(COURT_OFFICER_ORDER);
+        assertThat(handler.handledEvents()).containsOnly(CaseEvent.COURT_OFFICER_ORDER);
     }
 
 }
