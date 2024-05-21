@@ -148,6 +148,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("document_filename")
                 .isEqualTo(fileName);
         }
+
         @Test
         void shouldNotReturnError_whenNoDate() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
