@@ -20,6 +20,7 @@ public class Applicant1DQ implements DQ {
     private FixedRecoverableCosts applicant1DQFixedRecoverableCosts;
     private FixedRecoverableCosts applicant1DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
+    private DisclosureOfElectronicDocuments specApplicant1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureOfNonElectronicDocuments specApplicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant1DQDisclosureReport;
@@ -65,12 +66,10 @@ public class Applicant1DQ implements DQ {
         return applicant1DQDisclosureOfElectronicDocuments;
     }
 
-    /* In claimant response, field applicant1DQDisclosureOfElectronicDocuments, is used in both specified and unspecified
-    * So when fetching data in DQGenerator we need to return this field when claim is specified*/
     @Override
     @JsonProperty("specApplicant1DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
-        return getDisclosureOfElectronicDocuments();
+        return specApplicant1DQDisclosureOfElectronicDocuments;
     }
 
     @Override
