@@ -49,7 +49,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderH
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     CourtOfficerOrderHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    AssignCategoryId.class,
 })
 public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
@@ -63,7 +64,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
+    @Autowired
     private AssignCategoryId assignCategoryId;
     @MockBean
     private CourtOfficerOrderGenerator courtOfficerOrderGenerator;
@@ -147,6 +148,11 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("documentLink")
                 .extracting("document_filename")
                 .isEqualTo(fileName);
+            assertThat(response.getData())
+                .extracting("previewCourtOfficerOrder")
+                .extracting("documentLink")
+                .extracting("category_id")
+                .isEqualTo("caseManagementOrders");
         }
 
         @Test
