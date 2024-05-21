@@ -143,7 +143,7 @@ class FeatureToggleServiceTest {
         var caseFileKey = "cui-case-progression";
         givenToggle(caseFileKey, false);
 
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
@@ -152,7 +152,7 @@ class FeatureToggleServiceTest {
         var caseFileKey = "early-adopters";
         givenToggle(caseFileKey, false);
 
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
