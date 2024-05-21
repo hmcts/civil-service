@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -21,8 +19,6 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
 public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
@@ -73,7 +69,7 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                 jsonPath("$[0].titleEn").value(claimantFirstName + " " + claimantLastName
                                                    + " has requested a County Court Judgment against you"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The claimant rejected your "
+                    "<p class=\"govuk-body\">John Smith rejected your "
                         + "<a href=\"{CCJ_REPAYMENT_PLAN_DEFENDANT_URL}\" class=\"govuk-link\">repayment plan</a> "
                         + "and has proposed a new plan, which the court agreed with, based on the financial details you"
                         + " provided.</p> <p class=\"govuk-body\">When we've processed the request, we'll post a copy "
@@ -83,8 +79,9 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                         + " rel=\"noopener noreferrer\"> apply for a certificate (opens in new tab)</a>  that confirms"
                         + " this.</p><p class=\"govuk-body\"><a href=\"{CITIZEN_CONTACT_THEM_URL}\" "
                         + "class=\"govuk-link\">Contact " + claimantFirstName + " " + claimantLastName + "</a> if you "
-                        + "need their payment details.</p> <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  "
-                        + "rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a>"
+                        +
+                        "need their payment details.</p> <p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  "
+                        + "rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a>.</p>"
                 )
             );
     }
