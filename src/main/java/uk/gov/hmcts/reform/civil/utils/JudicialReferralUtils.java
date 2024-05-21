@@ -34,14 +34,7 @@ public class JudicialReferralUtils {
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
             };
         } else {
-            AllocatedTrack allocatedTrack =
-                getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
-                        ? caseData.getClaimValue().toPounds()
-                        : caseData.getTotalClaimAmount(),
-                    caseData.getClaimType(),
-                    caseData.getPersonalInjuryType()
-                );
+            AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
             if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
                 return false;
             }
