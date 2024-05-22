@@ -68,6 +68,18 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         + ".</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
                         + " respond</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae James John wedi cynnig talu "
+                        + "£" + totalAmount + " i chi mewn rhandaliadau o £"
+                        + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
+                        ".00", "")
+                        + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
+                        + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + " ymlaen.</p>"
+                        + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
+                        + "</a></p>"
                 )
             );
 
