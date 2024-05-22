@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -55,9 +54,13 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldReturnCorrectValue_whenIsGAForLipInvoked() {
-        assertThat(featureToggleService.isGaForLipsEnabled()).isFalse();
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
+        var caseFlagsKey = "GaForLips";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

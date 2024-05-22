@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -117,7 +116,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabled() {
-        return LocalDate.now().getYear() < 2000;
+        return featureToggleApi.isFeatureEnabled("GaForLips");
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
