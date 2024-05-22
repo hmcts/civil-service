@@ -73,9 +73,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
     private AssignCategoryId assignCategoryId;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
     private CoreCaseUserService coreCaseUserService;
 
     @MockBean
@@ -656,7 +653,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     .uploadMediationDocumentsChooseOptions(CLAIMANT_ONE_ID, DOCUMENTS_REFERRED_OPTION)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -683,8 +679,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
                 assertThat(actual).hasSize(2);
                 assertThat(actual).containsExactly(getExpectedReferredDocsOne(APP1_CATEGORY_ID), getExpectedReferredDocsTwo(APP1_CATEGORY_ID));
-                verify(uploadMediationService, times(2)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(2)).getScenarios();
+                verify(uploadMediationService, times(2)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test
@@ -802,7 +797,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     .uploadMediationDocumentsChooseOptions(DEFENDANT_ONE_ID, DOCUMENTS_REFERRED_OPTION)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -829,8 +823,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
                 assertThat(actual).hasSize(2);
                 assertThat(actual).containsExactly(getExpectedReferredDocsOne(RES1_CATEGORY_ID), getExpectedReferredDocsTwo(RES1_CATEGORY_ID));
-                verify(uploadMediationService, times(2)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(2)).getScenarios();
+                verify(uploadMediationService, times(2)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test

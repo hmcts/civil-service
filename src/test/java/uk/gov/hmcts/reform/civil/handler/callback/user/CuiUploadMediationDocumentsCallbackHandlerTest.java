@@ -48,9 +48,6 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
     private ObjectMapper objectMapper;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
     private UploadMediationService uploadMediationService;
 
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
@@ -92,15 +89,11 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
-                verify(uploadMediationService, times(0)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(0)).getScenarios();
-
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test
             void shouldUploadRespondent1Documents_whenInvokedForMediationNonAttendance_WithCarmIsEnabled() {
-                when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
                     .build();
@@ -113,8 +106,7 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
-                verify(uploadMediationService, times(1)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(1)).getScenarios();
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
         }
 
@@ -134,14 +126,11 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
-                verify(uploadMediationService, times(0)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(0)).getScenarios();
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test
             void shouldUploadRespondent1Documents_whenInvokedForDocumentsReferred_withCarmEnabled() {
-                when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .uploadMediationByDocumentTypes(DOCUMENTS_REFERRED_OPTION)
                     .build();
@@ -154,9 +143,7 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
-                verify(uploadMediationService, times(1)).recordScenarios(any(), any(), any());
-                verify(uploadMediationService, times(1)).getScenarios();
-
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
 
         }
