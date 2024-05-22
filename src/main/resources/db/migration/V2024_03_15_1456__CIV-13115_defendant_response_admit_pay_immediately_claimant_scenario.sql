@@ -9,9 +9,9 @@ VALUES ('Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{"Notice
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', 'Response to the claim', 'Response to the claim',
+VALUES ('Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', 'Response to the claim', 'Ymateb i’r hawliad',
         '<p class="govuk-body">${respondent1PartyName} has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}.</p><p class="govuk-body">The payment must be received in your account by then, if not you can request a county court judgment.</p><p class="govuk-body"><a href="{TELL_US_IT_IS_SETTLED}" rel="noopener noreferrer" class="govuk-link">Tell us it''s paid</a></p>',
-        '<p class="govuk-body">${respondent1PartyName} has offered to pay ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineCy}.</p><p class="govuk-body">The payment must be received in your account by then, if not you can request a county court judgment.</p><p class="govuk-body"><a href="{TELL_US_IT_IS_SETTLED}" rel="noopener noreferrer" class="govuk-link">Tell us it''s paid</a></p>',
+        '<p class="govuk-body">Mae ${respondent1PartyName} wedi cynnig talu ${defendantAdmittedAmount} erbyn ${respondent1AdmittedAmountPaymentDeadlineCy}.</p><p class="govuk-body">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.</p><p class="govuk-body"><a href="{TELL_US_IT_IS_SETTLED}" rel="noopener noreferrer" class="govuk-link">Dweud wrthym ei fod wedi cael ei dalu</a></p>',
         'CLAIMANT');
 
 /**
@@ -19,5 +19,6 @@ VALUES ('Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', 'Response t
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response','<a href={VIEW_RESPONSE_TO_CLAIM}>Gweld yr ymateb i''r hawliad</a>',
+values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response',
+        '<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">Gweld yr ymateb i''r hawliad</a>',
         'Yr ymateb', 'Response.View', 'Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 3);
