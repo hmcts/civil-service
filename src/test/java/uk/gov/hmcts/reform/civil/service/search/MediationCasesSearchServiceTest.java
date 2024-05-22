@@ -13,7 +13,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
 
-    private static final LocalDate CARM_DATE = LocalDate.of(2024, 5, 1);
+    private static final LocalDate CARM_DATE = LocalDate.of(2024, 8, 1);
 
     @BeforeEach
     void setup() {
