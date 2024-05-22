@@ -150,6 +150,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo generalAppParentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
+    private final Document testStampedDocument;
 
     @Builder.Default
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();

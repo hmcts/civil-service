@@ -9,11 +9,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
+import uk.gov.hmcts.reform.civil.service.DocumentStampingService;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,15 +26,17 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
 public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_CASE_NOTE);
-
+    private static final String COURT_SEAL_FILENAME = "courtSeal.png";
     private final CaseNoteService caseNoteService;
     private final ObjectMapper objectMapper;
+    private final DocumentStampingService stampingService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -58,10 +62,17 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, caseData.getCaseNotes());
 
+        CaseDocument doc = stampingService.stampDocument(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData.getTestStampedDocument(), null, COURT_SEAL_FILENAME);
+
+        var systemDocs = caseData.getSystemGeneratedCaseDocuments();
+        systemDocs.add(element(doc));
+        System.out.println(doc);
+
         CaseData updatedCaseData = caseData.toBuilder()
             .caseNotes(caseNotes)
             .caseNote(null)
             .businessProcess(BusinessProcess.ready(ADD_CASE_NOTE))
+            .systemGeneratedCaseDocuments(systemDocs)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
