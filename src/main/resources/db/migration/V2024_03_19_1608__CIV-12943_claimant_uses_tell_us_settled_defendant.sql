@@ -26,9 +26,9 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
           "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant",
-          "Notice.AAA6.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant",
-          "Notice.AAA6.DefResponse.Full Defence. FullDispute.RefusedMediation.Defendant",
-          "Notice.AAA6.DefResponse.Full Defence. FullDispute.SuggestedMediation.Defendant",
+          "Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant",
+          "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant",
+          "Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant",
           "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant",
           "Notice.AAA6.CP.Hearing.Scheduled",
           "Notice.AAA6.CP.HearingDocuments.OtherPartyUploaded",
@@ -44,7 +44,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
           "Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant",
           "Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"
         }',
-        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy"]}');
+        '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy","applicant1PartyName"]}');
 /**
  * Add notification template
  */
@@ -53,6 +53,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
         'The claim is settled',
         'The claim is settled',
-        '<p class="govuk-body">The claimant has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
-        '<p class="govuk-body">The claimant has confirmed that you settled on ${applicant1ClaimSettledDateCy}.</p>',
+        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateEn}.</p>',
+        '<p class="govuk-body">${applicant1PartyName} has confirmed that you settled on ${applicant1ClaimSettledDateCy}.</p>',
         'DEFENDANT');
