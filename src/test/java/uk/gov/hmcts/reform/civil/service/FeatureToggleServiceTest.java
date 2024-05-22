@@ -57,7 +57,34 @@ class FeatureToggleServiceTest {
 
     @Test
     void shouldReturnCorrectValue_whenIsGAForLipInvoked() {
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(false);
+        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(false);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
+        var bulkClaimKey = "bulk_claim_enabled";
+        givenToggle(bulkClaimKey, toggleStat);
+
+        assertThat(featureToggleService.isBulkClaimEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
+        var lipVlipKey = "cuiReleaseTwoEnabled";
+        givenToggle(lipVlipKey, toggleStat);
+
+        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDashboardServiceInvoked(Boolean toggleStat) {
+        var dashboardKey = "dashboard-service";
+        givenToggle(dashboardKey, toggleStat);
+
+        assertThat(featureToggleService.isDashboardServiceEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
