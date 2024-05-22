@@ -2,9 +2,9 @@
  * Add scenario for claimant
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Claimant',
-        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Claimant"}',
-        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Claimant": []}');
+VALUES ('Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant',
+        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant"}',
+        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant": []}');
 
 /**
  * Add task list items claimant
@@ -15,15 +15,15 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
         '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Claimant', '{3, 3}', 'CLAIMANT', 7);
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant', '{3, 3}', 'CLAIMANT', 7);
 
 /**
  * Add scenario for claimant
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Defendant',
-        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Defendant"}',
-        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Defendant": []}');
+VALUES ('Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant',
+        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"}',
+        '{"Notice.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant": []}');
 
 /**
  * Add task list items claimant
@@ -34,4 +34,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
         '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Defendant', '{3, 3}', 'DEFENDANT', 7);
+        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant', '{3, 3}', 'DEFENDANT', 7);

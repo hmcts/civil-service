@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
@@ -78,7 +77,6 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private final Time time;
     private final AssignCategoryId assignCategoryId;
     private final UploadMediationService uploadMediationService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -145,11 +143,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         builder.uploadMediationDocumentsForm(null);
 
         //create dashboard scenarios
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            String[] scenarios = uploadMediationService.getScenarios(callbackParams);
-            uploadMediationService.recordScenarios(scenarios, caseData, authToken);
-        }
+        uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();

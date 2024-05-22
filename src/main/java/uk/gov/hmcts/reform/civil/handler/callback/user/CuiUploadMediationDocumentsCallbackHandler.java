@@ -11,13 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
@@ -29,7 +27,6 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
 
     private static final List<CaseEvent> EVENTS = List.of(CUI_UPLOAD_MEDIATION_DOCUMENTS);
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
     private final UploadMediationService uploadMediationService;
 
     @Override
@@ -43,13 +40,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     private CallbackResponse submitData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            //if user is claimant
-
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            String[] scenarios = uploadMediationService.getScenarios(callbackParams);
-            uploadMediationService.recordScenarios(scenarios, caseData, authToken);
-        }
+        uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();

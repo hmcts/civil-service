@@ -144,8 +144,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Defendant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Claimant"),
-    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_INACTIVE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Defendant"),
-    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_INACTIVE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationInactive.CARM.Claimant");
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"),
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant");
     private final String scenario;
 
     DashboardScenarios(String scenario) {
