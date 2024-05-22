@@ -568,8 +568,6 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                    flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), JudgmentAdmissionUtils.isLRvsLiPOnevOne(c));
                 })
                 .transitionTo(FULL_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .set((c, flags) -> {
@@ -592,8 +590,6 @@ public class StateFlowEngine {
                 .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
                 .set((c, flags) -> {
                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                    flags.put(FlowFlag.JUDGMENT_ONLINE_LIVE.name(), featureToggleService.isJudgmentOnlineLive());
-                    flags.put(FlowFlag.LR_V_LIP_ONE_V_ONE.name(), JudgmentAdmissionUtils.isLRvsLiPOnevOne(c));
                 })
                 .transitionTo(PART_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .set((c, flags) -> {
