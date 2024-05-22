@@ -36,7 +36,13 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant',
           "Notice.AAA6.CP.OrderMade.Completed",
           "Notice.AAA6.CP.Bundle.Ready",
           "Notice.AAA6.CP.Trial Arrangements.Finalised",
-          "Notice.AAA6.CP.Trial Arrangements.Required"
+          "Notice.AAA6.CP.Trial Arrangements.Required",
+          "Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant",
+          "Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant",
+          "Notice.AAA6.MediationSuccessful.CARM.Defendant",
+          "Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant",
+          "Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant",
+          "Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"
         }',
         '{"Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant": ["applicant1ClaimSettledDateEn", "applicant1ClaimSettledDateCy","applicant1PartyName"]}');
 /**

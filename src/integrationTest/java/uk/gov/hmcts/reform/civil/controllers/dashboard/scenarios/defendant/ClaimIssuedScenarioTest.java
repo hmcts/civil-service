@@ -55,15 +55,17 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld yr hawliad</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available"),
                 jsonPath("$[1].taskNameEn").value(
-                    "<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                    "<a href={VIEW_INFO_ABOUT_CLAIMANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
                 jsonPath("$[3].taskNameEn").value(
-                    "<a href={VIEW_INFO_ABOUT_DEFENDANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
+                    "<a href={VIEW_INFO_ABOUT_DEFENDANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
                 jsonPath("$[3].currentStatusEn").value("Available"),
                 jsonPath("$[4].taskNameEn").value("<a>View mediation settlement agreement</a>"),
                 jsonPath("$[4].currentStatusEn").value("Not available yet"),
@@ -71,19 +73,21 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[5].currentStatusEn").value("Not available yet"),
                 jsonPath("$[6].taskNameEn").value("<a>View mediation documents</a>"),
                 jsonPath("$[6].currentStatusEn").value("Not available yet"),
-                jsonPath("$[7].taskNameEn").value("<a>View hearings</a>"),
+                jsonPath("$[7].taskNameEn").value("<a>View the hearing</a>"),
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
                 jsonPath("$[8].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[9].taskNameEn").value("<a>View documents</a>"),
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
-                jsonPath("$[10].taskNameEn").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[10].currentStatusEn").value("Available"),
-                jsonPath("$[11].taskNameEn").value("<a>View the judgment</a>"),
-                jsonPath("$[11].currentStatusEn").value("Not available yet"),
-                jsonPath("$[12].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[12].currentStatusEn").value("Not available yet")
+                jsonPath("$[10].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[10].currentStatusEn").value("Not available yet"),
+                jsonPath("$[11].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES} rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[11].currentStatusEn").value("Available"),
+                jsonPath("$[12].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[12].currentStatusEn").value("Not available yet"),
+                jsonPath("$[13].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[13].currentStatusEn").value("Not available yet")
 
             );
 
@@ -125,15 +129,17 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_CLAIM_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld yr hawliad</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available"),
                 jsonPath("$[1].taskNameEn").value(
-                    "<a href={VIEW_INFO_ABOUT_CLAIMANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
+                    "<a href={VIEW_INFO_ABOUT_CLAIMANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
                 jsonPath("$[3].taskNameEn").value(
-                    "<a href={VIEW_INFO_ABOUT_DEFENDANT}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
+                    "<a href={VIEW_INFO_ABOUT_DEFENDANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
                 jsonPath("$[3].currentStatusEn").value("Available"),
                 jsonPath("$[4].taskNameEn").value("<a>View mediation settlement agreement</a>"),
                 jsonPath("$[4].currentStatusEn").value("Not available yet"),
@@ -141,21 +147,23 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[5].currentStatusEn").value("Not available yet"),
                 jsonPath("$[6].taskNameEn").value("<a>View mediation documents</a>"),
                 jsonPath("$[6].currentStatusEn").value("Not available yet"),
-                jsonPath("$[7].taskNameEn").value("<a>View hearings</a>"),
+                jsonPath("$[7].taskNameEn").value("<a>View the hearing</a>"),
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
                 jsonPath("$[8].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[9].taskNameEn").value("<a>View documents</a>"),
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
-                jsonPath("$[10].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[10].taskNameEn").value("<a>Add the trial arrangements</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
-                jsonPath("$[11].taskNameEn").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[11].currentStatusEn").value("Available"),
-                jsonPath("$[12].taskNameEn").value("<a>View the judgment</a>"),
-                jsonPath("$[12].currentStatusEn").value("Not available yet"),
-                jsonPath("$[13].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[13].currentStatusEn").value("Not available yet")
+                jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[11].currentStatusEn").value("Not available yet"),
+                jsonPath("$[12].taskNameEn").value(
+                    "<a href={VIEW_ORDERS_AND_NOTICES} rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[12].currentStatusEn").value("Available"),
+                jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[13].currentStatusEn").value("Not available yet"),
+                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[14].currentStatusEn").value("Not available yet")
 
             );
 
