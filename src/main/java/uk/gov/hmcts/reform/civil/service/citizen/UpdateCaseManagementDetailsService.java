@@ -68,7 +68,7 @@ public class UpdateCaseManagementDetailsService {
     }
 
     private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
-        if (caseData.isRespondent1LiP()){
+        if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
                     .ifPresent(requestedCourt -> builder.respondent1DQ(
