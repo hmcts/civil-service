@@ -1300,7 +1300,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test
@@ -1310,7 +1310,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
@@ -1332,7 +1332,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
@@ -1353,7 +1353,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
