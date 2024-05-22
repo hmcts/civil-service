@@ -55,8 +55,8 @@ public class TrialArrangementsNotifyOtherPartyDefendantScenarioTest extends Dash
                     "<a>Add the trial arrangements</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 }
