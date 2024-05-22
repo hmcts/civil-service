@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
@@ -29,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @Slf4j
@@ -46,6 +49,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final AssignCategoryId assignCategoryId;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService featureToggleService;
+    private static final String BUNDLE_NAME = "Defendant Response";
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
 
@@ -71,26 +75,31 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
-        if (stitchEnabled && featureToggleService.isLipVLipEnabled()) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (stitchEnabled && featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()) {
             log.info("-------- stitched enabled and it's lip vs lip -----------");
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("-------- Document stitched ----------- {}", documentMetaDataList.size());
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    sealedForm.getDocumentName(),
+                    BUNDLE_NAME,
                     sealedForm.getDocumentName(),
                     caseData
             );
             log.info("-------- final stitched doc-----------");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+            List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments().stream()
+                    .filter(systemGeneratedCaseDocument -> !systemGeneratedCaseDocument.getValue()
+                            .getDocumentType().equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(Collectors.toList());
+            systemGeneratedCaseDocuments.add(element(sealedForm));
+
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
                     .systemGeneratedCaseDocuments(ElementUtils.wrapElements(stitchedDocument));
             log.info("-------- final stitched doc------end-----");
-
         } else {
             log.info("-------- else part-----");
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)

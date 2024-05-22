@@ -12,8 +12,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -138,12 +140,18 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
+        List<Element<CaseDocument>> documents = List.of(
+                element(CaseDocument.builder().documentName("Stitched document").build()),
+                element(CaseDocument.builder().documentName("document name").build()));
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(), any(CaseData.class)))
                 .thenReturn(STITCHED_DOC);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         CaseData caseData = CaseDataBuilder.builder()
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
