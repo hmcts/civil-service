@@ -75,7 +75,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         + " i chi mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
+                        + frequency.getDashboardLabelWelsh() + ". Maent yn cynnig gwneud hyn o "
                         + DateUtils.formatDateInWelsh(firstPaymentDate)
                         + " ymlaen. Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"

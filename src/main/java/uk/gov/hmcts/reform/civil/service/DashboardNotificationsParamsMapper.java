@@ -120,14 +120,6 @@ public class DashboardNotificationsParamsMapper {
                 params.put("instalmentStartDateEn", DateUtils.formatDate(date));
                 params.put("instalmentStartDateCy", DateUtils.formatDateInWelsh(date));
             });
-            params.put(
-                "instalmentTimePeriodEn",
-                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
-            );
-            params.put(
-                "instalmentTimePeriodCy",
-                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
-            );
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
@@ -137,6 +129,10 @@ public class DashboardNotificationsParamsMapper {
             params.put(
                 "paymentFrequency",
                 caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
+            );
+            params.put(
+                "paymentFrequencyWelsh",
+                caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabelWelsh()
             );
             getFirstRepaymentDate(caseData).ifPresent(date -> {
                 params.put("firstRepaymentDateEn", DateUtils.formatDate(date));
@@ -277,17 +273,6 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
-    }
-
-    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
-        return switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK -> "week";
-            case ONCE_TWO_WEEKS -> "2 weeks";
-            case ONCE_THREE_WEEKS -> "3 weeks";
-            case ONCE_FOUR_WEEKS -> "4 weeks";
-            case ONCE_ONE_MONTH -> "month";
-            default -> null;
-        };
     }
 
     private Optional<LocalDate> getInstalmentStartDate(CaseData caseData) {

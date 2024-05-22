@@ -266,8 +266,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("instalmentAmount").isEqualTo("£10");
-        assertThat(result).extracting("instalmentTimePeriodEn").isEqualTo("week");
-        assertThat(result).extracting("instalmentTimePeriodCy").isEqualTo("week");
+        assertThat(result).extracting("paymentFrequency").isEqualTo("every week");
+        assertThat(result).extracting("paymentFrequencyWelsh").isEqualTo("bob wythnos");
         assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDateInWelsh(date));
     }
