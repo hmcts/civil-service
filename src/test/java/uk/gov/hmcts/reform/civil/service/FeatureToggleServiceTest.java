@@ -57,7 +57,7 @@ class FeatureToggleServiceTest {
 
     @Test
     void shouldReturnCorrectValue_whenIsGAForLipInvoked() {
-        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(false);
+        assertThat(featureToggleService.isGaForLipsEnabled()).isFalse();
     }
 
     @ParameterizedTest
