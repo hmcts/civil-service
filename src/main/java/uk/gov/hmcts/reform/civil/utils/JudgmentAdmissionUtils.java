@@ -19,5 +19,4 @@ public class JudgmentAdmissionUtils {
         return caseData.hasApplicant1AcceptedCcj()
             && (caseData.hasApplicant1AcceptedCourtDecision() || caseData.hasApplicant1CourtDecisionInFavourOfClaimant());
     }
-
 }
