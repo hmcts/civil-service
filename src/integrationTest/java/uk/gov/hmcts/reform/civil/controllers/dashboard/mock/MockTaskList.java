@@ -201,24 +201,6 @@ public class MockTaskList {
         return List.of(
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy(
-                    "<a>View mediation settlement agreement</a>")
-                .taskNameEn(
-                    "<a>View mediation settlement agreement</a>")
-                .categoryCy("Mediation")
-                .categoryEn("Mediation")
-                .role(role)
-                .currentStatusEn(TaskStatus.INACTIVE.getName())
-                .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .nextStatusEn(TaskStatus.INACTIVE.getName())
-                .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(5)
-                .updatedAt(OffsetDateTime.now())
-                .createdAt(OffsetDateTime.now())
-                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
-                .build(),
-            TaskList.builder()
-                .reference(reference)
                 .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
                 .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
                 .categoryCy("Mediation")
@@ -342,4 +324,23 @@ public class MockTaskList {
         );
     }
 
+    public static List<TaskList> getUploadMediationTaskListViewMediationAvailableMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.AVAILABLE.getName())
+                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .nextStatusEn(TaskStatus.AVAILABLE.getName())
+                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .taskOrder(7)
+                .build());
+    }
 }
