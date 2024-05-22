@@ -1545,7 +1545,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                ADD_CASE_NOTE
             )
         ),
         entry(
