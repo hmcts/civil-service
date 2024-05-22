@@ -68,6 +68,7 @@ import static java.math.BigDecimal.ZERO;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8284,6 +8285,30 @@ class EventHistoryMapperTest {
                 .extracting("eventDetails").asList()
                 .extracting("installmentAmount").isNotNull();
 
+        }
+
+        @Test
+        void validateRespondent2IntentionType() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2Represented(NO)
+                .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+                .build();
+
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData));
+
+            CaseData caseData1 = CaseDataBuilder.builder()
+                .respondent2Represented(NO)
+                .respondent1Represented(YES)
+                .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+                .build();
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData1));
+
+            CaseData caseData2 = CaseDataBuilder.builder()
+                .respondent2Represented(YES)
+                .respondent1Represented(YES)
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .build();
+            assertEquals("Defend part of the claim", mapper.evaluateRespondent2IntentionType(caseData2));
         }
     }
 }
