@@ -68,7 +68,7 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                                 "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
                         jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                         jsonPath("$[0].taskNameCy").value(
-                                "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                        jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
+                                "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
+                        jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()));
     }
 }

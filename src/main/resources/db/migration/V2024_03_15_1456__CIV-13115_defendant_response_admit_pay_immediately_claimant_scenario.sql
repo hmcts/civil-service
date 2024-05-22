@@ -19,5 +19,6 @@ VALUES ('Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', 'Response t
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response','<a href={VIEW_RESPONSE_TO_CLAIM}>View the response to the claim</a>',
-        'The response', 'Response.View', 'Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 3);
+values ('<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">View the response to the claim</a>', 'The response',
+        '<a href={VIEW_RESPONSE_TO_CLAIM} rel="noopener noreferrer" class="govuk-link">Gweld yr ymateb i''r hawliad</a>',
+        'Yr ymateb', 'Response.View', 'Scenario.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant', '{3, 3}', 'CLAIMANT', 3);

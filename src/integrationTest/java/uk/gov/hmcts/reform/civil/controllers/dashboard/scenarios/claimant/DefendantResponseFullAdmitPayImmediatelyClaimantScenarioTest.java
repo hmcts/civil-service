@@ -78,6 +78,8 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">View the response to the claim</a>"),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
             );
     }
