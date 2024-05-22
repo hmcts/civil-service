@@ -482,6 +482,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (shouldMoveToInMediationState(
             caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
             nextState = CaseState.IN_MEDIATION.name();
+            businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         }
 
         builder.businessProcess(businessProcess);
