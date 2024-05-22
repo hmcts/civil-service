@@ -1,70 +1,147 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 public class UploadMediationServiceTest {
 
+    public static final CaseData CASE_DATA = CaseData.builder()
+        .legacyCaseReference("reference")
+        .ccdCaseReference(1234L)
+        .build();
     @Mock
     private DashboardNotificationsParamsMapper mapper;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
+    @Mock
+    private CoreCaseUserService coreCaseUserService;
+    @Mock
+    private UserService userService;
+    @Mock
+    private  FeatureToggleService featureToggleService;
+
     @InjectMocks
     private UploadMediationService uploadMediationService;
 
     HashMap<String, Object> params = new HashMap<>();
-
+    @BeforeEach
+    void setUp() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+    }
     @Test
-    void shouldReturnGetScenarios() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndAPPLICANTSOLICITORONE() {
         //Given
-        String[] expectedScenarios =  new String[]{
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM.getScenario()
-        };
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
         //When
-        //String[] scenarios = uploadMediationService.getScenarios();
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        //assertThat(scenarios).isEqualTo(expectedScenarios);
+        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+
+    }
+    @Test
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndCLAIMANT() {
+        //Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
+
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
+        //When
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
+        //Then
+        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+
+    }
+    @Test
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRESPONDENTSOLICITORONE() {
+        //Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
+        //When
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
+        //Then
+        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+
+    }
+    @Test
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndDEFENDANTE() {
+        //Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
+        //When
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
+        //Then
+        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+
     }
 
     @Test
-    void shouldReturnRecordScenarios() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRESPONDENTSOLICITORTWO() {
         //Given
-        String[] expectedScenarios =  new String[]{
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
-            SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM.getScenario()
-        };
-        params.put("ccdCaseReference", "123");
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()));
 
-        var caseData = CaseDataBuilder.builder()
-            .caseReference(
-                Long.valueOf("123"))
-            .build();
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
         //When
-        //uploadMediationService.recordScenarios(expectedScenarios, caseData, "token");
-
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
+        verify(dashboardApiClient, times(0)).recordScenario(any(),any(), any(), any());
+
     }
+    @Test
+    void shouldReturnRecordScenarioWhenCarmIsNotEnabled() {
+        //Given
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
+        //When
+        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
+        //Then
+        verify(dashboardApiClient, times(0)).recordScenario(any(),any(), any(), any());
+
+    }
+
 }
 
