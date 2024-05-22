@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,7 +73,7 @@ class CourtOfficerOrderGeneratorTest {
     private CourtOfficerOrderGenerator generator;
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    public void setUp() {
         when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
         when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
