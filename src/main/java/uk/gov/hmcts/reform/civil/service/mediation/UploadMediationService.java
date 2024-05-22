@@ -34,7 +34,7 @@ public class UploadMediationService {
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
 
-    public void uploadMediationDocumentsTaskList(CallbackParams callbackParams){
+    public void uploadMediationDocumentsTaskList(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -42,6 +42,7 @@ public class UploadMediationService {
             recordScenarios(scenarios, caseData, authToken);
         }
     }
+
     private String[] getScenarios(CallbackParams callbackParams) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         List<String> roles = coreCaseUserService.getUserCaseRoles(
@@ -53,7 +54,7 @@ public class UploadMediationService {
                 SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM.getScenario(),
                 SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM.getScenario()
             };
-        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)){
+        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
             return new String[]{
                 SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM.getScenario(),
                 SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM.getScenario()

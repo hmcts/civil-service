@@ -19,14 +19,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 public class UploadMediationServiceTest {
@@ -51,12 +49,14 @@ public class UploadMediationServiceTest {
     private UploadMediationService uploadMediationService;
 
     HashMap<String, Object> params = new HashMap<>();
+
     @BeforeEach
     void setUp() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
     }
+
     @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndAPPLICANTSOLICITORONE() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndApplicantSolicitorOne() {
         //Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -67,11 +67,12 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
 
     }
+
     @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndCLAIMANT() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndClaimant() {
         //Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -82,11 +83,12 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
 
     }
+
     @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRESPONDENTSOLICITORONE() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRespondentSolicitorOne() {
         //Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -97,11 +99,12 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
 
     }
+
     @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndDEFENDANTE() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledAndDefendant() {
         //Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -112,12 +115,12 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
 
     }
 
     @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRESPONDENTSOLICITORTWO() {
+    void shouldReturnRecordScenarioWhenCarmIsEnabledandRespondentSolicitorOne() {
         //Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -128,9 +131,10 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(0)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
 
     }
+
     @Test
     void shouldReturnRecordScenarioWhenCarmIsNotEnabled() {
         //Given
@@ -139,7 +143,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(0)).recordScenario(any(),any(), any(), any());
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
 
     }
 

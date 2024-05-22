@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
