@@ -49,8 +49,9 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final AssignCategoryId assignCategoryId;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService featureToggleService;
+    private static final String DOC_NAME = "Defendant's_response.pdf";
     private static final String BUNDLE_NAME = "Defendant Response";
-    @Value("${stitching.enabled:true}")
+    @Value("${stitching.enabled}")
     private boolean stitchEnabled;
 
     private final Map<String, Callback> callbackMap = Map.of(
@@ -80,7 +81,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (stitchEnabled && featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()) {
-            log.info("-------- stitched enabled and it's lip vs lip -----------");
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("-------- Document stitched ----------- {}", documentMetaDataList.size());
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
@@ -92,13 +92,14 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
             );
             log.info("-------- final stitched doc-----------");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+
             List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments().stream()
                     .filter(systemGeneratedCaseDocument -> !systemGeneratedCaseDocument.getValue()
                             .getDocumentType().equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(Collectors.toList());
-            systemGeneratedCaseDocuments.add(element(sealedForm));
+            systemGeneratedCaseDocuments.add(element(stitchedDocument));
 
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
-                    .systemGeneratedCaseDocuments(ElementUtils.wrapElements(stitchedDocument));
+                    .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
             log.info("-------- final stitched doc------end-----");
         } else {
             log.info("-------- else part-----");
