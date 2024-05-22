@@ -68,11 +68,13 @@ public class UpdateCaseManagementDetailsService {
     }
 
     private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
-        Optional.ofNullable(caseData.getRespondent1DQ())
-            .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
-                .ifPresent(requestedCourt -> builder.respondent1DQ(
-                    dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                        .build())));
+        if (caseData.isRespondent1LiP()){
+            Optional.ofNullable(caseData.getRespondent1DQ())
+                .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
+                    .ifPresent(requestedCourt -> builder.respondent1DQ(
+                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
+                            .build())));
+        }
     }
 
     private RequestedCourt correctCaseLocation(RequestedCourt requestedCourt, List<LocationRefData> locations) {
