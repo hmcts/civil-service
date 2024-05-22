@@ -119,14 +119,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.726'
+        version: '1.12.727'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.23') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.24') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -384,7 +384,7 @@ dependencies {
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.0.1-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.1.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
