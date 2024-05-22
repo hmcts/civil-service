@@ -18,14 +18,14 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_INFO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HRG_INFO;
 
 @Service
 @RequiredArgsConstructor
 public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =  List.of(
-        UPDATE_NEXT_HEARING_INFO,
+        UPDATE_NEXT_HRG_INFO,
         UPDATE_NEXT_HEARING_DETAILS
     );
 

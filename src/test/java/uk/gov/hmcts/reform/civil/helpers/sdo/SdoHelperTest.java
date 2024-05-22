@@ -692,7 +692,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .smallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.telephoneTheCourt)
+                .smallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.TELEPHONE_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
@@ -716,7 +716,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .smallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.videoTheCourt)
+                .smallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.VIDEO_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
@@ -1173,7 +1173,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .fastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.telephoneTheCourt)
+                .fastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.TELEPHONE_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
@@ -1197,7 +1197,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .fastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.videoTheCourt)
+                .fastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.VIDEO_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
@@ -1542,7 +1542,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.telephoneTheCourt)
+                .disposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.TELEPHONE_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
@@ -1566,7 +1566,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .disposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.videoTheCourt)
+                .disposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.VIDEO_THE_COURT)
                 .build();
 
             assertThat(SdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");

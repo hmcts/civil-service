@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum HearingMethodVideoConferenceDJ {
-    videoTheClaimant("the claimant"),
-    videoTheDefendant("the defendant"),
-    videoTheCourt("the court");
+    VIDEO_THE_CLAIMANT("the claimant"),
+    VIDEO_THE_DEFENDANT("the defendant"),
+    VIDEO_THE_COURT("the court");
 
     private String label;
 

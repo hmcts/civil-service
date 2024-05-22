@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.enums.dj;
 
 public enum CaseManagementOrderAdditional {
-    OrderTypeTrialAdditionalDirectionsBuildingDispute,
-    OrderTypeTrialAdditionalDirectionsClinicalNegligence,
-    OrderTypeTrialAdditionalDirectionsCreditHire,
-    OrderTypeTrialAdditionalDirectionsEmployersLiability,
-    OrderTypeTrialAdditionalDirectionsHousingDisrepair,
-    OrderTypeTrialAdditionalDirectionsPersonalInjury,
-    OrderTypeTrialAdditionalDirectionsRoadTrafficAccident
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_BUILDING_DISPUTE,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_CLINICAL_NEGLIGENCE,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_CREDIT_HIRE,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_EMPLOYERS_LIABILITY,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_HOUSING_DISREPAIR,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_PERSONAL_INJURY,
+    ORDER_TYPE_TRIAL_ADDITIONAL_DIRECTIONS_ROAD_TRAFFIC_ACCIDENT
 }
