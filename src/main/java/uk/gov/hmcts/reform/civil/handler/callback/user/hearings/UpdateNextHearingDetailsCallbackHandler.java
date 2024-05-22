@@ -77,7 +77,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
         log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}]- Retrieved latest hearing",
-                 latestHearing.getHearingId(), caseId, latestHearing.getHmcStatus());
+                 caseId, latestHearing.getHearingId(), latestHearing.getHmcStatus());
 
         if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             LocalDateTime nextHearingDate = getNextHearingDate(latestHearing);
