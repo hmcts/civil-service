@@ -2196,7 +2196,7 @@ class StateFlowEngineTest {
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.SDO_ENABLED.name(), false)
+                    entry(FlowFlag.SDO_ENABLED.name(), true)
                 );
             }
         }
@@ -2542,7 +2542,7 @@ class StateFlowEngineTest {
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
@@ -2664,7 +2664,7 @@ class StateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(5).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
