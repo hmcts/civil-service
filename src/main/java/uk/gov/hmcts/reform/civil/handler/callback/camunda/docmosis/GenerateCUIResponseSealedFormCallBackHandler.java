@@ -68,15 +68,19 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         log.info("-------- featureToggleService.isLipVLipEnabled() ----------- {}", featureToggleService.isLipVLipEnabled());
         CaseData caseData = callbackParams.getCaseData();
         CaseDocument sealedForm = formGenerator.generate(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            caseData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                        sealedForm,
+                        caseData
+                ));
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            log.info("-------- Document stitched ----------- {}", documentMetaDataList.size());
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
@@ -84,20 +88,11 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                     sealedForm.getDocumentName(),
                     caseData
             );
-            log.info("-------- final stitched doc-----------");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                             stitchedDocument,
-                            caseData
-                    ));
-            log.info("-------- final stitched doc------end-----");
-        } else {
-            log.info("-------- else part-----");
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
-                    .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                            sealedForm,
                             caseData
                     ));
         }
