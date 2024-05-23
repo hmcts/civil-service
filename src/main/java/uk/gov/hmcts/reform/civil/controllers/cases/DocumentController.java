@@ -62,7 +62,7 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/downloadDocument/{documentId}")
-    public @ResponseBody
+    public
     ResponseEntity<Resource> downloadDocumentById(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @NotNull @PathVariable String documentId) {

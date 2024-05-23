@@ -23,7 +23,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     private static final String[] AUTHORITIES = {
         "caseworker-civil",
@@ -70,25 +70,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
 
-    @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+        web.ignoring().requestMatchers(AUTH_WHITELIST);
     }
 
-    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()
             .logout().disable()
-            .authorizeRequests()
-            .antMatchers(AUTH_WHITELIST).permitAll()
-            .antMatchers("/cases/callbacks/**")
-            .hasAnyAuthority(AUTHORITIES)
-            .anyRequest()
-            .authenticated()
-            .and()
+            .authorizeHttpRequests(authorize ->
+               authorize
+                   .requestMatchers(AUTH_WHITELIST).permitAll()
+                   .requestMatchers("/cases/callbacks/**").hasAnyAuthority(AUTHORITIES)
+                   .anyRequest().authenticated()
+            )
             .oauth2ResourceServer()
             .jwt()
             .jwtAuthenticationConverter(jwtAuthenticationConverter)

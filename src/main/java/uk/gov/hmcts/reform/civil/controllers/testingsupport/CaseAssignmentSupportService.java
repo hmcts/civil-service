@@ -28,7 +28,7 @@ public class CaseAssignmentSupportService {
 
         List<CaseAssignedUserRole> userRoles =
             caseAccessDataStoreApi.getUserRoles(caaAccessToken, authToken, caseIds).getCaseAssignedUserRoles().stream()
-                .filter(role -> role.getUserId().equals(userId)).collect(Collectors.toList());
+                .filter(role -> role.getUserId().equals(userId)).toList();
 
         List<CaseAssignedUserRoleWithOrganisation> userRolesWithOrganisation =
             userRoles.stream().map(role -> CaseAssignedUserRoleWithOrganisation.builder()
@@ -37,7 +37,7 @@ public class CaseAssignmentSupportService {
                 .userId(role.getUserId())
                 .organisationId(organisationId)
                 .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
         CaseAssignedUserRolesRequest request = CaseAssignedUserRolesRequest.builder()
             .caseAssignedUserRoles(userRolesWithOrganisation).build();

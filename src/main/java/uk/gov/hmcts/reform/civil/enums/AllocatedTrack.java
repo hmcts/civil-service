@@ -83,6 +83,7 @@ public enum AllocatedTrack {
         return 28;
     }
 
+    @SuppressWarnings({"java:S1172", "java:S3400"})
     public static int getDaysToAddToDeadlineSpec(AllocatedTrack track) {
         return 28;
     }

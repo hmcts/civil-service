@@ -200,8 +200,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = caseData.getDuplicateSystemGeneratedCaseDocs();
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
+        String CLAIMANT = "claimant";
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (directionsQuestionnaire.getDocumentName().contains("claimant")) {
+            if (directionsQuestionnaire.getDocumentName().contains(CLAIMANT)) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
                 duplicateSystemGeneratedCaseDocs.add(element(copy));
@@ -211,14 +212,14 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             }
             if (nonNull(caseData.getRespondent2DocumentGeneration())
                     && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")
-                    && !directionsQuestionnaire.getDocumentName().contains("claimant")) {
+                    && !directionsQuestionnaire.getDocumentName().contains(CLAIMANT)) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF2.getValue());
             }
         }
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (directionsQuestionnaire.getDocumentName().contains("claimant")) {
+            if (directionsQuestionnaire.getDocumentName().contains(CLAIMANT)) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
                 duplicateSystemGeneratedCaseDocs.add(element(copy));

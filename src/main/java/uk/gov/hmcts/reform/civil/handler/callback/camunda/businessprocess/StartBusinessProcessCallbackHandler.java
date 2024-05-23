@@ -44,8 +44,7 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
         BusinessProcess businessProcess = data.getBusinessProcess();
 
         switch (businessProcess.getStatusOrDefault()) {
-            case READY:
-            case DISPATCHED:
+            case READY, DISPATCHED:
                 log.info("HANDLERSTART LegacyCaseReference ({}) businessProcessInstanceId({})",
                          data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
                 return evaluateReady(callbackParams, businessProcess);

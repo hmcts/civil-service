@@ -31,6 +31,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected abstract String getScenario(CaseData caseData);
 
+    @SuppressWarnings("java:S1172")
     protected String getExtraScenario(CaseData caseData) {
         return null;
     }
@@ -45,6 +46,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return true;
     }
 
+    @SuppressWarnings("java:S1172")
     protected boolean shouldRecordExtraScenario(CaseData caseData) {
         return false;
     }
