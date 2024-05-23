@@ -869,5 +869,4 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
-
 }
