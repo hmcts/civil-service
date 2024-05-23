@@ -2,23 +2,28 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -37,6 +42,9 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @MockBean
+    private DocumentDownloadService downloadService;
 
     @Nested
     class MidEventParticularsOfClaimCallback {
@@ -91,6 +99,20 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(response.getErrors()).containsOnly(
                 "You need to either upload 1 Particulars of claim only or enter the "
                     + "Particulars of claim text in the field provided. You cannot do both.");
+            Mockito.verifyNoInteractions(downloadService);
+        }
+
+        @Test
+        void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmittedV2() {
+            Document document = Document.builder().documentUrl("http://test/9939").documentFileName("go1protected.pdf").build();
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimDocument(
+                                                                            wrapElements(document))
+                                                                        .build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            handler.handle(params);
+            verify(downloadService).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
         }
 
         @Test

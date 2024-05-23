@@ -67,7 +67,7 @@ public abstract class CallbackHandler {
         callbackKey = callbackKey(callbackParams.getVersion(), callbackParams.getType(), callbackParams.getPageId());
 
         if (ofNullable(callbacks().get(callbackKey)).isEmpty()) {
-            LOG.info(String.format("No implementation found for %s, falling back to default", callbackKey));
+            LOG.info("No implementation found for {}, falling back to default", callbackKey);
             callbackKey = callbackKey(callbackParams.getType(), callbackParams.getPageId());
         }
 

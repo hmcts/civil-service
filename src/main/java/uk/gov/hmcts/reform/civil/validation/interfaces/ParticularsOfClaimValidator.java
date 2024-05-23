@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 
 public interface ParticularsOfClaimValidator {
 
-    private ServedDocumentFiles getServedDocumentFiles(CallbackParams callbackParams) {
+    default ServedDocumentFiles getServedDocumentFiles(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         return ofNullable(caseData.getServedDocumentFiles())
@@ -21,13 +21,6 @@ public interface ParticularsOfClaimValidator {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(getServedDocumentFiles(callbackParams).getErrors())
-            .build();
-    }
-
-    default CallbackResponse validateParticularsOfClaimAddOrAmendDocuments(CallbackParams callbackParams) {
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocuments())
             .build();
     }
 }
