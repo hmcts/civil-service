@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -105,14 +107,20 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmittedV2() {
             Document document = Document.builder().documentUrl("http://test/9939").documentFileName("go1protected.pdf").build();
+            DocumentWithRegex documentWithRegex  = DocumentWithRegex.builder().document(document).build();
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
                                                                         .particularsOfClaimDocument(
                                                                             wrapElements(document))
+                                                                        .medicalReport(wrapElements(documentWithRegex))
+                                                                        .scheduleOfLoss(wrapElements(documentWithRegex))
+                                                                        .other(wrapElements(documentWithRegex))
+                                                                        .certificateOfSuitability(wrapElements(documentWithRegex))
+                                                                        .timelineEventUpload(wrapElements(document))
                                                                         .build()).build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             handler.handle(params);
-            verify(downloadService).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
+            verify(downloadService, times(6)).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
         }
 
         @Test
