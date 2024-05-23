@@ -102,6 +102,20 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                     referenceTemplate
                 );
             }
+        } else if (featureToggleService.isLipVLipEnabled()
+            && caseData.isApplicant1NotRepresented()
+            && !caseData.isRespondent1NotRepresented()
+            && isRespondentSolicitor1Notification(callbackParams)) {
+            // Lip v LR scenario
+            String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, caseData.getLegacyCaseReference());
+            sendEmail(
+                isRespondentSolicitor1Notification(callbackParams)
+                    ? caseData.getRespondentSolicitor1EmailAddress()
+                    : caseData.getRespondentSolicitor2EmailAddress(),
+                notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
+                lrDefendantProperties(caseData),
+                referenceTemplate
+            );
         } else {
             if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
                 String referenceTemplate = String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
