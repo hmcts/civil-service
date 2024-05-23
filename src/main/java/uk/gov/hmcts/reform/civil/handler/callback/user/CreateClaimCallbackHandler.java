@@ -144,7 +144,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
-    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -430,7 +430,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         List<String> validationErrors = validateCourtChoice(caseData);
 
-        if (validationErrors.size() > 0) {
+        if (validationErrors.isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
         }
 
@@ -591,6 +591,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    @SuppressWarnings("java:S1172")
     private String getHeader(CaseData caseData) {
         return format("# Please now pay your claim fee%n# using the link below");
     }
@@ -602,13 +603,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent2OrgRegistered() == NO);
     }
 
-    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
-        return caseData.getRespondent1Represented() == NO
-            ||  isSecondRespondentLitigantInPerson(caseData);
-    }
 
     private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
-        return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+        return (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
     private String getBody(CaseData caseData) {
@@ -658,18 +655,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
     }
 
+    final String particularsOfClaim = "particularsOfClaim";
+
     private void assignParticularOfClaimCategoryIds(CaseData caseData) {
         if (YES.equals(caseData.getUploadParticularsOfClaim())) {
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                     Element::getValue, "particularsOfClaim");
+                                                     Element::getValue, particularsOfClaim);
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), particularsOfClaim);
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), particularsOfClaim);
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), particularsOfClaim);
             assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                     document -> document.getValue().getDocument(), particularsOfClaim);
         }
     }
 }

@@ -137,6 +137,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
         }
     }
 
+    @SuppressWarnings("java:S1172")
     private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
         var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::toBuilder)

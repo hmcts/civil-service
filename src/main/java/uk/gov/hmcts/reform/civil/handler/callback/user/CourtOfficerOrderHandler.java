@@ -115,7 +115,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private CallbackResponse validateFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         if (nonNull(caseData.getCourtOfficerFurtherHearingComplex().getListFromDate())
             && caseData.getCourtOfficerFurtherHearingComplex().getListFromDate().isBefore(LocalDate.now())) {

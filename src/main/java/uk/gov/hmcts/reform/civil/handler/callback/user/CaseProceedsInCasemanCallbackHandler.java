@@ -58,7 +58,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = validator.validate(caseData, CasemanTransferDateGroup.class).stream()
             .map(ConstraintViolation::getMessage)
-            .collect(Collectors.toList());
+            .toList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

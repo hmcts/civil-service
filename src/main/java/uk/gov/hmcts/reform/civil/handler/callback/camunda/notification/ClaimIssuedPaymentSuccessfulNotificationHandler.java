@@ -61,6 +61,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    @SuppressWarnings("java:S1172")
     private String addTemplate(CaseData caseData) {
         return notificationsProperties.getNotifyClaimantAfterClaimIssue();
     }

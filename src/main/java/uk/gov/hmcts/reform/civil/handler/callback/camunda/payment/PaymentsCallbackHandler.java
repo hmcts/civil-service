@@ -118,6 +118,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    @SuppressWarnings("java:S1172")
     private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
         try {
             var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);

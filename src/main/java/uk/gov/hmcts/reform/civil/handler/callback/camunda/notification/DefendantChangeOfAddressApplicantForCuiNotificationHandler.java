@@ -97,6 +97,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
+    @SuppressWarnings("java:S1172")
     public String getEmailTemplate(CaseData caseData, boolean isLiPClaimant) {
         String emailTemplate;
         if (isLiPClaimant) {

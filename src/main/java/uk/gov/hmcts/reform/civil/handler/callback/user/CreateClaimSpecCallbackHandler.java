@@ -189,7 +189,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final LocationRefDataService locationRefDataService;
-    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
 
@@ -277,14 +277,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
-        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
+        if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -314,10 +314,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
             List<String> errors = new ArrayList<>();
-            if (caseData.getInterestFromSpecificDate() != null) {
-                if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
-                    errors.add("Correct the date. You can’t use a future date.");
-                }
+            if (caseData.getInterestFromSpecificDate() != null && caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
+                errors.add("Correct the date. You can’t use a future date.");
             }
 
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -427,8 +425,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData caseData = callbackParams.getCaseData();
 
         StateFlow evaluation = stateFlowEngine.evaluate(caseData);
-        State state = evaluation.getState();
-        Map<String, Boolean> flags = evaluation.getFlags();
 
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
@@ -650,11 +646,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
+    final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
@@ -860,12 +857,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         } else {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             } else {
                 return format(
                     "# Your claim has been received and will progress offline%n## Claim number: %s",
