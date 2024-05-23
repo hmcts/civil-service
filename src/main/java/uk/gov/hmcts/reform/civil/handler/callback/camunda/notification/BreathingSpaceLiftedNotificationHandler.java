@@ -64,6 +64,10 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
 
         CaseData caseData = callbackParams.getCaseData();
 
+        if(caseData.isRespondent1LiP()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         if (isRespondentNotification(callbackParams)) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),

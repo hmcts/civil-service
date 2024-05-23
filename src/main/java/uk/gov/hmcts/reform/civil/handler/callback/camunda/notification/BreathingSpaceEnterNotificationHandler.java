@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -57,14 +58,21 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
 
         String templateId;
         String recipient;
-        Map<String, String> templateProperties = addProperties(caseData);
+        Map<String, String> templateProperties = (caseData.isRespondent1LiP())? addPropertiesForDefendantLip(caseData) : addProperties(caseData);
+
         if (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
-            templateId = notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate();
-            recipient = caseData.getRespondentSolicitor1EmailAddress();
-            String defendantLR = getOrganisationName(caseData.getRespondent1OrganisationPolicy(), null);
-            templateProperties.put(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, defendantLR);
-            templateProperties.put("defendantName", caseData.getRespondent1().getPartyName());
+            if (caseData.isRespondent1LiP()) {
+                templateId = notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip();
+                recipient =  Optional.ofNullable(caseData.getRespondent1())
+                    .map(Party::getPartyEmail).orElse("");
+            } else {
+                templateId = notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate();
+                recipient = caseData.getRespondentSolicitor1EmailAddress();
+                String defendantLR = getOrganisationName(caseData.getRespondent1OrganisationPolicy(), null);
+                templateProperties.put(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, defendantLR);
+                templateProperties.put("defendantName", caseData.getRespondent1().getPartyName());
+            }
         } else if (CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
             // TODO tbd in the future, when we include MP in BS, same template for the time being
@@ -118,9 +126,18 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
         HashMap<String, String> properties = new HashMap<>();
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         properties.put(PARTY_REFERENCES, PartyUtils.buildPartiesReferences(caseData));
         return properties;
+    }
+
+    public Map<String, String> addPropertiesForDefendantLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
+        );
     }
 }
