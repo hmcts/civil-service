@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers;
 
-import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;

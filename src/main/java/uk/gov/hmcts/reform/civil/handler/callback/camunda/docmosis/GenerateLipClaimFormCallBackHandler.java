@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;

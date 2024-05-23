@@ -17,6 +17,7 @@ public class ScenarioRequestParams {
      * @return Sonar requests this to be serializable, hence HashMap instead of Map.
      */
     HashMap<String, Object> params;
+
     @SuppressWarnings("java:S1319")
     @JsonCreator
     public ScenarioRequestParams(HashMap<String, Object> params) {
