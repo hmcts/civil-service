@@ -39,8 +39,10 @@ public class DocumentDownloadService {
                 .substring(document.getDocumentUrl().lastIndexOf("/") + 1);
             try {
                 letterContent = downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-            } catch (IOException e) {
-                log.error("Failed getting letter content for filename {} caseId {} ", document.getDocumentFileName(), caseId);
+            } catch (IOException | DocumentDownloadException e) {
+                String formatError = String.format("Failed getting letter content for filename %s caseId %s ",
+                                                   document.getDocumentFileName(), caseId);
+                log.error(formatError);
                 throw new DocumentDownloadException(document.getDocumentFileName(), e);
             }
 
