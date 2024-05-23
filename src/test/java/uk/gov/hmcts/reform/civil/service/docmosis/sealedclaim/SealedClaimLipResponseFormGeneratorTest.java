@@ -77,7 +77,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_STITCH_SPEC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
@@ -893,5 +895,36 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
         Assertions.assertEquals(2, templateData.getDefendant1UnavailableDatesList().size());
+    }
+
+    @Test
+    void shouldGenerateSealedFormForStitchDocumentSuccessfully() {
+
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        //Given
+        CaseData caseData = commonData().build();
+
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+                docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        SealedClaimLipResponseForm templateData = generator
+                .getTemplateData(caseData);
+        //When
+        CaseDocument result = generator.generateLipResponseDoc(caseData, AUTHORIZATION);
+        //Then
+        assertThat(result).isEqualTo(caseDocument);
+        verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_STITCH_SPEC);
+        verify(documentManagementService).uploadDocument(
+                eq(AUTHORIZATION),
+                uploadDocumentArgumentCaptor.capture()
+        );
+        PDF document = uploadDocumentArgumentCaptor.getValue();
+        assertThat(document.getDocumentType()).isEqualTo(DEFENDANT_RESPONSE);
     }
 }

@@ -72,30 +72,25 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         log.info("-------- stitchEnabled ----------- {}", stitchEnabled);
         log.info("-------- featureToggleService.isLipVLipEnabled() ----------- {}", featureToggleService.isLipVLipEnabled());
         CaseData caseData = callbackParams.getCaseData();
-        CaseDocument sealedForm = formGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (stitchEnabled && featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()) {
-            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            CaseDocument lipSealedForm = getLipSealedForm(callbackParams, caseData);
+
+            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, lipSealedForm);
             log.info("-------- Document stitched ----------- {}", documentMetaDataList.size());
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                     BUNDLE_NAME,
-                    sealedForm.getDocumentName(),
+                    lipSealedForm.getDocumentName(),
                     caseData
             );
             log.info("-------- final stitched doc-----------");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
 
-            List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments().stream()
-                    .filter(systemGeneratedCaseDocument -> !systemGeneratedCaseDocument.getValue()
-                            .getDocumentType().equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(Collectors.toList());
+            List<Element<CaseDocument>> systemGeneratedCaseDocuments = getSystemGeneratedCaseDocumentsExcludeDQ(caseData);
             systemGeneratedCaseDocuments.add(element(stitchedDocument));
 
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
@@ -103,6 +98,12 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
             log.info("-------- final stitched doc------end-----");
         } else {
             log.info("-------- else part-----");
+            CaseDocument sealedForm = formGenerator.generate(
+                    caseData,
+                    callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                             sealedForm,
@@ -133,5 +134,18 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 ).forEach(documents::add);
 
         return documents;
+    }
+
+    private CaseDocument getLipSealedForm(CallbackParams callbackParams, CaseData caseData) {
+        return formGenerator.generateLipResponseDoc(
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+    }
+
+    private List<Element<CaseDocument>> getSystemGeneratedCaseDocumentsExcludeDQ(CaseData caseData) {
+        return caseData.getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> !systemGeneratedCaseDocument.getValue()
+                        .getDocumentType().equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(Collectors.toList());
     }
 }
