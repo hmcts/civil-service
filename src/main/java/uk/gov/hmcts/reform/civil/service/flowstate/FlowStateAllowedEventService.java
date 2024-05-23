@@ -966,7 +966,10 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
         entry(

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
+    EditJudgmentOnlineMapper.class,
     EditJudgmentCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
@@ -60,6 +62,8 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event

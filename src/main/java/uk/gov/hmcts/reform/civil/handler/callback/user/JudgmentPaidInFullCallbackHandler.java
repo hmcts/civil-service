@@ -35,7 +35,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDGMENT_PAID_IN_FULL);
     protected final ObjectMapper objectMapper;
-    private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+    private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
 
     @Override

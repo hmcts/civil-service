@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMappe
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,24 +38,36 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EDIT_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+    private final EditJudgmentOnlineMapper editJudgmentOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setRTLFieldShowCondition)
+            .put(callbackKey(ABOUT_TO_START), this::populateFromActiveJudgment)
             .put(callbackKey(MID, "validateDates"), this::validateDates)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private CallbackResponse setRTLFieldShowCondition(CallbackParams callbackParams) {
+    private CallbackResponse populateFromActiveJudgment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.NO) {
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (activeJudgment.getIsRegisterWithRTL() == YesOrNo.NO) {
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
         } else {
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+        }
+        if (JudgmentType.DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())) {
+            // populate data from Default Judgment
+            caseData.setJoOrderMadeDate(activeJudgment.getIssueDate());
+            caseData.setJoPaymentPlan(activeJudgment.getPaymentPlan());
+            caseData.setJoInstalmentDetails(activeJudgment.getInstalmentDetails());
+            caseData.setJoJudgmentRecordReason(null);
+            caseData.setJoAmountOrdered(activeJudgment.getOrderedAmount());
+            caseData.setJoAmountCostOrdered(activeJudgment.getCosts());
+            caseData.setJoIsRegisteredWithRTL(activeJudgment.getIsRegisterWithRTL());
+            caseData.setJoIssuedDate(activeJudgment.getIssueDate());
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
