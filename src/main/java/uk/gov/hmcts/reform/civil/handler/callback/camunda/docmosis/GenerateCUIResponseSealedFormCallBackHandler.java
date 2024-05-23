@@ -71,13 +71,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData updatedCaseData = caseData.toBuilder()
-                .respondent1ClaimResponseDocumentSpec(sealedForm)
-                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                        sealedForm,
-                        caseData
-                ))
-                .build();
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updatedCaseData.toBuilder();
 
@@ -96,7 +89,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                            sealedForm,
+                            stitchedDocument,
                             caseData
                     ));
             log.info("-------- final stitched doc------end-----");
