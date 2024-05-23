@@ -116,6 +116,8 @@ public enum AllocatedTrack {
                 return "Multi Track";
             case SMALL_CLAIM:
                 return "Small Claim Track";
+            case INTERMEDIATE_CLAIM:
+                return "Intermediate Track";
             default:
                 throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
         }
