@@ -71,6 +71,7 @@ public class InitiateGeneralApplicationService {
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final UserRoleCaching userRoleCaching;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String GA_DOC_CATEGORY_ID = "applications";
@@ -209,11 +210,11 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.generalAppEvidenceDocument(gaEvidenceDoc);
         }
 
-        GeneralApplication generalApplication = applicationBuilder
+        applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
-            .isGaApplicantLip(NO)
-            .isGaRespondentOneLip(NO)
-            .isGaRespondentTwoLip(NO)
+            .isGaApplicantLip(caseData.isApplicantNotRepresented() == true ? YES : NO)
+            .isGaRespondentOneLip(caseData.isRespondent1LiP() == true ? YES : NO)
+            .isGaRespondentTwoLip(caseData.isRespondent2LiP() == true ? YES : NO)
             .generalAppType(caseData.getGeneralAppType())
             .generalAppHearingDate(caseData.getGeneralAppHearingDate())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
@@ -227,10 +228,15 @@ public class InitiateGeneralApplicationService {
             .generalAppSuperClaimType(caseType.name())
             .caseAccessCategory(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
-                                       .build())
-            .build();
+                                       .build());
 
-        return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
+        if (featureToggleService.isGaForLipsEnabled()) {
+            applicationBuilder.isGaApplicantLip(NO)
+                .isGaRespondentOneLip(NO)
+                .isGaRespondentTwoLip(NO);
+        }
+
+        return helper.setRespondentDetailsIfPresent(dataBuilder, applicationBuilder.build(), caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
