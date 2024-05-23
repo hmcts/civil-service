@@ -40,9 +40,9 @@ public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest 
                 jsonPath("$[0].titleEn").value("More time requested"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">The response deadline is now 4pm on 1 April 2024. There are {daysLeftToRespond} days remaining for you.<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"),
-                jsonPath("$[0].titleCy").value("More time requested"),
+                jsonPath("$[0].titleCy").value("Cais am fwy o amser"),
                 jsonPath("$[0].descriptionCy").value(
-                                "<p class=\"govuk-body\">The response deadline is now 4pm on 1 Ebrill 2024. There are {daysLeftToRespond} days remaining for you.<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> Respond to claim</a></p>"));
+                                "<p class=\"govuk-body\">Y terfyn amser nawr yw 4pm ar 1 Ebrill 2024. Mae yna {daysLeftToRespond} diwrnod yn weddill i chi.<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> ymateb i’r hawliad</a></p>"));
 
     }
 
