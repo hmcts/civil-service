@@ -518,6 +518,7 @@ public class StateFlowEngine {
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
@@ -525,22 +526,27 @@ public class StateFlowEngine {
                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
-            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
-                               JudicialReferralUtils::shouldMoveToJudicialReferral))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+            })
             .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
                         .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             })
             .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             })
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)

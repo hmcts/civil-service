@@ -1110,4 +1110,12 @@ public class FlowPredicate {
         caseData.getTakenOfflineByStaffDate() != null
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
+
+    public static final Predicate<CaseData> mintiApplicableCase = caseData ->
+        getPredicateForMintiApplicable(caseData);
+
+    private static boolean getPredicateForMintiApplicable(CaseData caseData) {
+        LocalDateTime submittedDate = caseData.getSubmittedDate() != null ? caseData.getSubmittedDate() : LocalDateTime.now();
+        return submittedDate.isAfter(LocalDateTime.of(2025, 1, 31, 8, 0, 0));
+    }
 }
