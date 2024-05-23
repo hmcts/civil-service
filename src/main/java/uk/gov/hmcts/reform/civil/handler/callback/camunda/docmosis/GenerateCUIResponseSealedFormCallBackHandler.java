@@ -72,7 +72,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updatedCaseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
