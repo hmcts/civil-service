@@ -731,7 +731,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1332,7 +1333,8 @@ public class FlowStateAllowedEventService {
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1520,7 +1522,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                ADD_CASE_NOTE
             )
         ),
         entry(
