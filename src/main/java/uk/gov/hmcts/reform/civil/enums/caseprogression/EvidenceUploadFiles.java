@@ -28,7 +28,7 @@ public enum EvidenceUploadFiles {
     public String getDisplayName() {
         return displayName;
     }
-        public String getDocumentTypeDisplayName() {
-            return documentTypeDisplayName;
-        }
+    public String getDocumentTypeDisplayName() {
+        return documentTypeDisplayName;
+    }
 }
