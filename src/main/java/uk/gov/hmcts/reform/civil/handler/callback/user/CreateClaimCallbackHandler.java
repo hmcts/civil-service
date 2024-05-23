@@ -603,7 +603,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent2OrgRegistered() == NO);
     }
 
-
     private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
         return (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }

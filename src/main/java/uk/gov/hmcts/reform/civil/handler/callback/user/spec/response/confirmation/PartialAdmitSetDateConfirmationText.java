@@ -48,7 +48,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             applicantName += " and " + caseData.getApplicant2().getPartyName();
         }
 
-        final String IF_CONDITION_START = "<h3 class=\"govuk-heading-m\">If ";
+        final String headingThreeText = "<h3 class=\"govuk-heading-m\">If ";
 
         StringBuilder sb = new StringBuilder();
         sb.append("<br>You believe you owe &#163;").append(admitOwed).append(
@@ -70,7 +70,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
 
         sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
 
-            .append(IF_CONDITION_START)
+            .append(headingThreeText)
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
             sb.append(" accept your offer</h3>");
@@ -97,7 +97,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             .append(" can request a county court judgment against you for &#163;")
             .append(admitOwed).append(P_TAG)
 
-            .append(IF_CONDITION_START)
+            .append(headingThreeText)
             .append(applicantName)
             .append(" disagrees that you only owe &#163;")
             .append(admitOwed)
@@ -112,7 +112,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             sb.append("<p>The court will review the case for the full amount of &#163;")
               .append(totalClaimAmount).append(P_TAG);
         }
-        sb.append(IF_CONDITION_START)
+        sb.append(headingThreeText)
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
