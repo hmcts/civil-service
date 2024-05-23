@@ -20,6 +20,9 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
     @Autowired
     private DefaultJudgementIssuedDefendantNotificationHandler defaultJudgementIssuedDefendantNotificationHandler;
 
+    @Autowired
+    private DefaultJudgementIssuedDefendantNotificationHandler handler;
+
     @Test
     void should_create_scenario_for_default_judgement() throws Exception {
 
@@ -35,6 +38,7 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
         when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         defaultJudgementIssuedDefendantNotificationHandler.handle(callbackParams(caseData));
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
