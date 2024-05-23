@@ -56,7 +56,7 @@ public class DashboardNotificationService {
         return dashboardNotificationsEntityList.stream()
             .sorted(Comparator.comparing(t -> t.getCreatedAt(), Comparator.reverseOrder()))
             .map(Notification::from)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {
