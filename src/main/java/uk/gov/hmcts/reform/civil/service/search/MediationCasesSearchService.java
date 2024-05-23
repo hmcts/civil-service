@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 @Service
 public class MediationCasesSearchService extends ElasticSearchService {
 
-    private static final LocalDate CARM_DATE = LocalDate.of(2024, 5, 1);
+    private static final LocalDate CARM_DATE = LocalDate.of(2024, 8, 1);
 
     public MediationCasesSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);

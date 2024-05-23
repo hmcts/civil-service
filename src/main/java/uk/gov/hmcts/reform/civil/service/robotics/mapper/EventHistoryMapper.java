@@ -1849,7 +1849,7 @@ public class EventHistoryMapper {
                                     "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                                    evaluateRespondent2IntentionType(caseData)
                                 )
                             )
                         ));
@@ -1891,6 +1891,14 @@ public class EventHistoryMapper {
                                 )));
             }
         }
+    }
+
+    public String evaluateRespondent2IntentionType(CaseData caseData) {
+        if (caseData.isRespondent2NotRepresented() && caseData.getRespondent2ClaimResponseIntentionType() != null) {
+            return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
+        }
+        //represented by same solicitor
+        return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
     }
 
     private Event buildAcknowledgementOfServiceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
