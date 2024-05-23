@@ -145,7 +145,7 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(), any(CaseData.class)))
                 .thenReturn(STITCHED_DOC);
-        given(formGenerator.generateLipResponseDoc(any(CaseData.class), anyString())).willReturn(FORM);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         CaseData caseData = CaseDataBuilder.builder()
@@ -164,6 +164,6 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
                 .filter(caseDocumentElement -> caseDocumentElement.getValue()
                         .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
 
-        verify(formGenerator).generateLipResponseDoc(caseData, BEARER_TOKEN);
+        verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 }

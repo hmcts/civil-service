@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_STITCH_SPEC;
 
 @Service
 @RequiredArgsConstructor
@@ -122,23 +121,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         return documentManagementService.uploadDocument(
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.DEFENDANT_DEFENCE)
-        );
-    }
-
-    public CaseDocument generateLipResponseDoc(final CaseData caseData, final String authorization) {
-        SealedClaimLipResponseForm templateData = getTemplateData(caseData);
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-                templateData,
-                DEFENDANT_RESPONSE_LIP_STITCH_SPEC
-        );
-        String fileName = String.format(
-                DEFENDANT_RESPONSE_LIP_STITCH_SPEC.getDocumentTitle(),
-                caseData.getLegacyCaseReference()
-        );
-
-        return documentManagementService.uploadDocument(
-                authorization,
-                new PDF(fileName, docmosisDocument.getBytes(), DocumentType.DEFENDANT_RESPONSE)
         );
     }
 }
