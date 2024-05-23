@@ -35,11 +35,11 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return false;
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isRPAEmailEnabled() {
@@ -63,11 +63,11 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isDashboardServiceEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("dashboard-service");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
