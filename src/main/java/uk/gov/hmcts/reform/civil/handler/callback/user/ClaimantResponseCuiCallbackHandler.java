@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -111,6 +112,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
