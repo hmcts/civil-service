@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -54,6 +56,9 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
+    @Autowired
+    private ObjectMapper objectMapper;
+    
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
 
     @Test
@@ -222,6 +227,31 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             verify(dashboardApiClient, never()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(500))
+                .applicant1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

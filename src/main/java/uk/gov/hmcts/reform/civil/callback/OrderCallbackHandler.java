@@ -37,7 +37,7 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
         HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())) {
-            caseDataBuilder.requestForReconsiderationDeadline(LocalDate.now().plusDays(7));
+            caseDataBuilder.requestForReconsiderationDeadline(LocalDate.now().plusDays(7).atTime(16,0));
         }
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
