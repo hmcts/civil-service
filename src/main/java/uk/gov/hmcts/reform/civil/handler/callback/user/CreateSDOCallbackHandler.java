@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -142,7 +141,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -894,7 +892,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
-
     private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
         return SdoR2WitnessOfFact.builder()
             .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
@@ -921,7 +918,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
             .build();
     }
-
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
