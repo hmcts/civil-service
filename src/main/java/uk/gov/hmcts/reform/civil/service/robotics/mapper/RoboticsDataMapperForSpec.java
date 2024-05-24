@@ -60,14 +60,14 @@ public class RoboticsDataMapperForSpec {
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
-    public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData) {
+    public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
         requireNonNull(caseData);
         RoboticsCaseDataSpec.RoboticsCaseDataSpecBuilder builder = RoboticsCaseDataSpec.builder()
             .header(buildCaseHeader(caseData))
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData));
+            .events(eventHistoryMapper.buildEvents(caseData, authToken));
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
