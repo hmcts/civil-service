@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -60,7 +59,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final FurtherInformation furtherInformation;
     private final WelshLanguageRequirements welshLanguageRequirements;
     private final StatementOfTruth statementOfTruth;
-    private final AllocatedTrack allocatedTrack;
+    private final String allocatedTrack;
     private final DisclosureReport disclosureReport;
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
