@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -32,9 +31,9 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandler {
 
@@ -64,8 +63,6 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
-        log.info("-------- stitchEnabled ----------- {}", stitchEnabled);
-        log.info("-------- featureToggleService.isLipVLipEnabled() ----------- {}", featureToggleService.isLipVLipEnabled());
         CaseData caseData = callbackParams.getCaseData();
         CaseDocument sealedForm = formGenerator.generate(
             caseData,
@@ -89,10 +86,10 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                     caseData
             );
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
+            CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
                     .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                            stitchedDocument,
+                            updatedStitchedDoc,
                             caseData
                     ));
         }
