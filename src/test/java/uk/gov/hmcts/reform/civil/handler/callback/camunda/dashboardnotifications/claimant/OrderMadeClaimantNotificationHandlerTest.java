@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
@@ -45,20 +46,24 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    OrderMadeClaimantNotificationHandler.class,
+    DashboardApiClient.class,
+    JacksonAutoConfiguration.class,
+    ValidationAutoConfiguration.class
+})
 public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
-    private OrderMadeClaimantNotificationHandler handler;
-    @Mock
-    private DashboardApiClient dashboardApiClient;
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
     @Autowired
-    private ObjectMapper objectMapper;
-    
+    private OrderMadeClaimantNotificationHandler handler;
+    @MockBean
+    private DashboardApiClient dashboardApiClient;
+    @MockBean
+    private DashboardNotificationsParamsMapper mapper;
+    @MockBean
+    private FeatureToggleService toggleService;
+
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
 
     @Test

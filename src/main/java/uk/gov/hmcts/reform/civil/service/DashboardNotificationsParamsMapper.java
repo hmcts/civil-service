@@ -25,7 +25,6 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
@@ -147,8 +146,6 @@ public class DashboardNotificationsParamsMapper {
             });
         }
 
-
-
         if (nonNull(caseData.getHearingDueDate())) {
             LocalDate date = caseData.getHearingDueDate();
             params.put("hearingDueDateEn", DateUtils.formatDate(date));
@@ -211,8 +208,8 @@ public class DashboardNotificationsParamsMapper {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
 
-        if(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
-        || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
+        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
+            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
             params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
             params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
         }

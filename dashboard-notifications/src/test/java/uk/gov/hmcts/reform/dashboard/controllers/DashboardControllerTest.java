@@ -153,6 +153,19 @@ class DashboardControllerTest {
     public void shouldReturnOkWhenNotificationDeleted() {
 
         //when
+        final ResponseEntity responseEntity = dashboardController.deleteNotificationByReferenceAndNameAndRole(
+            "notification_name", "reference", "CLAIMANT", AUTHORISATION);
+
+        //then
+        assertEquals(responseEntity.getStatusCode(), OK);
+        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+            "notification_name", "reference", "CLAIMANT");
+    }
+
+    @Test
+    public void shouldReturnOkWhenNotificationDeletedByNotificationName() {
+
+        //when
         final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
 
         //then
