@@ -132,7 +132,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .build()),
                     ElementUtils.element(CaseDocument.builder()
                                              .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(7))
+                                             .createdDatetime(LocalDateTime.now().minusDays(7)
+                                                                  .minusSeconds(1))
                                              .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);

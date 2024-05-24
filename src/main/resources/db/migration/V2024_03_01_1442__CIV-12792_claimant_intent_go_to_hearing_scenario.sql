@@ -11,6 +11,6 @@ VALUES ('Scenario.AAA6.ClaimantIntent.GoToHearing.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.GoToHearing.Claimant', 'Wait for the court to review the case', 'Aros i’r llys adolygu’r achos',
-        '<p class="govuk-body">You have rejected ${respondent1PartyName}''s response. The case will be referred to a judge who will decide what should happen next.</p><p class="govuk-body"><a href="{VIEW_RESPONSE_TO_CLAIM}"  rel="noopener noreferrer" class="govuk-link">View the defendant''s response</a>.</p>',
-        '<p class="govuk-body">Rydych wedi gwrthod ymateb ${respondent1PartyName}. Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p><p class="govuk-body"><a href="{VIEW_RESPONSE_TO_CLAIM}"  rel="noopener noreferrer" class="govuk-link">Gweld ymateb y diffynnydd</a>.</p>',
+        '<p class="govuk-body">You have rejected ${respondent1PartyName}''s response. The case will be referred to a judge who will decide what should happen next. <a href="{VIEW_RESPONSE_TO_CLAIM}"  rel="noopener noreferrer" class="govuk-link">View the defendant''s response</a>.</p>',
+        '<p class="govuk-body">Rydych wedi gwrthod ymateb ${respondent1PartyName}. Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf. <a href="{VIEW_RESPONSE_TO_CLAIM}"  rel="noopener noreferrer" class="govuk-link">Gweld ymateb y diffynnydd</a>.</p>',
         'CLAIMANT');

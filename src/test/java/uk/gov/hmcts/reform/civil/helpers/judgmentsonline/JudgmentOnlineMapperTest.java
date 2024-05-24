@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class JudgmentOnlineMapperTest {
@@ -50,6 +51,11 @@ class JudgmentOnlineMapperTest {
         caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
         //caseData.setCase(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
         caseData.setJoIsRegisteredWithRTL(YES);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            // sort by time, sometimes too fast for time to be different
+        }
         activeJudgment = recordJudgmentMapper.addUpdateActiveJudgment(caseData);
         caseData.setActiveJudgment(activeJudgment);
 
@@ -67,6 +73,11 @@ class JudgmentOnlineMapperTest {
         caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
         //caseData.setCase(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
         caseData.setJoIsRegisteredWithRTL(YES);
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            // sort by time, sometimes too fast for time to be different
+        }
         activeJudgment = recordJudgmentMapper.addUpdateActiveJudgment(caseData);
         caseData.setActiveJudgment(activeJudgment);
 
@@ -81,10 +92,10 @@ class JudgmentOnlineMapperTest {
         assertEquals(caseData.getHistoricJudgment().get(0).getValue().getJudgmentId(), 3);
         assertEquals(caseData.getHistoricJudgment().get(1).getValue().getJudgmentId(), 2);
         assertEquals(caseData.getHistoricJudgment().get(2).getValue().getJudgmentId(), 1);
-        assertEquals(caseData.getHistoricJudgment().get(0).getValue().getLastUpdateTimeStamp().isAfter(caseData.getHistoricJudgment().get(
-            1).getValue().getLastUpdateTimeStamp()), true);
-        assertEquals(caseData.getHistoricJudgment().get(1).getValue().getLastUpdateTimeStamp().isAfter(caseData.getHistoricJudgment().get(
-            2).getValue().getLastUpdateTimeStamp()), true);
+        assertTrue(caseData.getHistoricJudgment().get(0).getValue().getLastUpdateTimeStamp().isAfter(caseData.getHistoricJudgment().get(
+            1).getValue().getLastUpdateTimeStamp()));
+        assertTrue(caseData.getHistoricJudgment().get(1).getValue().getLastUpdateTimeStamp().isAfter(caseData.getHistoricJudgment().get(
+            2).getValue().getLastUpdateTimeStamp()));
     }
 
 }

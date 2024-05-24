@@ -16,8 +16,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant',
         'Response to the claim',
         'Response to the claim',
-        '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
-        '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds.</p><a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>',
+        '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds. <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.</p>',
+        '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds. <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.</p>',
         'DEFENDANT');
 
 /**
@@ -49,8 +49,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant',
         'Response to the claim',
         'Response to the claim',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineEn}.</p><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineCy}.</p><a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineEn}. <a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineCy}. <a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
         'CLAIMANT');
 
 /**

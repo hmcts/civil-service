@@ -13,8 +13,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant', 'Response to the claim', 'Ymateb i’r hawliad',
-        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">Mae ${respondent1PartyName} wedi cynnig talu ${defendantAdmittedAmount} i chi erbyn ${respondent1AdmittedAmountPaymentDeadlineCy}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">Gweld ac ymateb</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has offered to pay you ${defendantAdmittedAmount} by ${respondent1AdmittedAmountPaymentDeadlineEn}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">Mae ${respondent1PartyName} wedi cynnig talu ${defendantAdmittedAmount} i chi erbyn ${respondent1AdmittedAmountPaymentDeadlineCy}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" class="govuk-link">Gweld ac ymateb</a></p>',
         'CLAIMANT');
 
 /**

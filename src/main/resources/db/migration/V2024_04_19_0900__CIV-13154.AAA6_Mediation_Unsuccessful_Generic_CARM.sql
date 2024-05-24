@@ -14,8 +14,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
         'Mediation appointment unsuccessful',
         'Mediation appointment unsuccessful',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">You were not able to resolve this claim using mediation. This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">You were not able to resolve this claim using mediation. This case will now be reviewed by the court.</p>',
         'CLAIMANT');
 
 /**
@@ -34,6 +34,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant',
         'Mediation appointment unsuccessful',
         'Mediation appointment unsuccessful',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">You were not able to resolve this claim using mediation. This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">You were not able to resolve this claim using mediation. This case will now be reviewed by the court.</p>',
         'DEFENDANT');
