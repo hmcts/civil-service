@@ -35,6 +35,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_TWO;
@@ -74,6 +76,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     private static final String ORGANISATION_NAME_2 = "Org Name 2";
     private static final String EMAIL_TEMPLATE = "test-notification-id";
     private static final String EMAIL_NO_ATTENDANCE_TEMPLATE = "test-na-notification-id";
+
+    private static final String EMAIL_TEMPLATE_LIP_V_LR = "test-notification-id-lip-v-lr";
     private static final String APPLICANT_PARTY_NAME = "Alice";
     private static final String APPLICANT_2_PARTY_NAME = "Portia";
     private static final String DEFENDANT_1_PARTY_NAME = "Lycia";
@@ -103,6 +107,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+        given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLiPvLr()).willReturn(EMAIL_TEMPLATE_LIP_V_LR);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
     }
@@ -307,5 +312,32 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
         assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_D2_NO_ATTENDANCE_PROPERTY_MAP);
+    }
+
+    @Test
+    void shouldSendNotificationToDefendant1LRforLiPvLrCase_whenMoreThan1Reason() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+            .applicant1Represented(NO)
+            .specRespondent1Represented(YES)
+            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.NO)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+        //When
+        notificationHandler.handle(params);
+        //Then
+        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                       emailTemplate.capture(),
+                                                       notificationDataMap.capture(), reference.capture()
+        );
+        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE_LIP_V_LR);
     }
 }
