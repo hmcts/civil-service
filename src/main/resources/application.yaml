@@ -319,6 +319,7 @@ notifications:
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
   mediationUnsuccessfulLRTemplate: "0b0f7846-6238-4ece-87b1-597e22ed518b"
+  mediationUnsuccessfulLRTemplateForLiPvLr: "13c72c37-4657-4998-ae4c-ebdf31978ef5"
   mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
   mediationUnsuccessfulNoAttendanceLRTemplate: "a26641f7-b1d5-4d85-a130-6719b8cc173e"
 
@@ -399,6 +400,7 @@ notifications:
   notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
+  notifyLrDefendantSuccessfulMediationForLiPvLrClaim: "d8022f51-600a-4e69-8e6b-dee584516ad3"
 
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
   notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"

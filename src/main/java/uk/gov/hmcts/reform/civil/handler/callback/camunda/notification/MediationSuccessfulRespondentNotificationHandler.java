@@ -112,7 +112,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                 isRespondentSolicitor1Notification(callbackParams)
                     ? caseData.getRespondentSolicitor1EmailAddress()
                     : caseData.getRespondentSolicitor2EmailAddress(),
-                notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
+                notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLiPvLrClaim(),
                 lrDefendantProperties(caseData),
                 referenceTemplate
             );
