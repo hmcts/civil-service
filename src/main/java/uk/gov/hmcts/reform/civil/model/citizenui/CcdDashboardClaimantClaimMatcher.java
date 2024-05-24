@@ -50,6 +50,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean hasResponsePending() {
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
+            && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
