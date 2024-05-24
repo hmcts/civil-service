@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -107,7 +108,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
-        given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLiPvLr()).willReturn(EMAIL_TEMPLATE_LIP_V_LR);
+        given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr()).willReturn(EMAIL_TEMPLATE_LIP_V_LR);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
     }
@@ -315,7 +316,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @Test
-    void shouldSendNotificationToDefendant1LRforLiPvLrCase_whenMoreThan1Reason() {
+    void shouldSendNotificationToDefendant1LRforLiPvLrCase() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
@@ -339,5 +340,27 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         );
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE_LIP_V_LR);
+    }
+
+    @Test
+    void shouldSendNotificationToDefendant1LRforLiPvLrCase_whenMoreThan1Reason() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+            .applicant1Represented(YES)
+            .specRespondent1Represented(YES)
+            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.NO)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+        //When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) notificationHandler.handle(params);
+        //Then
+        assertThat(response.getErrors()).isNull();
     }
 }

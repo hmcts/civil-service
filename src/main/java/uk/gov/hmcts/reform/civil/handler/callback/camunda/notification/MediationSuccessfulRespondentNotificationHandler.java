@@ -108,7 +108,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, caseData.getLegacyCaseReference());
             sendEmail(
                 setUpLrEmailAddress(callbackParams),
-                notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLiPvLrClaim(),
+                notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim(),
                 lrDefendantProperties(caseData),
                 referenceTemplate
             );

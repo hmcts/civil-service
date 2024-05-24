@@ -86,7 +86,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             when(organisationDetailsService.getRespondent2LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
-            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLiPvLrClaim()).thenReturn(TEMPLATE_ID_LIP_LR);
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim()).thenReturn(TEMPLATE_ID_LIP_LR);
         }
 
         @Test
@@ -356,7 +356,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         }
 
         @Test
-        void shouldNotifyDefendantLiPvLrNotifyDefendant_whenInvoked() {
+        void shouldNotifyDefendantLipVLrNotifyDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);

@@ -102,7 +102,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         );
     }
 
-    public Map<String, String> addPropertiesForDefendantLrForLiPvLr(final CaseData caseData) {
+    public Map<String, String> addPropertiesForDefendantLrForLipVLr(final CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
@@ -160,7 +160,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     private void sendMailtoDefendantForLiPvLrCase(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isRespondentSolicitor1Notification(callbackParams)) {
-            sendGenericMailToDefendant1SolicitorForLiPvLrCase(caseData);
+            sendGenericMailToDefendant1SolicitorForLipVLrCase(caseData);
         }
     }
 
@@ -208,11 +208,11 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
             .equals(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name());
     }
 
-    private void sendGenericMailToDefendant1SolicitorForLiPvLrCase(CaseData caseData) {
+    private void sendGenericMailToDefendant1SolicitorForLipVLrCase(CaseData caseData) {
         notificationService.sendMail(
             caseData.getRespondentSolicitor1EmailAddress(),
-            notificationsProperties.getMediationUnsuccessfulLRTemplateForLiPvLr(),
-            addPropertiesForDefendantLrForLiPvLr(caseData),
+            notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr(),
+            addPropertiesForDefendantLrForLipVLr(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR, caseData.getLegacyCaseReference())
         );
     }
