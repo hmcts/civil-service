@@ -120,7 +120,8 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                         + "attend your appointment.</a></p>"),
                 jsonPath("$[0].titleCy").value("Ni wnaethoch fynychu cyfryngu"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Ni wnaethoch fynychu eich apwyntiad cyfryngu, ac efallai y bydd y barnwr yn eich cosbi. Ni fydd eich cais yn cael ei adolygu gan y llys. "
+                    "<p class=\"govuk-body\">Ni wnaethoch fynychu eich apwyntiad cyfryngu, ac efallai y " +
+                        "bydd y barnwr yn eich cosbi. Ni fydd eich cais yn cael ei adolygu gan y llys. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Esboniwch pam na wnaethoch chi fynychu eich apwyntiad.</a></p>"));
 
         //Verify dashboard information
