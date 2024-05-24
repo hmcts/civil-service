@@ -69,7 +69,7 @@ public class RoboticsDataMapper {
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData));
+            .events(eventHistoryMapper.buildEvents(caseData, authToken));
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
