@@ -62,30 +62,29 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
-        Supplier<Party.Type> getDefendantType;
 
-        if (leadDefendantIs1) {
-            getDefendantType = caseData.getRespondent1()::getType;
-        } else {
-            getDefendantType = caseData.getRespondent2()::getType;
-        }
+        Supplier<Party.Type> getDefendantType = leadDefendantIs1
+            ? caseData.getRespondent1()::getType
+            : caseData.getRespondent2()::getType;
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-
             locationHelper.getClaimantRequestedCourt(caseData)
-                    .filter(this::hasInfo)
-                    .ifPresent(requestedCourt -> {
-                        locationHelper.getMatching(locationRefDataService.getCourtLocationsForDefaultJudgments(
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()), requestedCourt)
-                            .ifPresent(matchingLocation -> LocationHelper.updateWithLocation(dataBuilder, matchingLocation));
-                    });
+                .filter(this::hasInfo)
+                .ifPresent(requestedCourt ->
+                               locationHelper.getMatching(
+                                       locationRefDataService.getCourtLocationsForDefaultJudgments(
+                                           callbackParams.getParams().get(BEARER_TOKEN).toString()),
+                                       requestedCourt)
+                                   .ifPresent(matchingLocation ->
+                                                  LocationHelper.updateWithLocation(caseData.toBuilder(), matchingLocation)
+                                   )
+                );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
     }
 

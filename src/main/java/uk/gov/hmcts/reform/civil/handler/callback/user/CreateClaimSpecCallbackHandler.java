@@ -243,7 +243,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     CaseData::getSpecRespondent2CorrespondenceAddressdetails
                 )
             )
-            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
+            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
             .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
@@ -679,11 +679,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 + exitSurveyContentService.applicantSurvey();
     }
 
+    final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
+
     private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
             return format(
                 CONFIRMATION_SUMMARY_PBA_V3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference())
+                format(caseDetailsUrl, caseData.getCcdCaseReference())
             );
         } else {
             return format(
@@ -770,14 +772,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
-                errors.add("Total Claim Amount cannot exceed £ 25,000");
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            }
+        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
+            errors.add("Total Claim Amount cannot exceed £ 25,000");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
         }
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
@@ -882,7 +884,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 ? getSpecConfirmationSummary(caseData)
                 : toggleService.isPbaV3Enabled() ? format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
+                format(caseDetailsUrl, caseData.getCcdCaseReference()),
                 format(caseDocLocation, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
@@ -904,7 +906,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (featureToggleService.isPbaV3Enabled()) {
             return format(
                 SPEC_CONFIRMATION_SUMMARY_PBA_V3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference())
+                format(caseDetailsUrl, caseData.getCcdCaseReference())
             );
         } else {
             return format(
@@ -912,14 +914,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 format(caseDocLocation, caseData.getCcdCaseReference())
             );
         }
-    }
-
-    private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
-            .build();
     }
 
     private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
@@ -957,29 +951,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
-        if (toggleService.isSdoR2Enabled()) {
-            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
-                LocalDate today = LocalDate.now();
-                LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
-                if (scheduledDate.isAfter(today)) {
-                    errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
-                }
+        if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+            LocalDate today = LocalDate.now();
+            LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+            if (scheduledDate.isAfter(today)) {
+                errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .errors(errors)
-            .build();
-    }
 
-    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<String> errors = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
-        if (scheduledDate.isAfter(today)) {
-            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
