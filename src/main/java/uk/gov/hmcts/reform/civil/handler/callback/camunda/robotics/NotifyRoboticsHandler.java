@@ -47,14 +47,15 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
             try {
                 log.info(String.format("Start notify robotics for %s", legacyCaseReference));
+                String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
                 if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
                     roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
                         caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()
+                        authToken
                     );
                     errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
                 }
