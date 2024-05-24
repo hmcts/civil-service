@@ -4,12 +4,12 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.5'
   id 'org.springframework.boot' version '2.7.18'
-  id 'org.owasp.dependencycheck' version '9.1.0'
+  id 'org.owasp.dependencycheck' version '9.2.0'
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
-  id "org.flywaydb.flyway" version "10.12.0"
+  id "org.flywaydb.flyway" version "10.13.0"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -119,14 +119,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.726'
+        version: '1.12.728'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.23') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.24') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -337,7 +337,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.86'
+  implementation 'com.github.hmcts:civil-commons:1.0.87'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -384,7 +384,7 @@ dependencies {
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.0.1-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.1.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
@@ -436,8 +436,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.15'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.15'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.16'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.16'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
