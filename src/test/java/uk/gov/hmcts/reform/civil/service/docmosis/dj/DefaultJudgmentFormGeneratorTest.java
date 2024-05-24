@@ -10,7 +10,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -247,6 +250,10 @@ public class DefaultJudgmentFormGeneratorTest {
             .totalClaimAmount(new BigDecimal(2000))
             .addApplicant2(YesOrNo.YES)
             .applicant2(PartyBuilder.builder().individual().build())
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+            .repaymentDate(LocalDate.now().plusMonths(4))
+            .repaymentSuggestion("200")
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
@@ -275,6 +282,7 @@ public class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
             .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
@@ -300,6 +308,8 @@ public class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
+            .paymentSetDate(LocalDate.now().plusDays(5))
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
@@ -328,6 +338,10 @@ public class DefaultJudgmentFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
+            .repaymentDate(LocalDate.now().plusMonths(4))
+            .repaymentSuggestion("200")
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
@@ -357,6 +371,10 @@ public class DefaultJudgmentFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
             .respondent2(PartyBuilder.builder().company().build())
             .totalClaimAmount(new BigDecimal(2000))
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
+            .repaymentDate(LocalDate.now().plusMonths(4))
+            .repaymentSuggestion("200")
             .build();
         List<CaseDocument> caseDocuments = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
                                                                               GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
