@@ -1064,11 +1064,15 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan =
-        CaseData::hasApplicantAcceptedRepaymentPlan;
+    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantAcceptedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+                : caseData.hasApplicantAcceptedRepaymentPlan();
 
-    public static final Predicate<CaseData> rejectRepaymentPlan =
-        CaseData::hasApplicantRejectedRepaymentPlan;
+    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
+        caseData.isLipvLipOneVOne()
+                ? caseData.hasApplicantRejectedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null
+                : caseData.hasApplicantRejectedRepaymentPlan();
 
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
