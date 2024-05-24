@@ -655,6 +655,24 @@ class ManageContactInformationUtilsTest {
         }
 
         @Test
+        void shouldReturnExpectedPartyDetailsList_forGivenData_whenUpdatedFormDataIsNotDefined() {
+            UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()
+                .firstName("NewClaimantName")
+                .lastName("LastName")
+                .phoneNumber("09876565432")
+                .emailAddress("some-email@example.com")
+                .build();
+
+            UUID uuid = UUID.randomUUID();
+
+            List<Element<PartyFlagStructure>> existingList = List.of(Element.<PartyFlagStructure>builder().id(uuid).value(
+                createParty("claimant-1-lr-individual")).build());
+            List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, null);
+
+            assertThat(unwrapElements(actual)).isEqualTo(List.of());
+        }
+
+        @Test
         void shouldReturnExpectedPartyDetailsList_forGivenData_whenExistingListIsEmpty() {
 
             UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()

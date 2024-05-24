@@ -513,7 +513,7 @@ public class ManageContactInformationUtils {
 
     public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
                                                                            List<Element<UpdatePartyDetailsForm>> updatedData) {
-        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
+        return ofNullable(updatedData).orElse(new ArrayList<>()).stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
                         .id(updatedParty.getId())
                         .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
                                 .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
