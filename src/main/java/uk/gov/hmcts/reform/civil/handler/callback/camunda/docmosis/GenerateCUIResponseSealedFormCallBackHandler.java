@@ -78,20 +78,22 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                    documentMetaDataList,
-                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    sealedForm.getDocumentName(),
-                    sealedForm.getDocumentName(),
-                    caseData
-            );
-            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-            CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
-                    .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                            updatedStitchedDoc,
-                            caseData
-                    ));
+            if (documentMetaDataList.size() > 1) {
+                CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+                        documentMetaDataList,
+                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                        sealedForm.getDocumentName(),
+                        sealedForm.getDocumentName(),
+                        caseData
+                );
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+                CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
+                caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
+                        .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                                updatedStitchedDoc,
+                                caseData
+                        ));
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
