@@ -11,8 +11,8 @@ VALUES ('Scenario.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
          "Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant",
          "Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant",
          "Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
-        "Notice.AAA6.ClaimantIntent.Mediation.Claimant",
-        "Notice.AAA6.ClaimantIntent.GoToHearing.Claimant"}',
+         "Notice.AAA6.ClaimantIntent.Mediation.Claimant",
+         "Notice.AAA6.ClaimantIntent.GoToHearing.Claimant"}',
         '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant" : []}');
 
 /**
