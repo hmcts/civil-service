@@ -42,7 +42,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
                 jsonPath("$[0].titleEn").value("Mr. John Rambo has requested a County Court Judgment against you"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">The claimant rejected your repayment plan and asked you to sign a settlement. You did not sign the agreement.</p>" +
+                        "<p class=\"govuk-body\">Mr. John Rambo rejected your repayment plan and asked you to sign a settlement. You did not sign the agreement.</p>" +
                             "<p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>" +
                             "<p class=\"govuk-body\">If you pay the debt within one month of the date of judgment, the County Court Judgment (CCJ) " +
                             "is removed from the public register. You can pay £15 to <a href={APPLY_FOR_CERTIFICATE} " +
@@ -52,7 +52,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
                 jsonPath("$[0].titleCy").value("Mr. John Rambo has requested a County Court Judgment against you"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">The claimant rejected your repayment plan and asked you to sign a settlement. You did not sign the agreement.</p>" +
+                        "<p class=\"govuk-body\">Mr. John Rambo rejected your repayment plan and asked you to sign a settlement. You did not sign the agreement.</p>" +
                             "<p class=\"govuk-body\">When we've processed the request, we'll post a copy of the judgment to you.</p>" +
                             "<p class=\"govuk-body\">If you pay the debt within one month of the date of judgment, the County Court Judgment (CCJ) " +
                             "is removed from the public register. You can pay £15 to <a href={APPLY_FOR_CERTIFICATE} " +

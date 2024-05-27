@@ -76,15 +76,15 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                     "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the hearing</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">View the hearing</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()),
+                    "<a href={VIEW_HEARINGS}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld y gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()),
                 jsonPath("$[1].reference").value(caseId),
                 jsonPath("$[1].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[1].taskNameCy").value(
-                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getName())
+                    "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld gorchmynion a rhybuddion</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
 
             );
     }
@@ -119,13 +119,13 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
 
-                jsonPath("$[1].titleEn").value("You must pay the hearing fee"),
-                jsonPath("$[1].descriptionEn").value(
+                jsonPath("$[0].titleEn").value("You must pay the hearing fee"),
+                jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You must either <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">pay the hearing fee</a> of £200 "
                         + "or <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\"> apply for help with fees</a>. " +
                         "You must do this by 1 April 2024. If you do not take one of these actions, your claim will be struck out."),
-                jsonPath("$[1].titleCy").value("Rhaid i chi dalu ffi'r gwrandawiad"),
-                jsonPath("$[1].descriptionCy").value(
+                jsonPath("$[0].titleCy").value("Rhaid i chi dalu ffi'r gwrandawiad"),
+                jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rhaid i chi naill ai <a href=\"{PAY_HEARING_FEE_URL_REDIRECT}\" class=\"govuk-link\">dalu ffi'r gwrandawiad</a> o £200 neu <a href=\"{APPLY_HELP_WITH_FEES_START}\" class=\"govuk-link\">wneud cais am help i dalu ffioedd</a>. Mae'n rhaid i chi wneud hyn erbyn 1 Ebrill 2024. Os na fyddwch yn cymryd un o'r camau hyn, bydd eich hawliad yn cael ei ddileu.")
             );
 
@@ -138,8 +138,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                     "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
                 jsonPath("$[1].currentStatusEn").value(TaskStatus.ACTION_NEEDED.getName()),
                 jsonPath("$[1].taskNameCy").value(
-                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
-                jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getName()),
+                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
                 jsonPath("$[1].hintTextEn").value("Deadline is 12am on 1 April 2024"),
                 jsonPath("$[1].hintTextCy").value("Deadline is 12am on 1 Ebrill 2024")
             );
