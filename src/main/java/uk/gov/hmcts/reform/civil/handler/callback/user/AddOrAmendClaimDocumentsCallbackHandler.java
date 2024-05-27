@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -10,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -35,6 +39,7 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_OR_AMEND_CLAIM_DOCUMENTS);
     private final ExitSurveyContentService exitSurveyContentService;
     private final DocumentDownloadService service;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,13 +74,23 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
                 .errors(getServedDocumentFiles(callbackParams).getErrorsAddOrAmendDocuments())
                 .build();
         }
-        Long caseId = callbackParams.getCaseData().getCcdCaseReference();
+
+        CaseData caseData = callbackParams.getCaseData();
+        Map<String, Object> data = callbackParams.getRequest().getCaseDetailsBefore().getData();
+        CaseData caseDataBefore = objectMapper.convertValue(data, new TypeReference<>() {
+        });
+
+        Long caseId = caseData.getCcdCaseReference();
         ServedDocumentFiles servedDocumentFiles = getServedDocumentFiles(callbackParams);
         List<String> errors = new ArrayList<>();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
         List<Element<Document>> particularsOfClaimDocument = servedDocumentFiles.getParticularsOfClaimDocument();
+        ServedDocumentFiles servedDocumentFilesBefore = getServedDocumentFiles(caseDataBefore);
         if (particularsOfClaimDocument != null) {
+            List<Element<Document>> particularsOfClaimDocumentBefore =
+                Optional.ofNullable(servedDocumentFilesBefore.getParticularsOfClaimDocument()).orElse(new ArrayList<>());
+            particularsOfClaimDocument.removeAll(particularsOfClaimDocumentBefore);
+
             particularsOfClaimDocument.forEach(o ->
                                                    service.validateEncryptionOnUploadedDocument(
                                                        o.getValue(),
@@ -87,6 +102,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
         List<Element<DocumentWithRegex>> medicalReport = servedDocumentFiles.getMedicalReport();
         if (medicalReport != null) {
+            List<Element<DocumentWithRegex>> medicalReportBefore
+                = Optional.ofNullable(servedDocumentFilesBefore.getMedicalReport()).orElse(new ArrayList<>());
+            medicalReport.removeAll(medicalReportBefore);
             medicalReport.forEach(o ->
                                       service.validateEncryptionOnUploadedDocument(
                                           o.getValue().getDocument(),
@@ -98,6 +116,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
         List<Element<DocumentWithRegex>> scheduleOfLoss = servedDocumentFiles.getScheduleOfLoss();
         if (scheduleOfLoss != null) {
+            List<Element<DocumentWithRegex>> scheduleOfLossBefore
+                = Optional.ofNullable(servedDocumentFilesBefore.getScheduleOfLoss()).orElse(new ArrayList<>());
+            scheduleOfLoss.removeAll(scheduleOfLossBefore);
             scheduleOfLoss.forEach(o ->
                                        service.validateEncryptionOnUploadedDocument(
                                            o.getValue().getDocument(),
@@ -109,6 +130,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
         List<Element<DocumentWithRegex>> certificateOfSuitability = servedDocumentFiles.getCertificateOfSuitability();
         if (certificateOfSuitability != null) {
+            List<Element<DocumentWithRegex>> certificateOfSuitabilityBefore
+                = Optional.ofNullable(servedDocumentFilesBefore.getCertificateOfSuitability()).orElse(new ArrayList<>());
+            certificateOfSuitability.removeAll(certificateOfSuitabilityBefore);
             certificateOfSuitability.forEach(o ->
                                                  service.validateEncryptionOnUploadedDocument(
                                                      o.getValue().getDocument(),
@@ -120,6 +144,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
         List<Element<DocumentWithRegex>> other = servedDocumentFiles.getOther();
         if (other != null) {
+            List<Element<DocumentWithRegex>> otherBefore
+                = Optional.ofNullable(servedDocumentFilesBefore.getOther()).orElse(new ArrayList<>());
+            other.removeAll(otherBefore);
             other.forEach(o ->
                               service.validateEncryptionOnUploadedDocument(
                                   o.getValue().getDocument(),
@@ -131,6 +158,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
 
         List<Element<Document>> timelineEventUpload = servedDocumentFiles.getTimelineEventUpload();
         if (timelineEventUpload != null) {
+            List<Element<Document>> timelineEventUploadBefore
+                = Optional.ofNullable(servedDocumentFilesBefore.getTimelineEventUpload()).orElse(new ArrayList<>());
+            timelineEventUpload.removeAll(timelineEventUploadBefore);
             timelineEventUpload.forEach(o ->
                                             service.validateEncryptionOnUploadedDocument(
                                                 o.getValue(),

@@ -11,8 +11,10 @@ import static java.util.Optional.ofNullable;
 public interface ParticularsOfClaimValidator {
 
     default ServedDocumentFiles getServedDocumentFiles(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        return getServedDocumentFiles(callbackParams.getCaseData());
+    }
 
+    default ServedDocumentFiles getServedDocumentFiles(CaseData caseData) {
         return ofNullable(caseData.getServedDocumentFiles())
             .orElse(ServedDocumentFiles.builder().build());
     }

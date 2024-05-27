@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -21,11 +24,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
+import java.util.Map;
+
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -41,12 +47,12 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private AddOrAmendClaimDocumentsCallbackHandler handler;
-
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
-
     @MockBean
     private DocumentDownloadService downloadService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Nested
     class MidEventParticularsOfClaimCallback {
@@ -68,10 +74,15 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmpty() {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
-
+            Map<String, Object> beforeCaseData = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            CallbackParams params = callbackParamsOf(caseData,
+                                                     MID,
+                                                     CallbackVersion.V_2,
+                                                     pageId,
+                                                     Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"),
+                                                     beforeCaseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -80,11 +91,17 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
                                                                         .particularsOfClaimText("Some string")
                                                                         .build()).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
-
+            Map<String, Object> beforeCaseData = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            CallbackParams params = callbackParamsOf(caseData,
+                                                     MID,
+                                                     CallbackVersion.V_2,
+                                                     pageId,
+                                                     Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"),
+                                                     beforeCaseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getErrors()).isEmpty();
+            verifyNoInteractions(downloadService);
         }
 
         @Test
@@ -121,6 +138,63 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
             handler.handle(params);
             verify(downloadService, times(6)).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldValidateForNewUploadedDocument_whenThereIsExistingDocumentPresentIgnoreExistingDocument() {
+            Document document = Document.builder().documentUrl("http://test/9939").documentFileName("go1protected.pdf").build();
+            DocumentWithRegex documentWithRegex  = DocumentWithRegex.builder().document(document).build();
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimDocument(
+                                                                            wrapElements(document))
+                                                                        .medicalReport(wrapElements(documentWithRegex))
+                                                                        .scheduleOfLoss(wrapElements(documentWithRegex))
+                                                                        .other(wrapElements(documentWithRegex))
+                                                                        .certificateOfSuitability(wrapElements(documentWithRegex))
+                                                                        .timelineEventUpload(wrapElements(document))
+                                                                        .build()).build();
+            Map<String, Object> beforeCaseData = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            CallbackParams params = callbackParamsOf(caseData,
+                                                     MID,
+                                                     CallbackVersion.V_2,
+                                                     pageId,
+                                                     Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"),
+                                                     beforeCaseData);
+
+            handler.handle(params);
+            verifyNoInteractions(downloadService);
+        }
+
+        @Test
+        void shouldValidateForNewUploadedDocument_whenThereIsExistingDocumentPresentIgnoreExistingDocumentV2() {
+            Document document = Document.builder().documentUrl("http://test/9939").documentFileName("go1protected.pdf").build();
+            DocumentWithRegex documentWithRegex  = DocumentWithRegex.builder().document(document).build();
+            CaseData caseDataBefore = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimDocument(
+                                                                            wrapElements(document))
+                                                                        .build()).build();
+
+            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
+                                                                        .particularsOfClaimDocument(
+                                                                            wrapElements(document))
+                                                                        .medicalReport(wrapElements(documentWithRegex))
+                                                                        .scheduleOfLoss(wrapElements(documentWithRegex))
+                                                                        .other(wrapElements(documentWithRegex))
+                                                                        .certificateOfSuitability(wrapElements(documentWithRegex))
+                                                                        .timelineEventUpload(wrapElements(document))
+                                                                        .build()).build();
+            Map<String, Object> beforeCaseData = objectMapper.convertValue(caseDataBefore, new TypeReference<>() {
+            });
+            CallbackParams params = callbackParamsOf(caseData,
+                                                     MID,
+                                                     CallbackVersion.V_2,
+                                                     pageId,
+                                                     Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"),
+                                                     beforeCaseData);
+
+            handler.handle(params);
+            verify(downloadService, times(5)).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
         }
 
         @Test
