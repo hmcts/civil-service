@@ -35,15 +35,15 @@ public class MediationScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("You have said you wish continue with your claim"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days.</p>" +
-                            "<p class=\"govuk-body\"><a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\"  rel=\"noopener noreferrer\" class=\"govuk-link\"> " +
+                        "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days. " +
+                            "<a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\"  rel=\"noopener noreferrer\" class=\"govuk-link\"> " +
                             "Find out more about how mediation works (opens in new tab)</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Rydych wedi dweud eich bod yn dymuno parhau â’ch hawliad"),
                 jsonPath("$[0].descriptionCy")
                     .value(
                         "<p class=\"govuk-body\">Bydd eich achos yn cael ei gyfeirio at y gwasanaeth cyfryngu. " +
-                            "Bydd eich apwyntiad cyfryngu yn cael ei drefnu o fewn 28 diwrnod.</p>" +
-                            "<p class=\"govuk-body\"><a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\"  " +
+                            "Bydd eich apwyntiad cyfryngu yn cael ei drefnu o fewn 28 diwrnod. " +
+                            "<a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\"  " +
                             "rel=\"noopener noreferrer\" class=\"govuk-link\"> " +
                             "Rhagor o wybodaeth am sut mae cyfryngu yn gweithio (yn agor mewn tab newydd)</a>.</p>")
             );

@@ -45,11 +45,11 @@ public class ClaimantRequestedJudgeToMakeNewPlanScenarioTest extends DashboardBa
             jsonPath("$[0].titleEn").value(
                 "You requested a County Court Judgment against Mr Defendant Guy"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>.</p><p class=\"govuk-body\">When a judge has made a decision, we’ll post a copy of the judgment to you.</p>"),
+                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>. When a judge has made a decision, we’ll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol yn erbyn Mr Defendant Guy"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>.</p><p class=\"govuk-body\">Pan fydd barnwr wedi gwneud penderfyniad, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
+                "<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>. Pan fydd barnwr wedi gwneud penderfyniad, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
         );
     }
 }

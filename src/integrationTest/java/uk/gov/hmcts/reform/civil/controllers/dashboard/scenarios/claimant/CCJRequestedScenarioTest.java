@@ -44,20 +44,20 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">We'll process your request and post a copy of the judgment to you and "
                         + defendantName
-                        + ". We aim to do this as soon as possible.</p>"
-                        + "<p class=\"govuk-body\">Your online account will not be updated, and "
+                        + ". We aim to do this as soon as possible. "
+                        + "Your online account will not be updated, and "
                         + defendantName
-                        + " will no longer be able to respond to your claim online. Any further updates will be by post.</p>"
-                        + "<p class=\"govuk-body\">If a postal response is received before the judgment is issued, your request will be rejected.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>"),
+                        + " will no longer be able to respond to your claim online. Any further updates will be by post. "
+                        + "If a postal response is received before the judgment is issued, your request will be rejected. "
+                        + "<a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about actions you can take once a CCJ is issued (opens in a new tab)</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Cais am Ddyfarniad Llys Sirol (CCJ) wedi’i wneud"),
                  jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Byddwn yn prosesu eich cais ac yn anfon copi o’r dyfarniad drwy’r post atoch chi a "
-                    + defendantName + ". Fe ymdrechwn at wneud hyn cyn gynted â phosibl.</p>"
-                    + "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru, ac ni fydd "
-                    + defendantName + " yn gallu ymateb i’ch hawliad ar-lein mwyach. Byddwch yn cael eich hysbysu drwy’r post am unrhyw ddiweddariadau pellach.</p>"
-                    + "<p class=\"govuk-body\">Os derbynnir ymateb drwy’r post cyn cyhoeddi’r dyfarniad, bydd eich cais yn cael ei wrthod.</p>"
-                    + "<p class=\"govuk-body\"><a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
+                    + defendantName + ". Fe ymdrechwn at wneud hyn cyn gynted â phosibl. "
+                    + "Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru, ac ni fydd "
+                    + defendantName + " yn gallu ymateb i’ch hawliad ar-lein mwyach. Byddwch yn cael eich hysbysu drwy’r post am unrhyw ddiweddariadau pellach. "
+                    + "Os derbynnir ymateb drwy’r post cyn cyhoeddi’r dyfarniad, bydd eich cais yn cael ei wrthod. "
+                    + "<a href=\"{enforceJudgementUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am y camau y gallwch eu cymryd yn dilyn cyhoeddi CCJ (yn agor mewn tab newydd)</a>.</p>")
             );
 
         //Verify task Item is created
@@ -107,11 +107,11 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             jsonPath("$[0].titleEn").value(
                 "You requested a County Court Judgment against Mr. Sole Trader"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>.<br>When we've processed the request, we'll post a copy of the judgment to you.</p>"),
+                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>. When we've processed the request, we'll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader"),
             jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>." +
-                                                     "<br>Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
+                                                     " Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
         );
     }
 }

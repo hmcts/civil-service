@@ -117,13 +117,13 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                     "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
                         + "a penalty against you. Your case will not be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
-                        + "attend your appointment.</a></p>"),
+                        + "attend your appointment</a>.</p>"),
                 jsonPath("$[0].titleCy").value("You did not attend mediation"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
                         + "a penalty against you. Your case will not be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
-                        + "attend your appointment.</a></p>")
+                        + "attend your appointment</a>.</p>")
             );
 
         //Verify dashboard information

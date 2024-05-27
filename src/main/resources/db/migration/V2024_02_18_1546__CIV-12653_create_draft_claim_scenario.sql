@@ -11,7 +11,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ClaimIssue.ClaimSubmit.Required', 'This claim has not been submitted', 'Nid yw''r hawliad hwn wedi cael ei gyflwyno',
         '<p class="govuk-body">Your claim is saved as a draft. <a href="{DRAFT_CLAIM_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Continue with claim</a>.</p>',
-        '<p class="govuk-body">Mae eich cais wedi ei gadw fel drafft. <a href="{DRAFT_CLAIM_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Parhau gyda''r hawliad.</a>.</p>',
+        '<p class="govuk-body">Mae eich cais wedi ei gadw fel drafft. <a href="{DRAFT_CLAIM_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Parhau gyda''r hawliad</a>.</p>',
         'CLAIMANT');
 
 /**

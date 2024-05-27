@@ -65,8 +65,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + ". They are offering to do this starting from "
                         + DateUtils.formatDate(firstPaymentDate)
-                        + ".</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
+                        + ". <a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
                         + " respond</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
@@ -77,8 +76,8 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         ".00", "")
                         + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
                         + DateUtils.formatDateInWelsh(firstPaymentDate)
-                        + " ymlaen.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
+                        + " ymlaen. "
+                        + "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
                         + "</a></p>"
                 )
             );

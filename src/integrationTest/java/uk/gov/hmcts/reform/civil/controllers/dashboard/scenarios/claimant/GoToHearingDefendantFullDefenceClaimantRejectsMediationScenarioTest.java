@@ -50,13 +50,13 @@ public class GoToHearingDefendantFullDefenceClaimantRejectsMediationScenarioTest
                 jsonPath("$[0].descriptionEn")
                     .value(
                         "<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim. They said no to mediation." +
-                            " The case will be referred to a judge who will decide what should happen next.</p> <p class=\"govuk-body\">You can <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">view your" +
+                            " The case will be referred to a judge who will decide what should happen next. You can <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">view your" +
                             " response</a> or <a target=\"_blank\" href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\" class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionCy")
                     .value(
                         "<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad. Mi wnaethant wrthod rhoi cynnig ar gyfryngu." +
-                            " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p> <p class=\"govuk-body\">Gallwch" +
+                            " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf. Gallwch" +
                             " <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">weld eich ymateb</a> neu <a target=\"_blank\" href={VIEW_CLAIMANT_HEARING_REQS} rel=\"noopener noreferrer\" class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd</a>.</p>")
             );
     }

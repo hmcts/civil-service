@@ -49,11 +49,11 @@ public class GoToHearingScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trader's response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>"),
+                        "<p class=\"govuk-body\">You have rejected Mr. Sole Trader's response. The case will be referred to a judge who will decide what should happen next. <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Rydych wedi gwrthod ymateb Mr. Sole Trader. Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y diffynnydd</a>.</p>")
+                        "<p class=\"govuk-body\">Rydych wedi gwrthod ymateb Mr. Sole Trader. Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf. <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y diffynnydd</a>.</p>")
             );
     }
 }

@@ -56,16 +56,16 @@ public class DefendantFullDefenceFullDisputeClaimantCarmScenarioTest extends Das
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">John Doe has rejected the claim. " +
-                        "You need to respond by " +
-                        DateUtils.formatDate(applicantResponseDeadline) + ".</p>" +
-                        "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
+                        "You need to respond by "
+                        + DateUtils.formatDate(applicantResponseDeadline) + ". "
+                        + "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
                 ),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">John Doe has rejected the claim. " +
-                        "You need to respond by " +
-                        DateUtils.formatDateInWelsh(applicantResponseDeadline) + ".</p>" +
-                        "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
+                        "You need to respond by "
+                        + DateUtils.formatDateInWelsh(applicantResponseDeadline)
+                        + ". <a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
                 )
             );
 
@@ -73,7 +73,7 @@ public class DefendantFullDefenceFullDisputeClaimantCarmScenarioTest extends Das
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].reference").value(caseId),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
