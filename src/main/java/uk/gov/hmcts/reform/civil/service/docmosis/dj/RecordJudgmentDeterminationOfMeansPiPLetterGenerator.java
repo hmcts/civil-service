@@ -79,7 +79,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode()) // TODO: Confirm with the team
+            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
             .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
             .build();
     }

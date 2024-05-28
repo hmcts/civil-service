@@ -54,8 +54,8 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
                     "<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 
@@ -89,8 +89,8 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
                     "<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 }

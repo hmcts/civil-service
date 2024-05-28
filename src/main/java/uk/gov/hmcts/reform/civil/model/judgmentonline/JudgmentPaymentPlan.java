@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JudgmentStatusDetails {
+public class JudgmentPaymentPlan {
 
-    private JudgmentStatusType judgmentStatusTypes;
-    private LocalDateTime lastUpdatedDate;
-    private String joRtlState;
+    private PaymentPlanSelection type;
+    private LocalDate paymentDeadlineDate;
 }
