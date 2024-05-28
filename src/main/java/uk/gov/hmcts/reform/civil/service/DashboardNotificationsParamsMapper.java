@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -49,6 +52,9 @@ public class DashboardNotificationsParamsMapper {
             params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
         } else {
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+        }
+        if(caseData.getJoJudgmentRecordReason()!= null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)){
+            params.put("paymentFrecuencyMessage", getPaymentFrecuencyMessage(caseData).toString());
         }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
@@ -338,4 +344,33 @@ public class DashboardNotificationsParamsMapper {
         }
         return null;
     }
+    private static StringBuilder getPaymentFrecuencyMessage(CaseData caseData) {
+        //You must pay the claim amount of £${joClaimAmount} in monthly instalments of £${joMonthlyAmount}. The first payment is due on ${joDueDate}.
+        PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
+        StringBuilder paymentFrecuencyMessage = new StringBuilder();
+        if (paymentPlanType.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
+            JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
+            paymentFrecuencyMessage.append(" You must pay the claim amount of £ ")
+                .append(caseData.getJoAmountOrdered())
+                .append(" in ")
+                .append(getStringPaymentFrecuency(instalmentDetails))
+                .append(" instalments of £ ")
+                .append(instalmentDetails.getAmount())
+                .append(" The first payment is due on ")
+                .append(instalmentDetails.getStartDate());
+        }
+        return paymentFrecuencyMessage;
+    }
+
+    private static String getStringPaymentFrecuency(JudgmentInstalmentDetails judgmentInstalmentDetails){
+        switch (judgmentInstalmentDetails.getPaymentFrequency()){
+            case WEEKLY :
+                return "weekly";
+            case EVERY_TWO_WEEKS:
+                return "biweekly";
+            case MONTHLY : return"monthly";
+        }
+        return "";
+    }
+
 }
