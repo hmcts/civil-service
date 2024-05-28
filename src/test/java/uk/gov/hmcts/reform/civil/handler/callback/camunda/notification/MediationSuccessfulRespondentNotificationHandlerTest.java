@@ -100,6 +100,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -196,7 +197,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         }
 
         @Test
-        void shouldNotifyDefendantLiPvLR_whenInvoked() {
+        void shouldNotifyDefendantCarmLRvLRNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
