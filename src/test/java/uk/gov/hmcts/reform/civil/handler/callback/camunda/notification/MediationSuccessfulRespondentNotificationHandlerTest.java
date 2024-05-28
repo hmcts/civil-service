@@ -365,7 +365,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .applicant1Represented(NO)
-                .specRespondent1Represented(YES)
+                .specRespondent1Represented(NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(
@@ -382,6 +382,37 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 TEMPLATE_ID_LIP_LR,
                 lrDefendantProperties(caseData),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
+            );
+        }
+
+        @Test
+        void shouldNotifyDefendantLrVLipNotifyDefendant_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YES)
+                .specRespondent1Represented(YES)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-successful-respondent-notification-000DC001"
             );
         }
 
