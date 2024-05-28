@@ -10,6 +10,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 
 @Service
@@ -68,7 +71,10 @@ public class UpdateClaimStateService {
     private boolean isJudicialReferralAllowed(CaseData caseData) {
         return isProceedOrNotSettleClaim(caseData)
             && (isClaimantOrDefendantRejectMediation(caseData)
-            || caseData.isFastTrackClaim());
+            || caseData.isFastTrackClaim()
+            || ((MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
+            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)));
     }
 
     private boolean isProceedOrNotSettleClaim(CaseData caseData) {
