@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -123,6 +124,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -460,6 +462,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                if (featureToggleService.isJudgmentOnlineLive()) {
+                    caseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData));
+                }
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
                     && ((caseData.hasClaimantNotAgreedToFreeMediation()

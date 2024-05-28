@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -42,6 +43,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -110,6 +112,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
+        }
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
