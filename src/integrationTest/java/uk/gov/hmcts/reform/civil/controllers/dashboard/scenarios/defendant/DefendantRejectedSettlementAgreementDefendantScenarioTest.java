@@ -42,8 +42,8 @@ public class DefendantRejectedSettlementAgreementDefendantScenarioTest extends D
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">Mr. John Rambo can request a County Court Judgment (CCJ), " +
                     "which would order you to repay the money in line with the agreement. " +
-                    "The court believes you can afford this.</p> " +
-                    "<p class=\"govuk-body\">If the claimant requests a CCJ then you can ask a judge " +
+                    "The court believes you can afford this. " +
+                    "If the claimant requests a CCJ then you can ask a judge " +
                     "to consider changing the plan, based on your financial details.</p>"),
             jsonPath("$[0].titleCy").value("Cytundeb setlo"),
             jsonPath("$[0].descriptionCy").value(

@@ -17,7 +17,7 @@ VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defe
         ' The court will contact you when they respond. '
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a></p>',
         '<p class="govuk-body">Rydych wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gall ${applicant1PartyName} wrthod neu gytuno i gyfryngu.'
-        ' Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.'
+        ' Bydd y llys yn cysylltu â chi pan fyddant yn ymateb. '
         '<a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">Gweld eich ymateb</a></p>',
         'DEFENDANT');
 
