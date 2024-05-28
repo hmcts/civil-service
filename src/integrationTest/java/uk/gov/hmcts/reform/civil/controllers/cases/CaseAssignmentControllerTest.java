@@ -6,6 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -36,6 +37,8 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private AssignCaseService assignCaseService;
     @MockBean
     private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Test
     @SneakyThrows
@@ -90,6 +93,15 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
+    @Test
+    @SneakyThrows
+    void givenCorrectParams_whenAssignClaim_forDefendant_shouldReturnStatusOk() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
+        doPost("authorization", "12345", ASSIGN_CASE, "123", "DEFENDANT")
+            .andExpect(status().isOk());
+    }
+  
     @Test
     @SneakyThrows
     void givenCorrectClaim_whenDefendantLinkedStatusFalse_shouldReturnStatusOk() {
