@@ -512,8 +512,8 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE)
                 .transitionTo(IN_MEDIATION).onlyIf((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                                                        // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                                                       // and move to in mediation if applicant does not settle
-                                                       .or(lipFullDefenceProceed.and(isCarmApplicableLipCase).and(not(fullDefenceProceed))))
+                                                       // and move to in mediation if applicant does chooses to proceed/not settle
+                                                       .or(lipFullDefenceProceed.and(isCarmApplicableLipCase)))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
