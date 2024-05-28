@@ -19,12 +19,12 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 import java.io.IOException;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class JudgmentByAdmissionLiPLetterGenerator {
+public class JudgmentByAdmissionPiPLetterGenerator {
 
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
@@ -40,7 +40,7 @@ public class JudgmentByAdmissionLiPLetterGenerator {
         CaseDocument caseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                JUDGMENT_BY_ADMISSION_LIP_DEFENDANT_LETTER.getDocumentTitle(),
+                JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 judgmentByAdmissionLetter.getBytes(),
                 DocumentType.JUDGMENT_BY_ADMISSION_LETTER
             )
@@ -69,7 +69,7 @@ public class JudgmentByAdmissionLiPLetterGenerator {
     private DocmosisDocument generate(CaseData caseData) {
         return documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
-            JUDGMENT_BY_ADMISSION_LIP_DEFENDANT_LETTER
+            JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER
         );
     }
 

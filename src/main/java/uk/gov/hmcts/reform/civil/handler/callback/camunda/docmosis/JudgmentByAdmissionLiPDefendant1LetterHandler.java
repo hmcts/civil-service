@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.JudgmentByAdmissionLiPLetterGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.JudgmentByAdmissionPiPLetterGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class JudgmentByAdmissionLiPDefendant1LetterHandler extends CallbackHandl
     private static final List<CaseEvent> EVENTS = List.of(
         JUDGMENT_BY_ADMISSION_DEFENDANT1_PIN_IN_LETTER);
     public static final String TASK_ID = "SendJudgmentByAdmissionLiPLetterDef1";
-    private final JudgmentByAdmissionLiPLetterGenerator judgmentByAdmissionLiPLetterGenerator;
+    private final JudgmentByAdmissionPiPLetterGenerator judgmentByAdmissionLiPLetterGenerator;
 
     @Override
     protected Map<String, Callback> callbacks() {
