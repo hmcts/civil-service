@@ -20,7 +20,7 @@ public class JudicialReferralUtilsTest {
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
 
-        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData);
+        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, false);
         assertTrue(judicialReferralUtils);
     }
 
@@ -31,7 +31,7 @@ public class JudicialReferralUtilsTest {
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .build();
 
-        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData);
+        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, false);
 
         assertFalse(judicialReferralUtils);
     }
@@ -46,7 +46,7 @@ public class JudicialReferralUtilsTest {
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
 
-        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData);
+        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, false);
         assertTrue(judicialReferralUtils);
     }
 

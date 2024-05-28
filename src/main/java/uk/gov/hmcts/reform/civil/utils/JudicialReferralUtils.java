@@ -22,7 +22,7 @@ public class JudicialReferralUtils {
      *                 vs all the defendants
      * @return true if and only if the case should move to judicial referral
      */
-    public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
+    public static boolean shouldMoveToJudicialReferral(CaseData caseData, boolean mintiApplicableCase) {
         CaseCategory caseCategory = caseData.getCaseAccessCategory();
 
         if (CaseCategory.SPEC_CLAIM.equals(caseCategory)) {
@@ -34,7 +34,7 @@ public class JudicialReferralUtils {
             };
         } else {
             AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack) && !mintiApplicableCase) {
                 return false;
             }
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
