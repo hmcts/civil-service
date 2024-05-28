@@ -59,6 +59,11 @@ public class Applicant1DQ implements DQ {
     public FixedRecoverableCosts getFixedRecoverableCosts() {
         return applicant1DQFixedRecoverableCosts;
     }
+    @Override
+    @JsonProperty("applicant1DQFixedRecoverableCostsIntermediate")
+    public FixedRecoverableCosts getFixedRecoverableCostsIntermediate() {
+        return applicant1DQFixedRecoverableCostsIntermediate;
+    }
 
     @Override
     @JsonProperty("applicant1DQDisclosureOfElectronicDocuments")

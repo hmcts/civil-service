@@ -67,12 +67,17 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("respondent2DQFixedRecoverableCostsIntermediate")
+    public FixedRecoverableCosts getFixedRecoverableCostsIntermediate() {
+        return respondent2DQFixedRecoverableCostsIntermediate;
+    }
+
+    @Override
     @JsonProperty("respondent2DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments() {
         return respondent2DQDisclosureOfElectronicDocuments;
     }
 
-    @Override
     @JsonProperty("specRespondent2DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
         return specRespondent2DQDisclosureOfElectronicDocuments;
@@ -84,7 +89,6 @@ public class Respondent2DQ implements DQ {
         return respondent2DQDisclosureOfNonElectronicDocuments;
     }
 
-    @Override
     @JsonProperty("specRespondent2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
         return specRespondent2DQDisclosureOfNonElectronicDocuments;

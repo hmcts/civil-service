@@ -11,13 +11,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -802,6 +805,36 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(extracted.getLastName()).isEqualTo("last");
                 assertThat(extracted.getPhoneNumber()).isEqualTo("07123456789");
                 assertThat(extracted.getEmailAddress()).isEqualTo("test@email.com");
+            }
+
+            @Test
+            void whenIntermediateClaim_shouldUseFixedRecoverableCostsIntermediate() {
+                FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .frcSupportingDocument(Document.builder().build())
+                    .complexityBandingAgreed(YES)
+                    .band(ComplexityBand.BAND_1)
+                    .reasons("Reasoning")
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFixedRecoverableCosts(null)
+                                       .respondent1DQFixedRecoverableCostsIntermediate(frcIntermediate)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+                assertThat(data.getIsSubjectToFixedRecoverableCostRegime()).isEqualTo(YES);
+                assertThat(data.getComplexityBandingAgreed()).isEqualTo(YES);
+                assertThat(data.getBand()).isEqualTo(ComplexityBand.BAND_1);
+                assertThat(data.getBandText()).isEqualTo(ComplexityBand.BAND_1.getLabel());
+                assertThat(data.getReasons()).isEqualTo("Reasoning");
             }
 
             @Test
