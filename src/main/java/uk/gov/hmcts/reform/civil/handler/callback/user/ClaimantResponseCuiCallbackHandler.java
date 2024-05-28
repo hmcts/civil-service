@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -112,6 +113,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
 
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
+
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -121,8 +125,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement()
-            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+            return caseData.isCourtDecisionInClaimantFavourImmediateRePayment()
+                    ? deadlinesCalculator.getRespondentToImmediateSettlementAgreement(responseDate)
+                    : deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate);
+        }
+        return null;
     }
 
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
