@@ -2191,12 +2191,13 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true)
                 );
             } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(6).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.SDO_ENABLED.name(), true)
+                    entry(FlowFlag.SDO_ENABLED.name(), true),
+                    entry(FlowFlag.MINTI_ENABLED.name(), false)
                 );
             }
         }
@@ -2537,7 +2538,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(6).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
@@ -2662,7 +2663,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(6).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
@@ -2710,13 +2711,14 @@ class StateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(7).contains(
+            assertThat(stateFlow.getFlags()).hasSize(8).contains(
                 entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.IS_MULTI_TRACK.name(), true),
+                entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry(FlowFlag.SDO_ENABLED.name(), false)
             );
         }
