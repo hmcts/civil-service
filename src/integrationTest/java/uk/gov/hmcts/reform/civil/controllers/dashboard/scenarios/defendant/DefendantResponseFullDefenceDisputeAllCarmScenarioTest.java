@@ -56,13 +56,13 @@ public class DefendantResponseFullDefenceDisputeAllCarmScenarioTest extends Dash
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                     jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have rejected the claim. The court"
-                        + " will contact you when John Doe responds.</p>"
-                        + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"),
+                        + " will contact you when John Doe responds. "
+                        + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>"),
                     jsonPath("$[0].titleCy").value("Response to the claim"),
                     jsonPath("$[0].descriptionCy").value(
                             "<p class=\"govuk-body\">You have rejected the claim. The court"
-                                    + " will contact you when John Doe responds.</p>"
-                                    + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>")
+                                    + " will contact you when John Doe responds. "
+                                    + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>.</p>")
             );
 
         //Verify task Item is created

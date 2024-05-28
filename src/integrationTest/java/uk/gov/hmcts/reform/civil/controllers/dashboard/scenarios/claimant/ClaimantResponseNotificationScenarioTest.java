@@ -41,15 +41,15 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
                 jsonPath("$[0].titleEn").value("Your claim is now going to mediation"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Your claim is now going to mediation."
-                            + " You will be contacted within 28 days with details of your appointment."
-                            + " If you do not attend your mediation appointment, the judge may issue a penalty.</p>"),
+                        "<p class=\"govuk-body\">Your claim is now going to mediation. "
+                            + "You will be contacted within 28 days with details of your appointment. "
+                            + "If you do not attend your mediation appointment, the judge may issue a penalty.</p>"),
                 jsonPath("$[0].titleCy").value("Your claim is now going to mediation"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Your claim is now going to mediation."
-                            + " You will be contacted within 28 days with details of your appointment."
-                            + " If you do not attend your mediation appointment, the judge may issue a penalty.</p>"));
+                        "<p class=\"govuk-body\">Your claim is now going to mediation. "
+                            + "You will be contacted within 28 days with details of your appointment. "
+                            + "If you do not attend your mediation appointment, the judge may issue a penalty.</p>"));
     }
 
     @Test

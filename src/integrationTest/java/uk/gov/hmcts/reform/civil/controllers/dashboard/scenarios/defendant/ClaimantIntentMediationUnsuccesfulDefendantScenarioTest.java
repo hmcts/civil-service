@@ -78,12 +78,12 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mediation appointment unsuccessful"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> "
-                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation. "
+                        + "This case will now be reviewed by the court.</p>"),
                 jsonPath("$[0].titleCy").value("Mediation appointment unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> "
-                        + "<p class=\"govuk-body\">This case will now be reviewed by the court.</p>")
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation. "
+                        + "This case will now be reviewed by the court.</p>")
             );
 
         //Verify dashboard information
@@ -156,12 +156,12 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mediation appointment unsuccessful"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
-                        + "class=\"govuk-body\">This case will now be reviewed by the court.</p>"),
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation. "
+                        + "This case will now be reviewed by the court.</p>"),
                 jsonPath("$[0].titleCy").value("Mediation appointment unsuccessful"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p "
-                        + "class=\"govuk-body\">This case will now be reviewed by the court.</p>")
+                    "<p class=\"govuk-body\">You were not able to resolve this claim using mediation. "
+                        + "This case will now be reviewed by the court.</p>")
             );
 
         //Verify dashboard information

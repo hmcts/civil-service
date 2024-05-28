@@ -63,7 +63,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + ". You have offered to do this starting from " + DateUtils.formatDate(firstPaymentDate)
-                        + ". We will contact you when the claimant responds to your offer.</p><p class=\"govuk-body\"><a "
+                        + ". We will contact you when the claimant responds to your offer. <a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
@@ -73,7 +73,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " bob " + frequency.getDashboardLabel() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate)
-                        + " ymlaen. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p><p class=\"govuk-body\"><a "
+                        + " ymlaen. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig. <a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );

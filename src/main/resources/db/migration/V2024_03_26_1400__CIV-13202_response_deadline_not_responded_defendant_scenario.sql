@@ -17,7 +17,7 @@ VALUES ('Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant',
         '${applicant1PartyName} can now request a county court judgment. You can still respond to the claim before they ask for a judgment. '
         'A County Court Judgment can mean you find it difficult to get credit, like a mortgage or mobile phone contact. Bailiffs could also be sent to your home. '
         '<a href="{RESPONSE_TASK_LIST_URL}" class="govuk-link">Respond to claim</a></p>',
-        '<p class="govuk-body">Nid ydych wedi ymateb i’r hawliad.'
+        '<p class="govuk-body">Nid ydych wedi ymateb i’r hawliad. '
         'Gall ${applicant1PartyName} nawr wneud cais am ddyfarniad llys sirol. Gallwch dal ymateb i’r hawliad cyn iddynt wneud cais am ddyfarniad. '
         'Gall Dyfarniad Llys Sirol olygu eich bod yn ei chael hi''n anodd cael credyd, fel morgais neu gontract ffôn symudol. Gallai beilïaid hefyd gael eu hanfon i''ch cartref. '
         '<a href="{RESPONSE_TASK_LIST_URL}" class="govuk-link">Ymateb i hawliad</a></p>',

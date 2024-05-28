@@ -34,6 +34,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.MediationSuccessful.CARM.Defendant',
         'Mediation appointment successful',
         'Mediation appointment successful',
-        '<p class="govuk-body">Both parties attended mediation and an agreement was reached.</p> <p class="govuk-body">This case is now settled and no further action is needed.</p> <p class="govuk-body">You can view your mediation agreement <a href="{MEDIATION_SUCCESSFUL_URL}" rel="noopener noreferrer" class="govuk-link" target="_blank">here</a>.</p>',
-        '<p class="govuk-body">Both parties attended mediation and an agreement was reached.</p> <p class="govuk-body">This case is now settled and no further action is needed.</p> <p class="govuk-body">You can view your mediation agreement <a href="{MEDIATION_SUCCESSFUL_URL}" rel="noopener noreferrer" class="govuk-link" target="_blank">here</a>.</p>',
+        '<p class="govuk-body">Both parties attended mediation and an agreement was reached. This case is now settled and no further action is needed. You can view your mediation agreement <a href="{MEDIATION_SUCCESSFUL_URL}" rel="noopener noreferrer" class="govuk-link" target="_blank">here</a>.</p>',
+        '<p class="govuk-body">Both parties attended mediation and an agreement was reached. This case is now settled and no further action is needed. You can view your mediation agreement <a href="{MEDIATION_SUCCESSFUL_URL}" rel="noopener noreferrer" class="govuk-link" target="_blank">here</a>.</p>',
         'DEFENDANT');

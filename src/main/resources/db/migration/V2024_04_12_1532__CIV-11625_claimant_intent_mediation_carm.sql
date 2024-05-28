@@ -21,8 +21,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
         'Your claim is now going to mediation',
         'Your claim is now going to mediation',
-        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment.   If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
-        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment.   If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
+        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
+        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
         'CLAIMANT');
 
 /**

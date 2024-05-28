@@ -52,16 +52,16 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
                 jsonPath("$[0].titleEn").value("Mediation appointment successful"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached.</p> "
-                            + "<p class=\"govuk-body\">This case is now settled and no further action is needed.</p> "
-                            + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
+                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached. "
+                            + "This case is now settled and no further action is needed. "
+                            + "You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mediation appointment successful"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached.</p> "
-                            + "<p class=\"govuk-body\">This case is now settled and no further action is needed.</p> "
-                            + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
+                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached. "
+                            + "This case is now settled and no further action is needed. "
+                            + "You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
             );
 
