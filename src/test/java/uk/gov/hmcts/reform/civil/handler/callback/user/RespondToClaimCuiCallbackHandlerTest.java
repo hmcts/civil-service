@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,14 +14,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
@@ -32,17 +36,22 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -109,6 +118,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
 
         @Test
@@ -132,6 +142,51 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldPopulateRespondentWithUnavailabilityDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(5000))
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
+                .build().toBuilder().respondent1DQ(Respondent1DQ.builder()
+                                                       .respondent1DQHearing(Hearing.builder()
+                                                                                 .hearingLength(ONE_DAY)
+                                                                                 .unavailableDatesRequired(YES)
+                                                                                 .unavailableDates(wrapElements(List.of(
+                                                                                     UnavailableDate.builder()
+                                                                                         .date(LocalDate.of(2024, 2, 1))
+                                                                                         .dateAdded(LocalDate.of(
+                                                                                             2024,
+                                                                                             1,
+                                                                                             1
+                                                                                         ))
+                                                                                         .unavailableDateType(
+                                                                                             UnavailableDateType.SINGLE_DATE)
+                                                                                         .build())))
+                                                                                 .build())
+                                                       .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getRespondent1().getUnavailableDates()).isEqualTo(
+                wrapElements(List.of(UnavailableDate.builder()
+                                         .eventAdded("Defendant Response Event")
+                                         .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                         .dateAdded(now.toLocalDate())
+                                         .date(LocalDate.of(2024, 2, 1))
+                                         .build())));
         }
 
         @Test

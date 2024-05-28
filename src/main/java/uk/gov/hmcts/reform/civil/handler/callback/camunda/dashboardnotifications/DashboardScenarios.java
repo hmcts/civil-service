@@ -141,8 +141,16 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE("Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
-    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant");
-
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Defendant"),
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Defendant"),
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Claimant"),
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"),
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant");
     private final String scenario;
 
     DashboardScenarios(String scenario) {
