@@ -90,7 +90,7 @@ public class HearingValuesService {
         return ServiceHearingValuesModel.builder()
             .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
+            .publicCaseName(getPublicCaseName(caseData))
             .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
             .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
@@ -106,7 +106,7 @@ public class HearingValuesService {
             .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
             .hearingInWelshFlag(getHearingInWelshFlag(caseData))
             .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData)) // todo civ-6888
+            .facilitiesRequired(getFacilitiesRequired(caseData))
             .listingComments(getListingComments(caseData))
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
@@ -115,11 +115,11 @@ public class HearingValuesService {
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
             .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
+            .caseFlags(getCaseFlags(caseData))
             .build();
     }
 

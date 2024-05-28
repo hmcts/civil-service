@@ -62,7 +62,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -84,7 +84,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);

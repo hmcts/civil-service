@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -15,8 +16,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -33,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
 @Service
@@ -44,6 +50,14 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final HelpWithFeesForTabService helpWithFeesForTabService;
+    private final FeatureToggleService featureToggleService;
+
+    @Value("${court-location.specified-claim.epimms-id}")
+    private String epimmsId;
+
+    @Value("${court-location.specified-claim.region-id}")
+    private String regionId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -73,17 +87,27 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.submittedDate(time.now());
         // Add back Pip in post to temporary pass the email event
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
-            caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(null).build());
+            caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(
+                null).build());
             caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
         }
+        setUpHelpWithFees(caseDataBuilder);
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
+        caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
+        caseDataBuilder.caseNamePublic(buildCaseName(caseData));
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(caseDataBuilder);
+        }
+
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -102,4 +126,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
     }
 
+    private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
+    }
 }

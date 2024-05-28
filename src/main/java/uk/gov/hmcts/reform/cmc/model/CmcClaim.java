@@ -461,6 +461,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return false;
+    }
+
+    @Override
     public boolean isHwFClaimSubmit() {
         return false;
     }
@@ -492,6 +497,26 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isHwfPaymentOutcome() {
+        return false;
+    }
+
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUpload() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return false;
     }
 

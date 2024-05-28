@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public class DefendantPinToPostLRspecService {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CUIIdamClientService cuiIdamClientService;
+    private final ClaimStoreService claimStoreService;
     private static final int EXPIRY_PERIOD = 180;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
@@ -90,5 +93,11 @@ public class DefendantPinToPostLRspecService {
             log.error("Pin does not match or expired for {}", caseReference);
             throw new PinNotMatchException();
         }
+    }
+
+    public boolean isOcmcDefendantLinked(String caseReference) {
+        DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked(caseReference);
+        log.info("ocmc case reference {} defendent status is {}", caseReference, status.isLinked());
+        return status.isLinked();
     }
 }

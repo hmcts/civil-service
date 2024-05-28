@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -56,9 +57,9 @@ public class RoboticsNotificationService {
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
-    public void notifyJudgementLip(@NotNull CaseData caseData) {
+    public void notifyJudgementLip(@NotNull CaseData caseData, String authToken) {
         Optional<EmailData> emailData = prepareJudgementLipEmail(RoboticsEmailParams.builder()
-                                                              .caseData(caseData)
+                                                              .caseData(caseData).authToken(authToken)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
@@ -104,7 +105,7 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTO(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData);
+            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
             roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseData.toJsonString().getBytes())
@@ -114,9 +115,9 @@ public class RoboticsNotificationService {
         return roboticsCaseDataDTO;
     }
 
-    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData) throws JsonProcessingException {
+    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
-        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
         roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseDataSpec.toJsonString().getBytes())
             .events(roboticsCaseDataSpec.getEvents())
             .build();
@@ -152,7 +153,8 @@ public class RoboticsNotificationService {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-                if (nonNull(caseData.getPaymentTypeSelection())) {
+                if (nonNull(caseData.getPaymentTypeSelection())
+                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()
@@ -213,7 +215,7 @@ public class RoboticsNotificationService {
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
         try {
-            RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData());
+            RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData(), params.getAuthToken());
             String triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))

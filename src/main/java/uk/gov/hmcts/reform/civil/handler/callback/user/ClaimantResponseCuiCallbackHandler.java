@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,7 +32,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Slf4j
 @Service
@@ -88,14 +94,27 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
-        if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()) {
+        if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()
+            || (featureToggleService.isCarmEnabledForCase(caseData)
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
         if (featureToggleService.isHmcEnabled()) {
             populateDQPartyIds(builder);
         }
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =

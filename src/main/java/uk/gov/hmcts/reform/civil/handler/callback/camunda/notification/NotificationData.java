@@ -17,6 +17,7 @@ public interface NotificationData {
     String NOTIFICATION_DEADLINE = "notificationDeadline";
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
     String REASON = "reason";
+    String REASON_FROM_CASEWORKER = "reason from caseworker";
     String PARTY_REFERENCES = "partyReferences";
     String ALLOCATED_TRACK = "allocatedTrack";
     String RECIPIENT_PARTY_NAME = "recipientPartyName";
@@ -74,6 +75,7 @@ public interface NotificationData {
     String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
     String COURT_LOCATION = "courtlocation";
     String LEGAL_ORG_NAME = "LegalOrgName";
+    String LEGAL_ORG = "legal Org";
     String PARTY_NAME = "name";
 
     //NoC
@@ -100,6 +102,13 @@ public interface NotificationData {
     String AMOUNT = "amount";
     String PART_AMOUNT = "partAmount";
     String REMAINING_AMOUNT = "remainingAmount";
+    String DEFENDANT_NAME_ONE = "defendantName1";
+    String DEFENDANT_NAME_TWO = "defendantName2";
+    String CLAIMANT_NAME_ONE = "claimant1Name";
+    String CLAIMANT_NAME_TWO = "claimant2Name";
+    String LEGAL_REP_NAME = "legalrepname";
+    String CLAIM_NUMBER_CASE = "ClaimNumber";
+    String CLAIM_NAME = "ClaimName";
 
     Map<String, String> addProperties(CaseData caseData);
 

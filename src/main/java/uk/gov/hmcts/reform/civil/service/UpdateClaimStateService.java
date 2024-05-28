@@ -14,20 +14,19 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("java:S2583")
 public class UpdateClaimStateService {
 
     private final FeatureToggleService featureToggleService;
 
     public String setUpCaseState(CaseData updatedData) {
         if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData.getSubmittedDate()))) {
+                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             return CaseState.IN_MEDIATION.name();
-        } else if (isAllFinalOrderIssued(updatedData)) {
-            return CaseState.All_FINAL_ORDERS_ISSUED.name();
         } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
@@ -40,9 +39,8 @@ public class UpdateClaimStateService {
     }
 
     private boolean isCaseSettledAllowed(CaseData caseData) {
-        return ((Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
-            && caseData.isClaimantIntentionSettlePartAdmit())
-            || (caseData.isPartAdmitImmediatePaymentClaimSettled()));
+        return (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+            && caseData.isClaimantIntentionSettlePartAdmit());
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
@@ -80,20 +78,5 @@ public class UpdateClaimStateService {
     private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
         return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
             || caseData.hasDefendantNotAgreedToFreeMediation();
-    }
-
-    private boolean isAllFinalOrderIssued(CaseData caseData) {
-        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .orElse(null);
-        boolean isCourtDecisionAccepted = applicant1Response != null
-            && applicant1Response.hasClaimantAcceptedCourtDecision();
-        boolean isInFavourOfClaimant = applicant1Response != null
-            && applicant1Response.hasCourtDecisionInFavourOfClaimant();
-
-        return ((caseData.hasApplicantRejectedRepaymentPlan()
-            && (isCourtDecisionAccepted || isInFavourOfClaimant))
-            || caseData.hasApplicantAcceptedRepaymentPlan())
-            && caseData.hasApplicant1SignedSettlementAgreement();
     }
 }

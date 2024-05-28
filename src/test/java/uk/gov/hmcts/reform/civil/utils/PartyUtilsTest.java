@@ -911,4 +911,137 @@ class PartyUtilsTest {
             return buildExpertDetails(firstName, null);
         }
     }
+
+    @Nested
+    class PopulatePartyIndividualPartyIds {
+
+        @Test
+        void shouldopulateIndividualsPartyIds_withinGivenCaseDataBuilder() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                    .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("lrindividual").build()))
+                    .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("lrindividual").build()))
+                    .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res2").lastName("lrindividual").build()))
+                    .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("orgindividual").build()))
+                    .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app2").lastName("orgindividual").build()))
+                    .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("orgindividual").build()))
+                    .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res2").lastName("orgindividual").build()));
+
+            PartyUtils.populatePartyIndividuals(builder);
+
+            CaseData actual = builder.build();
+
+            var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
+            assertNotNull(app1LRIndividual.getPartyID());
+            assertEquals(app1LRIndividual.getFirstName(), "app1");
+            assertEquals(app1LRIndividual.getLastName(), "lrindividual");
+
+            var res1LRIndividual = unwrapElements(actual.getRespondent1LRIndividuals()).get(0);
+            assertNotNull(res1LRIndividual.getPartyID());
+            assertEquals(res1LRIndividual.getFirstName(), "res1");
+            assertEquals(res1LRIndividual.getLastName(), "lrindividual");
+
+            var res2LRIndividual = unwrapElements(actual.getRespondent2LRIndividuals()).get(0);
+            assertNotNull(res2LRIndividual.getPartyID());
+            assertEquals(res2LRIndividual.getFirstName(), "res2");
+            assertEquals(res2LRIndividual.getLastName(), "lrindividual");
+
+            var app1OrgIndividual = unwrapElements(actual.getApplicant1OrgIndividuals()).get(0);
+            assertNotNull(app1OrgIndividual.getPartyID());
+            assertEquals(app1OrgIndividual.getFirstName(), "app1");
+            assertEquals(app1OrgIndividual.getLastName(), "orgindividual");
+
+            var app2OrgIndividual = unwrapElements(actual.getApplicant2OrgIndividuals()).get(0);
+            assertNotNull(app2OrgIndividual.getPartyID());
+            assertEquals(app2OrgIndividual.getFirstName(), "app2");
+            assertEquals(app2OrgIndividual.getLastName(), "orgindividual");
+
+            var res1OrgIndividual = unwrapElements(actual.getRespondent1OrgIndividuals()).get(0);
+            assertNotNull(res1OrgIndividual.getPartyID());
+            assertEquals(res1OrgIndividual.getFirstName(), "res1");
+            assertEquals(res1OrgIndividual.getLastName(), "orgindividual");
+
+            var res2OrgIndividual = unwrapElements(actual.getRespondent2OrgIndividuals()).get(0);
+            assertNotNull(res2OrgIndividual.getPartyID());
+            assertEquals(res2OrgIndividual.getFirstName(), "res2");
+            assertEquals(res2OrgIndividual.getLastName(), "orgindividual");
+        }
+
+        @Test
+        void shouldopulateIndividualsPartyIds_mixedNullLRAndOrgFields() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().firstName("app1").lastName("lrindividual").build()))
+                .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName("orgindividual").build()));
+
+            PartyUtils.populatePartyIndividuals(builder);
+
+            CaseData actual = builder.build();
+
+            var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
+            assertNotNull(app1LRIndividual.getPartyID());
+            assertEquals(app1LRIndividual.getFirstName(), "app1");
+            assertEquals(app1LRIndividual.getLastName(), "lrindividual");
+
+            var res1OrgIndividual = unwrapElements(actual.getRespondent1OrgIndividuals()).get(0);
+            assertNotNull(res1OrgIndividual.getPartyID());
+            assertEquals(res1OrgIndividual.getFirstName(), "res1");
+            assertEquals(res1OrgIndividual.getLastName(), "orgindividual");
+
+            assertNull(actual.getRespondent1LRIndividuals());
+            assertNull(actual.getRespondent2LRIndividuals());
+            assertNull(actual.getApplicant1OrgIndividuals());
+            assertNull(actual.getApplicant2OrgIndividuals());
+            assertNull(actual.getRespondent2OrgIndividuals());
+        }
+
+        @Test
+        void shouldNotOverwriteExistingPartyIds_withinGivenCaseDataBuilder() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-lr-ind-id").firstName("app1").lastName("lrindividual").build()))
+                .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-lr-ind-id").firstName("res1").lastName("lrindividual").build()))
+                .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-lr-ind-id").firstName("res2").lastName("lrindividual").build()))
+                .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-org-ind-id").firstName("app1").lastName("orgindividual").build()))
+                .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app2-org-ind-id").firstName("app2").lastName("orgindividual").build()))
+                .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-org-ind-id").firstName("res1").lastName("orgindividual").build()))
+                .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-org-ind-id").firstName("res2").lastName("orgindividual").build()));
+
+            PartyUtils.populatePartyIndividuals(builder);
+
+            CaseData actual = builder.build();
+
+            var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
+            assertEquals(app1LRIndividual.getPartyID(), "app1-lr-ind-id");
+            assertEquals(app1LRIndividual.getFirstName(), "app1");
+            assertEquals(app1LRIndividual.getLastName(), "lrindividual");
+
+            var res1LRIndividual = unwrapElements(actual.getRespondent1LRIndividuals()).get(0);
+            assertEquals(res1LRIndividual.getPartyID(), "res1-lr-ind-id");
+            assertEquals(res1LRIndividual.getFirstName(), "res1");
+            assertEquals(res1LRIndividual.getLastName(), "lrindividual");
+
+            var res2LRIndividual = unwrapElements(actual.getRespondent2LRIndividuals()).get(0);
+            assertEquals(res2LRIndividual.getPartyID(), "res2-lr-ind-id");
+            assertEquals(res2LRIndividual.getFirstName(), "res2");
+            assertEquals(res2LRIndividual.getLastName(), "lrindividual");
+
+            var app1OrgIndividual = unwrapElements(actual.getApplicant1OrgIndividuals()).get(0);
+            assertEquals(app1OrgIndividual.getPartyID(), "app1-org-ind-id");
+            assertEquals(app1OrgIndividual.getFirstName(), "app1");
+            assertEquals(app1OrgIndividual.getLastName(), "orgindividual");
+
+            var app2OrgIndividual = unwrapElements(actual.getApplicant2OrgIndividuals()).get(0);
+            assertEquals(app2OrgIndividual.getPartyID(), "app2-org-ind-id");
+            assertEquals(app2OrgIndividual.getFirstName(), "app2");
+            assertEquals(app2OrgIndividual.getLastName(), "orgindividual");
+
+            var res1OrgIndividual = unwrapElements(actual.getRespondent1OrgIndividuals()).get(0);
+            assertEquals(res1OrgIndividual.getPartyID(), "res1-org-ind-id");
+            assertEquals(res1OrgIndividual.getFirstName(), "res1");
+            assertEquals(res1OrgIndividual.getLastName(), "orgindividual");
+
+            var res2OrgIndividual = unwrapElements(actual.getRespondent2OrgIndividuals()).get(0);
+            assertEquals(res2OrgIndividual.getPartyID(), "res2-org-ind-id");
+            assertEquals(res2OrgIndividual.getFirstName(), "res2");
+            assertEquals(res2OrgIndividual.getLastName(), "orgindividual");
+        }
+    }
 }

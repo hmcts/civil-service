@@ -56,9 +56,13 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
-        if (!updatedData.isBilingual()) {
+        if (isClaimantNotBilingualAndNotSignedSettlementAgreement(updatedData)) {
             response.state(updateClaimStateService.setUpCaseState(updatedData));
         }
         return response.build();
+    }
+
+    private boolean isClaimantNotBilingualAndNotSignedSettlementAgreement(CaseData caseData) {
+        return !caseData.isBilingual() && !caseData.hasApplicant1SignedSettlementAgreement();
     }
 }

@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -61,7 +60,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -542,18 +540,16 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
-        if (toggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            updatedData.respondent2DocumentGeneration(null);
-            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                updatedData.respondent2DocumentGeneration("userRespondent2");
-            }
+        // casefileview changes need to assign documents into specific folders, this is help determine
+        // which user is "creating" the document and therefore which folder to move the documents
+        // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        updatedData.respondent2DocumentGeneration(null);
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            updatedData.respondent2DocumentGeneration("userRespondent2");
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
@@ -566,16 +562,17 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
-        if (toggleService.isCaseFileViewEnabled()) {
-            log.info("Null placeholder documents");
-            updatedData.respondent1ClaimResponseDocument(null);
-            updatedData.respondent2ClaimResponseDocument(null);
+        log.info("Null placeholder documents");
+        updatedData.respondent1ClaimResponseDocument(null);
+        updatedData.respondent2ClaimResponseDocument(null);
+        if (caseData.getRespondent1() != null
+            && updatedData.build().getRespondent1DQ() != null) {
             updatedData.respondent1DQ(updatedData.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
-            if (caseData.getRespondent2() != null) {
-                updatedData.respondent2DQ(updatedData.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
-            }
         }
-
+        if (caseData.getRespondent2() != null
+            && updatedData.build().getRespondent2DQ() != null) {
+            updatedData.respondent2DQ(updatedData.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
@@ -643,12 +640,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 );
                 assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
                         DocCategory.DEF1_DEFENSE_DQ.getValue());
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
 
@@ -663,13 +655,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
                 assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
-                        DocCategory.DEF1_DEFENSE_DQ.getValue());
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
+                        DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
 
@@ -682,14 +669,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DEFENCE
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
                         DocCategory.DEF2_DEFENSE_DQ.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
@@ -702,14 +684,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
-                        DocCategory.DEF2_DEFENSE_DQ.getValue());
+                        DocCategory.DQ_DEF2.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
 
@@ -892,5 +869,4 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
-
 }

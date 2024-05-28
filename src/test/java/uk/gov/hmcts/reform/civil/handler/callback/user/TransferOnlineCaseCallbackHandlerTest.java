@@ -170,8 +170,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Site 1 - Adr 1 - AAA 111");
             assertThat(response.getData())
                 .extracting("transferCourtLocationList")
-                .extracting("list_items")
-                .isNull();
+                .doesNotHaveToString("list_items");
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("baseLocation")

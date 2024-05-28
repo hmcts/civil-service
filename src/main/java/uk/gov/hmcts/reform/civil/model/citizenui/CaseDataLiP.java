@@ -9,11 +9,12 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLiP {
@@ -43,6 +44,8 @@ public class CaseDataLiP {
 
     @JsonProperty("applicant1SettleClaim")
     private YesOrNo applicant1SettleClaim;
+    @JsonProperty("applicant1ClaimSettledDate")
+    private LocalDate applicant1ClaimSettledDate;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
@@ -78,5 +81,10 @@ public class CaseDataLiP {
     @JsonIgnore
     public boolean isDefendantSignedSettlementNotAgreed() {
         return YesOrNo.NO.equals(respondentSignSettlementAgreement);
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return YesOrNo.YES.equals(applicant1SettleClaim);
     }
 }

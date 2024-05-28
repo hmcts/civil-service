@@ -117,17 +117,25 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
-            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant")) {
                 updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant 2")) {
+                updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
                                                                       .file(document.getValue().getDocumentLink())
                                                                       .build());
-                if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                    updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                     .file(document.getValue().getDocumentLink())
-                                                                     .build());
-                }
             }
-        });
+        }
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -250,7 +258,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
 
-            updateApplicants(caseData, builder, statementOfTruth);
+            updateApplicants(caseData, builder, statementOfTruth, callbackParams);
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -281,14 +289,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         // and documents are added to claimantUploads, if we do not remove/null the original,
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            builder.applicant1DefenceResponseDocument(null);
-            builder.respondent1ClaimResponseDocument(null);
-            builder.respondentSharedClaimResponseDocument(null);
+        builder.applicant1DefenceResponseDocument(null);
+        builder.respondent1ClaimResponseDocument(null);
+        builder.respondentSharedClaimResponseDocument(null);
+        if (caseData.getApplicant1DQ() != null
+            && builder.build().getApplicant1DQ() != null) {
             builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
-            if (caseData.getApplicant2DQ() != null) {
-                builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
-            }
+        }
+        if (caseData.getApplicant2DQ() != null
+            && builder.build().getApplicant2DQ() != null) {
+            builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -299,7 +309,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
-    private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth) {
+    private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth,
+                                  CallbackParams callbackParams) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
             Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
@@ -307,7 +318,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
             String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
-                CallbackParams.Params.BEARER_TOKEN.toString(), true
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), true
             );
             applicant1DQBuilder.applicant1DQRequestedCourt(
                 RequestedCourt.builder()
@@ -374,6 +385,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                       updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
+        List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = caseData.getDuplicateClaimantDefendantResponseDocs();
         if (!claimantUploads.isEmpty()) {
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
@@ -383,9 +395,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
                     claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
-                claimantUploads.addAll(copy);
+                duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            updatedCaseData.duplicateClaimantDefendantResponseDocs(copy);
         }
     }
 

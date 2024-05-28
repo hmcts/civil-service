@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
@@ -25,10 +25,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class FeesPaymentController {
 
     public static final String FEES_PAYMENT_REQUEST_URL = "/fees/{feeType}/case/{caseReference}/payment";
-    public static final String FEES_PAYMENT_STATUS_URL = "/fees/{feeType}/payment/{paymentReference}/status";
+    public static final String FEES_PAYMENT_STATUS_URL = "/fees/{feeType}/case/{caseReference}/payment/{paymentReference}/status";
     private final FeesPaymentService feesPaymentService;
 
-    @PostMapping(path = FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @PostMapping(path = FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Citizen UI will call this API and will get gov pay link for payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
@@ -44,7 +44,7 @@ public class FeesPaymentController {
         );
     }
 
-    @GetMapping(path = FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON)
+    @GetMapping(path = FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Citizen UI will call this API and will get status of gov pay payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay status."),
@@ -52,10 +52,10 @@ public class FeesPaymentController {
     public ResponseEntity<CardPaymentStatusResponse> getGovPaymentRequestStatus(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
+        @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
-
         return new ResponseEntity<>(
-            feesPaymentService.getGovPaymentRequestStatus(feeType, paymentReference, authorization),
+            feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
             HttpStatus.OK
         );
     }

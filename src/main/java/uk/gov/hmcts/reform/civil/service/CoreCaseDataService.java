@@ -54,6 +54,16 @@ public class CoreCaseDataService {
         submitUpdate(caseId.toString(), caseDataContentFromStartEventResponse(startEventResponse, contentModified));
     }
 
+    public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified,
+                             String eventSummary, String eventDescription) {
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, contentModified);
+        caseDataContent.getEvent().setSummary(eventSummary);
+        caseDataContent.getEvent().setDescription(eventDescription);
+
+        submitUpdate(caseId.toString(), caseDataContent);
+    }
+
     public StartEventResponse startUpdate(String caseId, CaseEvent eventName) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
@@ -132,7 +142,9 @@ public class CoreCaseDataService {
 
     public SearchResult searchCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
+        String searchString = query.toString();
+        log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 
     public CaseDetails getCase(Long caseId) {

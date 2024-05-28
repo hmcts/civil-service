@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.DocumentHearingType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -16,6 +17,9 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 
 public class HearingUtils {
 
@@ -61,8 +65,28 @@ public class HearingUtils {
 
     public static String formatHearingDuration(HearingDuration hearingDuration) {
         switch (hearingDuration) {
+            case MINUTES_05:
+                return "5 minutes";
+            case MINUTES_10:
+                return "10 minutes";
+            case MINUTES_15:
+                return "15 minutes";
+            case MINUTES_20:
+                return "20 minutes";
+            case MINUTES_25:
+                return "25 minutes";
             case MINUTES_30:
                 return "30 minutes";
+            case MINUTES_35:
+                return "35 minutes";
+            case MINUTES_40:
+                return "40 minutes";
+            case MINUTES_45:
+                return "45 minutes";
+            case MINUTES_50:
+                return "50 minutes";
+            case MINUTES_55:
+                return "55 minutes";
             case MINUTES_60:
                 return "1 hour";
             case MINUTES_90:
@@ -117,6 +141,10 @@ public class HearingUtils {
             return formatHearingNote(caseData.getSdoHearingNotes().getInput());
         } else if (caseData.getTrialHearingHearingNotesDJ() != null) {
             return formatHearingNote(caseData.getTrialHearingHearingNotesDJ().getInput());
+        } else if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getHearingNotesTxt() != null) {
+            return formatHearingNote(caseData.getSdoR2Trial().getHearingNotesTxt());
+        } else if (caseData.getSdoR2SmallClaimsHearing() != null && caseData.getSdoR2SmallClaimsHearing().getHearingNotesTxt() != null) {
+            return formatHearingNote(caseData.getSdoR2SmallClaimsHearing().getHearingNotesTxt());
         } else {
             return null;
         }
@@ -137,7 +165,10 @@ public class HearingUtils {
         };
     }
 
-    public static boolean isDisposalHearing(String hearingType) {
-        return hearingType.contains("DIS");
+    public static boolean hearingFeeRequired(String hearingType) {
+        List<DocumentHearingType> hearingTypesExcludedFromFee = List.of(DIS, DRH);
+        return hearingTypesExcludedFromFee.stream().filter(
+            type -> getType(hearingType).equals(type)).count() < 1;
     }
+
 }

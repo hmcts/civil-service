@@ -43,7 +43,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
@@ -63,10 +62,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         String requestedCourt = null;
         StatementOfTruth statementOfTruth = null;
-        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null) {
+        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null && !isRespondent2(caseData)) {
             requestedCourt = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation().getBaseLocation();
             statementOfTruth = caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth();
-        } else if (caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null) {
+        } else if (caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null && isRespondent2(caseData)) {
             requestedCourt = caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getCaseLocation().getBaseLocation();
             statementOfTruth = caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth();
         }
@@ -85,12 +84,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .whyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .statementOfTruth(statementOfTruth)
             .allocatedTrack(caseData.getResponseClaimTrack())
             .responseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
-            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
+            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
             .mediation(caseData.getResponseClaimMediationSpecRequired());
         addCarmMediationDetails(builder, caseData);
         addRepaymentPlanDetails(builder, caseData);
@@ -134,9 +133,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 .timeline(getTimeLine(caseData));
         }
 
-        if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+        if (caseData.getRespondent1SpecDefenceResponseDocument() != null && !isRespondent2(caseData)) {
             builder.respondent1SpecDefenceResponseDocument(
                 caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
+        } else if (caseData.getRespondent2SpecDefenceResponseDocument() != null && isRespondent2(caseData)) {
+            builder.respondent1SpecDefenceResponseDocument(
+                caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName());
         }
 
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
@@ -151,9 +153,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        if (featureToggleService.isPinInPostEnabled() && isOneVOne(caseData)) {
-            builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
-        }
+        builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
     }
 
     private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
@@ -252,8 +252,21 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {
-        if (caseData.getSpecResponseTimelineOfEvents() != null) {
+        if (caseData.getSpecResponseTimelineOfEvents() != null && !isRespondent2(caseData)) {
             List<TimelineOfEvents> timelineOfEvents = caseData.getSpecResponseTimelineOfEvents();
+            List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
+            for (int index = 0; index < timelineOfEvents.size(); index++) {
+                TimelineOfEventDetails timelineOfEventDetail
+                    = new TimelineOfEventDetails(
+                    timelineOfEvents.get(index).getValue()
+                        .getTimelineDate(),
+                    timelineOfEvents.get(index).getValue().getTimelineDescription()
+                );
+                timelineOfEventDetails.add(index, new TimelineEventDetailsDocmosis(timelineOfEventDetail));
+            }
+            return timelineOfEventDetails;
+        } else if (caseData.getSpecResponseTimelineOfEvents2() != null && isRespondent2(caseData)) {
+            List<TimelineOfEvents> timelineOfEvents = caseData.getSpecResponseTimelineOfEvents2();
             List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
                 TimelineOfEventDetails timelineOfEventDetail

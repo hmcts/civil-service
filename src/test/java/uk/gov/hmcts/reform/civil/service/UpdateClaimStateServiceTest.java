@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -212,25 +211,6 @@ class UpdateClaimStateServiceTest {
     }
 
     @Test
-    void shouldChangeCaseState_whenApplicantAcceptRepaymentPlanAndChooseSettlementAgreement() {
-        //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-            .caseDataLip(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build())
-                             .build())
-            .build();
-
-        //When
-        var response = service.setUpCaseState(caseData);
-
-        //Then
-        assertThat(response).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-    }
-
-    @Test
     void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
@@ -271,6 +251,8 @@ class UpdateClaimStateServiceTest {
     void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
@@ -285,7 +267,7 @@ class UpdateClaimStateServiceTest {
         var response = service.setUpCaseState(caseData);
 
         //Then
-        assertThat(response).isEqualTo(CaseState.CASE_SETTLED.name());
+        assertThat(response).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
     }
 
     @Test

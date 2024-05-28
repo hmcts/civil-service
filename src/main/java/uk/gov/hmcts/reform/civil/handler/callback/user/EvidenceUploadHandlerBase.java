@@ -1,22 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FilenameUtils;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -24,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
@@ -31,19 +18,37 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -52,12 +57,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -70,6 +77,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final UserService userService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final FeatureToggleService featureToggleService;
 
     private static final String SPACE = " ";
     private static final String END = ".";
@@ -159,12 +167,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
+    private List<Element<UploadEvidenceDocumentType>> additionalBundleDocs;
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
                                         CoreCaseDataService coreCaseDataService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
-                                        String createShowCondition) {
+                                        String createShowCondition, FeatureToggleService featureToggleService) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
@@ -174,6 +183,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.userService = userService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.coreCaseDataService = coreCaseDataService;
+        this.featureToggleService = featureToggleService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
@@ -214,6 +224,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 dynamicListOptions.add(OPTION_DEF_BOTH);
             }
         }
+        additionalBundleDocs = new ArrayList<>();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //Evidence upload will have different screen for Fast claims and Small claims.
         // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
@@ -432,13 +443,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (documentUpload == null || documentUpload.isEmpty()) {
             return;
         }
-        LocalDateTime midnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime halfFivePmYesterday = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 30));
         renameDocuments(documentUpload, theID);
         documentUpload.forEach(document -> {
             Document documentToAddId = documentExtractor.apply(document);
             documentToAddId.setCategoryID(theID);
             LocalDateTime dateTime = documentDateTimeExtractor.apply(document);
-            if (dateTime.isAfter(midnight)) {
+            if (dateTime.isAfter(halfFivePmYesterday)) {
                 String updateNotificationText = format(docNotificationText, claimantDefendantString);
                 if (!notificationString.toString().contains(updateNotificationText)) {
                     notificationString.append("\n").append(updateNotificationText);
@@ -787,6 +798,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.trialSelectionEvidenceRes(null);
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
         caseDataBuilder.notificationText(notificationString.toString());
+
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -1159,63 +1175,88 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .build();
     }
 
-    void addUploadDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
-                                  List<Element<UploadEvidenceDocumentType>> documentUploadEvidenceType,
-                                  Optional<Bundle> bundleDetails, String docType) {
-        if (null == documentUploadEvidenceType) {
+    <T> void addUploadDocList(List<Element<T>> documentUploaded, Function<Element<T>, Document> documentExtractor, Function<Element<T>,
+        LocalDateTime> documentUploadTimeExtractor, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData,
+                              String documentTypeDisplayName, String respondentOrApplicant) {
+
+        if (null == documentUploaded) {
             return;
         }
-        documentUploadEvidenceType.forEach(uploadEvidenceDocumentType -> {
-            if (null != uploadEvidenceDocumentType.getValue().getCreatedDatetime()
-                && bundleDetails.get().getCreatedOn().isPresent()
-                && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
-                .isAfter(bundleDetails.get().getCreatedOn().get())) {
-                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                         .witnessOptionName(uploadEvidenceDocumentType.getValue().getWitnessOptionName())
-                                                                         .typeOfDocument(docType)
-                                                                         .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
-                                                                         .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())
-                                                                         .build()));
+        Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
+                .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
+        LocalDateTime trialBundleDate = null;
+        if (bundleDetails.isPresent()) {
+            Optional<LocalDateTime> createdOn = bundleDetails.get().getCreatedOn();
+            if (createdOn.isPresent()) {
+                trialBundleDate = createdOn.get();
             }
-        });
+        }
+        if (Objects.equals(respondentOrApplicant, "applicant")) {
+            populateBundleCollection(
+                documentUploaded,
+                documentExtractor,
+                documentUploadTimeExtractor,
+                caseData::getApplicantDocsUploadedAfterBundle,
+                caseDataBuilder::applicantDocsUploadedAfterBundle,
+                documentTypeDisplayName,
+                trialBundleDate
+            );
+        } else {
+            populateBundleCollection(
+                documentUploaded,
+                documentExtractor,
+                documentUploadTimeExtractor,
+                caseData::getRespondentDocsUploadedAfterBundle,
+                caseDataBuilder::respondentDocsUploadedAfterBundle,
+                documentTypeDisplayName,
+                trialBundleDate
+            );
+        }
     }
 
-    void addWitnessDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
-                                   List<Element<UploadEvidenceWitness>> documentUploadEvidenceType,
-                                   Optional<Bundle> bundleDetails, String docType) {
-        if (null == documentUploadEvidenceType) {
-            return;
+    private <T> void populateBundleCollection(List<Element<T>> documentUploaded,
+                                              Function<Element<T>, Document> documentExtractor,
+                                              Function<Element<T>, LocalDateTime> documentUploadTimeExtractor,
+                                              Supplier<List<Element<UploadEvidenceDocumentType>>> existingDocsSupplier,
+                                              Consumer<List<Element<UploadEvidenceDocumentType>>> docsUpdater,
+                                              String documentTypeDisplayName,
+                                              LocalDateTime trialBundleDate) {
+        // If either claimant or respondent additional bundle doc collection exists, we add to that
+        if (existingDocsSupplier.get() != null) {
+            additionalBundleDocs = existingDocsSupplier.get();
         }
-        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
-            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
-                null))) {
-                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                         .typeOfDocument(docType)
-                                                                         .createdDatetime(
-                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
-                                                                         .documentUpload(
-                                                                             uploadEvidenceDocumentTypeElement.getValue().getWitnessOptionDocument())
-                                                                         .build()));
-            }
-        });
-    }
-
-    void addExpertDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
-                                  List<Element<UploadEvidenceExpert>> documentUploadEvidenceType,
-                                  Optional<Bundle> bundleDetails, String docType) {
-        if (null == documentUploadEvidenceType) {
-            return;
-        }
-        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
-            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
-                null))) {
-                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                         .typeOfDocument(docType)
-                                                                         .createdDatetime(
-                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
-                                                                         .documentUpload(
-                                                                             uploadEvidenceDocumentTypeElement.getValue().getExpertDocument())
-                                                                         .build()));
+        documentUploaded.forEach(uploadEvidenceDocumentType -> {
+            Document documentToAdd = documentExtractor.apply(uploadEvidenceDocumentType);
+            LocalDateTime documentCreatedDateTime = documentUploadTimeExtractor.apply(uploadEvidenceDocumentType);
+            // If document was uploaded after the trial bundle was created, it is added to additional bundle documents
+            // via applicant or respondent collections
+            if (documentCreatedDateTime != null
+                && documentCreatedDateTime.isAfter(trialBundleDate)
+            ) {
+                // If a document already exists in the collection, it cannot be re-added.
+                boolean containsValue = additionalBundleDocs.stream()
+                    .map(Element::getValue)
+                    .map(upload -> upload != null ? upload.getDocumentUpload() : null)
+                    .filter(docUpload -> docUpload != null)
+                    .map(Document::getDocumentUrl)
+                    .anyMatch(docUrl -> docUrl.equals(documentToAdd.getDocumentUrl()));
+                // When a bundle is created, applicantDocsUploadedAfterBundle and respondentDocsUploadedAfterBundle
+                // are assigned as empty lists, in actuality they contain a single element (default builder) we remove
+                // this as it is not required.
+                additionalBundleDocs.removeIf(element -> {
+                    UploadEvidenceDocumentType upload = element.getValue();
+                    return upload == null || upload.getDocumentUpload() == null
+                        || upload.getDocumentUpload().getDocumentUrl() == null;
+                });
+                if (!containsValue) {
+                    var newDocument = UploadEvidenceDocumentType.builder()
+                        .typeOfDocument(documentTypeDisplayName)
+                        .createdDatetime(documentCreatedDateTime)
+                        .documentUpload(documentToAdd)
+                        .build();
+                    additionalBundleDocs.add(element(newDocument));
+                    docsUpdater.accept(additionalBundleDocs);
+                }
             }
         });
     }

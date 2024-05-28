@@ -17,13 +17,19 @@ import java.util.Map;
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
@@ -46,15 +52,16 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certific
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissalOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueBilingual;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueHwF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted1v1RespondentOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted1v1RespondentOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRegisteredRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.contactDetailsChange;
@@ -85,11 +92,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueHwF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pinInPostEnabledAndLiP;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.reasonNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
@@ -203,6 +210,7 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
@@ -216,6 +224,7 @@ public class StateFlowEngine {
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Only one unrepresented defendant
@@ -225,6 +234,7 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 1
@@ -237,6 +247,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 2
@@ -248,6 +259,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendants
@@ -259,6 +271,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
@@ -279,6 +292,18 @@ public class StateFlowEngine {
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
                     })
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(nocSubmittedForLiPApplicant)
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), false,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
+                        )))
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )))
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -360,7 +385,8 @@ public class StateFlowEngine {
                    .set(flags -> {
                        flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
                    })
-                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
+                                                       .and(not(pastClaimNotificationDeadline)))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
@@ -466,11 +492,11 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF)
                     .onlyIf(takenOfflineByStaffAfterNotificationAcknowledged)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(caseDismissedAfterClaimAcknowledged)
+                    .onlyIf(caseDismissedAfterClaimAcknowledged.and(reasonNotSuitableForSdo.negate()))
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterNotificationAcknowledged)
             .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                 .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and(claimDismissalOutOfTime.negate()))
+                    .onlyIf(notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and(claimDismissalOutOfTime.negate()).and(takenOfflineByStaff.negate()))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .onlyIf(notificationAcknowledged.and(respondentTimeExtension)
                         .and(awaitingResponsesFullDefenceReceived)
@@ -503,9 +529,20 @@ public class StateFlowEngine {
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()))
+                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
+                        .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+            })
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
+            })
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
             .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
             .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
@@ -570,9 +607,10 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE_PROCEED)
                 .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimantResponseBeforeSDO
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf((takenOfflineByStaffAfterClaimantResponseBeforeSDO
                                                                  .or(takenOfflineByStaffAfterSDO)
                                                                  .or(takenOfflineAfterNotSuitableForSdo))
+                                                                 .and(not(caseDismissedPastHearingFeeDue)))
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
                 .transitionTo(IN_MEDIATION).onlyIf(specSmallClaimCarm)

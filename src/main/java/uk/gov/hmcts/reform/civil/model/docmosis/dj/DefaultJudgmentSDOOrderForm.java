@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -78,6 +79,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
+    private final SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
 
     //additional data for hearings
     private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
@@ -117,6 +119,8 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final boolean trialHearingMethodInPersonAddSection;
     private final DisposalHearingMethodDJ trialHearingMethodDJ;
     private final String trialHearingLocation;
+    private final boolean sdoDJR2TrialCreditHireAddSection;
+    private final boolean sdoDJR2TrialCreditHireDetailsAddSection;
 
     //hnl fields
     private final DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
@@ -129,5 +133,10 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
     private final boolean writtenByJudge;
+
+    //sdoR2 fields
+    private final boolean hasDisposalHearingWelshSectionDJ;
+    private final boolean hasTrialHearingWelshSectionDJ;
+    private final String welshLanguageDescriptionDJ;
 
 }

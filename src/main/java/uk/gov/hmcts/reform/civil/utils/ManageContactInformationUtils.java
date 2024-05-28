@@ -13,6 +13,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
@@ -69,7 +73,9 @@ public class ManageContactInformationUtils {
 
     public static void addApplicant1Options(List<DynamicListElement> list, CaseData caseData, boolean isAdmin) {
         addApplicant1PartyOptions(list, caseData);
-        addApplicantLegalRepIndividuals(list, false);
+        if (!NO.equals(caseData.getApplicant1Represented())) {
+            addApplicantLegalRepIndividuals(list, false);
+        }
         addApplicant1ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
@@ -339,7 +345,7 @@ public class ManageContactInformationUtils {
             }
         } else {
             // applicant 2 org individuals
-            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_ONE);
+            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_TWO);
         }
     }
 
@@ -489,5 +495,69 @@ public class ManageContactInformationUtils {
 
     private static void addExperts(List<DynamicListElement> list, String id, String party) {
         list.add(dynamicElementFromCode(id, String.format("%s %s", party, EXPERTS)));
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
+                        Element.<UpdatePartyDetailsForm>builder()
+                                .id(partyElement.getId())
+                                .value(UpdatePartyDetailsForm.builder()
+                                        .firstName(partyElement.getValue().getFirstName())
+                                        .lastName(partyElement.getValue().getLastName())
+                                        .emailAddress(partyElement.getValue().getEmail())
+                                        .phoneNumber(partyElement.getValue().getPhone())
+                                        .build())
+                                .build())
+                .toList();
+    }
+
+    public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
+                                                                           List<Element<UpdatePartyDetailsForm>> updatedData) {
+        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
+                        .id(updatedParty.getId())
+                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
+                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                                .map(existingParty -> existingParty.getValue())
+                                .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
+                        .build())
+                .toList();
+    }
+
+    private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
+        return  individual.toBuilder()
+                .firstName(form.getFirstName())
+                .lastName(form.getLastName())
+                .email(form.getEmailAddress())
+                .phone(form.getPhoneNumber())
+                .build();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1OrgIndividuals());
+        }
+        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant2OrgIndividuals());
+        }
+        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1OrgIndividuals());
+        }
+        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2OrgIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1LRIndividuals());
+        }
+        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1LRIndividuals());
+        }
+        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2LRIndividuals());
+        }
+        return new ArrayList<>();
     }
 }

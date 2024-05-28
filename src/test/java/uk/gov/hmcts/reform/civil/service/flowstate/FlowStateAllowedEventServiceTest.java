@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
@@ -75,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
@@ -86,6 +89,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -333,7 +337,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -362,7 +367,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -391,7 +397,9 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        COURT_OFFICER_ORDER
+
                     }
                 ),
                 of(
@@ -429,7 +437,8 @@ class FlowStateAllowedEventServiceTest {
                         MOVE_TO_DECISION_OUTCOME,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
-                        BUNDLE_CREATION_NOTIFICATION
+                        BUNDLE_CREATION_NOTIFICATION,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -602,11 +611,14 @@ class FlowStateAllowedEventServiceTest {
                         SET_ASIDE_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
                         asyncStitchingComplete,
                         CLAIMANT_RESPONSE_CUI,
                         REQUEST_FOR_RECONSIDERATION,
-                        DECISION_ON_RECONSIDERATION_REQUEST
+                        DECISION_ON_RECONSIDERATION_REQUEST,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        COURT_OFFICER_ORDER
                     }
                 ),
                 of(
@@ -712,7 +724,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
@@ -816,7 +829,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
                         TRANSFER_ONLINE_CASE,
-                        INVALID_HWF_REFERENCE
+                        INVALID_HWF_REFERENCE,
+                        COURT_OFFICER_ORDER
                     }
                 )
             );
@@ -990,7 +1004,7 @@ class FlowStateAllowedEventServiceTest {
 
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
-        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
+        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven() {
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
@@ -1154,6 +1168,22 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
             .isEqualTo(true);
     }
 }

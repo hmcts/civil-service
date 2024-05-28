@@ -2,20 +2,25 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -127,4 +132,54 @@ public class NotificationUtils {
         return time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm");
     }
 
+    public static boolean shouldSendMediationNotificationDefendant1LRCarm(CaseData caseData, boolean isCarmEnabled) {
+        return isCarmEnabled
+            && !caseData.isRespondent1NotRepresented()
+            && (YES.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+            || (caseData.getCaseDataLiP() != null
+            && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())));
+    }
+
+    public static boolean shouldSendMediationNotificationDefendant2LRCarm(CaseData caseData, boolean isCarmEnabled) {
+        return isCarmEnabled
+            && !caseData.isRespondent2NotRepresented()
+            && YES.equals(caseData.getApplicant1ProceedsWithClaimSpec());
+    }
+
+    public static String getRespondentLegalOrganizationName(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
+        String id = organisationPolicy.getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+
+        String respondentLegalOrganizationName = null;
+        if (organisation.isPresent()) {
+            respondentLegalOrganizationName = organisation.get().getName();
+        }
+        return respondentLegalOrganizationName;
+    }
+
+    public static String getDefendantNameBasedOnCaseType(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            return getPartyNameBasedOnType(caseData.getRespondent1());
+        } else {
+            return getPartyNameBasedOnType(caseData.getRespondent1())
+                .concat(" and ")
+                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
+    }
+
+    public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    public static String getApplicantEmail(CaseData caseData, boolean isApplicantLip) {
+        if (isApplicantLip) {
+            return caseData.getApplicant1().getPartyEmail() != null ? caseData.getApplicant1Email() : null;
+        } else {
+            return caseData.getApplicantSolicitor1UserDetails() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : null;
+        }
+    }
 }

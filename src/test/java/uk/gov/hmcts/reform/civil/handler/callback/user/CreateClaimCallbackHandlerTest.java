@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
@@ -87,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -1067,6 +1069,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // claim amount is 100000.00, so track is intermediate, as this is the upper limit
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
+        }
+
+        @Test
+        void shouldSetMultiAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // claim amount is 100000.01, so track is multi
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseDataUpdated = CaseDataBuilder.builder().atStateClaimDraft()
+                .claimValue(ClaimValue.builder()
+                           .statementOfValueInPennies(BigDecimal.valueOf(10000001))
+                           .build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(V_1, caseDataUpdated, ABOUT_TO_SUBMIT));
+            assertThat(response.getData()).containsEntry("allocatedTrack", MULTI_CLAIM.name());
+        }
+
+        @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
@@ -1147,7 +1172,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
-                .extracting("Organisation").extracting("OrganisationID").isNull();
+                .extracting("Organisation").doesNotHaveToString("OrganisationID");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
             assertThat(response.getData()).extracting("respondent2OrganisationIDCopy").isEqualTo("org1");
         }
@@ -1319,7 +1344,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
-                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued").isNull();
+                assertThat(response.getData()).doesNotHaveToString("defendant2LIPAtClaimIssued");
             }
 
             @Test
@@ -1518,7 +1543,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
-                    .extracting("applicantPreferredCourtLocationList").isNull();
+                    .doesNotHaveToString("applicantPreferredCourtLocationList");
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
@@ -1664,8 +1689,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
             }
 
             @Test
@@ -1686,8 +1710,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent1OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
@@ -1696,8 +1719,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
-                    .extracting("Organisation")
-                    .isNull();
+                    .doesNotHaveToString("Organisation");
             }
         }
 
@@ -1734,8 +1756,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @MethodSource("caseDataStream")
         void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // When
@@ -1757,8 +1777,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotAssignCategoryIds_whenDocumentNotExist() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .uploadParticularsOfClaim(NO)
                 .build();
@@ -1766,14 +1784,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // Then
-            assertThat(response.getData()).extracting("servedDocumentFiles").isNull();
+            assertThat(response.getData()).doesNotContainKey("servedDocumentFiles");
         }
 
         @Test
         void shouldNotAssignCategoryIds_whenDocumentNotExistAndParticularOfClaimTextExists() {
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
                 .particularsOfClaimText("Some string").build();
 

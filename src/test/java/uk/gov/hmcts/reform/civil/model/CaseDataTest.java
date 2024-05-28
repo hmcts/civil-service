@@ -8,12 +8,15 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -44,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SD
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -785,6 +789,75 @@ public class CaseDataTest {
         assertThat(fee).isEqualTo(ZERO);
     }
 
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullSpec() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
     @Nested
     class GetHearingLocationText {
 
@@ -957,6 +1030,41 @@ public class CaseDataTest {
             //Then
             assertTrue(isJudgementDateNotPermitted);
         }
+
+        @Test
+        void shouldReturnTrueWhenCourtFavoursClaimantAndSetDateIsAfterCurrentDateAndSettlementAgreementSigned() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
+                                                                    .paymentSetDate(LocalDate.now().plusDays(1)).build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
+                                 .respondentSignSettlementAgreement(YES).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenCourtFavoursClaimantAndPayImmediatelyDateIsAfterCurrentDateAndSettlementAgreementSigned() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(LocalDate.now().plusDays(1))
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
+                                 .respondentSignSettlementAgreement(YES).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
     }
 
     @Nested
@@ -1022,6 +1130,54 @@ public class CaseDataTest {
             boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
             //Then
             assertFalse(isHWFTypeClaimIssued);
+        }
+    }
+
+    @Nested
+    class AlreadyPaidAmountCheck {
+        @Test
+        void shouldReturnTrueIfPaidLessFullDefence() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(new BigDecimal(1000))
+                                    .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfPaidLessPartAdmit() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .respondToAdmittedClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(new BigDecimal(1000))
+                                    .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnFalseIfFullAdmission() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertFalse(isPaidLessThanClaimAmount);
         }
     }
 }

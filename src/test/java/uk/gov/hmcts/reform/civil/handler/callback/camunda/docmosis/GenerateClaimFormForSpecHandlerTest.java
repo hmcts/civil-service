@@ -200,7 +200,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            specClaimTimelineDocuments.get(0).getDocument().setCategoryID(null);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
@@ -213,7 +212,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
     @Test
     void shouldAssignCategoryId_whenInvoked() {
         // Given
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specRespondent1Represented(YES)
@@ -233,7 +231,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -254,7 +251,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimTemplateDocumentFiles(testDocument)
@@ -275,7 +271,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -299,7 +294,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)

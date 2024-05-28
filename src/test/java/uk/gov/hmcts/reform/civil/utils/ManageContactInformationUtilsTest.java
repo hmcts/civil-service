@@ -8,35 +8,50 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
@@ -44,9 +59,13 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addD
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapFormDataToIndividualsData;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapPartyFieldsToPartyFormData;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.prepareLRIndividuals;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.prepareOrgIndividuals;
 
 @SuppressWarnings("unchecked")
 class ManageContactInformationUtilsTest {
@@ -70,20 +89,22 @@ class ManageContactInformationUtilsTest {
     void shouldAddCorrectOptions_forClaimant1AsLegalRep() {
         CaseData caseDataWithExpertsAndWitnesses = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .addApplicant1ExpertsAndWitnesses().build();
 
         CaseData caseDataWithoutExpertsAndWitnesses = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed().build();
 
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseDataWithExpertsAndWitnesses, false);
-        assertThat(options).isEqualTo(expectedApplicant1Options(true, false));
+        assertThat(options).isEqualTo(expectedApplicant1Options(true, false, false));
 
         List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addApplicant1Options(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
-        assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicant1Options(false, false));
+        assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicant1Options(false, false, false));
     }
 
     @Test
@@ -116,18 +137,20 @@ class ManageContactInformationUtilsTest {
     void shouldAddCorrectOptions_forClaimant1AsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed().build();
 
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1Options(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1Options(true, true, false));
     }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1OrganisationAsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .applicant1(Party.builder()
                             .organisationName("Test Inc")
@@ -138,13 +161,32 @@ class ManageContactInformationUtilsTest {
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, false));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1LipAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1Represented(NO)
+                .applicant1(Party.builder()
+                        .organisationName("Test Inc")
+                        .type(ORGANISATION)
+                        .build())
+                .build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, true));
     }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1CompanyAsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addApplicant1LitigationFriend()
+            .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
             .applicant1(Party.builder()
                             .companyName("Test Inc")
@@ -155,7 +197,25 @@ class ManageContactInformationUtilsTest {
         List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
-        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, false));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1LipCompanyAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .applicant1Represented(NO)
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1(Party.builder()
+                        .companyName("Test Inc")
+                        .type(COMPANY)
+                        .build())
+                .build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true, true));
     }
 
     @Test
@@ -170,6 +230,30 @@ class ManageContactInformationUtilsTest {
         addApplicantOptions2v1(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicants2v1Options(true, true));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimants2v1AsAdmin_secondClaimantAsCompany() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .multiPartyClaimTwoApplicants()
+                .applicant2(PartyBuilder.builder().company().build())
+                .atStateApplicantRespondToDefenceAndProceed().build();
+
+        List<DynamicListElement> options = new ArrayList<>();
+        addApplicantOptions2v1(options, caseData, true);
+
+        List<DynamicListElement> expected = new ArrayList<>();
+        expected.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2", "CLAIMANT 2: Company ltd"));
+        expected.add(dynamicElementFromCode("CLAIMANT_2_ORGANISATION_INDIVIDUALS", "CLAIMANT 2: Individuals attending for the organisation"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANTS: Individuals attending for the legal representative"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANTS: Witnesses"));
+        expected.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANTS: Experts"));
+
+        assertThat(options).isEqualTo(expected);
     }
 
     @Test
@@ -522,11 +606,428 @@ class ManageContactInformationUtilsTest {
         }
     }
 
-    private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+    @Nested
+    class MapPartyFieldsToPartyFormData {
+
+        @Test
+        void shouldReturnExpectedPartyDetailsFormData_whenDataIsDefined() {
+            var partyData = createParty("claimant-1-lr-individual");
+
+            List<Element<UpdatePartyDetailsForm>> actual = mapPartyFieldsToPartyFormData(wrapElements(partyData));
+
+            assertThat(unwrapElements(actual)).isEqualTo(List.of(
+                UpdatePartyDetailsForm.builder()
+                    .firstName(partyData.getFirstName())
+                    .lastName(partyData.getLastName())
+                    .phoneNumber(partyData.getPhone())
+                    .emailAddress(partyData.getEmail())
+                    .build()));
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenDataIsNull() {
+            List<Element<UpdatePartyDetailsForm>> actual = mapPartyFieldsToPartyFormData(null);
+            assertThat(actual).isEmpty();
+        }
+    }
+
+    @Nested
+    class MapFormDataToIndividualsData {
+        @Test
+        void shouldReturnExpectedPartyDetailsList_forGivenData_whenExistingListIsDefined() {
+            PartyFlagStructure existing = createParty("claimant-1-lr-individual");
+
+            UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()
+                .firstName("NewClaimantName")
+                .lastName(existing.getLastName())
+                .phoneNumber(existing.getPhone())
+                .emailAddress(existing.getEmail())
+                .build();
+
+            UUID uuid = UUID.randomUUID();
+            List<Element<PartyFlagStructure>> existingList = List.of(Element.<PartyFlagStructure>builder().id(uuid).value(existing).build());
+            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(Element.<UpdatePartyDetailsForm>builder().id(uuid).value(updated).build());
+
+            List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
+
+            List<PartyFlagStructure>  expected = List.of(existing.toBuilder().firstName("NewClaimantName").build());
+            assertThat(unwrapElements(actual)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnExpectedPartyDetailsList_forGivenData_whenExistingListIsEmpty() {
+
+            UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()
+                .firstName("NewClaimantName")
+                .lastName("LastName")
+                .phoneNumber("09876565432")
+                .emailAddress("some-email@example.com")
+                .build();
+
+            UUID uuid = UUID.randomUUID();
+
+            List<Element<PartyFlagStructure>> existingList = List.of();
+            List<Element<UpdatePartyDetailsForm>>  updatedList = List.of(Element.<UpdatePartyDetailsForm>builder().id(uuid).value(updated).build());
+
+            List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
+
+            List<PartyFlagStructure> expected = List.of(
+                PartyFlagStructure.builder()
+                    .firstName(updated.getFirstName())
+                    .lastName(updated.getLastName())
+                    .phone(updated.getPhoneNumber())
+                    .email(updated.getEmailAddress())
+                    .build()
+            );
+
+            assertThat(unwrapElements(actual)).isEqualTo(expected);
+        }
+    }
+
+    @Nested
+    class PrepareOrgIndividuals {
+
+        @Test
+        void shouldPopulateExpectedOrgIndividuals_applicant1OrgIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("claimant-1-org-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("claimant-1-org-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .applicant1OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .applicant2OrgIndividuals(wrapElements(createParty("claimant-2-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                CLAIMANT_ONE_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyList_applicant1OrgIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .applicant2OrgIndividuals(wrapElements(createParty("claimant-2-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                CLAIMANT_ONE_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+
+        @Test
+        void shouldPopulateExpectedOrgIndividuals_applicant2OrgIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("claimant-2-org-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("claimant-2-org-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .applicant2OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .applicant1OrgIndividuals(wrapElements(createParty("claimant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                CLAIMANT_TWO_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyList_applicant2OrgIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .applicant1OrgIndividuals(wrapElements(createParty("claimant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                CLAIMANT_TWO_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+
+        @Test
+        void shouldPopulateExpectedOrgIndividuals_respondent1OrgIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("defendant-1-org-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("defendant-1-org-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .respondent1OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .respondent2OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                DEFENDANT_ONE_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmprtList_respondent1OrgIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .respondent2OrgIndividuals(wrapElements(createParty("defendant-2-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                DEFENDANT_ONE_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+
+        @Test
+        void shouldPopulateExpectedOrgIndividuals_respondent2OrgIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("defendant-2-org-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("defendant-2-org-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .respondent2OrgIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .respondent1OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                DEFENDANT_TWO_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmprtList_respondent2OrgIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .respondent1OrgIndividuals(wrapElements(createParty("defendant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareOrgIndividuals(
+                DEFENDANT_TWO_ORG_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+    }
+
+    @Nested
+    class PrepareLRIndividuals {
+
+        @Test
+        void shouldPopulateExpectedLRIndividuals_applicant1LRIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("claimant-1-lr-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("claimant-1-lr-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .applicant1LRIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .respondent1LRIndividuals(wrapElements(createParty("defendant-1-lr-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyList_applicant1LRIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .respondent1LRIndividuals(wrapElements(createParty("defendant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+
+        @Test
+        void shouldPopulateExpectedLRIndividuals_respondent1LRIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("defendant-1-lr-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("defendant-1-lr-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .respondent1LRIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .respondent2LRIndividuals(wrapElements(createParty("defendant-2-lr-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyList_respondent1LRIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .respondent2LRIndividuals(wrapElements(createParty("defendant-2-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+
+        @Test
+        void shouldPopulateExpectedLRIndividuals_respondent2LRIndividuals() {
+            PartyFlagStructure partyDetails1 = createParty("defendant-2-lr-individual-1");
+            PartyFlagStructure partyDetails2 = createParty("defendant-2-lr-individual-2");
+
+            CaseData caseData = CaseData.builder()
+                .respondent2LRIndividuals(wrapElements(partyDetails1, partyDetails2))
+                .respondent1LRIndividuals(wrapElements(createParty("defendant-1-lr-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEqualTo(
+                wrapElements(
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails1.getFirstName())
+                        .lastName(partyDetails1.getLastName())
+                        .emailAddress(partyDetails1.getEmail())
+                        .phoneNumber(partyDetails1.getPhone())
+                        .build(),
+                    UpdatePartyDetailsForm.builder()
+                        .firstName(partyDetails2.getFirstName())
+                        .lastName(partyDetails2.getLastName())
+                        .emailAddress(partyDetails2.getEmail())
+                        .phoneNumber(partyDetails2.getPhone())
+                        .build()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyList_respondent2LRIndividualsNull() {
+            CaseData caseData = CaseData.builder()
+                .respondent1LRIndividuals(wrapElements(createParty("defendant-1-org-individual")))
+                .build();
+
+            List<Element<UpdatePartyDetailsForm>> actual = prepareLRIndividuals(
+                DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID,
+                caseData
+            );
+
+            assertThat(actual).isEmpty();
+        }
+    }
+
+    private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin, boolean isLip) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
         list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        if (!isLip) {
+            list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        }
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
@@ -534,11 +1035,13 @@ class ManageContactInformationUtilsTest {
         return list;
     }
 
-    private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
+    private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin, boolean isLip) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Test Inc"));
         list.add(dynamicElementFromCode("CLAIMANT_1_ORGANISATION_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the organisation"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        if (!isLip) {
+            list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
+        }
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
@@ -596,5 +1099,18 @@ class ManageContactInformationUtilsTest {
             list.add(dynamicElementFromCode("DEFENDANT_1_EXPERTS", "DEFENDANTS: Experts"));
         }
         return list;
+    }
+
+    private PartyFlagStructure createParty(String prefix) {
+        return PartyFlagStructure.builder()
+            .partyID(prefix + "-id")
+            .firstName(prefix + "-firstname")
+            .lastName(prefix + "-lastname")
+            .email(prefix + "-individual@example.com")
+            .phone(prefix + "-07867654543")
+            .flags(Flags.builder()
+                       .roleOnCase(prefix + "-role")
+                       .build())
+            .build();
     }
 }

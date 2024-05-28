@@ -13,7 +13,11 @@ public interface DQ {
 
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 
+    DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments();
+
     DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments();
+
+    DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments();
 
     DisclosureReport getDisclosureReport();
 

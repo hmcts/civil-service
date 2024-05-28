@@ -28,6 +28,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
@@ -41,11 +45,18 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC);
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC,
+        NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK,
+        NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK,
+        NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK);
 
     public static final String TASK_ID = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1";
     public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
+
+    public static final String TASK_ID_MULTITRACK = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1Multitrack";
+    public static final String TASK_ID_RESPONDENT_SOL2_MULTITRACK = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2Multitrack";
+    public static final String TASK_ID_CC_MULTITRACK = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CCMultitrack";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
     private static final String NP_PROCEED_REFERENCE_TEMPLATE
         = "claimant-confirms-not-to-proceed-respondent-notification-%s";
@@ -63,6 +74,13 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            if (isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
+                return TASK_ID_RESPONDENT_SOL2_MULTITRACK;
+            }
+            return isCcNotificationMultiTrack(callbackParams) ? TASK_ID_CC_MULTITRACK : TASK_ID_MULTITRACK;
+        }
         if (isRespondentSolicitor2Notification(callbackParams)) {
             return Task_ID_RESPONDENT_SOL2;
         }
@@ -76,12 +94,21 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String template;
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
 
+        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            recipient = isCcNotificationMultiTrack(callbackParams)
+                ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                : caseData.getRespondentSolicitor1EmailAddress();
+        }
+
         if (isRespondentSolicitor2Notification(callbackParams)) {
+            recipient = caseData.getRespondentSolicitor2EmailAddress();
+        }
+
+        if (isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
@@ -108,8 +135,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+
+        String template;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = getSpecTemplate(callbackParams, caseData);
+        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            template = notificationsProperties.getSolicitorCaseTakenOffline();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
@@ -200,9 +231,19 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
     }
 
+    private boolean isCcNotificationMultiTrack(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK.name());
+    }
+
     private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED.name());
+    }
+
+    private boolean isRespondentSolicitor2NotificationMultiTrack(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK.name());
     }
 
     //finding legal org name

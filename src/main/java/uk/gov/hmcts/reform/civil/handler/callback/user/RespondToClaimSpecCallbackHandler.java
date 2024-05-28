@@ -1115,11 +1115,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
-        return AllocatedTrack.getAllocatedTrack(
-            caseData.getTotalClaimAmount(),
-            null,
-            null
-        );
+        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
+                                                toggleService, caseData);
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
@@ -1181,7 +1178,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
-        if (toggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (toggleService.isCarmEnabledForCase(caseData)) {
             updatedCaseData.showCarmFields(YES);
         } else {
             updatedCaseData.showCarmFields(NO);
@@ -1409,7 +1406,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        final AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
@@ -1599,18 +1596,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
-        if (toggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            updatedData.respondent2DocumentGeneration(null);
-            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                updatedData.respondent2DocumentGeneration("userRespondent2");
-            }
+        // casefileview changes need to assign documents into specific folders, this is help determine
+        // which user is "creating" the document and therefore which folder to move the documents
+        // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        updatedData.respondent2DocumentGeneration(null);
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            updatedData.respondent2DocumentGeneration("userRespondent2");
         }
 
         updateCorrespondenceAddress(callbackParams, updatedData, caseData);
@@ -1690,16 +1685,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DEFENCE
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1ClaimDocument,
                     DocCategory.DEF1_DEFENSE_DQ.getValue()
                 );
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
@@ -1714,14 +1704,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1DQDraftDirections,
-                    DocCategory.DEF1_DEFENSE_DQ.getValue()
+                    DocCategory.DQ_DEF1.getValue()
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
@@ -1732,16 +1717,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             updatedCaseData.build().getRespondent2ResponseDate(),
                             DocumentType.DEFENDANT_DEFENCE
                     );
-                    CaseDocument copy = assignCategoryId
-                            .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
                         DocCategory.DEF2_DEFENSE_DQ.getValue()
                     );
                     defendantUploads.add(documentElement);
-                    if (Objects.nonNull(copy)) {
-                        defendantUploads.add(ElementUtils.element(copy));
-                    }
                 }
             }
         } else {
@@ -1779,14 +1759,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent2DQDraftDirections,
-                    DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    DocCategory.DQ_DEF2.getValue()
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
         if (!defendantUploads.isEmpty()) {
@@ -1794,10 +1769,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
-        if (toggleService.isCaseFileViewEnabled()) {
-            updatedCaseData.respondent1SpecDefenceResponseDocument(null);
-            updatedCaseData.respondent2SpecDefenceResponseDocument(null);
-        }
+        updatedCaseData.respondent1SpecDefenceResponseDocument(null);
+        updatedCaseData.respondent2SpecDefenceResponseDocument(null);
 
     }
 

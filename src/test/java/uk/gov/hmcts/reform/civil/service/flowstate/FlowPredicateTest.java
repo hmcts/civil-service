@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -96,6 +97,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentF
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pinInPostEnabledAndLiP;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.reasonNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
@@ -1749,7 +1751,7 @@ class FlowPredicateTest {
                 .applicant1ProceedWithClaim(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .build().toBuilder()
-                .submittedDate(LocalDateTime.of(2024, 6, 1, 1, 1))
+                .submittedDate(LocalDateTime.of(2024, 8, 1, 1, 0))
                 .build();
             assertTrue(specSmallClaimCarm.test(caseData));
         }
@@ -1762,7 +1764,7 @@ class FlowPredicateTest {
                 .applicant1ProceedWithClaim(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .build().toBuilder()
-                .submittedDate(LocalDateTime.of(2022, 6, 1, 1, 1))
+                .submittedDate(LocalDateTime.of(2024, 7, 31, 23, 0))
                 .build();
             assertFalse(specSmallClaimCarm.test(caseData));
         }
@@ -1991,8 +1993,24 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissed()
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .takenOfflineByStaffDate(null)
+                .build();
             assertTrue(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissed()
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
 
         @Test
@@ -2017,8 +2035,21 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged_1v2_BothDefendants()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(LocalDateTime.now())
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged_1v2_BothDefendants()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
@@ -2026,16 +2057,37 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtension_1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
 
         @Test
@@ -2043,8 +2095,19 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtensionRespondent1_1v2DS()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtensionRep1_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionRespondent1_1v2DS()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
 
         @Test
@@ -2052,14 +2115,47 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledgedTimeExtensionRespondent2_1v2DS()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(null)
                 .build();
             assertTrue(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledgedExtensionRep2_1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedTimeExtensionRespondent2_1v2DS()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .takenOfflineByStaffDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterClaimAcknowledgedExtension.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(null)
+                .respondent2ResponseDate(null)
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(2))
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
                 .build();
             assertFalse(caseDismissedAfterDetailNotified.test(caseData));
         }
@@ -3327,5 +3423,23 @@ class FlowPredicateTest {
             .build();
 
         assertFalse(isInHearingReadiness.test(caseData));
+    }
+
+    @Test
+    void reasonNotSuitableForSdo() {
+        CaseData caseData = CaseData.builder()
+            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Test").build())
+            .build();
+
+        assertTrue(reasonNotSuitableForSdo.test(caseData));
+    }
+
+    @Test
+    void reasonNotSuitableForSdoExt() {
+        CaseData caseData = CaseData.builder()
+            .reasonNotSuitableSDO(null)
+            .build();
+
+        assertFalse(reasonNotSuitableForSdo.test(caseData));
     }
 }

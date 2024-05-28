@@ -80,6 +80,8 @@ class FeesPaymentServiceTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
+    @MockBean
+    private UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     void before() {
@@ -230,11 +232,13 @@ class FeesPaymentServiceTest {
             .thenReturn(response);
         CardPaymentStatusResponse govPaymentRequestStatus = feesPaymentService.getGovPaymentRequestStatus(
             HEARING,
+            "123",
             "RC-1701-0909-0602-0418",
             BEARER_TOKEN
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
+        verify(updatePaymentStatusService, times(1)).updatePaymentStatus(any(), any(), any());
     }
 
     @Test
@@ -244,7 +248,7 @@ class FeesPaymentServiceTest {
 
         assertThrows(
             PaymentsApiException.class,
-            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN)
+            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN)
         );
 
         verify(paymentsClient, times(5)).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
@@ -257,7 +261,7 @@ class FeesPaymentServiceTest {
 
         assertThrows(
             PaymentsApiException.class,
-            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN
+            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN
             )
         );
 
@@ -271,7 +275,7 @@ class FeesPaymentServiceTest {
             .thenThrow(FeignException.InternalServerError.class)
             .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
 
-        feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN);
+        feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
         verify(paymentsClient, times(3))
             .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);

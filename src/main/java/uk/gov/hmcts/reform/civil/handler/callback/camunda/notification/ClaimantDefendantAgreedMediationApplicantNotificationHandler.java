@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_AGREEMENT);
     private static final String REFERENCE_TEMPLATE = "mediation-agreement-applicant-notification-%s";
     public static final String TASK_ID = "ClaimantDefendantAgreedMediationNotifyApplicant";
@@ -46,9 +48,13 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
 
     private CallbackResponse notifyApplicantLR(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String emailTemplate =  featureToggleService.isCarmEnabledForCase(caseData)
+            ? notificationsProperties.getNotifyApplicantLRMediationTemplate()
+            : notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate();
+
         notificationService.sendMail(
             addEmail(caseData),
-            notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate(),
+            emailTemplate,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         return AboutToStartOrSubmitCallbackResponse.builder().build();

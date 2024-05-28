@@ -8,10 +8,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.UpdatePaymentStatusService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +47,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private PaymentsClient paymentsClient;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+    @MockBean
+    private UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     void before() {
@@ -82,7 +88,20 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
-        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
+        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
+            .andExpect(content().json(toJson(expectedResponse(status))))
+            .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Success"})
+    @SneakyThrows
+    void shouldReturnServiceRequestPaymentStatusWhenExceptionInCaseDataUpdate(String status) {
+        PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
+        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+            .thenReturn(response);
+        doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
             .andExpect(content().json(toJson(expectedResponse(status))))
             .andExpect(status().isOk());
     }

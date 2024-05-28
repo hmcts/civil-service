@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -58,6 +57,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.math.BigDecimal.ZERO;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -128,6 +128,10 @@ public class EventHistoryMapper {
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
 
     public EventHistory buildEvents(CaseData caseData) {
+        return buildEvents(caseData, null);
+    }
+
+    public EventHistory buildEvents(CaseData caseData, String authToken) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
@@ -192,7 +196,7 @@ public class EventHistoryMapper {
                         buildFullDefenceNotProceed(builder, caseData);
                         break;
                     case FULL_DEFENCE_PROCEED:
-                        buildFullDefenceProceed(builder, caseData);
+                        buildFullDefenceProceed(builder, caseData, authToken);
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
@@ -334,7 +338,7 @@ public class EventHistoryMapper {
                                          String litigiousPartyID) {
 
         BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : BigDecimal.ZERO;
+            ? caseData.getTotalInterest() : ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
@@ -350,7 +354,7 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
-                                                            ? partialPaymentPounds : BigDecimal.ZERO)
+                                                            ? partialPaymentPounds : ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY)) ? true : false)
                               .paymentInFullDate((caseData.getPaymentTypeSelection()
@@ -363,7 +367,7 @@ public class EventHistoryMapper {
                                   .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
                                                      ? getInstallmentAmount(caseData.getRepaymentSuggestion())
                                   .setScale(2)
-                                                     : BigDecimal.ZERO)
+                                                     : ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
                               .dateOfJudgment(LocalDateTime.now())
@@ -383,7 +387,7 @@ public class EventHistoryMapper {
     private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
         return isResponsePayByInstallment
             ? MonetaryConversions.penniesToPounds(
-            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
+            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
             : null;
     }
 
@@ -513,7 +517,7 @@ public class EventHistoryMapper {
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           caseData.getTotalInterest())
+                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
                                   .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
@@ -1177,9 +1181,9 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
-        List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
+        final List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
         CaseCategory claimType = caseData.getCaseAccessCategory();
         if (SPEC_CLAIM.equals(claimType)) {
@@ -1206,7 +1210,7 @@ public class EventHistoryMapper {
         } else {
             String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
-                CallbackParams.Params.BEARER_TOKEN.toString(), true
+                authToken, true
             );
 
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
@@ -1845,7 +1849,7 @@ public class EventHistoryMapper {
                                     "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
+                                    evaluateRespondent2IntentionType(caseData)
                                 )
                             )
                         ));
@@ -1887,6 +1891,14 @@ public class EventHistoryMapper {
                                 )));
             }
         }
+    }
+
+    public String evaluateRespondent2IntentionType(CaseData caseData) {
+        if (caseData.isRespondent2NotRepresented() && caseData.getRespondent2ClaimResponseIntentionType() != null) {
+            return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
+        }
+        //represented by same solicitor
+        return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
     }
 
     private Event buildAcknowledgementOfServiceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -2281,6 +2293,10 @@ public class EventHistoryMapper {
 
     private BigDecimal getCostOfJudgment(CaseData data) {
 
+        if (data.getOutstandingFeeInPounds() != null) {
+            return data.getOutstandingFeeInPounds();
+        }
+
         String repaymentSummary = data.getRepaymentSummaryObject();
         BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
@@ -2297,7 +2313,7 @@ public class EventHistoryMapper {
         }
 
         return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
-            : claimCost != null ? claimCost.setScale(2) : BigDecimal.ZERO;
+            : claimCost != null ? claimCost.setScale(2) : ZERO;
 
     }
 
@@ -2380,7 +2396,7 @@ public class EventHistoryMapper {
                                              List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
-        if (caseData.hasDefendantPayedTheAmountClaimed()) {
+        if (caseData.hasDefendantPaidTheAmountClaimed()) {
             statesPaidEvents.add(buildDefenceFiledEvent(
                 builder,
                 respondent1ResponseDate,

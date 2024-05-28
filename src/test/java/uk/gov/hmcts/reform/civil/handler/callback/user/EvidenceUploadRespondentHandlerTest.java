@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -65,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -104,6 +108,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -142,6 +148,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
     }
 
     @Test
@@ -1168,6 +1175,26 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldStartEvidenceUploadedBusinessProcess_whenCPIsEnabled() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(YES)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // When
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(EVIDENCE_UPLOADED.name());
+        assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
+    }
+
+    @Test
     void givenSubmittedThenReturnsSubmittedCallbackResponse() {
         // Given
         String header = "# Documents uploaded";
@@ -1206,36 +1233,124 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
+    void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded_onNewCreatedBundle() {
+        List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle = new ArrayList<>();
+        UploadEvidenceDocumentType document = new UploadEvidenceDocumentType();
+        document.setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+        respondentDocsUploadedAfterBundle.add(ElementUtils.element(document));
         // Given caseBundles with bundle created date is before witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
-
+            // populate respondentDocsUploadedAfterBundle with a default built element after a new bundle, it only
+            // contains createdDatetime and no document, so will be removed from final list
+            .respondentDocsUploadedAfterBundle(respondentDocsUploadedAfterBundle)
+            // added after trial bundle, so will  be added
+            .documentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .documentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then respondent docs uploaded after bundle should return size 2, 2 new docs and 1 being removed.
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).hasSize(2);
+    }
 
-        // Then respondent docs uploaded after bundle should return size 4
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(6);
+    @Test
+    void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
+        // Given caseBundles with bundle created date is before witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            // populate respondentDocsUploadedAfterBundle with an existing upload
+            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
+            // added before trial bundle, so will not be added
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url11"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url22"))
+            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url33"))
+            // added after trial bundle, so will  be added
+            .documentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
+            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url55"))
+            .documentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url77"))
+            // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then respondent docs uploaded after bundle should return size 5, 4 new docs and 1 existing.
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).hasSize(5);
     }
 
     @Test
     void shouldNotAddRespondentEvidenceDocWhenBundleCreatedDateIsAfterEvidenceUploaded() {
         // Given caseBundles with bundle created date is after witness and expert doc created date
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
+            .documentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
+            .documentForDisclosureRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
+            .documentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
+            .documentReferredInStatementRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
+            .documentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url7"))
+            .documentCaseSummaryRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url8"))
+            .documentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url9"))
+            .documentSkeletonArgumentRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url10"))
+            .documentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url11"))
+            .documentAuthoritiesRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url12"))
+            .documentCostsRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url13"))
+            .documentCostsRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url14"))
+            .documentHearsayNoticeRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url15"))
+            .documentHearsayNoticeRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url16"))
+            .documentWitnessSummaryRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"))
+            .documentWitnessSummaryRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url18"))
+            .documentQuestionsRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url19"))
+            .documentQuestionsRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"))
+            .documentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url21"))
+            .documentEvidenceForTrialRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .documentAnswersRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"))
+            .documentAnswersRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url24"))
+            .documentJointStatementRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url25"))
+            .documentJointStatementRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url26"))
+            .documentExpertReportRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url27"))
+            .documentExpertReportRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url28"))
+            .documentWitnessStatementRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url29"))
+            .documentWitnessStatementRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url30"))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1247,8 +1362,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        // Then respondent docs uploaded after bundle should return size 0
-        assertThat(updatedData.getRespondentDocsUploadedAfterBundle().size()).isEqualTo(0);
+        // Then applicant docs uploaded after bundle should return size 0
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).isNull();
+    }
+
+    @Test
+    void shouldAddAdditionalBundleDocuments_RespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
+        // Given caseBundles with bundle created date is before witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then applicant docs uploaded after bundle should return size 2
+        assertThat(updatedData.getRespondentDocsUploadedAfterBundle()).hasSize(2);
     }
 
     @Test
@@ -1265,8 +1400,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .caseBundles(caseBundles)
             .build();
 
@@ -1293,8 +1428,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
+            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
             .caseBundles(caseBundles)
             .build();
 
@@ -1661,12 +1796,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return caseBundles;
     }
 
-    private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()
                                                          .witnessOptionDocument(Document.builder().documentBinaryUrl(
                                                                  TEST_URL)
+                                                                                    .documentUrl(uniqueUrl)
                                                                                     .documentFileName(TEST_FILE_NAME).build())
                                                          .witnessOptionName("FirstName LastName")
                                                          .createdDatetime(uploadedDate)
@@ -1674,23 +1810,27 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return witnessEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
+                                                        .expertOptionUploadDate(LocalDate.now())
                                                         .createdDatetime(uploadedDate)
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentUrl(uniqueUrl)
                                                                             .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  expertEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate) {
+    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate, String uniqueUrl) {
         List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocs = new ArrayList<>();
         uploadEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                         .builder()
+                                                        .documentIssuedDate(LocalDate.now())
                                                         .createdDatetime(uploadedDate)
                                                         .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                                                .documentUrl(uniqueUrl)
                                                                             .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  uploadEvidenceDocs;
