@@ -58,14 +58,14 @@ public class DefendantFullDefenceFullDisputeClaimantCarmScenarioTest extends Das
                     "<p class=\"govuk-body\">John Doe has rejected the claim. " +
                         "You need to respond by "
                         + DateUtils.formatDate(applicantResponseDeadline) + ". "
-                        + "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
+                        + "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>.</p>"
                 ),
                 jsonPath("$[0].titleCy").value("Response to the claim"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">John Doe has rejected the claim. " +
                         "You need to respond by "
                         + DateUtils.formatDateInWelsh(applicantResponseDeadline)
-                        + ". <a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>"
+                        + ". <a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">View and respond</a>.</p>"
                 )
             );
 

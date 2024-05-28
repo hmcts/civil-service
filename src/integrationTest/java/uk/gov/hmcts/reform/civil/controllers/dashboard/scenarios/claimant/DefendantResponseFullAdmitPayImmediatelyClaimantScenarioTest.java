@@ -65,9 +65,9 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi cynnig talu £1000 erbyn " +
-                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ".</p>" +
-                        "<p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dweud wrthym ei fod wedi cael ei dalu</a></p>"
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ". " +
+                        "Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol. " +
+                        "<a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dweud wrthym ei fod wedi cael ei dalu</a></p>"
                 )
             );
 
