@@ -50,4 +50,32 @@ public class JudicialReferralUtilsTest {
         assertTrue(judicialReferralUtils);
     }
 
+    @Test
+    public void testShouldMoveToJudicialReferralForUnspecMultiClaimMintiEnabled() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(100000000))
+                            .build())
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .build();
+
+        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, true);
+        assertTrue(judicialReferralUtils);
+    }
+
+    @Test
+    public void testShouldNotMoveToJudicialReferralForUnspecMultiClaimMintiNotEnabled() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(100000000))
+                            .build())
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .build();
+
+        boolean judicialReferralUtils = JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, false);
+        assertTrue(judicialReferralUtils);
+    }
+
 }
