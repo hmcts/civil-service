@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -129,6 +128,10 @@ public class EventHistoryMapper {
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
 
     public EventHistory buildEvents(CaseData caseData) {
+        return buildEvents(caseData, null);
+    }
+
+    public EventHistory buildEvents(CaseData caseData, String authToken) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
@@ -193,7 +196,7 @@ public class EventHistoryMapper {
                         buildFullDefenceNotProceed(builder, caseData);
                         break;
                     case FULL_DEFENCE_PROCEED:
-                        buildFullDefenceProceed(builder, caseData);
+                        buildFullDefenceProceed(builder, caseData, authToken);
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
@@ -1178,7 +1181,7 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         final List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
@@ -1207,7 +1210,7 @@ public class EventHistoryMapper {
         } else {
             String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
-                CallbackParams.Params.BEARER_TOKEN.toString(), true
+                authToken, true
             );
 
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
