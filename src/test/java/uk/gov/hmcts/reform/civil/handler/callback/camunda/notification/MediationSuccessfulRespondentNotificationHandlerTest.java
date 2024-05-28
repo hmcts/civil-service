@@ -418,7 +418,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         }
 
         @Test
-        void shouldNotSendNotificationToDefendantForLrVLr_whenInvoked() {
+        void shouldNotSendNotificationToDefendantForLipVLip_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -428,18 +428,23 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(respondent1)
                 .respondent1OrgRegistered(null)
-                .specRespondent1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YES)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
             //Then
-            assertThat(response.getErrors()).isNull();
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-successful-respondent-notification-000DC001"
+            );
         }
 
         @NotNull
