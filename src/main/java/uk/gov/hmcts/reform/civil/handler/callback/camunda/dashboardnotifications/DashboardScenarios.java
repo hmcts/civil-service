@@ -143,7 +143,12 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION("Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
-    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant");
+    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant"),
+    SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Defendant"),
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant");
 
     private final String scenario;
 
