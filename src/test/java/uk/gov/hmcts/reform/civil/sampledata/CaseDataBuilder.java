@@ -32,6 +32,8 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -458,6 +460,11 @@ public class CaseDataBuilder {
     private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
+    private DJPaymentTypeSelection paymentTypeSelection;
+    private LocalDate paymentSetDate;
+    private RepaymentFrequencyDJ repaymentFrequency;
+    private LocalDate repaymentDate;
+    private String repaymentSuggestion;
 
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
@@ -1582,6 +1589,31 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1(Party party) {
         this.applicant1 = party;
+        return this;
+    }
+
+    public CaseDataBuilder paymentTypeSelection(DJPaymentTypeSelection paymentTypeSelection) {
+        this.paymentTypeSelection = paymentTypeSelection;
+        return this;
+    }
+
+    public CaseDataBuilder paymentSetDate(LocalDate paymentSetDate) {
+        this.paymentSetDate = paymentSetDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentFrequency(RepaymentFrequencyDJ repaymentFrequency) {
+        this.repaymentFrequency = repaymentFrequency;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentDate(LocalDate repaymentDate) {
+        this.repaymentDate = repaymentDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentSuggestion(String repaymentSuggestion) {
+        this.repaymentSuggestion = repaymentSuggestion;
         return this;
     }
 
@@ -7425,6 +7457,11 @@ public class CaseDataBuilder {
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
+            .paymentTypeSelection(paymentTypeSelection)
+            .repaymentSuggestion(repaymentSuggestion)
+            .paymentSetDate(paymentSetDate)
+            .repaymentFrequency(repaymentFrequency)
+            .repaymentDate(repaymentDate)
             .build();
     }
 
