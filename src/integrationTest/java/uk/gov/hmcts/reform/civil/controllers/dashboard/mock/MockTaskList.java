@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.mock;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class MockTaskList {
 
@@ -195,6 +197,42 @@ public class MockTaskList {
                 .build());
     }
 
+    public static List<TaskList> getUploadMediationTaskListMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.IN_PROGRESS.getName())
+                .currentStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
+                .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
+                .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
+                .taskOrder(6)
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.AVAILABLE.getName())
+                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .nextStatusEn(TaskStatus.AVAILABLE.getName())
+                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .taskOrder(7)
+                .build());
+    }
+
     public static List<TaskList> getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock(String role, String reference) {
         return List.of(
             TaskList.builder()
@@ -286,4 +324,23 @@ public class MockTaskList {
         );
     }
 
+    public static List<TaskList> getUploadMediationTaskListViewMediationAvailableMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.AVAILABLE.getName())
+                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .nextStatusEn(TaskStatus.AVAILABLE.getName())
+                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .taskOrder(7)
+                .build());
+    }
 }
