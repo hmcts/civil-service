@@ -42,11 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
     DefendantPinToPostLRspecService.class,
@@ -106,17 +106,17 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
                 .expiryDate(LocalDate.now().plusDays(180))
                 .build();
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", pinInPostData);
-
-            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), pinInPostData);
-
-            verify(coreCaseDataService).triggerEvent(caseData.getCcdCaseReference(), UPDATE_CASE_DATA, data);
+            var updatedData = defendantPinToPostLRspecService.removePinInPostData(caseDetails);
+            assertThat(updatedData).isEqualTo(data);
         }
 
         @Test
