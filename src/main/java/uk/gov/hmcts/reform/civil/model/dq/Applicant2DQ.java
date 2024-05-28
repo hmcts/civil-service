@@ -18,6 +18,7 @@ public class Applicant2DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant2DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts applicant2DQFixedRecoverableCosts;
+    private FixedRecoverableCosts applicant2DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments applicant2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant2DQDisclosureReport;
@@ -62,9 +63,19 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("applicant2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return applicant2DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return null;
     }
 
     @Override
