@@ -58,8 +58,9 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
         } else {
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
         }
-        if (JudgmentType.DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())) {
-            // populate data from Default Judgment
+        if (JudgmentType.DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
+            || JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())) {
+            // populate data from Default Judgment Or JBA
             caseData.setJoOrderMadeDate(activeJudgment.getIssueDate());
             caseData.setJoPaymentPlan(activeJudgment.getPaymentPlan());
             caseData.setJoInstalmentDetails(activeJudgment.getInstalmentDetails());
