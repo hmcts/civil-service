@@ -40,31 +40,7 @@ class StateFlowBuilderTest {
             Assertions.assertThrows(IllegalArgumentException.class, () -> StateFlowBuilder.<FlowState>flow(""));
         }
 
-        @Test
-        void shouldThrowIllegalArgumentException_whenSubflowNameIsNull() {
-            StateFlowContext stateFlowContext = new StateFlowContext();
-            Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> StateFlowBuilder.<SubflowState>subflow(null, stateFlowContext)
-            );
-        }
 
-        @Test
-        void shouldThrowIllegalArgumentException_whenSubflowNameIsEmpty() {
-            StateFlowContext stateFlowContext = new StateFlowContext();
-            Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> StateFlowBuilder.<SubflowState>subflow("", stateFlowContext)
-            );
-        }
-
-        @Test
-        void shouldThrowIllegalArgumentException_whenStateFlowContextIsNull() {
-            Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> StateFlowBuilder.<SubflowState>subflow("SUBFLOW", null)
-            );
-        }
 
         @Test
         void shouldThrowIllegalArgumentException_whenInitialIsNull() {
@@ -95,12 +71,6 @@ class StateFlowBuilderTest {
             Assertions.assertThrows(IllegalArgumentException.class, () -> flow.onlyIf(null));
         }
 
-        @Test
-        void shouldThrowIllegalArgumentException_whenSubflowIsNull() {
-            var flow = StateFlowBuilder.<FlowState>flow("FLOW")
-                .initial(FlowState.STATE_1);
-            Assertions.assertThrows(IllegalArgumentException.class, () -> flow.subflow(null));
-        }
     }
 
     @Nested
@@ -197,55 +167,7 @@ class StateFlowBuilderTest {
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
         }
 
-        @Test
-        @Disabled("Subflow currently allows only one final state to transition back to main flow")
-        void shouldBuildStateFlow_whenInitialStateHasSubflow() {
-            Consumer<StateFlowContext> subflow = stateFlowContext ->
-                StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                        .transitionTo(SubflowState.STATE_1).onlyIf(caseData -> true)
-                        .transitionTo(SubflowState.STATE_2).onlyIf(caseData -> false)
-                    .state(SubflowState.STATE_1)
-                    .state(SubflowState.STATE_2);
 
-            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
-                .initial(FlowState.STATE_1)
-                .subflow(subflow)
-                .transitionTo(FlowState.STATE_2).onlyIf(caseData -> true)
-                .state(FlowState.STATE_2)
-                .build();
-
-            StateFlowAssert.assertThat(stateFlow).enteredStates(
-                "FLOW.STATE_1",
-                "SUBFLOW.STATE_1",
-                "FLOW.STATE_2"
-            );
-            assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
-        }
-
-        @Test
-        void shouldBuildStateFlow_whenTransitionHasSubflow() {
-            Consumer<StateFlowContext> subflow = stateFlowContext ->
-                StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                    .transitionTo(SubflowState.STATE_1)
-                    .state(SubflowState.STATE_1)
-                    .transitionTo(SubflowState.STATE_2)
-                    .state(SubflowState.STATE_2);
-
-            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
-                .initial(FlowState.STATE_1)
-                .transitionTo(FlowState.STATE_2)
-                .state(FlowState.STATE_2)
-                .subflow(subflow)
-                .build();
-
-            StateFlowAssert.assertThat(stateFlow).enteredStates(
-                "FLOW.STATE_1",
-                "FLOW.STATE_2",
-                "SUBFLOW.STATE_1",
-                "SUBFLOW.STATE_2"
-            );
-            assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
-        }
 
         @Test
         void shouldSetStateMachineError_whenConditionsOnTransitionsAreNotMutuallyExclusive() {
@@ -286,24 +208,6 @@ class StateFlowBuilderTest {
                 .build();
 
             StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "FLOW.STATE_3");
-            assertThat(stateFlow.asStateMachine().hasStateMachineError()).isTrue();
-        }
-
-        @Test
-        void shouldBuildStateFlowWithSubflowButSetStateMachineError_whenAmbiguousTransitions() {
-            Consumer<StateFlowContext> subflow = stateFlowContext ->
-                StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                    .transitionTo(SubflowState.STATE_1)
-                    .state(SubflowState.STATE_1);
-
-            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
-                .initial(FlowState.STATE_1)
-                .transitionTo(FlowState.STATE_2)
-                .subflow(subflow)
-                .state(FlowState.STATE_2)
-                .build();
-
-            StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "SUBFLOW.STATE_1");
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isTrue();
         }
     }

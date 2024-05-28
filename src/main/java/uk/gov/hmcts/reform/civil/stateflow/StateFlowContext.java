@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.ArrayList;
@@ -8,23 +9,23 @@ import java.util.Optional;
 
 public class StateFlowContext {
 
-    protected static final String EXTENDED_STATE_CASE_KEY = "case";
-    protected static final String EXTENDED_STATE_HISTORY_KEY = "history";
-    protected static final String EXTENDED_STATE_FLAGS_KEY = "flags";
+    public static final String EXTENDED_STATE_CASE_KEY = "case";
+    public static final String EXTENDED_STATE_HISTORY_KEY = "history";
+    public static final String EXTENDED_STATE_FLAGS_KEY = "flags";
 
     private final List<String> states = new ArrayList<>();
 
     private final List<Transition> transitions = new ArrayList<>();
 
-    Optional<String> getInitialState() {
+    public Optional<String> getInitialState() {
         return states.isEmpty() ? Optional.empty() : Optional.of(states.get(0));
     }
 
-    Optional<String> getCurrentState() {
+    public Optional<String> getCurrentState() {
         return states.isEmpty() ? Optional.empty() : Optional.of(states.get(states.size() - 1));
     }
 
-    Optional<Transition> getCurrentTransition() {
+    public Optional<Transition> getCurrentTransition() {
         return transitions.isEmpty() ? Optional.empty() : Optional.of(transitions.get(transitions.size() - 1));
     }
 

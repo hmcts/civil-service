@@ -1,10 +1,15 @@
-package uk.gov.hmcts.reform.civil.stateflow;
+package uk.gov.hmcts.reform.civil.stateflow.simplegrammar;
 
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
 import org.springframework.statemachine.config.configurers.StateConfigurer;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlowContext;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlowListener;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.Build;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateFlow;
@@ -20,9 +25,7 @@ import uk.gov.hmcts.reform.civil.stateflow.grammar.StateNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionToNext;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
-import uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -37,17 +40,21 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
  * - evaluate the current state of a Case
  * - return the internal state engine for further processing
  */
-public class StateFlowBuilder<S> {
+@Component
+public class SimpleStateFlowBuilder {
 
     private static final String FLOW_NAME = "flowName";
     private static final String STATE = "state";
     // The internal stateFlowContext object. Methods in the DSL work on this
     private final String flowName;
+
     private final StateFlowContext stateFlowContext;
 
-    private StateFlowBuilder(final String flowName) {
-        this.flowName = flowName;
+
+    public SimpleStateFlowBuilder() {
         this.stateFlowContext = new StateFlowContext();
+        this.flowName = "MAIN";
+
     }
 
     public static boolean isEmpty(String string) {
@@ -72,15 +79,15 @@ public class StateFlowBuilder<S> {
      * @param flowName name of the flow
      * @return FlowNext which specifies what can come after a FLOW clause
      */
-    public static <S> CreateFlowNext<S> flow(String flowName) {
+    public CreateFlowNext<FlowState.Main> flow(String flowName) {
         checkNull(flowName, FLOW_NAME);
         checkEmpty(flowName, FLOW_NAME);
-        StateFlowBuilder<S> stateFlowBuilder = new StateFlowBuilder<>(flowName);
+        SimpleStateFlowBuilder stateFlowBuilder = new SimpleStateFlowBuilder();
         return stateFlowBuilder.flow();
     }
 
-    private CreateFlowNext<S> flow() {
-        return new Grammar<>();
+    private CreateFlowNext<FlowState.Main> flow() {
+        return new Grammar();
     }
 
     @Override
@@ -89,33 +96,33 @@ public class StateFlowBuilder<S> {
     }
 
     // Grammar
-    protected class Grammar<S>
+    protected class Grammar
         implements
-        CreateFlowNext<S>, CreateFlow<S>,
-        InitialNext<S>, Initial<S>,
-        TransitionToNext<S>, TransitionTo<S>,
-        OnlyIfNext<S>, OnlyIf<S>,
-        SetNext<S>, Set<S>,
-        StateNext<S>, State<S>, Build<S> {
+        CreateFlowNext<FlowState.Main>, CreateFlow<FlowState.Main>,
+        InitialNext<FlowState.Main>, Initial<FlowState.Main>,
+        TransitionToNext<FlowState.Main>, TransitionTo<FlowState.Main>,
+        OnlyIfNext<FlowState.Main>, OnlyIf<FlowState.Main>,
+        SetNext<FlowState.Main>, Set<FlowState.Main>,
+        StateNext<FlowState.Main>, State<FlowState.Main>, Build<FlowState.Main> {
 
         @Override
-        public CreateFlowNext<S> createFlow() {
+        public CreateFlowNext<FlowState.Main> createFlow() {
             return this;
         }
 
         @Override
-        public InitialNext<S> initial(S state) {
+        public InitialNext<FlowState.Main> initial(FlowState.Main state) {
             return addState(state);
         }
 
-        private Grammar<S> addState(S state) {
+        private Grammar addState(FlowState.Main state) {
             checkNull(state, STATE);
             stateFlowContext.addState(fullyQualified(state));
             return this;
         }
 
         @Override
-        public TransitionToNext<S> transitionTo(S state) {
+        public TransitionToNext<FlowState.Main> transitionTo(FlowState.Main state) {
             checkNull(state, STATE);
             stateFlowContext.getCurrentState()
                 .map(currentState -> new Transition(currentState, fullyQualified(state)))
@@ -124,7 +131,7 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
-        public OnlyIfNext<S> onlyIf(Predicate<CaseData> condition) {
+        public OnlyIfNext<FlowState.Main> onlyIf(Predicate<CaseData> condition) {
             checkNull(condition, STATE);
             stateFlowContext.getCurrentTransition()
                 .ifPresent(currentTransition -> currentTransition.setCondition(condition));
@@ -132,7 +139,7 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
-        public SetNext<S> set(Consumer<Map<String, Boolean>> flags) {
+        public SetNext<FlowState.Main> set(Consumer<Map<String, Boolean>> flags) {
             checkNull(flags, STATE);
             stateFlowContext.getCurrentTransition()
                 .ifPresent(currentTransition -> currentTransition.setFlags(flags));
@@ -140,7 +147,7 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
-        public SetNext<S> set(BiConsumer<CaseData, Map<String, Boolean>> flags) {
+        public SetNext<FlowState.Main> set(BiConsumer<CaseData, Map<String, Boolean>> flags) {
             checkNull(flags, STATE);
             stateFlowContext.getCurrentTransition()
                 .ifPresent(currentTransition -> currentTransition.setDynamicFlags(flags));
@@ -148,7 +155,7 @@ public class StateFlowBuilder<S> {
         }
 
         @Override
-        public StateNext<S> state(S state) {
+        public StateNext<FlowState.Main> state(FlowState.Main state) {
             return addState(state);
         }
 
@@ -214,7 +221,7 @@ public class StateFlowBuilder<S> {
             return new StateFlow(stateMachine);
         }
 
-        private String fullyQualified(S state) {
+        private String fullyQualified(FlowState.Main state) {
             return String.format("%s.%s", flowName, state.toString());
         }
     }
