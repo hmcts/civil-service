@@ -365,7 +365,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .applicant1Represented(NO)
-                .specRespondent1Represented(NO)
+                .specRespondent1Represented(YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(
@@ -399,7 +399,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YES)
-                .specRespondent1Represented(YES)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
