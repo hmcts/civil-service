@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_BY_ADMISSION
 
 @Service
 @RequiredArgsConstructor
-public class JudgmentByAdmissionLiPDefendant1LetterHandler extends CallbackHandler {
+public class JudgmentByAdmissionPinInPostLiPDefendant1LetterHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         JUDGMENT_BY_ADMISSION_DEFENDANT1_PIN_IN_LETTER);
