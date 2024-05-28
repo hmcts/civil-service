@@ -740,7 +740,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
@@ -1019,7 +1020,7 @@ class FlowStateAllowedEventServiceTest {
 
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
-        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
+        void shouldReturnValidStatesLRspec_whenCaseEventIsGiven() {
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }

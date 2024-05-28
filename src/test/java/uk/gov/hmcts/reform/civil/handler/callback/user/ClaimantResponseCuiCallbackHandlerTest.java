@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,19 +17,25 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
@@ -52,6 +61,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -59,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI
 import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -139,6 +151,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData));
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
         }
 
         @Test
@@ -169,22 +182,40 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation() {
-            Applicant1DQ applicant1DQ =
-                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                      .responseCourtCode("court1")
-                                                                      .caseLocation(CaseLocationCivil.builder()
-                                                                                        .region(courtLocation)
-                                                                                        .baseLocation(courtLocation)
-                                                                                        .build())
-                                                                      .build()).build();
-            Respondent1DQ respondent1DQ =
-                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .responseCourtCode("court2")
-                                                                        .caseLocation(CaseLocationCivil.builder()
-                                                                                          .region(courtLocation)
-                                                                                          .baseLocation(courtLocation)
-                                                                                          .build())
-                                                                        .build()).build();
+            given(time.now()).willReturn(LocalDateTime.of(2024, 1, 1, 0, 0, 0));
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQRequestedCourt(
+                    RequestedCourt.builder()
+                        .responseCourtCode("court1")
+                        .caseLocation(
+                            CaseLocationCivil.builder()
+                                .region(courtLocation)
+                                .baseLocation(courtLocation)
+                                .build()
+                        )
+                        .build()
+
+                )
+                .applicant1DQHearing(Hearing.builder()
+                                          .hearingLength(ONE_DAY)
+                                          .unavailableDatesRequired(YES)
+                                          .unavailableDates(wrapElements(List.of(
+                                              UnavailableDate.builder()
+                                                  .date(LocalDate.of(2024, 2, 1))
+                                                  .dateAdded(LocalDate.of(2024, 1, 1))
+                                                  .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                  .build())))
+                                          .build())
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                 .responseCourtCode("court2")
+                                                 .caseLocation(CaseLocationCivil.builder()
+                                                                   .region(courtLocation)
+                                                                   .baseLocation(courtLocation)
+                                                                   .build())
+                                                 .build())
+                .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
@@ -196,9 +227,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                         MediationDecision.No).build())
                                  .build())
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response;
+
+            LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -208,10 +246,20 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            assertThat(response.getData())
+                .extracting("applicant1")
+                .hasFieldOrProperty("unavailableDates");
 
             CaseData data = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isEqualTo("court1");
             assertThat(data.getCaseNameHmctsInternal()).isEqualTo(data.getApplicant1().getPartyName() + " v " + data.getRespondent1().getPartyName());
+            assertThat(data.getApplicant1().getUnavailableDates()).isEqualTo(
+                wrapElements(List.of(UnavailableDate.builder()
+                                         .eventAdded("Claimant Intention Event")
+                                         .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                         .dateAdded(now.toLocalDate())
+                                         .date(LocalDate.of(2024, 2, 1))
+                                         .build())));
         }
 
         @Test
@@ -434,7 +482,53 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
+        
+        @Test
+        void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseDataLip(
+                            CaseDataLiP.builder()
+                                    .applicant1LiPResponse(
+                                            ClaimantLiPResponse.builder()
+                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                                                    .build())
+                                    .build())
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                    .respondent1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("CLAIMANT_NAME")
+                            .build())
+                    .build();
+            given(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).willReturn(LocalDateTime.MAX);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
+        }
 
+        @Test
+        void shouldSetSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .caseDataLip(
+                            CaseDataLiP.builder()
+                                    .applicant1LiPResponse(
+                                            ClaimantLiPResponse.builder()
+                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                    .build())
+                                    .build())
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                    .respondent1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("CLAIMANT_NAME")
+                            .build())
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
+        }
     }
 
     @Test
