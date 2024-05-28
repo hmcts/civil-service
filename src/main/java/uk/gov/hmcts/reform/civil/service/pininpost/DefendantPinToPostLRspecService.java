@@ -21,8 +21,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -46,8 +44,10 @@ public class DefendantPinToPostLRspecService {
         }
     }
 
-    public void removePinInPostData(Long caseId, DefendantPinToPostLRspec pinInPostData) {
+    public Map<String, Object> removePinInPostData(CaseDetails caseDetails) {
         try {
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
             DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
                 .citizenCaseRole(pinInPostData.getCitizenCaseRole())
                 .respondentCaseRole(pinInPostData.getRespondentCaseRole())
@@ -55,7 +55,7 @@ public class DefendantPinToPostLRspecService {
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", updatePinInPostData);
-            coreCaseDataService.triggerEvent(caseId, UPDATE_CASE_DATA, data);
+            return data;
         } catch (FeignException e) {
             log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
             throw e;
