@@ -78,7 +78,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private static final Logger LOGGER = LoggerFactory.getLogger(InitiateGeneralApplicationHandler.class);
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
