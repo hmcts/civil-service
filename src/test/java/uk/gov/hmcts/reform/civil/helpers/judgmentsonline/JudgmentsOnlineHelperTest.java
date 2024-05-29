@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getCostOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergent;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -71,7 +71,7 @@ public class JudgmentsOnlineHelperTest {
                                                  .build())
                                       .build())
             .build();
-        assertThat(isNonDivergent(caseData)).isTrue();
+        assertThat(isNonDivergentForDJ(caseData)).isTrue();
     }
 
     @Test
@@ -89,7 +89,7 @@ public class JudgmentsOnlineHelperTest {
                                                  .build())
                                       .build())
             .build();
-        assertThat(isNonDivergent(caseData)).isFalse();
+        assertThat(isNonDivergentForDJ(caseData)).isFalse();
     }
 
     @Test

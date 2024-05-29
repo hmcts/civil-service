@@ -43,7 +43,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             ? caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() : BigDecimal.ZERO;
         BigDecimal orderAmount =  caseData.getCcjPaymentDetails() != null
             ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
-        isNonDivergent = JudgmentsOnlineHelper.isNonDivergent(caseData);
+        isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);

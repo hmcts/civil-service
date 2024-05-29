@@ -72,13 +72,19 @@ public class JudgmentsOnlineHelper {
         return errors;
     }
 
-    public static boolean isNonDivergent(CaseData caseData) {
+    public static boolean isNonDivergentForDJ(CaseData caseData) {
         return  MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
             || (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
+    }
+
+    public static boolean isNonDivergentForJBA(CaseData caseData) {
+        return  MultiPartyScenario.isOneVOne(caseData)
+            || MultiPartyScenario.isTwoVOne(caseData)
+            || caseData.isLRvLipOneVOne();
     }
 
     public static BigDecimal getCostOfJudgmentForDJ(CaseData data) {
