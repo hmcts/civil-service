@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 public abstract class CaseProgressionDashboardCallbackHandler extends DashboardCallbackHandler {
 
-
     public CaseProgressionDashboardCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
