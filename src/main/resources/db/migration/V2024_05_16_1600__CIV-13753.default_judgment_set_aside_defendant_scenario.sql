@@ -46,4 +46,4 @@ VALUES ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response t
         'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{3, 3}', 'CLAIMANT', 14),
        ('<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
         '<a href={VIEW_JUDGEMENT} class="govuk-link">View the judgment</a>', 'Judgments from the court',
-        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{3,3}', 'DEFENDANT', 15);
+        'Judgment.View', 'Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant', '{1,1}', 'DEFENDANT', 15);
