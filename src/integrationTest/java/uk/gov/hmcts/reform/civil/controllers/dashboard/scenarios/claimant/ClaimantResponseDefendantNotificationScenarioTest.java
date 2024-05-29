@@ -46,12 +46,12 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                         "<p class=\"govuk-body\">Your claim is now going to mediation."
                             + " You will be contacted within 28 days with details of your appointment. "
                             + "<br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>"),
-                jsonPath("$[0].titleCy").value("Your claim is now going to mediation"),
+                jsonPath("$[0].titleCy").value("Mae eich hawliad nawr yn mynd i gyfryngu"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Your claim is now going to mediation."
-                            + " You will be contacted within 28 days with details of your appointment. "
-                            + "<br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>"));
+                        "<p class=\"govuk-body\">Mae eich hawliad nawr yn mynd i gyfryngu."
+                            + " Byddwn yn cysylltu â chi o fewn 28 diwrnod gyda manylion am eich apwyntiad. "
+                            + "<br> Os na fyddwch yn mynychu’ch apwyntiad cyfryngu, efallai y bydd y barnwr yn eich cosbi.</p>"));
     }
 
     @Test
@@ -77,16 +77,17 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                 jsonPath("$[0].titleEn").value("Mr. John Rambo rejected your response"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You've both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p>"
-                            + "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab).</a><p/>"
-                            + "<p class=\"govuk-body\">They've also sent us their hearing requirements. You can "
-                            + "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">view their hearing requirements (PDF, {VIEW_CLAIMANT_HEARING_REQS_SIZE}).</a></p>"),
+                        "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days.</p>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab)</a><p/>" +
+                            "<p class=\"govuk-body\">They've also sent us their hearing requirements. " +
+                            "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">You can view their hearing requirements here (opens in new tab)</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mr. John Rambo rejected your response"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">You've both agreed to try mediation. Your mediation appointment will be arranged within 28 days.</p>"
-                            + "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab).</a><p/>"
-                            + "<p class=\"govuk-body\">They've also sent us their hearing requirements. You can "
-                            + "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">view their hearing requirements (PDF, {VIEW_CLAIMANT_HEARING_REQS_SIZE}).</a></p>"));
+                        "<p class=\"govuk-body\">Your case will be referred for mediation. Your mediation appointment will be arranged within 28 days.</p>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Find out more about how mediation works (opens in a new tab)</a><p/>" +
+                            "<p class=\"govuk-body\">They've also sent us their hearing requirements. " +
+                            "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">You can view their hearing requirements here (opens in new tab)</a>.</p>")
+            );
     }
 }
