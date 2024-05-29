@@ -56,8 +56,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData())) {
             sendEmail(callbackParams);
         } else if (featureToggleService.isLipVLipEnabled()
-            && callbackParams.getCaseData().isApplicant1NotRepresented()
-            && !callbackParams.getCaseData().isRespondent1NotRepresented()
+            && callbackParams.getCaseData().isLipvLROneVOne()
             && isRespondentSolicitor1Notification(callbackParams)) {
             // Lip v LR scenario
             sendMailtoDefendantForLiPvLrCase(callbackParams);

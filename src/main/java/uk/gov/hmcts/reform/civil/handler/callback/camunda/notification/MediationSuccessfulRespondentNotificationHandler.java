@@ -101,8 +101,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                 );
             }
         } else if (featureToggleService.isLipVLipEnabled()
-            && caseData.isApplicant1NotRepresented()
-            && !caseData.isRespondent1NotRepresented()
+            && caseData.isLipvLROneVOne()
             && isRespondentSolicitor1Notification(callbackParams)) {
             // Lip v LR scenario
             String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, caseData.getLegacyCaseReference());
