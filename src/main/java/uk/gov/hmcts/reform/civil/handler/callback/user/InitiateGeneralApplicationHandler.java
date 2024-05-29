@@ -103,6 +103,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
+        if(!featureToggleService.isHmcEnabled()){
         if (featureToggleService.isEarlyAdoptersEnabled()
             && (Objects.isNull(caseData.getCaseManagementLocation())
                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
@@ -110,6 +111,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 )) {
             LOGGER.info("not in region");
             errors.add(NOT_IN_EA_REGION);
+        }
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
