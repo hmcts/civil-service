@@ -22,6 +22,14 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 
 public class JudgmentsOnlineHelperTest {
 
+    public static final String REPAYMENT_SUMMARY_OBJECT = "The judgment will order dsfsdf ffdg to pay £1072.00, "
+        + "including the claim fee and interest,"
+        + " if applicable, as shown:\n### Claim amount \n"
+        + " £1000.00\n ### Fixed cost amount"
+        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+        + "Subtotal \n £1172.00\n\n ### Amount"
+        + " already paid \n£100.00\n ## Total still owed \n £1072.00";
+
     @Test
     void test_getRTLStatusBasedOnJudgementStatus() {
         assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED)).isEqualTo("R");
@@ -89,13 +97,7 @@ public class JudgmentsOnlineHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
             .repaymentSummaryObject(
-                "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                    + "including the claim fee and interest,"
-                    + " if applicable, as shown:\n### Claim amount \n"
-                    + " £1000.00\n ### Fixed cost amount"
-                    + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                    + "Subtotal \n £1172.00\n\n ### Amount"
-                    + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                REPAYMENT_SUMMARY_OBJECT)
             .build();
         assertThat(getCostOfJudgmentForDJ(caseData)).isEqualTo("172.00");
     }
@@ -105,13 +107,7 @@ public class JudgmentsOnlineHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build().toBuilder()
             .repaymentSummaryObject(
-                "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                    + "including the claim fee and interest,"
-                    + " if applicable, as shown:\n### Claim amount \n"
-                    + " £1000.00\n ### Fixed cost amount"
-                    + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                    + "Subtotal \n £1172.00\n\n ### Amount"
-                    + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                REPAYMENT_SUMMARY_OBJECT)
             .partialPayment(YES)
             .partialPaymentAmount("15000")
             .build();

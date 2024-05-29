@@ -112,6 +112,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(15).toString());
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
+            assertThat(response.getData()).containsEntry("joIsLiveJudgmentExists", "No");
 
             assertThat(response.getData().get("activeJudgment")).isNull();
             assertThat(response.getData().get("historicJudgment")).isNotNull();
@@ -135,11 +136,8 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-
-            //assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo(LocalDate.now().plusDays(15));
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
             assertThat(response.getData().get("joIsLiveJudgmentExists")).isEqualTo("No");
-
             assertThat(response.getData().get("activeJudgment")).isNull();
             assertThat(response.getData().get("historicJudgment")).isNotNull();
             JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();

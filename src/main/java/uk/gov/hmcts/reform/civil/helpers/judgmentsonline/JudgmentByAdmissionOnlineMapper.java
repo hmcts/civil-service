@@ -32,6 +32,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
 
+    @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         List<Element<Party>> defendants = new ArrayList<Element<Party>>();
         defendants.add(element(caseData.getRespondent1()));
@@ -43,9 +44,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigDecimal orderAmount =  caseData.getCcjPaymentDetails() != null
             ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergent(caseData);
-        PaymentPlanSelection paymentPlan = caseData.isPayByInstallment()
-            ? PaymentPlanSelection.PAY_IN_INSTALMENTS : caseData.isPayBySetDate()
-            ? PaymentPlanSelection.PAY_BY_DATE : PaymentPlanSelection.PAY_IMMEDIATELY;
+        PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         return activeJudgment.toBuilder()
@@ -104,5 +103,15 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     private LocalDate getPaymentDeadLineDate(CaseData caseData, PaymentPlanSelection paymentPlan) {
         return PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan) && caseData.getRespondToClaimAdmitPartLRspec() != null
             ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : null;
+    }
+
+    private PaymentPlanSelection getPaymentPlan(CaseData caseData) {
+
+        if (caseData.isPayByInstallment()) {
+            return PaymentPlanSelection.PAY_IN_INSTALMENTS;
+        } else if (caseData.isPayBySetDate()) {
+            return PaymentPlanSelection.PAY_BY_DATE;
+        }
+        return PaymentPlanSelection.PAY_IMMEDIATELY;
     }
 }
