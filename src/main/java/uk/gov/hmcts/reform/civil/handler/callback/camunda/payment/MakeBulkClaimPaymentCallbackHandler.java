@@ -104,7 +104,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), exception.getMessage()
                 ));
-                caseData = updateWithDuplicatePaymentError(caseData, exception);
+                caseData = updateWithDuplicatePaymentError(caseData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -137,8 +137,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
         }
     }
 
-    @SuppressWarnings("java:S1172")
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
         var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())

@@ -63,7 +63,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
 
         notificationService.sendMail(
             isLiPClaimant ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getEmailTemplate(caseData, isLiPClaimant),
+            getEmailTemplate(isLiPClaimant),
             isLiPClaimant ? addPropertiesForLiPClaimant(caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -97,8 +97,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    @SuppressWarnings("java:S1172")
-    public String getEmailTemplate(CaseData caseData, boolean isLiPClaimant) {
+    public String getEmailTemplate(boolean isLiPClaimant) {
         String emailTemplate;
         if (isLiPClaimant) {
             emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails();

@@ -842,7 +842,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updateExpertEvidenceFields(updatedData);
             updateDisclosureOfDocumentFields(updatedData);
             populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
-            prePopulateNihlFields(callbackParams, caseData, updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+            prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
             List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
             setCheckListNihl(updatedData, localIncludeInOrderToggle);
             updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
@@ -1011,9 +1011,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    @SuppressWarnings("java:S1172")
-    private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
-                                       CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
+    private void prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
 

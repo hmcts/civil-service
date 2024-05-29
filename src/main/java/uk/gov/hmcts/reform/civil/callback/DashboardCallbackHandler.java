@@ -31,8 +31,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected abstract String getScenario(CaseData caseData);
 
-    @SuppressWarnings("java:S1172")
-    protected String getExtraScenario(CaseData caseData) {
+    protected String getExtraScenario() {
         return null;
     }
 
@@ -46,7 +45,6 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return true;
     }
 
-    @SuppressWarnings("java:S1172")
     protected boolean shouldRecordExtraScenario(CaseData caseData) {
         return false;
     }
@@ -67,7 +65,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
             );
         }
 
-        scenario = getExtraScenario(caseData);
+        scenario = getExtraScenario();
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordExtraScenario(caseData)) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),

@@ -88,8 +88,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         );
         String categoryId = "detailsOfClaim";
         assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, categoryId);
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
-                                                                                 caseDataBuilder, callbackParams);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim);
         if (caseData.getSpecClaimDetailsDocumentFiles() != null
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), categoryId);
@@ -141,9 +140,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     }
 
-    @SuppressWarnings("java:S1172")
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument,
-                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CallbackParams callbackParams) {
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
