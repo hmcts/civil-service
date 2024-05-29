@@ -129,11 +129,15 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private String getLegalOrganizationName(final CaseData caseData) {
         Optional<OrganisationPolicy> respondent1OrganisationPolicy = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy());
         if (respondent1OrganisationPolicy.isPresent()) {
-            Optional<Organisation> organisation = organisationService
-                .findOrganisationById(respondent1OrganisationPolicy.get()
-                                          .getOrganisation().getOrganisationID());
-            if (organisation.isPresent()) {
-                return organisation.get().getName();
+            OrganisationPolicy organisationPolicy = respondent1OrganisationPolicy.get();
+            Optional<uk.gov.hmcts.reform.ccd.model.Organisation> policyOrganisation = Optional.ofNullable(organisationPolicy.getOrganisation());
+            if (policyOrganisation.isPresent()) {
+                Optional<Organisation> organisation = organisationService
+                    .findOrganisationById(respondent1OrganisationPolicy.get()
+                                              .getOrganisation().getOrganisationID());
+                if (organisation.isPresent()) {
+                    return organisation.get().getName();
+                }
             }
         }
         return caseData.getRespondent1().getPartyName();
