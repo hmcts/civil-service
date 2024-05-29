@@ -81,7 +81,7 @@ public class EditJudgmentsOnlineMapperTest {
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.MODIFIED, activeJudgment.getState());
         assertEquals("1200", activeJudgment.getOrderedAmount());
-        assertEquals(null, activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getCosts());
         assertEquals("1200", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(LocalDate.of(2022, 12, 12), activeJudgment.getIssueDate());
