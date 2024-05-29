@@ -14,18 +14,18 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 
 values ('<a>View mediation settlement agreement</a>',
         'Mediation',
-        '<a>View mediation settlement agreement</a>',
-        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 5),
+        '<a>Gweld cytundeb setlo o ran cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 5),
 
        ('<a>Upload mediation documents</a>',
         'Mediation',
-        '<a>Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6),
+        '<a>Uwchlwytho dogfennau cyfryngu</a>',
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6),
 
        ('<a>View mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{1, 1}', 'CLAIMANT', 7);
+        '<a>Gweld dogfennau cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenDefendantNotContactable.CARM.Claimant', '{1, 1}', 'CLAIMANT', 7);
 
 
 /**
@@ -44,15 +44,15 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 
 values ('<a>View mediation settlement agreement</a>',
         'Mediation',
-        '<a>View mediation settlement agreement</a>',
-        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 5),
+        '<a>Gweld cytundeb setlo o ran cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 5),
 
        ('<a>Upload mediation documents</a>',
         'Mediation',
-        '<a>Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 6),
+        '<a>Uwchlwytho dogfennau cyfryngu</a>',
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{2, 2}', 'DEFENDANT', 6),
 
        ('<a>View mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{1, 1}', 'DEFENDANT', 7);
+        '<a>Gweld dogfennau cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.WhenClaimantNotContactable.CARM.Defendant', '{1, 1}', 'DEFENDANT', 7);

@@ -46,12 +46,12 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                         "<p class=\"govuk-body\">Your claim is now going to mediation."
                             + " You will be contacted within 28 days with details of your appointment. "
                             + "<br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>"),
-                jsonPath("$[0].titleCy").value("Your claim is now going to mediation"),
+                jsonPath("$[0].titleCy").value("Mae eich hawliad nawr yn mynd i gyfryngu"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Your claim is now going to mediation."
-                            + " You will be contacted within 28 days with details of your appointment. "
-                            + "<br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>"));
+                        "<p class=\"govuk-body\">Mae eich hawliad nawr yn mynd i gyfryngu."
+                            + " Byddwn yn cysylltu â chi o fewn 28 diwrnod gyda manylion am eich apwyntiad. "
+                            + "<br> Os na fyddwch yn mynychu’ch apwyntiad cyfryngu, efallai y bydd y barnwr yn eich cosbi.</p>"));
     }
 
     @Test
