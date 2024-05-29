@@ -1895,7 +1895,7 @@ public class EventHistoryMapper {
     }
 
     public String evaluateRespondent2IntentionType(CaseData caseData) {
-        if (caseData.isRespondent2NotRepresented() && caseData.getRespondent2ClaimResponseIntentionType() != null) {
+        if (caseData.getRespondent2ClaimResponseIntentionType() != null) {
             return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
         }
         //represented by same solicitor
@@ -1915,7 +1915,7 @@ public class EventHistoryMapper {
                               .responseIntention(
                                   isRespondent1
                                       ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
-                                      : caseData.getRespondent2ClaimResponseIntentionType().getLabel())
+                                      : evaluateRespondent2IntentionType(caseData))
                               .build())
             .eventDetailsText(eventDetailsText)
             .build();
