@@ -54,7 +54,7 @@ public class BundleCreationDefendantNotificationHandlerTest extends BaseCallback
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         }
 
         @Test

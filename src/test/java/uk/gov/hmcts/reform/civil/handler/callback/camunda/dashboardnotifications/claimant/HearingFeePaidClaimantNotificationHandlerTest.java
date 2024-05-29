@@ -80,7 +80,7 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()
@@ -106,7 +106,7 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()
@@ -127,7 +127,7 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
                 .applicant1Represented(YesOrNo.YES)
                 .build();
 
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()
