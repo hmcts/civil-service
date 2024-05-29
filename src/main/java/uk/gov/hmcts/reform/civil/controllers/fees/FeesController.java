@@ -11,11 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
@@ -67,17 +68,20 @@ public class FeesController {
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 
-    @GetMapping("/general-application/{applicationType}")
+    @PostMapping("/general-application")
     @Operation(summary = "Gets the general app fee associated with an application type")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+        @ApiResponse(responseCode = "401", description = "Not Authorized")
+    })
     public ResponseEntity<Fee> getGeneralApplicationFee(
-        @PathVariable("applicationType") GeneralApplicationTypes applicationType,
-        @RequestParam(name = "withConsent", required = false) Boolean withConsent,
-        @RequestParam(name = "withNotice", required = false) Boolean withNotice
+        @RequestBody GeneralApplicationFeeRequest request
     ) {
-        Fee fee = generalAppFeesService.getFeeForGA(applicationType, withConsent, withNotice);
+        Fee fee = generalAppFeesService.getFeeForGALiP(
+            request.getApplicationTypes(),
+            request.getWithConsent(),
+            request.getWithNotice()
+        );
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 }
