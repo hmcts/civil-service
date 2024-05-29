@@ -15,9 +15,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant',
         'Response to the claim',
-        'Response to the claim',
+        'Ymateb i’r hawliad',
         '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds. <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.</p>',
-        '<p class="govuk-body">You have rejected the claim. The court will contact you when ${applicant1PartyName} responds. <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">View your response</a>.</p>',
+        '<p class="govuk-body">Rydych wedi gwrthod yr hawliad. Bydd y llys yn cysylltu â chi pan fydd ${applicant1PartyName} yn ymateb. <a href="{VIEW_RESPONSE_TO_CLAIM}" class="govuk-link">Gweld eich ymateb</a>.</p>',
         'DEFENDANT');
 
 /**
@@ -48,9 +48,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant',
         'Response to the claim',
-        'Response to the claim',
+        'Ymateb i’r hawliad',
         '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineEn}. <a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim. You need to respond by ${applicant1ResponseDeadlineCy}. <a href="{VIEW_AND_RESPOND}" class="govuk-link">View and respond</a>.</p>',
+        '<p class="govuk-body">Mae ${respondent1PartyName} wedi gwrthod yr hawliad. Mae angen i chi ymateb erbyn ${applicant1ResponseDeadlineCy}. <a href="{VIEW_AND_RESPOND}" class="govuk-link">Gweld ac ymateb</a>.</p>',
         'CLAIMANT');
 
 /**

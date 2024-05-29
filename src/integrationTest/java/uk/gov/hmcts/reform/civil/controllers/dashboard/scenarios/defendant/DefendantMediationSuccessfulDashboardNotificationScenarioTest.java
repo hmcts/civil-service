@@ -56,13 +56,13 @@ public class DefendantMediationSuccessfulDashboardNotificationScenarioTest exten
                             + "This case is now settled and no further action is needed. "
                             + "You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>"),
-                jsonPath("$[0].titleCy").value("Mediation appointment successful"),
+                jsonPath("$[0].titleCy").value("Roedd eich apwyntiad cyfryngu yn llwyddiannus"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached. "
-                            + "This case is now settled and no further action is needed. "
-                            + "You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
-                            + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
+                        "<p class=\"govuk-body\">Bu i’r ddau barti fynychu cyfryngu a daethpwyd i gytundeb. "
+                            + "Mae’r achos hwn bellach wedi setlo ac nid oes angen unrhyw gamau pellach. "
+                            + "Gallwch weld eich cytundeb cyfryngu <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
+                            + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">yma</a>.</p>")
             );
 
         //Verify dashboard information

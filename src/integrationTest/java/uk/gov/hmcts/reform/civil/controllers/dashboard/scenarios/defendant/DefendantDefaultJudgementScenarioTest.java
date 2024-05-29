@@ -15,6 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegrationTest {
 
     public static final String DEFENDANT = "DEFENDANT";
+    public static final String CLAIMANT = "CLAIMANT";
+
+    @Autowired
+    private DefaultJudgementIssuedDefendantNotificationHandler defaultJudgementIssuedDefendantNotificationHandler;
 
     @Autowired
     private DefaultJudgementIssuedDefendantNotificationHandler handler;
@@ -33,6 +37,7 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
+        defaultJudgementIssuedDefendantNotificationHandler.handle(callbackParams(caseData));
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
