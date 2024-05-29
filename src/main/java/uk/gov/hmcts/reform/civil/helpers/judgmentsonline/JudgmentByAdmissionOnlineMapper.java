@@ -38,8 +38,10 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         if (caseData.isMultiPartyDefendant()) {
             defendants.add(element(caseData.getRespondent2()));
         }
-        BigDecimal costs = getValue(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount());
-        BigDecimal orderAmount = getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs);
+        BigDecimal costs = caseData.getCcjPaymentDetails() != null && caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() != null
+            ? caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() : BigDecimal.ZERO;
+        BigDecimal orderAmount =  caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergent(caseData);
         PaymentPlanSelection paymentPlan = caseData.isPayByInstallment()
             ? PaymentPlanSelection.PAY_IN_INSTALMENTS : caseData.isPayBySetDate()
@@ -100,7 +102,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private LocalDate getPaymentDeadLineDate(CaseData caseData, PaymentPlanSelection paymentPlan) {
-        return PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan)
+        return PaymentPlanSelection.PAY_BY_DATE.equals(paymentPlan) && caseData.getRespondToClaimAdmitPartLRspec() != null
             ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : null;
     }
 }

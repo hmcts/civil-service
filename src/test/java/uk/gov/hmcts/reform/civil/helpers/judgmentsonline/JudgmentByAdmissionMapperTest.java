@@ -34,7 +34,6 @@ public class JudgmentByAdmissionMapperTest {
     @InjectMocks
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
-
     @Test
     void testIfJudgmentByAdmission() {
 
@@ -113,7 +112,7 @@ public class JudgmentByAdmissionMapperTest {
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getPaymentPlan().getType(),PaymentPlanSelection.PAY_IN_INSTALMENTS);
+        assertEquals(activeJudgment.getPaymentPlan().getType(), PaymentPlanSelection.PAY_IN_INSTALMENTS);
         assertEquals("1000", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(PaymentFrequency.WEEKLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
@@ -157,8 +156,8 @@ public class JudgmentByAdmissionMapperTest {
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getPaymentPlan().getType(),PaymentPlanSelection.PAY_BY_DATE);
-        assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(),LocalDate.now().plusDays(5));
+        assertEquals(activeJudgment.getPaymentPlan().getType(), PaymentPlanSelection.PAY_BY_DATE);
+        assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(), LocalDate.now().plusDays(5));
         assertEquals(null, activeJudgment.getInstalmentDetails());
     }
 }
