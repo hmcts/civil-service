@@ -60,7 +60,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             String claimId = caseData.getLegacyCaseReference();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-            if (caseData.isLipvLipOneVOne()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented())
+                && caseData.isApplicant1NotRepresented()
+                && featureToggleService.isLipVLipEnabled()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getNotifyLipSuccessfulMediation(),
