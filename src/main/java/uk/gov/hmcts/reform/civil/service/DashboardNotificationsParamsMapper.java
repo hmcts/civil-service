@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -56,6 +59,11 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
             params.put("applicant1ResponseDeadlineCy",
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+        }
+
+        if (featureToggleService.isJudgmentOnlineLive() && nonNull(caseData.getJoPaymentPlan())) {
+            params.put("defendantAdmittedAmount", this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
+            params.put("paymentAgreement", getPaymentAgreementMessage(caseData));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -216,6 +224,39 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return params;
+    }
+
+    private StringBuilder getPaymentAgreementMessage(CaseData caseData) {
+        PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
+        StringBuilder paymentAgreementMessage = new StringBuilder();
+
+        if (paymentPlanType == PaymentPlanSelection.PAY_IN_INSTALMENTS) {
+            JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
+            String frequency;
+
+            if (instalmentDetails.getPaymentFrequency() == PaymentFrequency.MONTHLY) {
+                frequency = "monthly";
+            } else if (instalmentDetails.getPaymentFrequency() == PaymentFrequency.EVERY_TWO_WEEKS) {
+                frequency = "biweekly";
+            } else {
+                frequency = "weekly";
+            }
+            paymentAgreementMessage
+                .append(" in ")
+                .append(frequency)
+                .append(" instalments of £")
+                .append(instalmentDetails.getAmount())
+                .append(". The first payment is due on ")
+                .append(instalmentDetails.getStartDate());
+        } else if (paymentPlanType == PaymentPlanSelection.PAY_BY_DATE) {
+            // TODO: ask for final message
+            paymentAgreementMessage.append(" placeholder for set by date ")
+                .append(caseData.getJoPaymentPlan().getPaymentDeadlineDate());
+        } else {
+            // TODO: ask for final message
+            paymentAgreementMessage.append(" immediately");
+        }
+        return paymentAgreementMessage;
     }
 
     private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
