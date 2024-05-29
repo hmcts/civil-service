@@ -429,7 +429,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             caseDataBuilder.activeJudgment(djOnlineMapper.addUpdateActiveJudgment(caseData));
             caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
-
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
