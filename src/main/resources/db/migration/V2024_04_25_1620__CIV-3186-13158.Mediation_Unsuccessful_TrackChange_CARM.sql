@@ -13,9 +13,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant',
         'You are no longer required to submit documents relating to mediation non-attendance',
-        'You are no longer required to submit documents relating to mediation non-attendance',
+        'Nid yw''n ofynnol bellach i chi gyflwyno dogfennau sy''n ymwneud â pheidio â mynychu cyfryngu',
         '<p class="govuk-body">A judge has reviewed your case and you are no longer required to submit documents relating to non-attendance of a mediation appointment. There will be no penalties issued for your non-attendance.</p>',
-        '<p class="govuk-body">A judge has reviewed your case and you are no longer required to submit documents relating to non-attendance of a mediation appointment. There will be no penalties issued for your non-attendance.</p>',
+        '<p class="govuk-body">Mae barnwr wedi adolygu eich achos ac nid yw''n ofynnol i chi gyflwyno dogfennau bellach yn ymwneud â pheidio â mynychu apwyntiad cyfryngu. Ni fydd unrhyw gosbau yn cael eu gosod am eich diffyg presenoldeb.</p>',
         'CLAIMANT');
 
 /**
@@ -43,9 +43,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant',
         'You are no longer required to submit documents relating to mediation non-attendance',
-        'You are no longer required to submit documents relating to mediation non-attendance',
+        'Nid yw''n ofynnol bellach i chi gyflwyno dogfennau sy''n ymwneud â pheidio â mynychu cyfryngu',
         '<p class="govuk-body">A judge has reviewed your case and you are no longer required to submit documents relating to non-attendance of a mediation appointment. There will be no penalties issued for your non-attendance.</p>',
-        '<p class="govuk-body">A judge has reviewed your case and you are no longer required to submit documents relating to non-attendance of a mediation appointment. There will be no penalties issued for your non-attendance.</p>',
+        '<p class="govuk-body">Mae barnwr wedi adolygu eich achos ac nid yw''n ofynnol i chi gyflwyno dogfennau bellach yn ymwneud â pheidio â mynychu apwyntiad cyfryngu. Ni fydd unrhyw gosbau yn cael eu gosod am eich diffyg presenoldeb.</p>',
         'DEFENDANT');
 
 /**
