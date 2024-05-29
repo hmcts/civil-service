@@ -419,7 +419,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergent(caseData)) {
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
@@ -429,7 +429,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             caseDataBuilder.activeJudgment(djOnlineMapper.addUpdateActiveJudgment(caseData));
             caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
-
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

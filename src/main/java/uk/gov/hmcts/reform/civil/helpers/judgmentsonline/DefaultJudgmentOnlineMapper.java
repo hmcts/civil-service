@@ -44,7 +44,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         }
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
         BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
-        isNonDivergent =  JudgmentsOnlineHelper.isNonDivergent(caseData);
+        isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
