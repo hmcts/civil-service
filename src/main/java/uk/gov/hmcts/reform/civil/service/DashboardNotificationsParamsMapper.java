@@ -49,8 +49,10 @@ public class DashboardNotificationsParamsMapper {
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
         if (featureToggleService.isGeneralApplicationsEnabled()) {
+            params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
             params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
         } else {
+            params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
         }
 

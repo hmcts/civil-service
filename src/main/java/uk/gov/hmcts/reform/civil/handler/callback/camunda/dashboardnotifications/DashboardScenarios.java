@@ -152,7 +152,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Defendant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CARM("Scenario.AAA6.MediationUploadDocuments.CARM.Claimant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"),
-    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant");
+    SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant"),
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant");
 
     private final String scenario;
 
