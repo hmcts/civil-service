@@ -109,9 +109,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                  || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
                                                                                   .getBaseLocation()))
                 )) {
-            LOGGER.info("not in region");
-            errors.add(NOT_IN_EA_REGION);
-        }
+               LOGGER.info("not in region");
+               errors.add(NOT_IN_EA_REGION);
+           }
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
