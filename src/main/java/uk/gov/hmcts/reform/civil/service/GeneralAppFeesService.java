@@ -58,8 +58,8 @@ public class GeneralAppFeesService {
             = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
-                              Boolean withNotice) {
-        return getFeeForGA(applicationTypes, withConsent, withNotice, null);
+                              Boolean withNotice, LocalDate hearingDate) {
+        return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
     }
 
     public Fee getFeeForGA(CaseData caseData) {

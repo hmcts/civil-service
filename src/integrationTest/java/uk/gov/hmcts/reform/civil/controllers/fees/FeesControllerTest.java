@@ -62,7 +62,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnGeneralApplicationFee() {
         Fee response = buildFeeResponse();
-        when(gaFeesService.getFeeForGALiP(List.of(GeneralApplicationTypes.EXTEND_TIME), true, false)).thenReturn(
+        when(gaFeesService.getFeeForGALiP(List.of(GeneralApplicationTypes.EXTEND_TIME), true, false, null)).thenReturn(
             response);
         GeneralApplicationFeeRequest feeRequest =
             GeneralApplicationFeeRequest.builder().applicationTypes((List.of(GeneralApplicationTypes.EXTEND_TIME)))

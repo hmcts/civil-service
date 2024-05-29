@@ -80,7 +80,8 @@ public class FeesController {
         Fee fee = generalAppFeesService.getFeeForGALiP(
             request.getApplicationTypes(),
             request.getWithConsent(),
-            request.getWithNotice()
+            request.getWithNotice(),
+            request.getHearingDate()
         );
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
