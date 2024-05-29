@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-public class JudgmentByAdmissionMapperTest {
+class JudgmentByAdmissionMapperTest {
 
     @InjectMocks
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
@@ -112,7 +112,7 @@ public class JudgmentByAdmissionMapperTest {
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getPaymentPlan().getType(), PaymentPlanSelection.PAY_IN_INSTALMENTS);
+        assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
         assertEquals("1000", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(PaymentFrequency.WEEKLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
@@ -156,7 +156,7 @@ public class JudgmentByAdmissionMapperTest {
         assertEquals(JudgmentType.JUDGMENT_BY_ADMISSION, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getPaymentPlan().getType(), PaymentPlanSelection.PAY_BY_DATE);
+        assertEquals(PaymentPlanSelection.PAY_BY_DATE, activeJudgment.getPaymentPlan().getType());
         assertEquals(activeJudgment.getPaymentPlan().getPaymentDeadlineDate(), LocalDate.now().plusDays(5));
         assertEquals(null, activeJudgment.getInstalmentDetails());
     }

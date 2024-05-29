@@ -469,6 +469,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
                 if (featureToggleService.isJudgmentOnlineLive()) {
                     builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData));
+                    builder.joIsLiveJudgmentExists(YesOrNo.YES);
                 }
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();

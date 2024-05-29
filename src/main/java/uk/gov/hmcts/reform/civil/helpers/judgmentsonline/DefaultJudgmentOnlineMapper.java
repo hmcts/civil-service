@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,8 +35,9 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     boolean isNonDivergent =  false;
     private final InterestCalculator interestCalculator;
 
+    @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-        List<Element<Party>> defendants = new ArrayList<Element<Party>>();
+        List<Element<Party>> defendants = new ArrayList<>();
         defendants.add(element(caseData.getRespondent1()));
         if (caseData.isMultiPartyDefendant()) {
             defendants.add(element(caseData.getRespondent2()));
@@ -50,7 +50,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .createdTimestamp(LocalDateTime.now())
             .state(getJudgmentState(caseData))
             .type(JudgmentType.DEFAULT_JUDGMENT)
-            .instalmentDetails(PaymentType.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
+            .instalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                    ? getInstalmentDetails(caseData) : null)
             .paymentPlan(getPaymentPlan(caseData))
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
@@ -67,11 +67,10 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {
-        JudgmentInstalmentDetails instalmentDetails = JudgmentInstalmentDetails.builder()
+        return JudgmentInstalmentDetails.builder()
             .amount(caseData.getRepaymentSuggestion())
             .startDate(caseData.getRepaymentDate())
             .paymentFrequency(getPaymentFrequency(caseData.getRepaymentFrequency())).build();
-        return instalmentDetails;
     }
 
     private PaymentFrequency getPaymentFrequency(RepaymentFrequencyDJ freqDJ) {
@@ -108,6 +107,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private LocalDate getPaymentDeadLineDate(CaseData caseData) {
-        return PaymentPlanSelection.PAY_BY_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
+        return DJPaymentTypeSelection.SET_DATE.equals(caseData.getPaymentTypeSelection()) ? caseData.getPaymentSetDate() : null;
     }
 }
