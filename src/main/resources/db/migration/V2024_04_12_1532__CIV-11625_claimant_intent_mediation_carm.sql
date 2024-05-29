@@ -20,9 +20,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant',
         'Your claim is now going to mediation',
-        'Your claim is now going to mediation',
+        'Mae eich hawliad nawr yn mynd i gyfryngu',
         '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. <br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
-        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. <br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
+        '<p class="govuk-body">Mae eich hawliad nawr yn mynd i gyfryngu. Byddwn yn cysylltu â chi o fewn 28 diwrnod gyda manylion am eich apwyntiad. <br> Os na fyddwch yn mynychu’ch apwyntiad cyfryngu, efallai y bydd y barnwr yn eich cosbi.</p>',
         'CLAIMANT');
 
 /**
@@ -46,7 +46,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant',
         'Your claim is now going to mediation',
-        'Your claim is now going to mediation',
+        'Mae eich hawliad nawr yn mynd i gyfryngu',
         '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. <br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
-        '<p class="govuk-body">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. <br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>',
+        '<p class="govuk-body">Mae eich hawliad nawr yn mynd i gyfryngu. Byddwn yn cysylltu â chi o fewn 28 diwrnod gyda manylion am eich apwyntiad. <br> Os na fyddwch yn mynychu’ch apwyntiad cyfryngu, efallai y bydd y barnwr yn eich cosbi.</p>',
         'DEFENDANT');
