@@ -64,7 +64,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
-            + "respondent solicitor are assigned to the case.";
+        + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
     private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
@@ -106,12 +106,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (!featureToggleService.isHmcEnabled()) {
             if (featureToggleService.isEarlyAdoptersEnabled()
                 && (Objects.isNull(caseData.getCaseManagementLocation())
-                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))
+                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+                                                                                      .getBaseLocation()))
                 )) {
-               LOGGER.info("not in region");
-               errors.add(NOT_IN_EA_REGION);
-           }
+                LOGGER.info("not in region");
+                errors.add(NOT_IN_EA_REGION);
+            }
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
@@ -132,16 +132,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             }
         }
         caseDataBuilder
-                .generalAppHearingDetails(
-                    GAHearingDetails
-                        .builder()
-                        .hearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                               .getCourtLocationsForGeneralApplication(authToken)))
-                        .build());
+            .generalAppHearingDetails(
+                GAHearingDetails
+                    .builder()
+                    .hearingPreferredLocation(getLocationsFromList(locationRefDataService
+                                                                       .getCourtLocationsForGeneralApplication(authToken)))
+                    .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            .errors(errors)
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
@@ -156,17 +156,17 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
-                                && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
+            && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
         if (generalAppTypes.size() == 1
-                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
-                && !consent) {
+            && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
+            && !consent) {
             errors.add(INVALID_SETTLE_BY_CONSENT);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .errors(errors)
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
@@ -178,25 +178,26 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
-            errors.add("It is not possible to select an additional application type when applying to vary payment terms of judgment");
+            errors.add(
+                "It is not possible to select an additional application type when applying to vary payment terms of judgment");
         }
         if (generalAppTypes.size() > 1
-                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
+            && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
             errors.add("It is not possible to select an additional application type " +
-                    "when applying to Settle by consent");
+                           "when applying to Settle by consent");
         }
 
         if (generalAppTypes.size() == 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES)
-                    .generalAppInformOtherParty(
-                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
+                .generalAppInformOtherParty(
+                    GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
         String token = callbackParams.getParams().get(BEARER_TOKEN).toString();
         boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
-                .isGAApplicantSameAsParentCaseClaimant(caseData, token);
+            .isGAApplicantSameAsParentCaseClaimant(caseData, token);
         caseDataBuilder
             .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
 
@@ -251,13 +252,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         Fee feeForGA = feesService.getFeeForGA(caseData);
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
-                .fee(feeForGA)
-                .build());
+                                                 .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
+                                                 .fee(feeForGA)
+                                                 .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
@@ -325,11 +326,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CaseData setWithNoticeByType(CaseData caseData) {
         if (Objects.nonNull(caseData.getGeneralAppType())
-                && caseData.getGeneralAppType().getTypes().size() == 1
-                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+            && caseData.getGeneralAppType().getTypes().size() == 1
+            && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseData = caseData.toBuilder()
-                    .generalAppInformOtherParty(
-                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
+                .generalAppInformOtherParty(
+                    GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
     }
