@@ -11,13 +11,25 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
+import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
+import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
+import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
+import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -36,13 +48,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
-import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
-import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
-import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -278,6 +283,7 @@ class DirectionsQuestionnaireGeneratorTest {
             ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("FAST_CLAIM")
                 .atStateRespondentFullDefence()
                 .respondent1DQWithFixedRecoverableCosts()
                 .build().toBuilder()
@@ -310,6 +316,7 @@ class DirectionsQuestionnaireGeneratorTest {
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("FAST_CLAIM")
                 .atStateClaimantFullDefence()
                 .applicant1DQWithExperts()
                 .applicant1DQWithWitnesses()
@@ -348,6 +355,7 @@ class DirectionsQuestionnaireGeneratorTest {
             ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("FAST_CLAIM")
                 .atStateRespondentFullDefence()
                 .respondent1DQWithFixedRecoverableCosts()
                 .build().toBuilder()
@@ -380,6 +388,7 @@ class DirectionsQuestionnaireGeneratorTest {
             ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("FAST_CLAIM")
                 .atStateApplicantRespondToDefenceAndProceed()
                 .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
                 .build().toBuilder()
@@ -465,6 +474,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("FAST_CLAIM")
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -509,6 +519,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .applicant1ProceedWithClaimSpec2v1(YES)
                     .addApplicant2(YES)
+                    .responseClaimTrack("FAST_CLAIM")
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -556,6 +567,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
+                    .responseClaimTrack("FAST_CLAIM")
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -597,6 +609,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1ProceedWithClaim(YES)
                     .caseAccessCategory(SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(NO)
+                    .responseClaimTrack("FAST_CLAIM")
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -1043,6 +1056,78 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(!caseData.isRespondent1NotRepresented()).isFalse();
+            }
+
+            @Test
+            void when1V1SpecIntermediate_includeIntermediateFrcDetails() {
+                FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .frcSupportingDocument(Document.builder().build())
+                    .complexityBandingAgreed(YES)
+                    .band(ComplexityBand.BAND_1)
+                    .reasons("Reasoning")
+                    .build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("INTERMEDIATE_CLAIM")
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFixedRecoverableCosts(null)
+                                       .respondent1DQFixedRecoverableCostsIntermediate(frcIntermediate)
+                                       .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                                                         .reachedAgreement(NO)
+                                                                                         .agreementLikely(NO)
+                                                                                         .reasonForNoAgreement("some reasons")
+                                                                                         .build())
+                                       .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                                            .bespokeDirections("non electric stuff")
+                                                                                            .build())
+                                       .build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+                FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+                assertThat(data.getIsSubjectToFixedRecoverableCostRegime()).isEqualTo(YES);
+                assertThat(data.getComplexityBandingAgreed()).isEqualTo(YES);
+                assertThat(data.getBand()).isEqualTo(ComplexityBand.BAND_1);
+                assertThat(data.getBandText()).isEqualTo(ComplexityBand.BAND_1.getLabel());
+                assertThat(data.getReasons()).isEqualTo("Reasoning");
+            }
+
+            @Test
+            void when1V1SpecMulti_DoNotIncludeIntermediateFrcDetails() {
+                FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .frcSupportingDocument(Document.builder().build())
+                    .complexityBandingAgreed(YES)
+                    .band(ComplexityBand.BAND_1)
+                    .reasons("Reasoning")
+                    .build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("MULTI_CLAIM")
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFixedRecoverableCosts(null)
+                                       .respondent1DQFixedRecoverableCostsIntermediate(null)
+                                       .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                                                         .reachedAgreement(NO)
+                                                                                         .agreementLikely(NO)
+                                                                                         .reasonForNoAgreement("some reasons")
+                                                                                         .build())
+                                       .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                                            .bespokeDirections("non electric stuff")
+                                                                                            .build())
+                                       .build())
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+                FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+                assertThat(data).isNull();
             }
 
             private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
