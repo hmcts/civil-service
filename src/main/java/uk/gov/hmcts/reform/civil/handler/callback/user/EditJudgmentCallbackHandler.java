@@ -53,11 +53,6 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
     private CallbackResponse populateFromActiveJudgment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        if (activeJudgment.getIsRegisterWithRTL() == YesOrNo.NO) {
-            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-        } else {
-            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
-        }
         if (JudgmentType.DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
             || JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())) {
             // populate data from Default Judgment Or JBA
@@ -67,9 +62,16 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoJudgmentRecordReason(null);
             caseData.setJoAmountOrdered(activeJudgment.getOrderedAmount());
             caseData.setJoAmountCostOrdered(activeJudgment.getCosts());
-            caseData.setJoIsRegisteredWithRTL(activeJudgment.getIsRegisterWithRTL());
             caseData.setJoIssuedDate(activeJudgment.getIssueDate());
+            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+        } else {
+            if (activeJudgment.getIsRegisterWithRTL() == YesOrNo.NO) {
+                caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
+            } else {
+                caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+            }
         }
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
