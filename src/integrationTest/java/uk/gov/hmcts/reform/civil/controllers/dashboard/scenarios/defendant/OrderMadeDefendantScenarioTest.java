@@ -101,10 +101,10 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">A judge has reviewed your case and you are no "
                                                          + "longer required to submit documents relating to non-attendance of a mediation appointment. "
                                                          + "There will be no penalties issued for your non-attendance.</p>"),
-                jsonPath("$[0].titleCy").value("You are no longer required to submit documents relating to mediation non-attendance"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">A judge has reviewed your case and you are no "
-                                                         + "longer required to submit documents relating to non-attendance of a mediation appointment. "
-                                                         + "There will be no penalties issued for your non-attendance.</p>"));
+                jsonPath("$[0].titleCy").value("Nid yw'n ofynnol bellach i chi gyflwyno dogfennau sy'n ymwneud â pheidio â mynychu cyfryngu"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae barnwr wedi adolygu " +
+                                                         "eich achos ac nid yw'n ofynnol i chi gyflwyno dogfennau bellach yn " +
+                                                         "ymwneud â pheidio â mynychu apwyntiad cyfryngu. Ni fydd unrhyw gosbau yn cael eu gosod am eich diffyg presenoldeb.</p>"));
     }
 
     private static CallbackParams callbackParamsTest(CaseData caseData) {
