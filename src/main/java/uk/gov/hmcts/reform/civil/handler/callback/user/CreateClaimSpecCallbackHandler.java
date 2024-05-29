@@ -54,7 +54,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -188,7 +187,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final LocationRefDataService locationRefDataService;
-    private static final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
 
@@ -423,8 +422,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        StateFlow evaluation = stateFlowEngine.evaluate(caseData);
-
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
@@ -645,7 +642,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
-    final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
+    static final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
@@ -670,7 +667,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
-                             caseDocLocation,
+                             CASE_DOC_LOCATION,
                              caseData.getCcdCaseReference()
                          ),
                          claimUrlsConfiguration.getResponsePackLink(),
@@ -679,7 +676,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 + exitSurveyContentService.applicantSurvey();
     }
 
-    final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
+    static final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
 
     private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
@@ -690,7 +687,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         } else {
             return format(
                 CONFIRMATION_SUMMARY,
-                format(caseDocLocation, caseData.getCcdCaseReference())
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
             );
         }
     }
@@ -885,7 +882,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 : toggleService.isPbaV3Enabled() ? format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
                 format(caseDetailsUrl, caseData.getCcdCaseReference()),
-                format(caseDocLocation, caseData.getCcdCaseReference()),
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
                 claimUrlsConfiguration.getN9bLink(),
@@ -893,7 +890,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 formattedServiceDeadline
             ) : format(
                 SPEC_LIP_CONFIRMATION_BODY,
-                format(caseDocLocation, caseData.getCcdCaseReference()),
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
                 claimUrlsConfiguration.getN9bLink(),
@@ -911,7 +908,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         } else {
             return format(
                 SPEC_CONFIRMATION_SUMMARY,
-                format(caseDocLocation, caseData.getCcdCaseReference())
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
             );
         }
     }

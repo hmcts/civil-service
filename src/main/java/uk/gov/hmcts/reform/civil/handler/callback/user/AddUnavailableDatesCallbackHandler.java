@@ -57,9 +57,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
-    final String claimant = "Claimant";
-    final String defendant = "Defendant";
-    final String invalidParticipants = "Invalid participants";
+    static final String claimant = "Claimant";
+    static final String defendant = "Defendant";
+    static final String invalidParticipants = "Invalid participants";
 
     @Override
     public List<CaseEvent> handledEvents() {

@@ -221,9 +221,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
     private final  List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-    final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
-    final String laterThanFourPmString = "later than 4pm on";
-    final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
+    static final String laterThanFourPmString = "later than 4pm on";
+    static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -524,6 +524,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "to the pages in that bundle.")
             .build();
 
+        String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
         if (featureToggleService.isSdoR2Enabled()) {
             List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
@@ -535,8 +536,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                             + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                             + "save with permission of the Trial Judge.")
-                .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                            + laterThanFourPmString)
+                .input4(partiesLiaseString + laterThanFourPmString)
                 .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
                 .build();
 
@@ -587,8 +587,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + laterThanFourPmString)
+            .input4(partiesLiaseString + laterThanFourPmString)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
@@ -786,8 +785,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + laterThanFourPmString)
+            .input4(partiesLiaseString + laterThanFourPmString)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "

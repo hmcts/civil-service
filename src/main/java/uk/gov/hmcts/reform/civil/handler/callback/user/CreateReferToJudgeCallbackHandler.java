@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -65,10 +64,6 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
 
-        Supplier<Party.Type> getDefendantType = leadDefendantIs1
-            ? caseData.getRespondent1()::getType
-            : caseData.getRespondent2()::getType;
-
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
                 .filter(this::hasInfo)
@@ -92,13 +87,6 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
             || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
             .map(DynamicList::getValue).isPresent();
-    }
-
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
