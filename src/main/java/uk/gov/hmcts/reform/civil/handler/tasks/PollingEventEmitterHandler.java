@@ -41,16 +41,14 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
             .map(caseDetailsConverter::toCaseData)
             .limit((50 * 60) / multiCasesExecutionDelayInSeconds) // 50 min is the max allowed time to avoid conflicting with next poller execution
             .forEach(mappedCase -> {
-                         log.info(format(
-                             "Emitting %s camunda event for case through poller: %d",
-                             mappedCase.getBusinessProcess().getCamundaEvent(),
-                             mappedCase.getCcdCaseReference()
-                         ));
-                         eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
-                         delayNextExecution(multiCasesExecutionDelayInSeconds);
-                     }
-            );
-
+                log.info(format(
+                    "Emitting %s camunda event for case through poller: %d",
+                    mappedCase.getBusinessProcess().getCamundaEvent(),
+                    mappedCase.getCcdCaseReference()
+                ));
+                eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
+                delayNextExecution(multiCasesExecutionDelayInSeconds);
+            });
     }
 
     private void delayNextExecution(Long multiCasesExecutionDelayInSeconds) {
