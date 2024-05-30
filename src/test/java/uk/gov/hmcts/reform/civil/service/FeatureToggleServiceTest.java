@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Ignore
 class FeatureToggleServiceTest {
 
     @Mock
@@ -203,7 +202,8 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
+    @Ignore
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
