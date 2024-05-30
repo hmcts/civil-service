@@ -54,12 +54,10 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mediation was unsuccessful"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements.</a></p>"),
-                jsonPath("$[0].titleCy").value("Mediation was unsuccessful"),
+                    "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Nid oedd y cyfryngu yn llwyddiannus"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You weren\'t able to resolve John Doe\'s claim against you using mediation. The court will review the case. We\'ll contact you to tell you what to do next. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">View John Doe\'s hearing requirements.</a></p>")
-            );
-
+                    "<p class=\"govuk-body\">Nid oeddech yn gallu datrys hawliad John Doe yn eich erbyn drwy gyfryngu. Bydd y llys yn adolygu’r achos. Mi wnawn gysylltu â chi i ddweud wrthych beth i’w wneud nesaf. <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">Gweld gofynion ar gyfer y gwrandawiad John Doe</a>.</p>"));
     }
 
     @Test
