@@ -347,10 +347,10 @@ public class DashboardNotificationsParamsMapper {
 
     private static StringBuilder getPaymentFrecuencyMessage(CaseData caseData) {
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
-        StringBuilder paymentFrecuencyMessage = new StringBuilder();
-        if (paymentPlanType.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
+        StringBuilder paymentFrequencyMessage = new StringBuilder();
+        if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
             JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
-            paymentFrecuencyMessage.append(" You must pay the claim amount of £ ")
+            paymentFrequencyMessage.append(" You must pay the claim amount of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())))).toString())
                 .append(" in ")
                 .append(getStringPaymentFrecuency(instalmentDetails))
@@ -359,7 +359,7 @@ public class DashboardNotificationsParamsMapper {
                 .append(" The first payment is due on ")
                 .append(instalmentDetails.getStartDate());
         }
-        return paymentFrecuencyMessage;
+        return paymentFrequencyMessage;
     }
 
     private static String getStringPaymentFrecuency(JudgmentInstalmentDetails judgmentInstalmentDetails) {
