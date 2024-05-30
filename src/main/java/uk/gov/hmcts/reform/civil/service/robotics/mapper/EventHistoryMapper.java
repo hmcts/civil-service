@@ -821,16 +821,18 @@ public class EventHistoryMapper {
                          .dateReceived(caseNote.getCreatedOn())
                          .eventDetailsText(left((format(
                              "case note added: %s",
-                             caseNote.getNote().replaceAll("\\s+", " ")
+                             caseNote.getNote() != null
+                                 ? caseNote.getNote().replaceAll("\\s+", " ") : ""
                          )), 250))
                          .eventDetails(EventDetails.builder()
                                            .miscText(left((format(
                                                "case note added: %s",
-                                               caseNote.getNote().replaceAll("\\s+", " ")
+                                               caseNote.getNote() != null
+                                                   ? caseNote.getNote().replaceAll("\\s+", " ") : ""
                                            )), 250))
                                            .build())
                          .build())
-            .collect(Collectors.toList());
+            .toList();
         builder.miscellaneous(events);
     }
 
