@@ -158,7 +158,6 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("£100");
     }
 
-
     @Test
     public void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans() {
 
