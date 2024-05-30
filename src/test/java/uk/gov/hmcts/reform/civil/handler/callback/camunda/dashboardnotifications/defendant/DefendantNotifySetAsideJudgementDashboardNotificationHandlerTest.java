@@ -9,30 +9,32 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.UploadHearingDocumentsClaimantHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest {
+public class DefendantNotifySetAsideJudgementDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private UploadHearingDocumentsClaimantHandler handler;
+    private DefendantNotifySetAsideJudgementDashboardNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -43,13 +45,14 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
     @Mock
     private FeatureToggleService featureToggleService;
 
-    public static final String TASK_ID = "CreateUploadHearingDocumentNotificationForClaimant";
+    public static final String TASK_ID = "GenerateDashboardNotificationSetAsideDefendant";
 
     HashMap<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT);
+        assertThat(handler.handledEvents()).contains(
+            CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT);
     }
 
     @Test
@@ -57,27 +60,25 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_SET_ASIDE_JUDGMENT_DEFENDANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiPAndSetAsideError() {
+        params.put("ccdCaseReference", "123");
 
-        params.put("ccdCaseReference", "1239988");
-
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -87,10 +88,32 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         handler.handle(callbackParams);
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
     }
 
+    @Test
+    public void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiP() {
+        params.put("ccdCaseReference", "123");
+
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verifyNoInteractions(dashboardApiClient);
+    }
 }
