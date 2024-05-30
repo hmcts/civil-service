@@ -7062,6 +7062,70 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled"
             );
         }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenCaseNoteAddedButCaseNoteSavedBecauseOfSystemGlitch() {
+            var noteCreatedAt = LocalDateTime.now().plusDays(3);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v1()
+                .caseNotes(CaseNote.builder()
+                               .createdOn(noteCreatedAt)
+                               .createdBy("createdBy")
+                               .build())
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getClaimNotificationDate())
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event caseNoteEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(noteCreatedAt)
+                .eventDetailsText("case note added: ")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("case note added: ")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, caseNoteEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
     }
 
     @Nested

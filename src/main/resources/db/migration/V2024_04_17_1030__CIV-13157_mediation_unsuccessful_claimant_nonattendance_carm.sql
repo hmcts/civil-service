@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant"}',
         '{"Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant":[]}');
 
 /**
@@ -44,7 +44,7 @@ values ('<a>View mediation settlement agreement</a>',
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"}',
         '{"Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant":[]}');
 
 /**
