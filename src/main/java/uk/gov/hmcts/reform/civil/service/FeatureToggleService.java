@@ -99,7 +99,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return true; //TODO: Revert this
+        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
     public boolean isMintiEnabled() {

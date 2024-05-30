@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_ADMIS
 
 @Service
 @RequiredArgsConstructor
-//TODO: To delete this class once Bhagyasree changes are checked-in -- Santoshini
 public class GenerateJudgmentByAdmissionDocHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(

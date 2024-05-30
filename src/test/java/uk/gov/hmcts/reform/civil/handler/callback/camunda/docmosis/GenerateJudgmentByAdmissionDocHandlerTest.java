@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_ADMIS
     GenerateJudgmentByAdmissionDocHandler.class,
     JacksonAutoConfiguration.class
 })
-//TODO: To delete this class once Bhagyasree changes are checked-in -- Santoshini
 public class GenerateJudgmentByAdmissionDocHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
