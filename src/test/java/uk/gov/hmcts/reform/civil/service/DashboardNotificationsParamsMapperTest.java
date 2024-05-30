@@ -9,10 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -24,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.*;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -160,6 +158,35 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("£100");
     }
 
+
+    @Test
+    public void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans() {
+
+        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
+
+        caseData = caseData.toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                     .startDate(LocalDate.of(2022, 12, 12))
+                                     .amount("120")
+                                     .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES)
+            .build();;
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("paymentFrecuencyMessage").isEqualTo(" You must pay the claim amount of £ 23.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12");
+    }
+
     @Test
     public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
 
@@ -169,7 +196,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo(" You must pay the claim amount of £ 23.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12");
     }
 
     @Test

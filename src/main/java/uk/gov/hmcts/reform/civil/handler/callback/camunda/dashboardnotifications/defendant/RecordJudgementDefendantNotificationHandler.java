@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -13,13 +14,14 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_RECORD_JUDGMENT_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_RECORD_JUDGEMENT_DETERMINATION_ISSUED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENT_ONLINE_RECORD_JUDGEMENT_DETERMINATION_ISSUED_DEFENDANT;
 
 @Service
 public class RecordJudgementDefendantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_RECORD_JUDGMENT_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationRecordJudgmentDefendant";
+
 
     public RecordJudgementDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                        DashboardNotificationsParamsMapper mapper,
@@ -39,7 +41,7 @@ public class RecordJudgementDefendantNotificationHandler extends DashboardJudgem
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_JUDGEMENTS_ONLINE_RECORD_JUDGEMENT_DETERMINATION_ISSUED_DEFENDANT.getScenario();
+        return SCENARIO_AAA6_JUDGEMENT_ONLINE_RECORD_JUDGEMENT_DETERMINATION_ISSUED_DEFENDANT.getScenario();
     }
 
     @Override
