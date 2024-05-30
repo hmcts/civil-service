@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
-import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -26,16 +30,52 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        setupTimeToLive();
+        Long multiCasesExecutionDelayInSeconds =
+            externalTask.getVariable("multiCasesExecutionDelayInSeconds");
+        Set<CaseDetails> cases = Set.copyOf(caseSearchService.getCases());
+        log.info("Job '{}' found {} case(s) with IDs {}", externalTask.getTopicName(), cases.size(),
+                 cases.stream().map(caseDetails -> caseDetails.getId().toString())
+                     .collect(Collectors.joining(","))
+        );
+
         cases.stream()
             .map(caseDetailsConverter::toCaseData)
             .forEach(mappedCase -> {
-                log.info(format("Emitting %s camunda event for case through poller: %d",
-                                mappedCase.getBusinessProcess().getCamundaEvent(),
-                                mappedCase.getCcdCaseReference()));
+                log.info(format(
+                    "Emitting %s camunda event for case through poller: %d",
+                    mappedCase.getBusinessProcess().getCamundaEvent(),
+                    mappedCase.getCcdCaseReference()
+                ));
                 eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
+                delayNextExecution(multiCasesExecutionDelayInSeconds);
             });
+    }
+
+    private static void setupTimeToLive() {
+        Timer timer = new Timer();
+        Thread currentThread = Thread.currentThread();
+        timer.schedule(
+            new TimerTask() {
+                @Override
+                public void run() {
+
+                    if (currentThread != null && currentThread.isAlive()) {
+                        currentThread.interrupt();
+                        timer.cancel();
+                    }
+                }
+            }, TimeUnit.MINUTES.toMillis(55));
+    }
+
+    private void delayNextExecution(Long multiCasesExecutionDelayInSeconds) {
+        if (multiCasesExecutionDelayInSeconds != null && multiCasesExecutionDelayInSeconds > 0) {
+            try {
+                TimeUnit.SECONDS.sleep(multiCasesExecutionDelayInSeconds);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Override
