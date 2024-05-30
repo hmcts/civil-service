@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -199,16 +198,6 @@ class FeatureToggleServiceTest {
         givenToggle(sdoR2Key, toggleStat);
 
         assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true})
-    @Ignore
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
-
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
