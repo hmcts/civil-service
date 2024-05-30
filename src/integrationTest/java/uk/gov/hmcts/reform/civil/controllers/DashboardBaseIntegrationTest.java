@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.config.MockMvcFeignClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
@@ -46,6 +47,9 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @MockBean
     protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    protected CoreCaseUserService coreCaseUserService;
 
     public static class MockMvcFeignConfiguration {
         @Bean
