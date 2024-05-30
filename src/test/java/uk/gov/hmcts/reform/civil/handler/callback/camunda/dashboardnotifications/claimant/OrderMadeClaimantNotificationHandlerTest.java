@@ -269,20 +269,20 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(BigDecimal.valueOf(500))
-                .applicant1Represented(YesOrNo.NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(500))
+                .applicant1Represented(YesOrNo.NO).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
             handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(

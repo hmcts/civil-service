@@ -70,11 +70,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         return caseData.isApplicant1NotRepresented();
     }
 
-    private boolean isCarmApplicableCase(CaseData caseData) {
-        return getFeatureToggleService().isCarmEnabledForCase(caseData)
-            && SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData));
-    }
-
     private boolean isSDODrawnPreCPRelease() {
         return !getFeatureToggleService().isCaseProgressionEnabled();
     }
