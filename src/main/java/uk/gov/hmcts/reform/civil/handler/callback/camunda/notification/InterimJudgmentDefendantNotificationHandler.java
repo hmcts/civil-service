@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -126,11 +127,18 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+        Optional<OrganisationPolicy> respondent1OrganisationPolicy = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy());
+        if (respondent1OrganisationPolicy.isPresent()) {
+            OrganisationPolicy organisationPolicy = respondent1OrganisationPolicy.get();
+            Optional<uk.gov.hmcts.reform.ccd.model.Organisation> policyOrganisation = Optional.ofNullable(organisationPolicy.getOrganisation());
+            if (policyOrganisation.isPresent()) {
+                Optional<Organisation> organisation = organisationService
+                    .findOrganisationById(respondent1OrganisationPolicy.get()
+                                              .getOrganisation().getOrganisationID());
+                if (organisation.isPresent()) {
+                    return organisation.get().getName();
+                }
+            }
         }
         return caseData.getRespondent1().getPartyName();
     }
