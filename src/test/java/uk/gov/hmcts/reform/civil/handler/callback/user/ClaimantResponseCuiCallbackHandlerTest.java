@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -454,6 +455,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .flightDelayDetails(FlightDelayDetails.builder()
                     .nameOfAirline("Sri Lankan")
                     .build())
@@ -477,6 +479,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData = caseData.toBuilder()
                 .isFlightDelayClaim(YES)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .flightDelayDetails(FlightDelayDetails.builder()
                     .nameOfAirline("INVALID_AIRLINE")
                     .build())
@@ -536,7 +539,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
-        
+
         @Test
         void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
             CaseData caseData = CaseDataBuilder.builder()

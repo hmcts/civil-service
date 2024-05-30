@@ -46,7 +46,7 @@ public class UpdateCaseManagementDetailsService {
         updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
-        if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
+        if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
             updateFlightDelayCaseManagementLocation(caseData, builder, availableLocations);
         } else {
             locationHelper.getCaseManagementLocation(caseData)
