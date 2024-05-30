@@ -53,7 +53,7 @@ public class DashboardNotificationsParamsMapper {
         } else {
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
         }
-        if(caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
+        if (caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
             params.put("paymentFrecuencyMessage", getPaymentFrecuencyMessage(caseData).toString());
         }
 
@@ -369,9 +369,9 @@ public class DashboardNotificationsParamsMapper {
             case EVERY_TWO_WEEKS:
                 return "biweekly";
             case MONTHLY :
-                return"monthly";
+                return "monthly";
+            default:
+                return "";
         }
-        return "";
     }
-
 }
