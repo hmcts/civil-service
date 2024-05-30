@@ -162,24 +162,6 @@ public class DashboardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping(path = {
-        "notifications/{notification_name}/{reference}/{role}"
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "401", description = "Not Authorized"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Void> deleteNotificationByReferenceAndNameAndRole(
-        @PathVariable("notification_name") String notificationName,
-        @PathVariable("reference") String reference,
-        @PathVariable("role") String role,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
-    ) {
-        log.info("Deleting notification for case: {}", reference);
-        dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(notificationName, reference, role);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

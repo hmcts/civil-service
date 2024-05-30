@@ -11,8 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +31,7 @@ public class RequestForReconsiderationNotificationDeadlineCallbackHandler extend
     private static final List<CaseEvent> EVENTS = List.of(REQUEST_FOR_RECONSIDERATION_DEADLINE_CHECK);
     private final ObjectMapper objectMapper;
     private final DashboardApiClient dashboardApiClient;
+    protected final DashboardNotificationsParamsMapper mapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,14 +51,13 @@ public class RequestForReconsiderationNotificationDeadlineCallbackHandler extend
             .build();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.requestForReconsiderationDeadlineChecked(YesOrNo.YES).build();
-        dashboardApiClient.deleteNotificationByReferenceAndNameAndRole(
-            "Notice.AAA6.CP.SDOMadebyLA.Claimant",
-            callbackParams.getRequest().getCaseDetails().getId().toString(),
-            "CLAIMANT", authToken, "application/json");
-        dashboardApiClient.deleteNotificationByReferenceAndNameAndRole(
-            "Notice.AAA6.CP.SDOMadebyLA.Defendant",
-            callbackParams.getRequest().getCaseDetails().getId().toString(),
-            "DEFENDANT", authToken, "application/json");
+        HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
+        dashboardApiClient.recordScenario(callbackParams.getRequest().getCaseDetails().getId().toString(),
+                                          DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE.getScenario(),
+                                          authToken,
+                                          ScenarioRequestParams.builder().params(paramsMap).build()
+
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

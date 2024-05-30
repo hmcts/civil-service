@@ -58,17 +58,6 @@ public interface DashboardApiClient {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     );
 
-    @DeleteMapping(path = {
-        "notifications/{notification_name}/{reference}/{role}"
-    })
-    ResponseEntity<Void>  deleteNotificationByReferenceAndNameAndRole(
-        @PathVariable("notification_name") String notificationName,
-        @PathVariable("reference") String reference,
-        @PathVariable("role") String role,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @RequestHeader(HttpHeaders.CONTENT_TYPE) String contentType
-    );
-
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
     ResponseEntity<Void> recordScenario(
         @PathVariable("unique_case_identifier") String uniqueCaseIdentifier,
