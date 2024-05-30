@@ -10,7 +10,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettled.Defendant', '{"Notice.AAA6.De
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant', 'The claim is settled', 'The claim is settled',
+VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant', 'The claim is settled', 'Mae’r hawliad wedi’i setlo',
         '<p class="govuk-body">${applicant1PartyName} has confirmed that you paid ${claimSettledAmount} on ${claimSettledDateEn}.</p>',
-        '<p class="govuk-body">${applicant1PartyName} has confirmed that you paid ${claimSettledAmount} on ${claimSettledDateCy}.</p>',
+        '<p class="govuk-body">Mae ${applicant1PartyName} wedi cadarnhau eich bod wedi talu ${claimSettledAmount} ar ${claimSettledDateCy}.</p>',
         'DEFENDANT');
