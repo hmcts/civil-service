@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -16,8 +17,10 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,10 +42,9 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         if (caseData.isMultiPartyDefendant()) {
             defendants.add(element(caseData.getRespondent2()));
         }
-        BigDecimal costs = caseData.getCcjPaymentDetails() != null && caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() != null
-            ? caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() : BigDecimal.ZERO;
-        BigDecimal orderAmount =  caseData.getCcjPaymentDetails() != null
-            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
+        BigDecimal costsInPounds = getCosts(caseData);
+        BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData, costsInPounds));
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -63,6 +65,18 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .costs(costs.toString())
             .totalAmount(orderAmount.add(costs).toString())
             .build();
+    }
+
+    @NotNull
+    private BigDecimal getOrderAmount(CaseData caseData, BigDecimal costs) {
+        return caseData.getCcjPaymentDetails() != null
+            ? getValue(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()).subtract(costs) : BigDecimal.ZERO;
+    }
+
+    @NotNull
+    private static BigDecimal getCosts(CaseData caseData) {
+        return caseData.getCcjPaymentDetails() != null && caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() != null
+            ? caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount() : BigDecimal.ZERO;
     }
 
     @Override
