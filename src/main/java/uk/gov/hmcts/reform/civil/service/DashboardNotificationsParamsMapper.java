@@ -53,7 +53,7 @@ public class DashboardNotificationsParamsMapper {
         } else {
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
         }
-        if(caseData.getJoJudgmentRecordReason()!= null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)){
+        if(caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
             params.put("paymentFrecuencyMessage", getPaymentFrecuencyMessage(caseData).toString());
         }
 
@@ -344,8 +344,8 @@ public class DashboardNotificationsParamsMapper {
         }
         return null;
     }
+
     private static StringBuilder getPaymentFrecuencyMessage(CaseData caseData) {
-        //You must pay the claim amount of £${joClaimAmount} in monthly instalments of £${joMonthlyAmount}. The first payment is due on ${joDueDate}.
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
         StringBuilder paymentFrecuencyMessage = new StringBuilder();
         if (paymentPlanType.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
@@ -362,13 +362,14 @@ public class DashboardNotificationsParamsMapper {
         return paymentFrecuencyMessage;
     }
 
-    private static String getStringPaymentFrecuency(JudgmentInstalmentDetails judgmentInstalmentDetails){
-        switch (judgmentInstalmentDetails.getPaymentFrequency()){
+    private static String getStringPaymentFrecuency(JudgmentInstalmentDetails judgmentInstalmentDetails) {
+        switch (judgmentInstalmentDetails.getPaymentFrequency()) {
             case WEEKLY :
                 return "weekly";
             case EVERY_TWO_WEEKS:
                 return "biweekly";
-            case MONTHLY : return"monthly";
+            case MONTHLY :
+                return"monthly";
         }
         return "";
     }
