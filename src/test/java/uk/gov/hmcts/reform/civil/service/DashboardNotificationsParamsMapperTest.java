@@ -136,7 +136,8 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
             .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
 
-        assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
+        assertThat(result).extracting("claimantSettlementAgreementEn").isEqualTo("accepted");
+        assertThat(result).extracting("claimantSettlementAgreementCy").isEqualTo("derbyn");
         assertThat(result).extracting("applicant1ClaimSettledDateEn")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
