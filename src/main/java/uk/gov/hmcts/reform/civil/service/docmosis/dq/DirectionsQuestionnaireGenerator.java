@@ -63,6 +63,7 @@ import java.util.stream.Stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -131,7 +132,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = featureToggleService.isFastTrackUpliftsEnabled() ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
@@ -161,8 +163,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
                                                               String authorisation,
                                                               String respondent) {
-        DocmosisTemplates templateId = featureToggleService.isFastTrackUpliftsEnabled()
-            ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -187,8 +189,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
                                                           String authorisation,
                                                           String respondent) {
-        DocmosisTemplates templateId = featureToggleService.isFastTrackUpliftsEnabled()
-            ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -275,6 +278,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder.build();
     }
 
+    private String getClaimTrack(CaseData caseData){
+        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack();
+    }
+
     @NotNull
     protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
@@ -287,8 +295,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                      .fetchSolicitorReferences(caseData))
             .respondents(getRespondents(caseData, null))
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                                ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack());
+            .allocatedTrack(getClaimTrack(caseData));
 
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
@@ -314,8 +321,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             specAndSmallClaim = true;
         }
 
+        DisclosureReport disclosureReport;
+        if (INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+            || (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && MULTI_CLAIM.equals(caseData.getAllocatedTrack()))) {
+            getDisclosureReport(dq);
+        }
+
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -607,11 +620,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
+                                                                         ? dq.getFixedRecoverableCostsIntermediate()
+                                                                         : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .disclosureReport(getDisclosureReport(dq))
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -639,11 +655,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
+                                                                         ? dq.getFixedRecoverableCostsIntermediate()
+                                                                         : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .disclosureReport(getDisclosureReport(dq))
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -654,8 +673,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                                ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
+            .allocatedTrack(getClaimTrack(caseData))
             .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
