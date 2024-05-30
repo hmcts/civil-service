@@ -66,8 +66,9 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
 
     @Override
     protected void sendNotifications(CallbackParams callbackParams, CaseData caseData, boolean multiPartyScenario) {
+        String authToken = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
         if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
-            roboticsNotificationService.notifyJudgementLip(caseData);
+            roboticsNotificationService.notifyJudgementLip(caseData, authToken);
         } else {
             roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
                                                        callbackParams.getParams().get(BEARER_TOKEN).toString()
