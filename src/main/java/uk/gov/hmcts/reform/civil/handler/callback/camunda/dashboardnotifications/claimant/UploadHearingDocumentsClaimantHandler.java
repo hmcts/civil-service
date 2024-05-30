@@ -44,6 +44,8 @@ public class UploadHearingDocumentsClaimantHandler extends CaseProgressionDashbo
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         // TODO check for Small Claims is because Small Claims does not use a known date
-        return caseData.isApplicantNotRepresented() && !SdoHelper.isSmallClaimsTrack(caseData);
+        return caseData.isApplicantNotRepresented()
+            && !SdoHelper.isSmallClaimsTrack(caseData)
+            && featureToggleService.isCaseProgressionEnabled();
     }
 }
