@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
@@ -352,7 +353,7 @@ public class EventHistoryMapper {
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts(getCostOfJudgment(caseData))
+                              .amountOfCosts(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? partialPaymentPounds : ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
@@ -2291,32 +2292,6 @@ public class EventHistoryMapper {
                     return null;
             }
         }).orElse(null);
-    }
-
-    private BigDecimal getCostOfJudgment(CaseData data) {
-
-        if (data.getOutstandingFeeInPounds() != null) {
-            return data.getOutstandingFeeInPounds();
-        }
-
-        String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
-        BigDecimal claimCost = null;
-        if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
-            claimCost = new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Claim fee amount \n £") + 20,
-                repaymentSummary.indexOf("\n ## Subtotal")
-            ));
-        }
-
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
-            : claimCost != null ? claimCost.setScale(2) : ZERO;
-
     }
 
     private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
