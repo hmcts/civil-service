@@ -58,16 +58,16 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">James John has offered to pay £1000 by " +
-                        DateUtils.formatDate(admitPaymentDeadline) + ".</p>" +
-                        "<p class=\"govuk-body\">The payment must be received in your account by then, if not you can request a county court judgment.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"
+                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
+                        "The payment must be received in your account by then, if not you can request a county court judgment. " +
+                        "<a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi cynnig talu £1000 erbyn " +
-                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ".</p>" +
-                        "<p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dweud wrthym ei fod wedi cael ei dalu</a></p>"
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ". " +
+                        "Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol. " +
+                        "<a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dweud wrthym ei fod wedi cael ei dalu</a></p>"
                 )
             );
 

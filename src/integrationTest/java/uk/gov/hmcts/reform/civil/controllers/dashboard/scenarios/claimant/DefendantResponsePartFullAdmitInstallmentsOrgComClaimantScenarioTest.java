@@ -64,8 +64,8 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + ". They are offering to do this starting from "
                         + DateUtils.formatDate(firstPaymentDate)
-                        + ". The defendant needs to send you their financial details.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
+                        + ". The defendant needs to send you their financial details. "
+                        + "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and"
                         + " respond</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
@@ -77,8 +77,8 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
                         ".00", "")
                         + " bob " + frequency.getDashboardLabel() + ". Maent yn cynnig gwneud hyn o "
                         + DateUtils.formatDateInWelsh(firstPaymentDate)
-                        + " ymlaen. Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.</p>"
-                        + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
+                        + " ymlaen. Mae angen i’r diffynnydd anfon eu manylion ariannol atoch. "
+                        + "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
                         + "</a></p>"
                 )
             );
