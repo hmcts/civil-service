@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidat
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,8 +78,13 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
         }
 
         CaseData caseData = callbackParams.getCaseData();
-        Map<String, Object> data = callbackParams.getRequest().getCaseDetailsBefore().getData();
-        CaseData caseDataBefore = objectMapper.convertValue(data, new TypeReference<>() {
+        Optional<CaseDetails> caseDetailsBefore = Optional.ofNullable(callbackParams.getRequest().getCaseDetailsBefore());
+
+        Map<String, Object> dataBefore = new HashMap<>();
+        if (caseDetailsBefore.isPresent()) {
+            dataBefore = caseDetailsBefore.get().getData();
+        }
+        CaseData caseDataBefore = objectMapper.convertValue(dataBefore, new TypeReference<>() {
         });
 
         Long caseId = caseData.getCcdCaseReference();
