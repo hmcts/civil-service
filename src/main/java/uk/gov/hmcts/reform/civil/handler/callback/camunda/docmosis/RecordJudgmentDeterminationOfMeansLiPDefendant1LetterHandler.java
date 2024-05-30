@@ -49,8 +49,8 @@ public class RecordJudgmentDeterminationOfMeansLiPDefendant1LetterHandler extend
     private CallbackResponse sendRecordJudgmentDeterminationOfMeansLetterToLiPDefendant1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isRespondent1Lip(caseData) && caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
-            recordJudgmentDeterminationOfMeansPiPLetterGenerator
-                .generateAndPrintRecordJudgmentDeterminationOfMeansLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+//            recordJudgmentDeterminationOfMeansPiPLetterGenerator
+//                .generateAndPrintRecordJudgmentDeterminationOfMeansLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
