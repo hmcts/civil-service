@@ -19,14 +19,17 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
 public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
-                                                          CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                                                          CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+    private static final List<CaseEvent> EVENTS = List.of(
+        CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
+        CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
+        CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
+    );
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
 
     public OrderMadeDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -51,9 +54,18 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             && isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)
             && isSDOEvent(callbackParams)
             && hasTrackChanged(caseData)) {
-            return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM.getScenario();
+
+            if (hasDefendantUploadDocuments(caseData)) {
+                return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM.getScenario();
+            } else {
+                return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
+            }
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
+    }
+
+    private boolean hasDefendantUploadDocuments(CaseData caseData) {
+        return !(caseData.getRes1MediationDocumentsReferred().isEmpty() && caseData.getRes1MediationNonAttendanceDocs().isEmpty());
     }
 
     @Override

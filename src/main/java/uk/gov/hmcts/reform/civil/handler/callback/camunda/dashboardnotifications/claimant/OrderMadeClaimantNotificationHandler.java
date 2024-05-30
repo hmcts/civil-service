@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
@@ -51,9 +52,19 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             && isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)
             && isSDOEvent(callbackParams)
             && hasTrackChanged(caseData)) {
-            return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario();
+
+            if (hasClaimantUploadDocuments(caseData)) {
+                return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario();
+            } else {
+                return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
+            }
+
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
+    }
+
+    private boolean hasClaimantUploadDocuments(CaseData caseData) {
+        return !(caseData.getApp1MediationDocumentsReferred().isEmpty() && caseData.getApp1MediationNonAttendanceDocs().isEmpty());
     }
 
     @Override

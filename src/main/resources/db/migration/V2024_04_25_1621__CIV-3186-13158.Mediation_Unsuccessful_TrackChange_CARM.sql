@@ -23,10 +23,11 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant',
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a>View mediation documents</a>',
+values ('<a>Upload mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant', '{2, 2}', 'CLAIMANT', 7);
+        '<a>Uwchlwytho dogfennau cyfryngu</a>',
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6);
+
 
 /**
  * Add scenario for defendant
@@ -49,13 +50,12 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant',
         'DEFENDANT');
 
 /**
- * Add task list items claimant
+ * Add task list items defendant
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a>View mediation documents</a>',
+values ('<a>Upload mediation documents</a>',
         'Mediation',
-        '<a>View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant', '{2, 2}', 'DEFENDANT', 7);
-
+        '<a>Uwchlwytho dogfennau cyfryngu</a>',
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant', '{2, 2}', 'DEFENDANT', 6);
 
