@@ -351,11 +351,11 @@ public class DashboardNotificationsParamsMapper {
         if (paymentPlanType.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
             JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
             paymentFrecuencyMessage.append(" You must pay the claim amount of £ ")
-                .append(caseData.getJoAmountOrdered())
+                .append(MonetaryConversions.penniesToPounds((new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())))).toString())
                 .append(" in ")
                 .append(getStringPaymentFrecuency(instalmentDetails))
                 .append(" instalments of £ ")
-                .append(instalmentDetails.getAmount())
+                .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
                 .append(" The first payment is due on ")
                 .append(instalmentDetails.getStartDate());
         }
