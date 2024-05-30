@@ -59,13 +59,13 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Defendant John has offered to pay you £1000 by "
-                      +  DateUtils.formatDate(responseDeadline) + ".</p>"
-                      +  "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                      +  DateUtils.formatDate(responseDeadline) + ". "
+                      +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Defendant John wedi cynnig talu £1000 i chi erbyn "
-                     +   DateUtils.formatDateInWelsh(responseDeadline) + ".</p>"
-                     +   "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
+                     +   DateUtils.formatDateInWelsh(responseDeadline) + ". "
+                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 
         //Verify task Item is created
@@ -113,12 +113,12 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1000 by "
-                     +   DateUtils.formatDate(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
+                     +   DateUtils.formatDate(admitPaymentDeadline) + ". "
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                jsonPath("$[0].descriptionCy").value(
                    "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1000 i chi erbyn "
-                    +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
+                    +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + ". "
                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 

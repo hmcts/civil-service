@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Cl
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant', 'Response to the claim', 'Ymateb i’r hawliad',
-        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and suggested mediation. You can reject or agree to mediation. You need to respond by ${applicant1ResponseDeadlineEn}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
-        '<p class="govuk-body">Mae ${respondent1PartyName} wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gallwch wrthod neu gytuno i gyfryngu. Mae angen i chi ymateb erbyn ${applicant1ResponseDeadlineCy}.</p><p class="govuk-body"><a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Gweld ac ymateb</a></p>',
+        '<p class="govuk-body">${respondent1PartyName} has rejected the claim and suggested mediation. You can reject or agree to mediation. You need to respond by ${applicant1ResponseDeadlineEn}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">View and respond</a></p>',
+        '<p class="govuk-body">Mae ${respondent1PartyName} wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gallwch wrthod neu gytuno i gyfryngu. Mae angen i chi ymateb erbyn ${applicant1ResponseDeadlineCy}. <a href="{CLAIMANT_RESPONSE_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Gweld ac ymateb</a></p>',
         'CLAIMANT');
 
 /**

@@ -49,14 +49,14 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">James John has not responded to the claim." +
                     " You can now request a county court judgment." +
-                    " The defendant can still respond to the claim before you ask for a judgment.</p>" +
-                    "<p class=\"govuk-body\"><a href=\"{REQUEST_CCJ_URL}\" class=\"govuk-link\">Request a CCJ</a></p>"),
+                    " The defendant can still respond to the claim before you ask for a judgment. " +
+                    "<a href=\"{REQUEST_CCJ_URL}\" class=\"govuk-link\">Request a CCJ</a></p>"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Nid yw James John wedi ymateb i’r hawliad." +
                         " Gallwch nawr wneud cais am ddyfarniad llys sirol." +
-                        " Gall y diffynnydd dal ymateb i’r hawliad cyn i chi ofyn am ddyfarniad.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{REQUEST_CCJ_URL}\" class=\"govuk-link\">Gwneud cais am CCJ</a></p>")
+                        " Gall y diffynnydd dal ymateb i’r hawliad cyn i chi ofyn am ddyfarniad. " +
+                        "<a href=\"{REQUEST_CCJ_URL}\" class=\"govuk-link\">Gwneud cais am CCJ</a></p>")
             );
     }
 
