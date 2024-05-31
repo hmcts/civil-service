@@ -62,6 +62,7 @@ public class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandlerTest exte
                               .build())
             .build());
     }
+    
     @Test
     void shouldGenerateClaimantForm() {
         CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT;
