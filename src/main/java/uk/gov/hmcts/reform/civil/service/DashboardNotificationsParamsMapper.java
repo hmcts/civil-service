@@ -249,6 +249,7 @@ public class DashboardNotificationsParamsMapper {
             case WEEKLY -> "weekly";
             case EVERY_TWO_WEEKS -> "biweekly";
             case MONTHLY -> "monthly";
+            default -> "";
         };
     }
 
