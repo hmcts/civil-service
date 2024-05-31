@@ -1,26 +1,38 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +40,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
-
+    private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
@@ -68,7 +80,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
             .paymentType(getPaymentType(caseData))
-            .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
             .payBy(setPayByDate(caseData))
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
@@ -160,5 +171,169 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             ? "OCON225"
             : "OCON225a";
+    }
+
+    private String getRespondent1SolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getRespondentSolicitor1Reference() != null) {
+            return caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+        }
+        return null;
+    }
+
+    private String getRespondent2SolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getRespondentSolicitor2Reference() != null) {
+            return caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
+        }
+        return null;
+    }
+
+    private String getApplicantSolicitorRef(CaseData caseData) {
+        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
+            .getApplicantSolicitor1Reference() != null) {
+            return caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
+        }
+        return null;
+    }
+
+
+    private Party getOrgDetails(OrganisationPolicy organisationPolicy) {
+
+        return Optional.ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID)
+            .map(organisationService::findOrganisationById)
+            .flatMap(value -> value.map(o -> Party.builder()
+                .name(o.getName())
+                .primaryAddress(getAddress(o.getContactInformation().get(0)))
+                .build())).orElse(null);
+    }
+
+    private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
+        if (caseData.isApplicantLiP()) {
+            return getPartyDetails(caseData.getApplicant1());
+        } else {
+            if (caseData.getApplicant1OrganisationPolicy() != null) {
+                return getOrgDetails(caseData.getApplicant1OrganisationPolicy());
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private Address getAddress(ContactInformation address) {
+        return uk.gov.hmcts.reform.civil.model.Address.builder().addressLine1(address.getAddressLine1())
+            .addressLine2(address.getAddressLine1())
+            .addressLine3(address.getAddressLine1())
+            .country(address.getCountry())
+            .county(address.getCounty())
+            .postCode(address.getPostCode())
+            .postTown(address.getTownCity())
+            .build();
+    }
+
+    private Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
+        return Party.builder()
+            .name(party.getPartyName())
+            .primaryAddress(party.getPrimaryAddress())
+            .build();
+    }
+
+    private Party getRespondentLROrLipDetails(CaseData caseData) {
+        if (caseData.isRespondent1LiP()) {
+            return getPartyDetails(caseData.getRespondent1());
+        } else {
+            if (caseData.getRespondent1OrganisationPolicy() != null) {
+                return getOrgDetails(caseData.getRespondent1OrganisationPolicy());
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
+                                     uk.gov.hmcts.reform.civil.model.Party applicant2) {
+
+        List<Party> applicants = new ArrayList<>();
+        applicants.add(Party.builder()
+                           .name(applicant1.getPartyName())
+                           .primaryAddress(applicant1.getPrimaryAddress())
+                           .build());
+        if (applicant2 != null) {
+            applicants.add(Party.builder()
+                               .name(applicant2.getPartyName())
+                               .primaryAddress(applicant2.getPrimaryAddress())
+                               .build());
+        }
+        return applicants;
+    }
+
+    public JudgmentByAdmissionOrDetermination toNonDivergentDocs(CaseData caseData, CaseEvent caseEvent) {
+        String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
+            .map(amount -> amount.setScale(2).toString())
+            .orElse("0");
+
+        String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
+
+        JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
+        LocalDateTime now = LocalDateTime.now();
+        return builder
+            .claimReferenceNumber(caseData.getLegacyCaseReference())
+            .respondent1Name(caseData.getRespondent1().getPartyName())
+            .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .respondent1Ref(getRespondent1SolicitorRef(caseData))
+            .respondent2Ref(getRespondent2SolicitorRef(caseData))
+            .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .respondent(getRespondentLROrLipDetails(caseData))
+            .totalClaimAmount(totalClaimAmount)
+            .totalInterestAmount(totalInterest)
+            .paymentPlan(getPaymentTypeForNonDivergent(caseData))
+            .payByDate(caseData.getRespondToClaimAdmitPartLRspec() != null
+                           ? DateFormatHelper.formatLocalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(), DateFormatHelper.DATE) : null)
+            .paymentStr(caseData.isPayByInstallment() ?
+                            getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .repaymentFrequency(caseData.isPayByInstallment()
+                                    ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .repaymentDate(caseData.isPayByInstallment()
+                               ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
+            .installmentAmount(String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)))
+            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
+            .ccjInterestToDate(totalInterest)
+            .claimFee(getClaimFee(caseData))
+            .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
+            .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
+            .build();
+    }
+
+    private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "each week";
+            case ONCE_ONE_MONTH: return "each month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequency(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "per week";
+            case ONCE_ONE_MONTH: return "per month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getPaymentTypeForNonDivergent(CaseData caseData) {
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
+            return "IMMEDIATELY";
+        } else if (caseData.isPayByInstallment()) {
+            return "REPAYMENT_PLAN";
+        } else if (caseData.isPayBySetDate()) {
+            return "SET_DATE";
+        }
+        return null;
     }
 }
