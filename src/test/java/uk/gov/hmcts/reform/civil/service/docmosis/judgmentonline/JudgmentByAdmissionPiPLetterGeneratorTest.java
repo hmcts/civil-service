@@ -39,7 +39,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER;
 
 @SpringBootTest(classes = {
     JudgmentByAdmissionPiPLetterGenerator.class,
@@ -51,12 +51,12 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String CLAIM_REFERENCE = "ABC";
     private static String fileNameTrial = null;
-    private static final String fileName = String.format(JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
+    private static final String fileName = String.format(JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
     private static final String JUDGMENT_BY_ADMISSION_LETTER = "judgment-by-admission-letter";
     private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocumentBuilder.builder()
         .documentName(fileNameTrial)
-        .documentType(DocumentType.JUDGMENT_BY_ADMISSION_LETTER)
+        .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
         .build();
 
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
@@ -118,10 +118,10 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     @Test
     void shouldDefaultJudgmentSpecPiPLetterGenerator_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(
-            JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER)))
-            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), bytes));
+            JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_LETTER)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
@@ -131,7 +131,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
 
         assertThat(letterContentByteData).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_LETTER));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER));
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
