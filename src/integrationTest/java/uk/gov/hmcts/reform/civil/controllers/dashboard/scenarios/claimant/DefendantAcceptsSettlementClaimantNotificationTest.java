@@ -38,11 +38,11 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends Dashboar
             jsonPath("$[0].titleEn").value(
                 "Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement. You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment(CCJ)</a>,  unless they break the terms of the agreement. You can <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the settlement agreement</a> or <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">tell us it's settled</a>.</p>"),
+                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement. You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment(CCJ)</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\">You can <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">view the settlement agreement</a> or <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">tell us it's settled</a>.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Cytundeb setlo"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">Mae Dave Indent wedi derbyn y cytundeb setlo. Ni allwch <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">wneud cais am Ddyfarniad Llys Sirol(CCJ)</a>,  oni bai eu bod yn torri telerau’r cytundeb. Gallwch <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> weld y cytundeb setlo</a> neu <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">ddweud wrthym ei fod wedi’i setlo</a>.</p>")
+                "<p class=\"govuk-body\">Mae Dave Indent wedi derbyn y cytundeb setlo. Ni allwch <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">wneud cais am Ddyfarniad Llys Sirol(CCJ)</a>,  oni bai eu bod yn torri telerau’r cytundeb.</p> <p class=\"govuk-body\">Gallwch <a href=\"{DOWNLOAD_SETTLEMENT_AGREEMENT}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\"> weld y cytundeb setlo</a> neu <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">ddweud wrthym ei fod wedi’i setlo</a>.</p>")
 
         );
     }

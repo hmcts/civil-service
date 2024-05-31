@@ -59,14 +59,14 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately." +
-                    " Funds must be received in your account by " + DateUtils.formatDate(whenWillThisAmountBePaid)
-                    + ". If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  " +
+                    " Funds must be received in your account by " + DateUtils.formatDate(whenWillThisAmountBePaid) + ".</p>" +
+                    "<p class=\"govuk-body\">If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  " +
                     "rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>"),
             jsonPath("$[0].titleCy").value("Talu ar unwaith"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Dave Indent i dalu £{fullAdmitPayImmediatelyPaymentAmount} " +
-                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid)
-                    + ". Os na fyddwch wedi cael yr arian erbyn hynny, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"" +
+                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid) + ".</p>" +
+                    "<p class=\"govuk-body\">Os na fyddwch wedi cael yr arian erbyn hynny, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"" +
                     "  rel=\"noopener noreferrer\" class=\"govuk-link\">gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
 
         );
