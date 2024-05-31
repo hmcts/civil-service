@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
@@ -54,7 +55,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             && isSDOEvent(callbackParams)
             && hasTrackChanged(caseData)) {
 
-            if (hasClaimantUploadDocuments(caseData)) {
+            if (hasUploadDocuments(caseData)) {
                 return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario();
             } else {
                 return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
@@ -67,8 +68,12 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
     }
 
-    private boolean hasClaimantUploadDocuments(CaseData caseData) {
-        return !(caseData.getApp1MediationDocumentsReferred().isEmpty() && caseData.getApp1MediationNonAttendanceDocs().isEmpty());
+    private boolean hasUploadDocuments(CaseData caseData) {
+        return !(isNull(caseData.getApp1MediationDocumentsReferred())
+            && isNull(caseData.getApp1MediationNonAttendanceDocs())
+            && isNull(caseData.getRes1MediationDocumentsReferred())
+            && isNull(caseData.getRes1MediationNonAttendanceDocs())
+        );
     }
 
     @Override

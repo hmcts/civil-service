@@ -15,12 +15,12 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 values ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation',
         '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{6, 6}', 'CLAIMANT', 6),
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{6, 6}', 'CLAIMANT', 6),
 
        ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
         '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{3, 3}', 'CLAIMANT', 7);
+        'Cyfryngu', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Claimant', '{3, 3}', 'CLAIMANT', 7);
 
 
 /**
@@ -40,11 +40,11 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 
 values ('<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
         'Mediation',
-        '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Upload mediation documents</a>',
-        'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{6, 6}', 'DEFENDANT', 6),
+        '<a href={UPLOAD_MEDIATION_DOCUMENTS} class="govuk-link">Uwchlwytho dogfennau cyfryngu</a>',
+        'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{6, 6}', 'DEFENDANT', 6),
 
        ('<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
         'Mediation',
-        '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">View mediation documents</a>',
-        'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{3, 3}', 'DEFENDANT', 7);
+        '<a href={VIEW_MEDIATION_DOCUMENTS} class="govuk-link">Gweld dogfennau cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Documents', 'Scenario.AAA6.MediationUploadDocuments.CARM.Defendant', '{3, 3}', 'DEFENDANT', 7);
 

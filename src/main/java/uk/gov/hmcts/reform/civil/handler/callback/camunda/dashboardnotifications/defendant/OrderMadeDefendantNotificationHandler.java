@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
@@ -56,7 +57,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             && isSDOEvent(callbackParams)
             && hasTrackChanged(caseData)) {
 
-            if (hasDefendantUploadDocuments(caseData)) {
+            if (hasUploadDocuments(caseData)) {
                 return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM.getScenario();
             } else {
                 return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
@@ -68,8 +69,12 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
     }
 
-    private boolean hasDefendantUploadDocuments(CaseData caseData) {
-        return !(caseData.getRes1MediationDocumentsReferred().isEmpty() && caseData.getRes1MediationNonAttendanceDocs().isEmpty());
+    private boolean hasUploadDocuments(CaseData caseData) {
+        return !(isNull(caseData.getRes1MediationDocumentsReferred())
+            && isNull(caseData.getRes1MediationNonAttendanceDocs())
+            && isNull(caseData.getApp1MediationDocumentsReferred())
+            && isNull(caseData.getApp1MediationNonAttendanceDocs())
+        );
     }
 
     @Override
