@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.config.MockMvcFeignClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @Testcontainers
 @RunWith(SpringRunner.class)
 @EnableFeignClients(defaultConfiguration = DashboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @MockBean
@@ -48,6 +47,9 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @MockBean
     protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    protected CoreCaseUserService coreCaseUserService;
 
     public static class MockMvcFeignConfiguration {
         @Bean

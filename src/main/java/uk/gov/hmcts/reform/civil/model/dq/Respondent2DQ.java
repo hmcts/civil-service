@@ -23,8 +23,11 @@ public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts respondent2DQFixedRecoverableCosts;
+    private FixedRecoverableCosts respondent2DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
+    private DisclosureOfElectronicDocuments specRespondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments specRespondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;
     private Experts respondent2DQExperts;
     private ExpertDetails respondToClaimExperts2;
@@ -70,9 +73,21 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("specRespondent2DQDisclosureOfElectronicDocuments")
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return specRespondent2DQDisclosureOfElectronicDocuments;
+    }
+
+    @Override
     @JsonProperty("respondent2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return respondent2DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    @JsonProperty("specRespondent2DQDisclosureOfNonElectronicDocuments")
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return specRespondent2DQDisclosureOfNonElectronicDocuments;
     }
 
     @Override

@@ -52,7 +52,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
                 jsonPath("$[0].titleCy").value("Mae Mr. John Rambo wedi gwneud cais am Ddyfarniad Llys Sirol yn eich erbyn"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi rejected eich cynllun ad-dalu ac wedi gofyn i chi lofnodi setliad." +
+                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi gwrthod eich cynllun ad-dalu ac wedi gofyn i chi lofnodi setliad." +
                             " Ni wnaethoch lofnodi’r cytundeb.</p><p class=\"govuk-body\">Pan fyddwn wedi prosesu’r cais, " +
                             "byddwn yn anfon copi o’r dyfarniad drwy'r post atoch chi.</p>" +
                             "<p class=\"govuk-body\">Os byddwch yn talu’r ddyled o fewn mis o ddyddiad y dyfarniad, bydd y Dyfarniad Llys Sirol (CCJ) " +

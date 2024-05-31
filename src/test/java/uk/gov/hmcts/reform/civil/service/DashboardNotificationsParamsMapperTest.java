@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -36,8 +37,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -48,9 +51,12 @@ public class DashboardNotificationsParamsMapperTest {
 
     private CaseData caseData;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper();
+        mapper = new DashboardNotificationsParamsMapper(featureToggleService);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
@@ -89,9 +95,14 @@ public class DashboardNotificationsParamsMapperTest {
             .hearingFee(new Fee(new BigDecimal(10000), "Test", "Test"))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
+            .applicant1Represented(NO)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<u>make an application to set aside (remove) or vary the judgment</u>");
+
+        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<u>make an application to vary the judgment</u>");
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
 
@@ -152,6 +163,19 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");
+    }
+
+    @Test
+    public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
+
+        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
+        caseData = caseData.toBuilder().build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+
+        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
     }
 
     @Test

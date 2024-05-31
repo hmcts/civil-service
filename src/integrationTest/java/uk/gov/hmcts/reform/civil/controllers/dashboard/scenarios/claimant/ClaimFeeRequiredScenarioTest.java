@@ -62,20 +62,22 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[5].currentStatusEn").value("Not available yet"),
                 jsonPath("$[6].taskNameEn").value("<a>View mediation documents</a>"),
                 jsonPath("$[6].currentStatusEn").value("Not available yet"),
-                jsonPath("$[7].taskNameEn").value("<a>View hearings</a>"),
+                jsonPath("$[7].taskNameEn").value("<a>View the hearing</a>"),
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
-                jsonPath("$[8].taskNameEn").value("<a>Upload hearing documents</a>"),
+                jsonPath("$[8].taskNameEn").value("<a>Pay the hearing fee</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a>Pay the hearing fee</a>"),
+                jsonPath("$[9].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
-                jsonPath("$[10].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[10].taskNameEn").value("<a>View documents</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
-                jsonPath("$[11].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[11].currentStatusEn").value("Available"),
-                jsonPath("$[12].taskNameEn").value("<a>View the judgment</a>"),
-                jsonPath("$[12].currentStatusEn").value("Not available yet"),
-                jsonPath("$[13].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[13].currentStatusEn").value("Not available yet")
+                jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[11].currentStatusEn").value("Not available yet"),
+                jsonPath("$[12].taskNameEn").value("<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
+                jsonPath("$[12].currentStatusEn").value("Available"),
+                jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[13].currentStatusEn").value("Not available yet"),
+                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[14].currentStatusEn").value("Not available yet")
 
             );
 
@@ -129,23 +131,25 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[5].currentStatusEn").value("Not available yet"),
                 jsonPath("$[6].taskNameEn").value("<a>View mediation documents</a>"),
                 jsonPath("$[6].currentStatusEn").value("Not available yet"),
-                jsonPath("$[7].taskNameEn").value("<a>View hearings</a>"),
+                jsonPath("$[7].taskNameEn").value("<a>View the hearing</a>"),
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
-                jsonPath("$[8].taskNameEn").value("<a>Upload hearing documents</a>"),
+                jsonPath("$[8].taskNameEn").value("<a>Pay the hearing fee</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[9].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
-                jsonPath("$[10].taskNameEn").value("<a>Pay the hearing fee</a>"),
+                jsonPath("$[10].taskNameEn").value("<a>View documents</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
-                jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[11].taskNameEn").value("<a>Add the trial arrangements</a>"),
                 jsonPath("$[11].currentStatusEn").value("Not available yet"),
-                jsonPath("$[12].taskNameEn").value(
+                jsonPath("$[12].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[12].currentStatusEn").value("Not available yet"),
+                jsonPath("$[13].taskNameEn").value(
                     "<a href={VIEW_ORDERS_AND_NOTICES}  rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[12].currentStatusEn").value("Available"),
-                jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
-                jsonPath("$[13].currentStatusEn").value("Not available yet"),
-                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[14].currentStatusEn").value("Not available yet")
+                jsonPath("$[13].currentStatusEn").value("Available"),
+                jsonPath("$[14].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[14].currentStatusEn").value("Not available yet"),
+                jsonPath("$[15].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[15].currentStatusEn").value("Not available yet")
 
             );
 
