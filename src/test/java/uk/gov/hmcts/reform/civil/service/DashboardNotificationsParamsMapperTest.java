@@ -3,12 +3,15 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -24,6 +27,10 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -42,6 +49,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JU
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -176,6 +185,41 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
 
         assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+    }
+
+    @ParameterizedTest
+    @EnumSource(PaymentFrequency.class)
+    public void shouldMapParameters_WhenJudgementByAdmissionInstalmentsIsIssued(PaymentFrequency paymentFrequency) {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        caseData = caseData.toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .activeJudgment(JudgmentDetails.builder()
+                                .state(ISSUED)
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
+                                .orderedAmount("150001")
+                                .instalmentDetails(JudgmentInstalmentDetails.builder()
+                                       .amount("20001")
+                                       .paymentFrequency(paymentFrequency)
+                                       .startDate(LocalDate.now())
+                                       .build())
+                                .build())
+            .build();;
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
+        assertThat(result).extracting("ccjInstallmentAmount").isEqualTo(BigDecimal.valueOf(200.01));
+        assertThat(result).extracting("ccjFirstRepaymentDateEn").isEqualTo(DateUtils.formatDate(LocalDate.now()));
+        switch (paymentFrequency) {
+            case WEEKLY -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("weekly");
+            case EVERY_TWO_WEEKS -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("biweekly");
+            case MONTHLY -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("monthly");
+        }
     }
 
     @Test

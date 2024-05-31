@@ -45,6 +45,7 @@ public class JudgementByAdmissionIssuedDefendantDashboardNotificationHandler ext
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1LiP() && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+        return caseData.isRespondent1LiP()
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
     }
 }

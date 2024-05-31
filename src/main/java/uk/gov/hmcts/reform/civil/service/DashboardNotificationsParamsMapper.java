@@ -5,13 +5,15 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -25,6 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
@@ -63,11 +67,19 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
         }
 
-        if (featureToggleService.isJudgmentOnlineLive() &&
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN &&
-            nonNull(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed())) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && nonNull(caseData.getActiveJudgment())
+            && caseData.getActiveJudgment().getState().equals(ISSUED)
+            && nonNull(caseData.getActiveJudgment().getPaymentPlan())
+            && caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
 
-            params.put("paymentFrequencyMessage", getPaymentAgreementMessage(caseData));
+            JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
+
+            params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
+            params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
+            params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
+            params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -232,25 +244,11 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
-    private String getPaymentAgreementMessage(CaseData caseData) {
-        RepaymentPlanLRspec paymentPlanDetails = caseData.getRespondent1RepaymentPlan();
-
-        return "You’ve agreed to pay the claim amount of £" +
-            MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()) +
-            " in " +
-            getStringPaymentFrecuency(paymentPlanDetails.getRepaymentFrequency()) +
-            " instalments of £" +
-            MonetaryConversions.penniesToPounds(paymentPlanDetails.getPaymentAmount()) +
-            ". The first payment is due on " +
-            caseData.getRespondent1PaymentDateToStringSpec();
-    }
-
-    private String getStringPaymentFrecuency(PaymentFrequencyLRspec repaymentFrequency) {
-        return switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK -> "weekly";
-            case ONCE_TWO_WEEKS -> "biweekly";
-            case ONCE_ONE_MONTH -> "monthly";
-            default -> "";
+    private String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
+        return switch (paymentFrequency) {
+            case WEEKLY -> "weekly";
+            case EVERY_TWO_WEEKS -> "biweekly";
+            case MONTHLY -> "monthly";
         };
     }
 
