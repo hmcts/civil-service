@@ -48,7 +48,6 @@ class JudgmentOnlineMapperTest {
         caseData.setJoAmountOrdered("1100");
         caseData.setJoPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build());
         caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
-        //caseData.setCase(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
         caseData.setJoIsRegisteredWithRTL(YES);
         activeJudgment = recordJudgmentMapper.addUpdateActiveJudgment(caseData);
         caseData.setActiveJudgment(activeJudgment);
@@ -65,7 +64,6 @@ class JudgmentOnlineMapperTest {
         caseData.setJoAmountOrdered("1100");
         caseData.setJoPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build());
         caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
-        //caseData.setCase(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
         caseData.setJoIsRegisteredWithRTL(YES);
         activeJudgment = recordJudgmentMapper.addUpdateActiveJudgment(caseData);
         caseData.setActiveJudgment(activeJudgment);
