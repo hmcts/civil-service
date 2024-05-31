@@ -56,10 +56,10 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
+
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
+
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
-
-
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
