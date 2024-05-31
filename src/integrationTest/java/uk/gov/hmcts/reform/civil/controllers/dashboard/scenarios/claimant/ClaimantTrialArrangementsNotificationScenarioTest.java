@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -21,6 +22,11 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
 
     @Autowired
     private TrialArrangementsClaimantNotificationHandler handler;
+
+    @Override
+    public void before() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+    }
 
     @Test
     void shouldCreateAddTrialArrangementsForClaimant() throws Exception {
