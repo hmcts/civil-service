@@ -30,10 +30,12 @@ import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -214,7 +216,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true),
+                        getTestCaseData(CaseData.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
                 );
 
@@ -244,7 +246,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThrows(IllegalArgumentException.class, () -> helper
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true),
+                        getTestCaseData(CaseData.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
                 ));
 
@@ -610,7 +612,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lr_Vs_Lip_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -656,7 +658,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsApp_Lr_Vs_Lip_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -694,7 +696,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -733,7 +735,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -774,7 +776,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldWork_Lip_Vs_Lip() {
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false).toBuilder();
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -810,11 +812,89 @@ public class InitiateGeneralApplicationServiceHelperTest {
             assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(1);
             assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getForename()).isEqualTo("defF");
             assertThat(result.getParentClaimantIsApplicant()).isEqualTo(YES);
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNull();
+        }
+
+        @Test
+        void shouldUrgency_Lip_Vs_Lip_at_10thDay() {
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 10).toBuilder();
+            caseDataBuilder.addRespondent2(YesOrNo.NO)
+                    .addApplicant2(YesOrNo.NO)
+                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                            .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                            .build())
+                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                            .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
+                                    .getFormattedName())
+                            .build())
+                    .ccdCaseReference(12L)
+                    .respondent1(Party.builder()
+                            .partyID("party")
+                            .partyEmail("party@gmail.com")
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualFirstName("defF").build())
+                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .applicant1Represented(NO);
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForLipVLip()).build());
+            CaseData caseData = caseDataBuilder.build();
+            GeneralApplication result = helper
+                    .setRespondentDetailsIfPresent(
+                            GeneralApplication.builder().build(),
+                            caseData,
+                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                    );
+
+            assertThat(result).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement().getReasonsForUrgency())
+                    .isEqualTo("There is a hearing on the main case within 10 days");
+            assertThat(result.getGeneralAppUrgencyRequirement().getGeneralAppUrgency())
+                    .isEqualTo(YES);
+            assertThat(result.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate())
+                    .isEqualTo(caseData.getHearingDate());
+        }
+
+        @Test
+        void shouldNotUrgency_Lip_Vs_Lip_at_11thDay() {
+            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
+            caseDataBuilder.addRespondent2(YesOrNo.NO)
+                    .addApplicant2(YesOrNo.NO)
+                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                            .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                            .build())
+                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                            .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
+                                    .getFormattedName())
+                            .build())
+                    .ccdCaseReference(12L)
+                    .respondent1(Party.builder()
+                            .partyID("party")
+                            .partyEmail("party@gmail.com")
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualFirstName("defF").build())
+                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .applicant1Represented(NO);
+            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForLipVLip()).build());
+            GeneralApplication result = helper
+                    .setRespondentDetailsIfPresent(
+                            GeneralApplication.builder().build(),
+                            caseDataBuilder.build(),
+                            getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                    );
+
+            assertThat(result).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNull();
         }
 
     }
 
-    public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
+    public CaseData getTestCaseData(CaseData caseData, boolean respondentExits, Integer hearingDateOffset) {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -860,6 +940,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                                      .organisationID(STRING_CONSTANT).build())
                                                    .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .hearingDate(Objects.nonNull(hearingDateOffset) ? LocalDate.now().plusDays(hearingDateOffset) : null)
                 .build();
         } else {
             return caseData.toBuilder()
@@ -891,6 +972,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                                      .organisationID(STRING_CONSTANT).build())
                                                    .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .hearingDate(Objects.nonNull(hearingDateOffset) ? LocalDate.now().plusDays(hearingDateOffset) : null)
                 .build();
         }
     }

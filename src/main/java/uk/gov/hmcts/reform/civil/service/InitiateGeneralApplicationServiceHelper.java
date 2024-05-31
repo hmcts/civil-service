@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +48,8 @@ public class InitiateGeneralApplicationServiceHelper {
     public static final String RESPONDENT_ID = "002";
     public static final String RESPONDENT2_ID = "003";
     public static final String APPLICANT2_ID = "004";
+    private static final int LIP_URGENT_DAYS = 10;
+    private static final String LIP_URGENT_REASON = "There is a hearing on the main case within 10 days";
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
                                                             CaseData caseData, UserDetails userDetails) {
@@ -120,8 +124,23 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
-
+        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
         return applicationBuilder.build();
+    }
+
+    private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
+                                 GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                 CaseData caseData) {
+        if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
+                && Objects.nonNull(caseData.getHearingDate())
+                && LocalDate.now().plusDays(LIP_URGENT_DAYS + 1).isAfter(caseData.getHearingDate())) {
+            applicationBuilder.generalAppUrgencyRequirement(
+                    GAUrgencyRequirement
+                            .builder()
+                            .generalAppUrgency(YES)
+                            .urgentAppConsiderationDate(caseData.getHearingDate())
+                            .reasonsForUrgency(LIP_URGENT_REASON).build());
+        }
     }
 
     private Boolean setSingleGaApplicant(List<CaseAssignedUserRole> applicantSolicitor,
