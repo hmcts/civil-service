@@ -7013,7 +7013,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
+    public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
         return wrapElements(MediationNonAttendanceStatement.builder()
                                 .yourName("My name")
                                 .document(Document.builder()
