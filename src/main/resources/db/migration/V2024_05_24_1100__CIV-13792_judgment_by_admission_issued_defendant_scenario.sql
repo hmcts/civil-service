@@ -7,7 +7,7 @@ VALUES ('Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant',
           "Notice.AAA6.ClaimantIntent.RequestedCCJ.ClaimantAcceptedDefendantPlan.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.NoDefResponse.Defendant",
           "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.DefPaymentMissed.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["paymentAgreement"]}');
+        '{"Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant": ["paymentFrequencyMessage"]}');
 
 /**
  * Add notification template
@@ -17,8 +17,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant',
         'A judgment has been made against you',
         'A judgment has been made against you',
-        '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>${paymentAgreement}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
-        '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>${paymentAgreement}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
+        '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>${paymentFrequencyMessage}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
+        '<p class="govuk-body">The judgment formalises the payment plan you’ve agreed with the claimant.<br>${paymentFrequencyMessage}.<br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>',
         'DEFENDANT');
 
 /**

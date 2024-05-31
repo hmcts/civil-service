@@ -61,9 +61,11 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
         }
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            params.put("defendantAdmittedAmount", this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
-            params.put("paymentAgreement", getPaymentAgreementMessage(caseData));
+        if (featureToggleService.isJudgmentOnlineLive() &&
+            caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN &&
+            nonNull(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed())) {
+
+            params.put("paymentFrequencyMessage", getPaymentAgreementMessage(caseData));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -226,33 +228,26 @@ public class DashboardNotificationsParamsMapper {
         return params;
     }
 
-    private StringBuilder getPaymentAgreementMessage(CaseData caseData) {
-        RespondentResponsePartAdmissionPaymentTimeLRspec paymentPlanType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
-        StringBuilder paymentAgreementMessage = new StringBuilder();
+    private String getPaymentAgreementMessage(CaseData caseData) {
+        RepaymentPlanLRspec paymentPlanDetails = caseData.getRespondent1RepaymentPlan();
 
-        if (paymentPlanType == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-            RepaymentPlanLRspec paymentPlanDetails = caseData.getRespondent1RepaymentPlan();
-            String frequency;
+        return "You’ve agreed to pay the claim amount of £" +
+            MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjJudgmentTotalStillOwed()) +
+            " in " +
+            getStringPaymentFrecuency(paymentPlanDetails.getRepaymentFrequency()) +
+            " instalments of £" +
+            MonetaryConversions.penniesToPounds(paymentPlanDetails.getPaymentAmount()) +
+            ". The first payment is due on " +
+            caseData.getRespondent1PaymentDateToStringSpec();
+    }
 
-            if (paymentPlanDetails.getRepaymentFrequency() == PaymentFrequencyLRspec.ONCE_ONE_MONTH) {
-                frequency = "monthly";
-            } else if (paymentPlanDetails.getRepaymentFrequency() == PaymentFrequencyLRspec.ONCE_TWO_WEEKS) {
-                frequency = "biweekly";
-            } else {
-                frequency = "weekly";
-            }
-
-            paymentAgreementMessage
-                .append("You’ve agreed to pay the claim amount of £")
-                .append(this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))))
-                .append(" in ")
-                .append(frequency)
-                .append(" instalments of £")
-                .append(MonetaryConversions.penniesToPounds(paymentPlanDetails.getPaymentAmount()))
-                .append(". The first payment is due on ")
-                .append(caseData.getRespondent1PaymentDateToStringSpec());
-        }
-        return paymentAgreementMessage;
+    private String getStringPaymentFrecuency(PaymentFrequencyLRspec repaymentFrequency) {
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "weekly";
+            case ONCE_TWO_WEEKS -> "biweekly";
+            case ONCE_ONE_MONTH -> "monthly";
+            default -> "";
+        };
     }
 
     private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {

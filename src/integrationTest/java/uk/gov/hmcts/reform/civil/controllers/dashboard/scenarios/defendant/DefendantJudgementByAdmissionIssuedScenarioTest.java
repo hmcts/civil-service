@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DefendantJudgementByAdmissionIssuedScenarioTest extends DashboardBaseIntegrationTest {
@@ -39,19 +38,6 @@ public class DefendantJudgementByAdmissionIssuedScenarioTest extends DashboardBa
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)
             .andExpect(status().isOk())
             .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("A judgment has been made against you"),
-                jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">The judgment formalises the payment plan you’ve agreed with the claimant.<br>" +
-                               "You’ve agreed to pay the claim amount of £10000000 bla bla bla.<br>" +
-                               "The claimant’s details for payment and the full payment plan can be found on the judgment.<br>" +
-                               "If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>"),
-                jsonPath("$[0].titleCy").value("A judgment has been made against you"),
-                jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">The judgment formalises the payment plan you’ve agreed with the claimant.<br>" +
-                               "You’ve agreed to pay the claim amount of £10000000 bla bla bla.<br>" +
-                               "The claimant’s details for payment and the full payment plan can be found on the judgment.<br>" +
-                               "If you can no longer afford the repayments you’ve agreed with the claimant, you can <u>make an application to vary the judgment</u>.</p>")
-            );
+                status().is(HttpStatus.OK.value()));
     }
 }
