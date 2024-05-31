@@ -42,7 +42,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
             new PDF(
                 JUDGMENT_BY_ADMISSION_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 judgmentByAdmissionLetter.getBytes(),
-                DocumentType.JUDGMENT_BY_ADMISSION_LETTER
+                DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER
             )
         );
         String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
