@@ -50,6 +50,7 @@ public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHand
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("claimantRepaymentPlanDecisionCy", "derbyn");
             scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
