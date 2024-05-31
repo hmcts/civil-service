@@ -10,17 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.validation.groups.ClaimWithdrawalDateGroup;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 
 @Service
@@ -45,7 +40,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if(caseData.getCcdState().equals(CaseState.All_FINAL_ORDERS_ISSUED)) {
+        if (caseData.getCcdState().equals(CaseState.All_FINAL_ORDERS_ISSUED)) {
             errors.add("This action is not currently allowed at this stage");
         }
 
