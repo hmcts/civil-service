@@ -5,15 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -63,7 +61,7 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
         }
 
-        if (featureToggleService.isJudgmentOnlineLive() && nonNull(caseData.getJoPaymentPlan())) {
+        if (featureToggleService.isJudgmentOnlineLive()) {
             params.put("defendantAdmittedAmount", this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
             params.put("paymentAgreement", getPaymentAgreementMessage(caseData));
         }
@@ -229,34 +227,30 @@ public class DashboardNotificationsParamsMapper {
     }
 
     private StringBuilder getPaymentAgreementMessage(CaseData caseData) {
-        PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
+        RespondentResponsePartAdmissionPaymentTimeLRspec paymentPlanType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         StringBuilder paymentAgreementMessage = new StringBuilder();
 
-        if (paymentPlanType == PaymentPlanSelection.PAY_IN_INSTALMENTS) {
-            JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
+        if (paymentPlanType == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+            RepaymentPlanLRspec paymentPlanDetails = caseData.getRespondent1RepaymentPlan();
             String frequency;
 
-            if (instalmentDetails.getPaymentFrequency() == PaymentFrequency.MONTHLY) {
+            if (paymentPlanDetails.getRepaymentFrequency() == PaymentFrequencyLRspec.ONCE_ONE_MONTH) {
                 frequency = "monthly";
-            } else if (instalmentDetails.getPaymentFrequency() == PaymentFrequency.EVERY_TWO_WEEKS) {
+            } else if (paymentPlanDetails.getRepaymentFrequency() == PaymentFrequencyLRspec.ONCE_TWO_WEEKS) {
                 frequency = "biweekly";
             } else {
                 frequency = "weekly";
             }
+
             paymentAgreementMessage
+                .append("You’ve agreed to pay the claim amount of £")
+                .append(this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))))
                 .append(" in ")
                 .append(frequency)
                 .append(" instalments of £")
-                .append(instalmentDetails.getAmount())
+                .append(MonetaryConversions.penniesToPounds(paymentPlanDetails.getPaymentAmount()))
                 .append(". The first payment is due on ")
-                .append(instalmentDetails.getStartDate());
-        } else if (paymentPlanType == PaymentPlanSelection.PAY_BY_DATE) {
-            // TODO: ask for final message
-            paymentAgreementMessage.append(" placeholder for set by date ")
-                .append(caseData.getJoPaymentPlan().getPaymentDeadlineDate());
-        } else {
-            // TODO: ask for final message
-            paymentAgreementMessage.append(" immediately");
+                .append(caseData.getRespondent1PaymentDateToStringSpec());
         }
         return paymentAgreementMessage;
     }
