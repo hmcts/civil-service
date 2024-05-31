@@ -49,6 +49,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
@@ -105,6 +106,41 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
                 jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae barnwr wedi adolygu eich achos ac " +
                                                          "nid yw'n ofynnol i chi gyflwyno dogfennau bellach yn ymwneud â pheidio â mynychu apwyntiad cyfryngu. " +
                                                          "Ni fydd unrhyw gosbau yn cael eu gosod am eich diffyg presenoldeb.</p>"));
+    }
+
+    @Test
+    void should_create_order_made_claimant_scenario_pre_cp_release() throws Exception {
+
+        String caseId = "72014545415";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
+            .finalOrderDocumentCollection(List.of(ElementUtils.element(
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        handler.handle(callbackParamsTest(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("An order has been issued by the court."),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
+                        "Please send any documents to the court named in the order if required. " +
+                        "The claim will now proceed offline, you will receive further updates by post.</p>"),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys."),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
+                        "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
+                        "Bydd yr hawliad nawr yn parhau all-lein a byddwch yn cael unrhyw ddiweddariadau pellach drwy’r post.</p>")
+            );
     }
 
     private static CallbackParams callbackParamsTest(CaseData caseData) {
