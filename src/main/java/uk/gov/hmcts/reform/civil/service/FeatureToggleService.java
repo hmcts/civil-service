@@ -91,7 +91,7 @@ public class FeatureToggleService {
     }
 
     public boolean isEarlyAdoptersEnabled() {
-        return LocalDate.now().getYear() < 2000;
+        return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 
     public boolean isSdoR2Enabled() {
