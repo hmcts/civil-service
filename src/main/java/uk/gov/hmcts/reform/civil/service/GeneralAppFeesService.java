@@ -57,8 +57,9 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
             = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
-    public Fee getFeeForGA(GeneralApplicationTypes applicationType, Boolean withConsent, Boolean withNotice) {
-        return getFeeForGA(List.of(applicationType), withConsent, withNotice, null);
+    public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
+                              Boolean withNotice, LocalDate hearingDate) {
+        return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
     }
 
     public Fee getFeeForGA(CaseData caseData) {

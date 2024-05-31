@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 
 @Service
@@ -41,6 +44,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -93,18 +97,35 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     }
 
     private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
+        String nextState;
+        BusinessProcess businessProcess;
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        CCJPaymentDetails
-            ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
+
+        if (featureToggleService.isJudgmentOnlineLive()
+            && data.isLRvLipOneVOne()
+            && data.isPayImmediately()) {
+
+            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+            businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
+        } else {
+            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
+        }
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            data.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data));
+            data.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        }
+
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            .businessProcess(BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC))
+            .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .state(nextState)
             .build();
     }
 
