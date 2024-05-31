@@ -253,8 +253,8 @@ public class InitiateGeneralApplicationServiceHelper {
         if (respSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                 || respSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
             collectGaRespLip(applicationBuilder, specBuilder, respSol, caseData);
-                    /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
-                details if case role of collected user matches with case role of Applicant 1*/
+            /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
+            details if case role of collected user matches with case role of Applicant 1*/
         } else if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
             if (caseData.getApplicantSolicitor1UserDetails() != null) {
                 specBuilder.id(respSol.getUserId());
@@ -262,15 +262,15 @@ public class InitiateGeneralApplicationServiceHelper {
                 specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                         .getOrganisation().getOrganisationID());
             }
-                /*Populate the GA respondent solicitor details in accordance with civil case Respondent
-                Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
+            /*Populate the GA respondent solicitor details in accordance with civil case Respondent
+            Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
         } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
             specBuilder.id(respSol.getUserId());
             specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
             specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
-                /*Populate the GA respondent solicitor details in accordance with civil case Respondent
-                Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
+            /*Populate the GA respondent solicitor details in accordance with civil case Respondent
+            Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
         } else {
             if (Objects.nonNull(caseData.getAddRespondent2())
                     && caseData.getAddRespondent2().equals(YES)) {
