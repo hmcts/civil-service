@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -152,7 +153,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     LocationRefDataService.class,
     JudgementService.class,
     PaymentDateService.class,
-    ResponseOneVOneShowTagService.class
+    ResponseOneVOneShowTagService.class,
+    JudgmentByAdmissionOnlineMapper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -1329,6 +1331,12 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
@@ -1336,6 +1344,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.INDIVIDUAL).build()).build();
@@ -1344,6 +1356,12 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getState())
                 .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+
         }
 
         @Test
