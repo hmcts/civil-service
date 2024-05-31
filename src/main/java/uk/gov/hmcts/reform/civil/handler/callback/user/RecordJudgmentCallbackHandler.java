@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.JudgmentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
@@ -36,7 +35,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper = new RecordJudgmentOnlineMapper();
+    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,7 +87,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-        caseData.setJudgmentType(JudgmentType.JUDGMENT_FOLLOWING_HEARING);
         caseData.setJoSetAsideOrderDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
         caseData.setJoSetAsideOrderType(null);

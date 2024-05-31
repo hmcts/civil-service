@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.JudgmentType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -636,7 +635,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentPaymentPlan joPaymentPlan;
     private JudgmentInstalmentDetails joInstalmentDetails;
     private YesOrNo joIsLiveJudgmentExists;
-    private JudgmentType judgmentType;
     private JudgmentPaidInFull joJudgmentPaidInFull;
     private JudgmentSetAsideReason joSetAsideReason;
     private String joSetAsideJudgmentErrorText;
