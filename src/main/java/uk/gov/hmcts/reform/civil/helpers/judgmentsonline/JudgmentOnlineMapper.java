@@ -28,7 +28,7 @@ public abstract class JudgmentOnlineMapper {
         return activeJudgment.toBuilder()
             .isJointJudgment(YesOrNo.YES)
             .lastUpdateTimeStamp(LocalDateTime.now())
-            .courtLocation(caseData.getCaseManagementLocation().getBaseLocation())
+            .courtLocation(caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation().getBaseLocation() : null)
             .build();
     }
 

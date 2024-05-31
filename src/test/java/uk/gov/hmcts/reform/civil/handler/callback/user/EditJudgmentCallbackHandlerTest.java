@@ -7,36 +7,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
+    EditJudgmentOnlineMapper.class,
     EditJudgmentCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    DefaultJudgmentOnlineMapper.class,
+    InterestCalculator.class
 })
 class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -45,6 +64,12 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @MockBean
+    private Time time;
+    @Mock
+    private InterestCalculator interestCalculator;
+    @InjectMocks
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -60,6 +85,8 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
+            caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -72,6 +99,38 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption", "No");
             }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
+        void shouldPopulateIfRTLRadioDisplayForDJ(YesOrNo value) {
+            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPaymentAmount("10")
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .partialPayment(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Smith")
+                                                     .build())
+                                          .build())
+                .build();
+            caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            //Then: all showRTL field should be set correctly
+            assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption", "No");
+
         }
     }
 
