@@ -21,7 +21,4 @@ public abstract class CaseProgressionDashboardCallbackHandler extends DashboardC
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
-
-    protected abstract String getScenario(CaseData caseData);
-
 }
