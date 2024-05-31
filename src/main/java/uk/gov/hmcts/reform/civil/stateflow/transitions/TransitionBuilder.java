@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -19,15 +21,14 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
 
-    protected final CaseDetailsConverter caseDetailsConverter;
-    protected final FeatureToggleService featureToggleService;
     protected final FlowState.Main fromState;
+    protected final FeatureToggleService featureToggleService;
     public static final String FLOW_NAME = "MAIN";
 
-    private final List<Transition> transitions = new ArrayList<>();
-
+    private List<Transition> transitions;
 
     @Override
     public MoveToNext<FlowState.Main> moveTo(FlowState.Main toState) {
@@ -68,4 +69,14 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
     }
 
 
+    @Override
+    public List<Transition> buildTransitions() {
+        this.transitions = new ArrayList<>();
+        setUpTransitions();
+        return this.transitions;
+    }
+
+
+
+    abstract void setUpTransitions() ;
 }

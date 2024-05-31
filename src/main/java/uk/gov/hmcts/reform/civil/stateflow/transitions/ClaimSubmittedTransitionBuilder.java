@@ -25,17 +25,16 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @Component
-public class ClaimSubmittedTransitionBuilder extends TransitionBuilder {
-    
+public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
     @Autowired
-    public ClaimSubmittedTransitionBuilder(FeatureToggleService featureToggleService, CaseDetailsConverter caseDetailsConverter) {
-        super(caseDetailsConverter, featureToggleService, FlowState.Main.CLAIM_SUBMITTED);
+    public ClaimSubmittedTransitionBuilder(FeatureToggleService featureToggleService) {
+        super(FlowState.Main.CLAIM_SUBMITTED, featureToggleService);
     }
 
 
     @Override
-    public List<Transition> buildTransitions() {
-        return this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyWhen(paymentSuccessful)
+    void setUpTransitions() {
+        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyWhen(paymentSuccessful)
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffBeforeClaimIssued)
             .moveTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyWhen(paymentFailed)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(isLipCase)
@@ -63,6 +62,6 @@ public class ClaimSubmittedTransitionBuilder extends TransitionBuilder {
                 Map.of(
                     FlowFlag.LIP_CASE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                ))).buildTransitions();
+                )));
     }
 }

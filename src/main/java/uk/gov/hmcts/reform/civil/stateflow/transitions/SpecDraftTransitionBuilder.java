@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
@@ -24,11 +22,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
-@Component
-public class DraftTransitionBuilder extends TransitionBuilder {
+public class SpecDraftTransitionBuilder extends TransitionBuilder {
 
-    public DraftTransitionBuilder(FeatureToggleService featureToggleService) {
-        super(FlowState.Main.DRAFT, featureToggleService);
+    public SpecDraftTransitionBuilder(FeatureToggleService featureToggleService) {
+        super(FlowState.Main.SPEC_DRAFT, featureToggleService);
     }
 
     @Override
