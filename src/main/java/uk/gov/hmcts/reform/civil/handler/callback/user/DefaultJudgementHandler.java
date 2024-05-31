@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
@@ -105,8 +106,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        log.info("Base Location  location :::::::::::" + caseData.getcaseManagementLocation().getBaseLocation());
-        log.info("Region :::::::::::" + caseData.getcaseManagementLocation().getRegion());
+        log.info("Base Location  location :::::::::::" + caseData.getCaseManagementLocation().getBaseLocation());
+        log.info("Region :::::::::::" + caseData.getCaseManagementLocation().getRegion());
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
@@ -243,8 +244,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("Base Location  location :::::::::::" + caseData.getcaseManagementLocation().getBaseLocation());
-        log.info("Region :::::::::::" + caseData.getcaseManagementLocation().getRegion());
+        log.info("Base Location  location :::::::::::" + caseData.getCaseManagementLocation().getBaseLocation());
+        log.info("Region :::::::::::" + caseData.getCaseManagementLocation().getRegion());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             DynamicList list = formatLocationList(caseData.getHearingSupportRequirementsDJ()
