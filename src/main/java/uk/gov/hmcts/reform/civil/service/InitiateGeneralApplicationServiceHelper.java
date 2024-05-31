@@ -191,7 +191,7 @@ public class InitiateGeneralApplicationServiceHelper {
             if (applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
                 return Optional.of(Boolean.FALSE);
             } else {
-                Optional.of(Boolean.TRUE);
+                return Optional.of(Boolean.TRUE);
             }
         }
         return Optional.empty();
