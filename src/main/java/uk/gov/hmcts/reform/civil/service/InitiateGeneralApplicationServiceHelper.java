@@ -152,7 +152,7 @@ public class InitiateGeneralApplicationServiceHelper {
         CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
         Boolean isGaAppSameAsParentCaseClLip = null;
         if (applnSol.getCaseRole() != null) {
-            isGaAppSameAsParentCaseClLip = setGaLipApp(applnSol, applicationBuilder);
+            isGaAppSameAsParentCaseClLip = setGaLipApp(applnSol, applicationBuilder).orElse(null);
             if (applnSol.getCaseRole().equals(applicant1OrgCaseRole)) {
 
                 applicantBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
@@ -183,19 +183,18 @@ public class InitiateGeneralApplicationServiceHelper {
         return isGaAppSameAsParentCaseClLip;
     }
 
-    private Boolean setGaLipApp(CaseAssignedUserRole applnSol,
+    private Optional<Boolean> setGaLipApp(CaseAssignedUserRole applnSol,
                                 GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        Boolean isGaAppSameAsParentCaseClLip = null;
         if (applnSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                 || applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
             applicationBuilder.isGaApplicantLip(YES);
             if (applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
-                return false;
+                return Optional.of(Boolean.FALSE);
             } else {
-                return true;
+                Optional.of(Boolean.TRUE);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private Boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier, Boolean isGAAppSameAsParentCaseLip) {
