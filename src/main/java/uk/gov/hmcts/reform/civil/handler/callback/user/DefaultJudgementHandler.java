@@ -105,6 +105,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        log.info("Base Location  location :::::::::::" + caseData.getcaseManagementLocation().getBaseLocation());
+        log.info("Region :::::::::::" + caseData.getcaseManagementLocation().getRegion());
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
@@ -241,6 +243,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Base Location  location :::::::::::" + caseData.getcaseManagementLocation().getBaseLocation());
+        log.info("Region :::::::::::" + caseData.getcaseManagementLocation().getRegion());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             DynamicList list = formatLocationList(caseData.getHearingSupportRequirementsDJ()
