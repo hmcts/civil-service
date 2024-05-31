@@ -36,7 +36,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper = new RecordJudgmentOnlineMapper();
+    private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
