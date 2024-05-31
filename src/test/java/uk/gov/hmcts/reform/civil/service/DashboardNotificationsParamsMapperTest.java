@@ -215,10 +215,13 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
         assertThat(result).extracting("ccjInstallmentAmount").isEqualTo(BigDecimal.valueOf(200.01));
         assertThat(result).extracting("ccjFirstRepaymentDateEn").isEqualTo(DateUtils.formatDate(LocalDate.now()));
-        switch (paymentFrequency) {
-            case WEEKLY -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("weekly");
-            case EVERY_TWO_WEEKS -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("biweekly");
-            case MONTHLY -> assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("monthly");
+
+        if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("weekly");
+        } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("biweekly");
+        } else {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("monthly");
         }
     }
 
