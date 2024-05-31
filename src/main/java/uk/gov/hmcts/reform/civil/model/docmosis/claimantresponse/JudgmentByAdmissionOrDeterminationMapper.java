@@ -197,7 +197,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return null;
     }
 
-
     private Party getOrgDetails(OrganisationPolicy organisationPolicy) {
 
         return Optional.ofNullable(organisationPolicy)
@@ -292,8 +291,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .paymentPlan(getPaymentTypeForNonDivergent(caseData))
             .payByDate(caseData.getRespondToClaimAdmitPartLRspec() != null
                            ? DateFormatHelper.formatLocalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(), DateFormatHelper.DATE) : null)
-            .paymentStr(caseData.isPayByInstallment() ?
-                            getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .paymentStr(caseData.isPayByInstallment() ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentFrequency(caseData.isPayByInstallment()
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentDate(caseData.isPayByInstallment()
