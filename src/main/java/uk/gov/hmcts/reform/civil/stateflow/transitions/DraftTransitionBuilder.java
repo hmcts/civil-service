@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
@@ -25,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
 @Component
+@Scope(value = "prototype")
 public class DraftTransitionBuilder extends TransitionBuilder {
 
     public DraftTransitionBuilder(FeatureToggleService featureToggleService) {
@@ -33,7 +31,8 @@ public class DraftTransitionBuilder extends TransitionBuilder {
 
     @Override
     void setUpTransitions() {
-         this.moveTo(FlowState.Main.CLAIM_SUBMITTED).onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
+        this.moveTo(CLAIM_SUBMITTED)
+            .onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
             .set(flags -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -43,7 +42,7 @@ public class DraftTransitionBuilder extends TransitionBuilder {
                     DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
-            .moveTo(FlowState.Main.CLAIM_SUBMITTED)
+            .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
                 .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
                 .or(claimSubmittedBothUnregisteredSolicitors))
@@ -80,6 +79,19 @@ public class DraftTransitionBuilder extends TransitionBuilder {
                     DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
+            // Unrepresented defendant 2
+            .moveTo(CLAIM_SUBMITTED)
+            .onlyWhen(claimSubmittedRespondent2Unrepresented
+                .and(claimSubmittedRespondent1Unrepresented.negate()))
+            .set(flags -> flags.putAll(
+                Map.of(
+                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
+                    FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
+                    GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
+                )))
+            // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedRespondent1Unrepresented.and(
                 claimSubmittedRespondent2Unrepresented))
@@ -90,30 +102,7 @@ public class DraftTransitionBuilder extends TransitionBuilder {
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                     DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                )))
-             .moveTo(CLAIM_SUBMITTED)
-             .onlyWhen(claimSubmittedRespondent2Unrepresented
-                 .and(claimSubmittedRespondent1Unrepresented.negate()))
-             .set(flags -> flags.putAll(
-                 Map.of(
-                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
-                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                     DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                 )))
-             // Unrepresented defendants
-             .moveTo(CLAIM_SUBMITTED)
-             .onlyWhen(claimSubmittedRespondent1Unrepresented.and(
-                 claimSubmittedRespondent2Unrepresented))
-             .set(flags -> flags.putAll(
-                 Map.of(
-                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                     DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                 )));
+                )));
     }
 
 

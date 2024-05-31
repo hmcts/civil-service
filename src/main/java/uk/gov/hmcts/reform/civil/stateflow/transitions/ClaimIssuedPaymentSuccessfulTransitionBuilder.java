@@ -44,7 +44,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 2. Def1 unrepresented, Def2 registered
             // 3. Def1 registered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .onlyWhen(getOr())
+            .onlyWhen(pendingClaimIssuedUnrepresentedDefendentPredicate())
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
@@ -82,7 +82,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
     }
 
     @NotNull
-    public static Predicate<CaseData> getOr() {
+    public static Predicate<CaseData> pendingClaimIssuedUnrepresentedDefendentPredicate() {
         return (respondent1NotRepresented.and(respondent2NotRepresented))
             .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
             .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
