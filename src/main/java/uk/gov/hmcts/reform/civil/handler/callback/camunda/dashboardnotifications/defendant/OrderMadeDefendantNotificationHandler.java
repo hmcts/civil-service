@@ -73,8 +73,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return !(isNull(caseData.getRes1MediationDocumentsReferred())
             && isNull(caseData.getRes1MediationNonAttendanceDocs())
             && isNull(caseData.getApp1MediationDocumentsReferred())
-            && isNull(caseData.getApp1MediationNonAttendanceDocs())
-        );
+            && isNull(caseData.getApp1MediationNonAttendanceDocs()));
     }
 
     @Override
