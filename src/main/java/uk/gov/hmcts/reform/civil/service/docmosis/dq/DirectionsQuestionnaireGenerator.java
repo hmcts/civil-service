@@ -137,21 +137,21 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = featureToggleService.isFastTrackUpliftsEnabled()
+                    templateId = isFastTrackOrMinti
                         ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isFastTrackUpliftsEnabled()
+                    templateId = isFastTrackOrMinti
                         ? DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_1V2_SS;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isFastTrackUpliftsEnabled()
+                    templateId = isFastTrackOrMinti
                         ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
                 }
                 break;
@@ -278,9 +278,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder.build();
     }
 
-    private String getClaimTrack(CaseData caseData){
+    private String getClaimTrack(CaseData caseData) {
         return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack();
+    }
+
+    private boolean shouldDisplayDisclosureReport(CaseData caseData) {
+        // This is to hide disclosure report from prod
+        if (MULTI_CLAIM.toString().equals(caseData.getAllocatedTrack())) {
+            return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        }
+        return true;
     }
 
     @NotNull
@@ -321,14 +329,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             specAndSmallClaim = true;
         }
 
-        DisclosureReport disclosureReport;
-        if (INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
-            || (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && MULTI_CLAIM.equals(caseData.getAllocatedTrack()))) {
-            getDisclosureReport(dq);
-        }
-
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -345,7 +347,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .furtherInformation(getFurtherInformation(dq, caseData))
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
-            .disclosureReport(getDisclosureReport(dq))
+            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq, authorisation));
         return builder;
@@ -620,14 +622,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .disclosureReport(getDisclosureReport(dq))
+            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -655,14 +657,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.equals(getClaimTrack(caseData))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .disclosureReport(getDisclosureReport(dq))
+            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
