@@ -78,6 +78,7 @@ public class Respondent2DQ implements DQ {
         return respondent2DQDisclosureOfElectronicDocuments;
     }
 
+    @Override
     @JsonProperty("specRespondent2DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
         return specRespondent2DQDisclosureOfElectronicDocuments;
@@ -89,6 +90,7 @@ public class Respondent2DQ implements DQ {
         return respondent2DQDisclosureOfNonElectronicDocuments;
     }
 
+    @Override
     @JsonProperty("specRespondent2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
         return specRespondent2DQDisclosureOfNonElectronicDocuments;

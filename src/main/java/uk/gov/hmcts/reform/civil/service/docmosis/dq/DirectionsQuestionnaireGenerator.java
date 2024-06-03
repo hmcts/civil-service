@@ -62,6 +62,7 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -285,8 +286,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
         // This is to hide disclosure report from prod
-        if (MULTI_CLAIM.toString().equals(caseData.getAllocatedTrack())) {
+        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        } else if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && FAST_CLAIM.equals(caseData.getAllocatedTrack())) {
+            return false;
         }
         return true;
     }

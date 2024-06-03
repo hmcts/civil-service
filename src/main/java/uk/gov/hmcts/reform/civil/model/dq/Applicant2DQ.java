@@ -68,6 +68,7 @@ public class Applicant2DQ implements DQ {
         return applicant2DQDisclosureOfElectronicDocuments;
     }
 
+    @Override
     public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
         return null;
     }
@@ -78,6 +79,7 @@ public class Applicant2DQ implements DQ {
         return applicant2DQDisclosureOfNonElectronicDocuments;
     }
 
+    @Override
     public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
         return null;
     }
