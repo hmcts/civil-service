@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED;
@@ -36,7 +34,7 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    @Autowired
+
     private final StateFlowEngine stateFlowEngine;
 
     @Override
@@ -85,7 +83,7 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
                 .getStateHistory()
                 .stream()
                 .map(State::getName)
-                .collect(Collectors.toList()),
+                .toList(),
             notificationsProperties
         );
     }
