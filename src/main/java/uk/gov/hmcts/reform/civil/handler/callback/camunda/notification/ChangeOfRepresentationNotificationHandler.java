@@ -124,8 +124,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         switch (event) {
             case NOTIFY_FORMER_SOLICITOR:
                 return notificationsProperties.getNoticeOfChangeFormerSolicitor();
-            case NOTIFY_OTHER_SOLICITOR_1:
-            case NOTIFY_OTHER_SOLICITOR_2:
+            case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2:
                 return notificationsProperties.getNoticeOfChangeOtherParties();
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
