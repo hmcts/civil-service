@@ -81,7 +81,7 @@ public class HwFDashboardNotificationsHandler extends DashboardCallbackHandler {
         if (caseData.getHwFEvent() != null) {
             if (caseData.isHWFTypeClaimIssued()) {
                 return dashboardScenariosClaimIssue.get(caseData.getHwFEvent());
-            } else if (caseData.isHWFTypeHearing()) {
+            } else if (caseData.isHWFTypeHearing() && featureToggleService.isCaseProgressionEnabled()) {
                 return dashboardScenariosHearingFee.get(caseData.getHwFEvent());
             }
         }

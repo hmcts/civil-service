@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +27,12 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
 
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
+
+    @BeforeEach
+    public void before() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+    }
 
     @Test
     void should_create_hearing_fee_hwf_rejected_scenario() throws Exception {
@@ -32,6 +42,7 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false).build()
             .toBuilder()
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
             .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.NO_REMISSION_HWF).build())
@@ -61,7 +72,8 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value("<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={PAY_HEARING_FEE} class=\"govuk-link\">Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value("Action needed")
             );
     }
