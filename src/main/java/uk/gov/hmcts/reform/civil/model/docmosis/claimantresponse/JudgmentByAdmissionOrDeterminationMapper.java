@@ -80,6 +80,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
             .paymentType(getPaymentType(caseData))
+            .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
             .payBy(setPayByDate(caseData))
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
