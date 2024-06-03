@@ -350,7 +350,7 @@ public class DashboardNotificationsParamsMapper {
         StringBuilder paymentFrequencyMessage = new StringBuilder();
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
             JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
-            paymentFrequencyMessage.append(" You must pay the claim amount of £ ")
+            paymentFrequencyMessage.append("You must pay the claim amount of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())))).toString())
                 .append(" in ")
                 .append(getStringPaymentFrecuency(instalmentDetails))

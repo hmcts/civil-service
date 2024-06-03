@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_NON_DIVERGENT_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENT_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT;
 
 @Service
 public class DefaultJudgementIssuedDefendantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
@@ -38,7 +38,7 @@ public class DefaultJudgementIssuedDefendantNotificationHandler extends Dashboar
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_JUDGEMENT_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT.getScenario();
+        return SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario();
     }
 
     @Override

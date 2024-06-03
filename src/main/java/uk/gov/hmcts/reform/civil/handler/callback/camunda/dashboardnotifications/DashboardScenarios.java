@@ -146,8 +146,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Defendant"),
-    SCENARIO_AAA6_JUDGEMENT_ONLINE_DEFAULT_JUDGEMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
-    SCENARIO_AAA6_JUDGEMENT_ONLINE_RECORD_JUDGEMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant");
+    SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
+    SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant");
 
     private final String scenario;
 
