@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -17,7 +15,7 @@ public class SettleClaimHelperTest {
     void test_state() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         List<String> errors = new ArrayList<>();
-        SettleClaimHelper.checkState(caseData,errors);
+        SettleClaimHelper.checkState(caseData, errors);
         assertThat(errors).isEmpty();
     }
 
@@ -25,7 +23,7 @@ public class SettleClaimHelperTest {
     void test_state_all_final_orders_issued() {
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
         List<String> errors = new ArrayList<>();
-        SettleClaimHelper.checkState(caseData,errors);
+        SettleClaimHelper.checkState(caseData, errors);
         assertThat(errors).isNotEmpty();
     }
 }
