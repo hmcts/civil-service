@@ -57,6 +57,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
+    static final String claimant = "Claimant";
+    static final String defendant = "Defendant";
+    static final String invalidParticipants = "Invalid participants";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -98,17 +101,17 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
 
         switch (multiPartyScenario) {
             case ONE_V_ONE: {
-                dynamicListOptions.add("Claimant");
-                dynamicListOptions.add("Defendant");
+                dynamicListOptions.add(claimant);
+                dynamicListOptions.add(defendant);
                 break;
             }
             case ONE_V_TWO_ONE_LEGAL_REP: {
-                dynamicListOptions.add("Claimant");
+                dynamicListOptions.add(claimant);
                 dynamicListOptions.add("Defendants");
                 break;
             }
             case ONE_V_TWO_TWO_LEGAL_REP: {
-                dynamicListOptions.add("Claimant");
+                dynamicListOptions.add(claimant);
                 dynamicListOptions.add("Defendant 1");
                 dynamicListOptions.add("Defendant 2");
                 break;
@@ -119,7 +122,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default: {
-                throw new CallbackException(String.format("Invalid participants"));
+                throw new CallbackException(invalidParticipants);
             }
         }
 
@@ -176,7 +179,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToApplicant2(caseData, updatedData);
             }
             // FALL-THROUGH
-            case ("Claimant"): {
+            case (claimant): {
                 addDateToApplicant1(caseData, updatedData);
                 break;
             }
@@ -184,8 +187,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToRespondent2(caseData, updatedData);
             }
             // FALL-THROUGH
-            case ("Defendant"):
-            case ("Defendant 1"): {
+            case (defendant), ("Defendant 1"): {
                 addDateToRespondent1(caseData, updatedData);
                 break;
             }
@@ -194,7 +196,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default: {
-                throw new CallbackException(String.format("Invalid participants"));
+                throw new CallbackException(invalidParticipants);
             }
         }
     }
@@ -251,7 +253,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default:
-                throw new CallbackException(String.format("Invalid participants"));
+                throw new CallbackException(invalidParticipants);
         }
     }
 
@@ -338,7 +340,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             + " %n%n Any dates marked as being unavailable for a hearing are now displayed in the Listing notes tab.";
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# Availability updated"))
+            .confirmationHeader("# Availability updated")
             .confirmationBody(format(body))
             .build();
     }
