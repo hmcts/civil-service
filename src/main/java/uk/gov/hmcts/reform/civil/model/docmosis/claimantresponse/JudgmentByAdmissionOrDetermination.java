@@ -60,4 +60,5 @@ public class JudgmentByAdmissionOrDetermination implements MappableObject {
     private final String paymentStr;
     private final String installmentAmount;
     private final String payByDate;
+    private final String applicantReference;
 }

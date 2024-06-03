@@ -283,6 +283,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
             .respondent1Ref(getRespondent1SolicitorRef(caseData))
             .respondent2Ref(getRespondent2SolicitorRef(caseData))
+            .applicantReference(getApplicantSolicitorRef(caseData))
             .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
             .respondent(getRespondentLROrLipDetails(caseData))
