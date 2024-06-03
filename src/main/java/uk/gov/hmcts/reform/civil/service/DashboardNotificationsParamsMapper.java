@@ -353,7 +353,7 @@ public class DashboardNotificationsParamsMapper {
             paymentFrequencyMessage.append("You must pay the claim amount of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())))).toString())
                 .append(" in ")
-                .append(getStringPaymentFrecuency(instalmentDetails))
+                .append(getStringPaymentFrequency(instalmentDetails))
                 .append(" instalments of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
                 .append(" The first payment is due on ")
@@ -362,7 +362,7 @@ public class DashboardNotificationsParamsMapper {
         return paymentFrequencyMessage;
     }
 
-    private static String getStringPaymentFrecuency(JudgmentInstalmentDetails judgmentInstalmentDetails) {
+    private static String getStringPaymentFrequency(JudgmentInstalmentDetails judgmentInstalmentDetails) {
         switch (judgmentInstalmentDetails.getPaymentFrequency()) {
             case WEEKLY :
                 return "weekly";
