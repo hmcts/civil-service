@@ -23,7 +23,10 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.util.List;
 
@@ -44,7 +47,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCES
     FlowStateAllowedEventService.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class})
+    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 class NoOngoingBusinessProcessAspectTest {
 
     @Autowired
