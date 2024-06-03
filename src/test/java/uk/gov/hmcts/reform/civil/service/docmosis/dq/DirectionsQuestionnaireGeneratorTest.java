@@ -20,16 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
-import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
-import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
-import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
-import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
-import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -818,6 +809,36 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
+            void whenIntermediateClaim_shouldUseFixedRecoverableCostsIntermediate() {
+                FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .frcSupportingDocument(Document.builder().build())
+                    .complexityBandingAgreed(YES)
+                    .band(ComplexityBand.BAND_1)
+                    .reasons("Reasoning")
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQFixedRecoverableCosts(null)
+                                       .respondent1DQFixedRecoverableCostsIntermediate(frcIntermediate)
+                                       .build())
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+                assertThat(data.getIsSubjectToFixedRecoverableCostRegime()).isEqualTo(YES);
+                assertThat(data.getComplexityBandingAgreed()).isEqualTo(YES);
+                assertThat(data.getBand()).isEqualTo(ComplexityBand.BAND_1);
+                assertThat(data.getBandText()).isEqualTo(ComplexityBand.BAND_1.getLabel());
+                assertThat(data.getReasons()).isEqualTo("Reasoning");
+            }
+
+            @Test
             void whenDisclosureReport_include() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -1098,13 +1119,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void when1V1SpecMulti_DoNotIncludeIntermediateFrcDetails() {
-                FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
-                    .isSubjectToFixedRecoverableCostRegime(YES)
-                    .frcSupportingDocument(Document.builder().build())
-                    .complexityBandingAgreed(YES)
-                    .band(ComplexityBand.BAND_1)
-                    .reasons("Reasoning")
-                    .build();
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
