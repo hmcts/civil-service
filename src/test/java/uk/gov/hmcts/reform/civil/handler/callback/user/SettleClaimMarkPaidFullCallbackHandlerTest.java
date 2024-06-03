@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private SettleClaimCallbackHandler handler;
+    private SettleClaimMarkPaidFullCallbackHandler handler;
 
     @Nested
     class AboutToStartCallback {
