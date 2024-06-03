@@ -45,7 +45,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandler extends Dashbo
     }
 
     @Override
-    public String getExtraScenario(CaseData caseData) {
+    public String getExtraScenario() {
         return SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_CLAIMANT.getScenario();
     }
 
