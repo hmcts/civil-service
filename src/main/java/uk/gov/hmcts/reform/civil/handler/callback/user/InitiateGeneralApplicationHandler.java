@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -142,7 +141,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
@@ -313,6 +312,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
      * @param callbackParams This parameter is required as this is passed as reference for execute method in CallBack
      * @return empty submitted callback response
      */
+    @Override
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
     }

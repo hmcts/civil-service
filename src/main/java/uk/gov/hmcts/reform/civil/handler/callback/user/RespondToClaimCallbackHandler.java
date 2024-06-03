@@ -236,13 +236,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
-                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-                    }
-                }
+            } else if (respondent2HasSameLegalRep(caseData)
+                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
+                && (caseData.getRespondent2DQ() != null
+                && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
             }
         }
         return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
@@ -255,13 +253,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
-                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-                    }
-                }
+            } else if (respondent2HasSameLegalRep(caseData)
+                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
+                && (caseData.getRespondent2DQ() != null
+                && caseData.getRespondent2DQ().getRespondent2DQExperts() != null)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
             }
         }
         return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
@@ -274,12 +270,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 hearing = caseData.getRespondent2DQ().getHearing();
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
-                        hearing = caseData.getRespondent2DQ().getHearing();
-                    }
-                }
+            } else if (respondent2HasSameLegalRep(caseData)
+                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
+                && (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null)) {
+                hearing = caseData.getRespondent2DQ().getHearing();
             }
         }
 
@@ -351,10 +345,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
-            if (caseData.getRespondent1Copy().getPrimaryAddress() == null) {
-                throw new IllegalArgumentException("Primary Address cannot be empty");
-            }
+        if (ofNullable(caseData.getRespondent1Copy()).isPresent()
+            || (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
+            throw new IllegalArgumentException("Primary Address cannot be empty");
         }
 
         // persist respondent address (ccd issue)
@@ -748,15 +741,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
-        );
+        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
     }
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {

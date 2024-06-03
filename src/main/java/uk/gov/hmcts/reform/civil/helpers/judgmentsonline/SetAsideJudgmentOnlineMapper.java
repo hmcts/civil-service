@@ -35,8 +35,15 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private LocalDate getSetAsideDate(CaseData caseData) {
-        return JudgmentSetAsideReason.JUDGE_ORDER
-            .equals(caseData.getJoSetAsideReason()) ? (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION
-            .equals(caseData.getJoSetAsideOrderType()) ? caseData.getJoSetAsideOrderDate() : caseData.getJoSetAsideDefenceReceivedDate()) : LocalDate.now();
+        LocalDate currentDate = LocalDate.now();
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
+            if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+                return caseData.getJoSetAsideOrderDate();
+            } else {
+                return caseData.getJoSetAsideDefenceReceivedDate();
+            }
+        } else {
+            return currentDate;
+        }
     }
 }

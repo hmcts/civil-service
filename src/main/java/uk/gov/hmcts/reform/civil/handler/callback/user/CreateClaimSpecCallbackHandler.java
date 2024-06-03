@@ -477,7 +477,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
         dataBuilder.caseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            CaseManagementCategory.builder().value(civil).listItems(itemList).build());
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 

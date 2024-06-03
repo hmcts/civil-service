@@ -77,9 +77,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList.DEFENDANT_NOT_ATTENDING;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v1;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v2;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2_V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -980,7 +980,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should1v1Text_WhenSubmittedAndCase1v1() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_1v1, "Mr. John Rambo", "Mr. Sole Trader");
+            String confirmationBody = format(BODY_1_V_1, "Mr. John Rambo", "Mr. Sole Trader");
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdCaseReference(1234L)
@@ -999,7 +999,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should1v2Text_WhenSubmittedAndCase1v2() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_1v2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
+            String confirmationBody = format(BODY_1_V_2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build().toBuilder()
                 .ccdCaseReference(1234L)
                 .build();
@@ -1017,7 +1017,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void should2v1Text_WhenSubmittedAndCase2v1() {
             // Given
             String confirmationHeader = format(HEADER, 1234);
-            String confirmationBody = format(BODY_2v1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
+            String confirmationBody = format(BODY_2_V_1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build().toBuilder()
                 .ccdCaseReference(1234L)
                 .build();

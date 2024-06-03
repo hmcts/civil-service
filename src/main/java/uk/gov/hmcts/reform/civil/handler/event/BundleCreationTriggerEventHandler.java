@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
@@ -56,7 +55,7 @@ public class BundleCreationTriggerEventHandler {
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
         caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
                                .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-            ).collect(Collectors.toList()));
+            ).toList());
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);

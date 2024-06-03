@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DQUtil {
 
@@ -33,7 +32,7 @@ public class DQUtil {
         } else {
             return lrDates.stream().map(Element::getValue)
                 .map(ElementUtils::element)
-                .collect(Collectors.toList());
+                .toList();
         }
     }
 }

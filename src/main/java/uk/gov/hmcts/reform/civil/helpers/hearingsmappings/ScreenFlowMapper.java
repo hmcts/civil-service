@@ -12,6 +12,8 @@ public class ScreenFlowMapper {
         //NO-OP
     }
 
+    static final String hearingJudge = "hearing-judge";
+
     public static List<ScreenNavigationModel> getScreenFlow() {
         List<ScreenNavigationModel> screenNavigationList = new ArrayList<>();
         screenNavigationList.add(ScreenNavigationModel.builder()
@@ -50,7 +52,7 @@ public class ScreenFlowMapper {
                                                              .conditionValue(HearingDetailsMapper.WELSH_REGION_ID)
                                                              .build(),
                                                          NavigationModel.builder()
-                                                             .resultValue("hearing-judge")
+                                                             .resultValue(hearingJudge)
                                                              .conditionOperator("NOT INCLUDE")
                                                              .conditionValue(HearingDetailsMapper.WELSH_REGION_ID)
                                                              .build()))
@@ -60,12 +62,12 @@ public class ScreenFlowMapper {
         screenNavigationList.add(ScreenNavigationModel.builder()
                                      .screenName("hearing-welsh")
                                      .navigation(List.of(NavigationModel.builder()
-                                                             .resultValue("hearing-judge")
+                                                             .resultValue(hearingJudge)
                                                              .build()))
                                      .build());
 
         screenNavigationList.add(ScreenNavigationModel.builder()
-                                     .screenName("hearing-judge")
+                                     .screenName(hearingJudge)
                                      .navigation(List.of(NavigationModel.builder()
                                                              .resultValue("hearing-timing")
                                                              .build()))

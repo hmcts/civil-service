@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -635,7 +634,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
                         authorisation, caseData.getCaseManagementLocation().getBaseLocation())
                 .stream().filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList());
+                .toList();
 
         if (matchingLocations.size() != 1) {
             throw new LocationRefDataException(

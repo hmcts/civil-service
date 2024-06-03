@@ -119,7 +119,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private static final String datePattern = "dd MMMM yyyy";
+    private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
@@ -705,18 +705,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondToAdmittedClaim() != null
             && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
             return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return deadlineCalculatorService.calculateExtendedDeadline(
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         return null;
     }
@@ -767,8 +767,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             errors.add("Enter a valid amount for equal instalments");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
             1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));

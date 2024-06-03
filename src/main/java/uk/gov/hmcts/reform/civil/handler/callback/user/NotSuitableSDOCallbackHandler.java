@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NotSuitable_SDO);
-    public static final String NotSuitableSDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
+    public static final String NOT_SUITABLE_SDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
@@ -145,38 +145,35 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if (isTransferOnlineCase(caseData)) {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeaderTOC(caseData))
-                .confirmationBody(getBodyTOC(caseData))
+                .confirmationHeader(getHeaderTOC())
+                .confirmationBody(getBodyTOC())
                 .build();
         } else {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeader(caseData))
-                .confirmationBody(getBody(caseData))
+                .confirmationHeader(getHeader())
+                .confirmationBody(getBody())
                 .build();
         }
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
         return format("# Your request was accepted%n## Case has now moved offline");
     }
 
-    private String getBody(CaseData caseData) {
-        return format(NotSuitableSDO_CONFIRMATION_BODY);
+    private String getBody() {
+        return format(NOT_SUITABLE_SDO_CONFIRMATION_BODY);
     }
 
     private boolean isTransferOnlineCase(CaseData caseData) {
-        if (toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
-            return true;
-        } else {
-            return false;
-        }
+        return toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions()
+            == NotSuitableSdoOptions.CHANGE_LOCATION;
     }
 
-    private String getHeaderTOC(CaseData caseData) {
+    private String getHeaderTOC() {
         return format("# Your request was successful%n## This claim will be transferred to a different location");
     }
 
-    private String getBodyTOC(CaseData caseData) {
+    private String getBodyTOC() {
         return format(NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY);
     }
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -103,10 +102,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
             return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
         } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
-            LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                LocalDate.now(),
-                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            return whenBePaid;
+            return deadlineCalculatorService.calculateExtendedDeadline(
+                java.time.LocalDate.now(),
+                uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
         }
 
         return null;

@@ -78,8 +78,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
         if (firstGA.isPresent()) {
             GeneralApplication ga = firstGA.get().getValue();
             switch (ga.getBusinessProcess().getStatusOrDefault()) {
-                case READY:
-                case DISPATCHED:
+                case READY, DISPATCHED:
                     ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
                     return updateBusinessProcess(caseId, startEventResponse, generalApplications);
                 default:

@@ -57,8 +57,8 @@ public abstract class JudgmentOnlineMapper {
     }
 
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {
-        return JudgmentState.CANCELLED.equals(activeJudgment.getState())
-            || JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
-            || JudgmentState.SET_ASIDE.equals(activeJudgment.getState()) ? true : false;
+        return uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.CANCELLED.equals(activeJudgment.getState())
+            || uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
+            || uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.SET_ASIDE.equals(activeJudgment.getState());
     }
 }

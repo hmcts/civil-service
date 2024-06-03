@@ -38,8 +38,8 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private final FeatureToggleService featureToggleService;
-    private static final String subject = "OCMC Mediation Data";
-    private static final String filename = "ocmc_mediation_data.json";
+    private static final String SUBJECT = "OCMC Mediation Data";
+    private static final String FILENAME = "ocmc_mediation_data.json";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
@@ -81,8 +81,8 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
         return Optional.of(EmailData.builder()
                                .to(mediationCSVEmailConfiguration.getJsonRecipient())
-                               .subject(subject)
-                               .attachments(of(json(mediationDTO.getJsonRawData(), filename)))
+                               .subject(SUBJECT)
+                               .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
                                .build());
     }
 

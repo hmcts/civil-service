@@ -43,10 +43,6 @@ public class SettlementAgreementFormMapper {
                 getContactPerson(defendantDetails)
         );
 
-        String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
-                .map(BigDecimal::toString)
-                .orElse("0");
-
         SettlementAgreementForm.SettlementAgreementFormBuilder builder = new SettlementAgreementForm.SettlementAgreementFormBuilder();
         return builder
                 .claimant(claimant)
