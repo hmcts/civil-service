@@ -45,6 +45,7 @@ public class DashboardScenariosService {
         this.taskItemTemplateRepository = taskItemTemplateRepository;
     }
 
+    @SuppressWarnings("java:S1172")
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
 
@@ -153,7 +154,7 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        Arrays.asList(scenario.getNotificationsToDelete()).forEach((templateName) -> {
+        Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
 
             Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                 .findByName(templateName);

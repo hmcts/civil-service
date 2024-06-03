@@ -18,6 +18,7 @@ public class ScenarioRequestParams {
      */
     HashMap<String, Object> params;
 
+    @SuppressWarnings("java:S1319")
     @JsonCreator
     public ScenarioRequestParams(HashMap<String, Object> params) {
         this.params = params;

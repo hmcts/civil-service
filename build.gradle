@@ -405,7 +405,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.3'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -441,7 +441,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.17'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.16'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.17'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
