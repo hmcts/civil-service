@@ -204,7 +204,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\\\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\\\" class=\\\"govuk-link\\\">make an application to set aside (remove) or vary the judgment</a>");
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
     }
 
     @Test
