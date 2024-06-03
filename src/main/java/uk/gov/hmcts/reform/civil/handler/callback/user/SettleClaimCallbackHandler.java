@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.SettleClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::validateState
+            callbackKey(ABOUT_TO_START), this::checkState
         );
     }
 
@@ -36,13 +37,11 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse validateState(CallbackParams callbackParams) {
+    private CallbackResponse checkState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getCcdState().equals(CaseState.All_FINAL_ORDERS_ISSUED)) {
-            errors.add("This action is not currently allowed at this stage");
-        }
+        SettleClaimHelper.checkState(caseData, errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
