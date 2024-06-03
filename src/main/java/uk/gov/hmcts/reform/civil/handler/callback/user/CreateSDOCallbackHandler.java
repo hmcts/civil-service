@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -142,7 +141,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -214,7 +212,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
-    @Autowired
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final SdoGeneratorService sdoGeneratorService;
@@ -224,6 +221,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
     private final  List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+    static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
+    static final String laterThanFourPmString = "later than 4pm on";
+    static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -524,6 +524,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "to the pages in that bundle.")
             .build();
 
+        String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
         if (featureToggleService.isSdoR2Enabled()) {
             List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
@@ -535,8 +536,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                             + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                             + "save with permission of the Trial Judge.")
-                .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                            + "later than 4pm on")
+                .input4(partiesLiaseString + laterThanFourPmString)
                 .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
                 .build();
 
@@ -559,9 +559,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                             + "is available.")
                 .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
                 .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+                .input7(claimantEvidenceString)
                 .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+                .input8(witnessStatementString)
                 .detailsShowToggle(addOrRemoveToggleList)
                 .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
                 .build();
@@ -587,8 +587,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + "later than 4pm on")
+            .input4(partiesLiaseString + laterThanFourPmString)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
@@ -597,9 +596,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+            .input7(claimantEvidenceString)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+            .input8(witnessStatementString)
             .build();
 
         updatedData.fastTrackCreditHire(tempFastTrackCreditHire).build();
@@ -786,8 +785,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + "later than 4pm on")
+            .input4(partiesLiaseString + laterThanFourPmString)
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
@@ -796,9 +794,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+            .input7(claimantEvidenceString)
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input11("This witness statement is limited to 10 pages per party, including any appendices.")
+            .input11(witnessStatementString)
             .build();
 
         updatedData.smallClaimsCreditHire(tempSmallClaimsCreditHire).build();
@@ -844,9 +842,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updateExpertEvidenceFields(updatedData);
             updateDisclosureOfDocumentFields(updatedData);
             populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
-            prePopulateNihlFields(callbackParams, caseData, updatedData, hearingMethodList, preferredCourt, locationRefDataList);
-            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-            setCheckListNihl(updatedData, includeInOrderToggle);
+            prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+            List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+            setCheckListNihl(updatedData, localIncludeInOrderToggle);
             updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
             updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
             updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
@@ -869,13 +867,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .getListItems()
             .stream()
             .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .collect(Collectors.toList());
+            .toList();
         hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
         return hearingMethodList;
     }
 
     private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
-        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+        return FastTrackWitnessOfFact.builder()
             .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
                         + "fact on whom they intend to rely.")
             .input2("3")
@@ -890,19 +888,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
                         + "permitted except with permission from the Court.")
             .build();
-        return tempFastTrackWitnessOfFact;
     }
 
     private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
-        SdoR2WitnessOfFact tempSdoR2WitnessOfFact = SdoR2WitnessOfFact.builder()
+        return SdoR2WitnessOfFact.builder()
             .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
             .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
                                       .isRestrictWitness(NO)
                                       .restrictNoOfWitnessDetails(
                                           SdoR2RestrictNoOfWitnessDetails.builder()
-                                              .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
+                                              .noOfWitnessClaimant(3)
+                                              .noOfWitnessDefendant(3)
                                               .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                              .build()).build())
+                                              .build())
+                                      .build())
             .sdoRestrictPages(SdoR2RestrictPages.builder()
                                   .isRestrictPages(NO)
                                   .restrictNoOfPagesDetails(
@@ -910,12 +909,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                           .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
                                           .noOfPages(12)
                                           .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                          .build()).build())
+                                          .build())
+                                  .build())
             .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
             .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
             .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
             .build();
-        return tempSdoR2WitnessOfFact;
     }
 
     private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -1012,8 +1011,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
-                                       CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
+    private void prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
 
@@ -1677,11 +1675,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean nonNull(Object object) {
-        if (object != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return object != null;
     }
 
     private Optional<String> validateGreaterThanZero(int count) {
@@ -1755,8 +1749,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 respondent2.getPartyName()
             );
         }
-        String body = initialBody + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
-        return body;
+        return initialBody + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
     }
 
     private void setCheckList(
