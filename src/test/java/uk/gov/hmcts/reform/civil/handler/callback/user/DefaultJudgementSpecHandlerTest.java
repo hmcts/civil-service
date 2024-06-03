@@ -56,6 +56,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_GRANTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_GRANTED_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_LIP_CASE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -1240,6 +1242,27 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                               JUDGMENT_REQUESTED_HEADER)
                                                                           .confirmationBody(String.format(
                                                                               JUDGMENT_REQUESTED_LIP_CASE))
+                                                                          .build());
+        }
+
+        @Test
+        void shouldReturnJudgementGrantedResponse_whenisJudgmentLiveTrueAndLrVLip() {
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
+                + "target=\"_blank\">Download  default judgment</a> "
+                + "%n%n The defendant will be served with the Default Judgment.";
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1(PartyBuilder.builder().build())
+                .respondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(caseData.isLRvLipOneVOne()).isTrue();
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(
+                                                                              JUDGMENT_GRANTED_HEADER)
+                                                                          .confirmationBody(format(body))
                                                                           .build());
         }
     }
