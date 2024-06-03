@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -42,6 +44,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -95,12 +98,15 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
     @MockBean
+    private AirlineEpimsService airlineEpimsService;
+    @MockBean
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
     @Autowired
     CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
+    private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -342,13 +348,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             return new ArrayList<>(List.of(
                 LocationRefData.builder()
                     .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                    .courtLocationCode("court1").build(),
+                    .regionId("region 1").courtLocationCode("court1").build(),
                 LocationRefData.builder()
                     .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                    .courtLocationCode("court2").build(),
+                    .regionId("region 2").courtLocationCode("court2").build(),
                 LocationRefData.builder()
                     .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                    .courtLocationCode("court3").build()
+                    .regionId("region 3").courtLocationCode("court3").build(),
+                LocationRefData.builder()
+                    .epimmsId("444").siteName(LIVERPOOL_SITE_NAME).courtAddress("Adr 3").postcode("CCC 333")
+                    .regionId("region 4").courtLocationCode("court4").build()
             ));
         }
 
@@ -436,6 +445,54 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .build();
+            caseData = caseData.toBuilder()
+                .isFlightDelayClaim(YES)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .flightDelayDetails(FlightDelayDetails.builder()
+                    .nameOfAirline("Sri Lankan")
+                    .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("111");
+            assertThat(updatedCaseData.getCaseManagementLocation().getRegion()).isEqualTo("region 1");
+            assertThat(updatedCaseData.getLocationName()).isEqualTo("Site 1");
+        }
+
+        @Test
+        void shouldUpdateCaseManagementLocationForFlightDelayClaimInvalidAirline() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+            when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .build();
+            caseData = caseData.toBuilder()
+                .isFlightDelayClaim(YES)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .flightDelayDetails(FlightDelayDetails.builder()
+                    .nameOfAirline("INVALID_AIRLINE")
+                    .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getCaseManagementLocation().getBaseLocation()).isEqualTo("444");
+            assertThat(updatedCaseData.getCaseManagementLocation().getRegion()).isEqualTo("region 4");
+            assertThat(updatedCaseData.getLocationName()).isEqualTo(LIVERPOOL_SITE_NAME);
+        }
+
+        @Test
         void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
@@ -482,7 +539,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(witness.getEventAdded()).isEqualTo(CLAIMANT_INTENTION_EVENT.getValue());
 
         }
-        
+
         @Test
         void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
             CaseData caseData = CaseDataBuilder.builder()
