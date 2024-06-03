@@ -170,7 +170,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @RequiredArgsConstructor
 public class FlowStateAllowedEventService {
 
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
 
     private static final List<CaseEvent> EVENT_WHITELIST = List.of(

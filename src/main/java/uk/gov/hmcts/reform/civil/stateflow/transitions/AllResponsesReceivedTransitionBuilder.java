@@ -52,4 +52,5 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified)
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA).onlyWhen(caseDismissedAfterDetailNotified);
     }
+
 }

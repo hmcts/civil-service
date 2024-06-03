@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 class StateFlowEngineSpecTest {
 
     @Autowired
-    private StateFlowEngine stateFlowEngine;
+    private IStateFlowEngine stateFlowEngine;
 
     @MockBean
     private FeatureToggleService featureToggleService;

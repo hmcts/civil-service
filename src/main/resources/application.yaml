@@ -64,9 +64,9 @@ hmc:
 
 serviceRequest:
   api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
+    callback-url: ${SERVICE_REQUEST_UPDATE:}
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
@@ -105,7 +105,7 @@ genApp:
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
-#      claims with value under this amount in pounds are assigned to CCMCC
+      #      claims with value under this amount in pounds are assigned to CCMCC
       amountPounds: 1000
       epimsId: 192280
       regionId: 4
@@ -191,6 +191,11 @@ aca:
 dashboard:
   api:
     url: http://localhost:4000
+
+stateflow:
+  engine:
+    simplification:
+      enabled: ${STATEFLOW_ENGINE_SIMPLIFICATION:true}
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -295,7 +300,7 @@ notifications:
   notifyClaimantAfterClaimIssue: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
   notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
-  notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
+  notifyDefendantLipWelshTemplate: "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
   notifyApplicantLRMediationAgreementTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
   notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
@@ -396,7 +401,7 @@ notifications:
 
   notifyLipSuccessfulMediation: "ed3810ae-3c12-4cc1-bc3f-8aff560fa6b2"
   notifyOneVTwoClaimantSuccessfulMediation: "18b7f7f0-a1f6-4c9f-9b1f-09a4f1450f4d"
-  notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
+  notifyLrClaimantSuccessfulMediation: "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
 
@@ -516,9 +521,9 @@ payments:
 
 serviceRequest:
   api:
-    callback-url : http://localhost:4000/service-request-update
-    site_id : AAA7
-    service : CIVIL
+    callback-url: http://localhost:4000/service-request-update
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
