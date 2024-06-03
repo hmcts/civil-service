@@ -194,7 +194,6 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
             assertThat(result).extracting("paymentFrecuencyMessage").isEqualTo("You must pay the claim " +
                                                                                "amount of £ 23.00 in weekly instalments of £ 1.20 The first payment is due on 2022-12-12");
