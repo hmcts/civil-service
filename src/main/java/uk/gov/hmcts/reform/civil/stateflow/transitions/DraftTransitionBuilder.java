@@ -22,12 +22,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DraftTransitionBuilder extends TransitionBuilder {
 
-    public DraftTransitionBuilder(FeatureToggleService featureToggleService) {
-        super(FlowState.Main.DRAFT, featureToggleService);
+public abstract class DraftTransitionBuilder extends TransitionBuilder {
+
+    public DraftTransitionBuilder(FlowState.Main initialState, FeatureToggleService featureToggleService) {
+        super(initialState, featureToggleService);
     }
 
     @Override

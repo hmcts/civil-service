@@ -8,9 +8,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SpecDraftTransitionBuilder extends DraftTransitionBuilder {
-
-    public SpecDraftTransitionBuilder(FeatureToggleService featureToggleService) {
-        super(FlowState.Main.SPEC_DRAFT, featureToggleService);
+public class UnspecifiedDraftTransitionBuilder extends DraftTransitionBuilder {
+    public UnspecifiedDraftTransitionBuilder(FeatureToggleService featureToggleService) {
+        super(FlowState.Main.DRAFT, featureToggleService);
     }
 }

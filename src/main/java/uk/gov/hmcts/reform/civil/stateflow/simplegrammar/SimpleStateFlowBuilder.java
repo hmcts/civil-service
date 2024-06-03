@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlowContext;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowListener;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
-import uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.transitions.MidTransitionBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.transitions.SpecDraftTransitionBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.transitions.TransitionBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.transitions.UnspecifiedDraftTransitionBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class SimpleStateFlowBuilder {
     // The internal stateFlowContext object. Methods in the DSL work on this
     private final String flowName = "MAIN";
 
-    private final DraftTransitionBuilder draftTransitionBuilder;
+    private final UnspecifiedDraftTransitionBuilder unspecifiedDraftTransitionBuilder;
     private final SpecDraftTransitionBuilder specDraftTransitionBuilder;
     private final List<MidTransitionBuilder> transitionBuilders;
 
@@ -136,7 +136,7 @@ public class SimpleStateFlowBuilder {
     private void buildTransitionsForContext(StateFlowContext stateFlowContext, FlowState.Main initialState) {
         List<TransitionBuilder> allTransitionBuilders = new ArrayList<>();
         if (initialState.equals(FlowState.Main.DRAFT)) {
-            allTransitionBuilders.add(draftTransitionBuilder);
+            allTransitionBuilders.add(unspecifiedDraftTransitionBuilder);
             allTransitionBuilders.addAll(transitionBuilders);
         } else {
             allTransitionBuilders.add(specDraftTransitionBuilder);
