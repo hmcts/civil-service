@@ -142,8 +142,8 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     public boolean isRespondentOrSolicitorHasNoEmail(CaseData caseData) {
         return ((isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondentSolicitor1EmailAddress() == null)
-            || ((!isRespondentSolicitorRegistered(caseData)
-            && caseData.getRespondent1().getPartyEmail() == null))
+            || (!isRespondentSolicitorRegistered(caseData)
+            && caseData.getRespondent1().getPartyEmail() == null)
             );
     }
 
