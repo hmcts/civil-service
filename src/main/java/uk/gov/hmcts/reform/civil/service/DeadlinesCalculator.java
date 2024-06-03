@@ -69,7 +69,7 @@ public class DeadlinesCalculator {
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadlineSpec(track);
+        int daysToAdd = getDaysToAddToDeadlineSpec();
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 

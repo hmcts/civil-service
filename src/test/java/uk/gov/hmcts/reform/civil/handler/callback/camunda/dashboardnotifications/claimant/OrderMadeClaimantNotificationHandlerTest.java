@@ -88,14 +88,15 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
                 .applicant1Represented(YesOrNo.NO).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "url");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name()).build()
             ).build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("orderDocument", "url");
-
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 
@@ -114,14 +115,16 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                     ElementUtils.element(CaseDocument.builder().documentLink(
                         Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
                 .applicant1Represented(YesOrNo.NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT.name()).build()
-            ).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT.name()).build()
+            ).build();
+
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 
@@ -140,13 +143,15 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                     ElementUtils.element(CaseDocument.builder().documentLink(
                         Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
                 .applicant1Represented(YesOrNo.NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
@@ -222,6 +227,31 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             verify(dashboardApiClient, never()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioInSdoPreCPRelease_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                   .applicant1Represented(YesOrNo.NO).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Claimant",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
