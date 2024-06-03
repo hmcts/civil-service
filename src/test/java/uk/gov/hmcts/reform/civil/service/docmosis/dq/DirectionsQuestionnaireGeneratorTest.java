@@ -109,6 +109,7 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String HNL_FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT_1v2SS = format(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
@@ -442,20 +443,24 @@ class DirectionsQuestionnaireGeneratorTest {
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)))
                     .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_CLAIMANT);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence()
-                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicantsProceedIntention(YesOrNo.YES)
+                    .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
                     .build();
-
                 CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
 
                 verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                                                                           eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
                 );
@@ -971,6 +976,32 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                           .draftOrderNumber(disclosureOrderNumber)
                                                                           .build())
                                        .build())
+                    .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+                assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
+                assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            }
+
+            @Test
+            void whenDisclosureReport_include_Minti() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
