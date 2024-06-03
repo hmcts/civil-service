@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers;
 
-import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -64,7 +63,7 @@ public class CallbackController {
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
+            .params(java.util.Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
