@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
+
     public FullAdmissionTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.FULL_ADMISSION, featureToggleService);
     }

@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder extends MidTransitionBuilder {
+
     public ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE, featureToggleService);
     }

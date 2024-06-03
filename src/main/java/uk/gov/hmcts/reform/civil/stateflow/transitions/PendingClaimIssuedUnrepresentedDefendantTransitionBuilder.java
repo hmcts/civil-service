@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilder extends MidTransitionBuilder {
+
     public PendingClaimIssuedUnrepresentedDefendantTransitionBuilder(
         FeatureToggleService featureToggleService) {
         super(FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, featureToggleService);

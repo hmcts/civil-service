@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimNotifiedTransitionBuilder extends MidTransitionBuilder {
+
     public ClaimNotifiedTransitionBuilder(
         FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_NOTIFIED, featureToggleService);

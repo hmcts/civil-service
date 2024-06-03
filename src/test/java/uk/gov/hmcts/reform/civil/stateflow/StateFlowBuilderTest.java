@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.util.Map.entry;
@@ -39,8 +37,6 @@ class StateFlowBuilderTest {
         void shouldThrowIllegalArgumentException_whenFlowNameIsEmpty() {
             Assertions.assertThrows(IllegalArgumentException.class, () -> StateFlowBuilder.<FlowState>flow(""));
         }
-
-
 
         @Test
         void shouldThrowIllegalArgumentException_whenInitialIsNull() {
@@ -167,8 +163,6 @@ class StateFlowBuilderTest {
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
         }
 
-
-
         @Test
         void shouldSetStateMachineError_whenConditionsOnTransitionsAreNotMutuallyExclusive() {
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
@@ -265,13 +259,13 @@ class StateFlowBuilderTest {
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
-                    .transitionTo(FlowState.STATE_2)
-                    .onlyIf(firstPredicate)
-                    .set(flags -> flags.put("FIRST_FLAG", true))
+                .transitionTo(FlowState.STATE_2)
+                .onlyIf(firstPredicate)
+                .set(flags -> flags.put("FIRST_FLAG", true))
                 .state(FlowState.STATE_2)
-                    .transitionTo(FlowState.STATE_3)
-                    .onlyIf(secondPredicate)
-                    .set(flags -> flags.put("SECOND_FLAG", true))
+                .transitionTo(FlowState.STATE_3)
+                .onlyIf(secondPredicate)
+                .set(flags -> flags.put("SECOND_FLAG", true))
                 .state(FlowState.STATE_3)
                 .build();
 

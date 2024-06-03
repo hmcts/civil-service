@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 
 @Component
 public class PendingClaimIssuedTransitionBuilder extends MidTransitionBuilder {
+
     public PendingClaimIssuedTransitionBuilder(
         FeatureToggleService featureToggleService) {
         super(FlowState.Main.PENDING_CLAIM_ISSUED, featureToggleService);

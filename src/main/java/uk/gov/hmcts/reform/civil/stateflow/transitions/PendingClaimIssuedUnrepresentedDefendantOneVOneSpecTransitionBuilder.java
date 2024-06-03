@@ -13,14 +13,15 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilder extends MidTransitionBuilder {
+
     public PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilder(
-                                                                                FeatureToggleService featureToggleService) {
+        FeatureToggleService featureToggleService) {
         super(FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, featureToggleService);
     }
 
     @Override
     void setUpTransitions() {
-            this.moveTo(CLAIM_ISSUED)
+        this.moveTo(CLAIM_ISSUED)
             .onlyWhen(claimIssued.and(pinInPostEnabledAndLiP))
             .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
             .onlyWhen(takenOfflineBySystem.and(not(pinInPostEnabledAndLiP)));

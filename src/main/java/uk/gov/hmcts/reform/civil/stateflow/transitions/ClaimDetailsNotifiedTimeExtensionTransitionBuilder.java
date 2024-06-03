@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimDetailsNotifiedTimeExtensionTransitionBuilder extends MidTransitionBuilder {
+
     public ClaimDetailsNotifiedTimeExtensionTransitionBuilder(
         FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, featureToggleService);

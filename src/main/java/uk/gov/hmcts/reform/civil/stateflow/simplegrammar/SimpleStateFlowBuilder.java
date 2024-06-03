@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
 @Component
 @AllArgsConstructor
 public class SimpleStateFlowBuilder {
+
     private static final String STATE = "state";
     // The internal stateFlowContext object. Methods in the DSL work on this
     private final String flowName = "MAIN";
@@ -52,7 +53,6 @@ public class SimpleStateFlowBuilder {
             throw new IllegalArgumentException(name + " may not be null");
         }
     }
-
 
     @SuppressWarnings("unchecked")
     public StateFlow build(FlowState.Main initialState) {
@@ -158,6 +158,5 @@ public class SimpleStateFlowBuilder {
     private String fullyQualified(FlowState.Main state) {
         return String.format("%s.%s", flowName, state.toString());
     }
-
 
 }

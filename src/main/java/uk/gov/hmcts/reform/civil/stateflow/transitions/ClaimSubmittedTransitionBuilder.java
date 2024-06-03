@@ -2,13 +2,10 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
@@ -26,11 +23,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
+
     @Autowired
     public ClaimSubmittedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_SUBMITTED, featureToggleService);
     }
-
 
     @Override
     void setUpTransitions() {

@@ -32,7 +32,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_AP
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @Component
-public class PartAdmissionTransitionBuilder extends MidTransitionBuilder{
+public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
+
     public PartAdmissionTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.PART_ADMISSION, featureToggleService);
     }

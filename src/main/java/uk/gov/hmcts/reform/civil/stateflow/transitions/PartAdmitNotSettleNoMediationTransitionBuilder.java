@@ -16,7 +16,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 
 @Component
-public class PartAdmitNotSettleNoMediationTransitionBuilder extends MidTransitionBuilder{
+public class PartAdmitNotSettleNoMediationTransitionBuilder extends MidTransitionBuilder {
+
     public PartAdmitNotSettleNoMediationTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION, featureToggleService);
     }

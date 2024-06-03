@@ -19,10 +19,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 
 @Component
 public class ContactDetailsChangeTransitionBuilder extends MidTransitionBuilder {
-    
-    
-public ContactDetailsChangeTransitionBuilder(FeatureToggleService featureToggleService) {
-    super(FlowState.Main.CONTACT_DETAILS_CHANGE, featureToggleService);
+
+    public ContactDetailsChangeTransitionBuilder(FeatureToggleService featureToggleService) {
+        super(FlowState.Main.CONTACT_DETAILS_CHANGE, featureToggleService);
     }
 
     @Override
@@ -36,6 +35,4 @@ public ContactDetailsChangeTransitionBuilder(FeatureToggleService featureToggleS
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
             });
     }
-    
-    
 }

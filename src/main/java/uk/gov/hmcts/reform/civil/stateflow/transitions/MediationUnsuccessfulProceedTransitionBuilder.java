@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class MediationUnsuccessfulProceedTransitionBuilder extends MidTransitionBuilder {
+
     public MediationUnsuccessfulProceedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED, featureToggleService);
     }

@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
+
     public ClaimIssuedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_ISSUED, featureToggleService);
     }

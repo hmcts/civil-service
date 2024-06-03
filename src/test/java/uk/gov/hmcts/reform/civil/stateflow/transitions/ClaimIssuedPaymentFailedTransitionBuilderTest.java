@@ -34,5 +34,4 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
         assertThat(result.get(0).getTargetState()).isEqualTo("MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
     }
 
-
 }

@@ -20,9 +20,7 @@ import uk.gov.hmcts.reform.civil.stateflow.grammar.StateNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionToNext;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
-import uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -151,7 +149,6 @@ public class StateFlowBuilder<S> {
         public StateNext<S> state(S state) {
             return addState(state);
         }
-
 
         @Override
         @SuppressWarnings("unchecked")

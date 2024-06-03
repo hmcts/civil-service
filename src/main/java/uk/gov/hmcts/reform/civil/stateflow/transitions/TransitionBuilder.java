@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -36,7 +35,6 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
         return this;
     }
 
-
     @Override
     public OnlyWhenNext<FlowState.Main> onlyWhen(Predicate<CaseData> condition) {
         this.getCurrentTransition().ifPresent(t -> t.setCondition(condition));
@@ -68,7 +66,6 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
         return String.format("%s.%s", FLOW_NAME, state.toString());
     }
 
-
     @Override
     public List<Transition> buildTransitions() {
         this.transitions = new ArrayList<>();
@@ -76,7 +73,5 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
         return this.transitions;
     }
 
-
-
-    abstract void setUpTransitions() ;
+    abstract void setUpTransitions();
 }

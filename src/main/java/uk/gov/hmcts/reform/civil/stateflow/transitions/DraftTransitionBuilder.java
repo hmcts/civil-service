@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
 @Component
-@Scope(value = "prototype")
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DraftTransitionBuilder extends TransitionBuilder {
 
     public DraftTransitionBuilder(FeatureToggleService featureToggleService) {
@@ -104,6 +105,4 @@ public class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )));
     }
-
-
 }

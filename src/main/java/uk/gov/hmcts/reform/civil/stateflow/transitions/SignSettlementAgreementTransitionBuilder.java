@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 
 @Component
 public class SignSettlementAgreementTransitionBuilder extends MidTransitionBuilder {
+
     public SignSettlementAgreementTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.SIGN_SETTLEMENT_AGREEMENT, featureToggleService);
     }

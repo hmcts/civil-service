@@ -22,7 +22,6 @@ public class SimpleStateFlowEngine {
     protected final FeatureToggleService featureToggleService;
     protected final SimpleStateFlowBuilder stateFlowBuilder;
 
-
     @Autowired
     public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService,
                            SimpleStateFlowBuilder stateFlowBuilder) {
@@ -31,7 +30,6 @@ public class SimpleStateFlowEngine {
         this.stateFlowBuilder = stateFlowBuilder;
 
     }
-
 
     public StateFlow evaluate(CaseDetails caseDetails) {
         return evaluate(caseDetailsConverter.toCaseData(caseDetails));

@@ -13,7 +13,6 @@ public class ClaimIssuedPaymentFailedTransitionBuilder extends MidTransitionBuil
         super(FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED, featureToggleService);
     }
 
-
     protected void setUpTransitions() {
         this.moveTo(FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyWhen(paymentSuccessful);
     }

@@ -26,13 +26,14 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder {
+
     public ClaimDetailsNotifiedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_DETAILS_NOTIFIED, featureToggleService);
     }
 
     @Override
     void setUpTransitions() {
-this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
+        this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
             .onlyWhen(respondentTimeExtension.and(not(notificationAcknowledged)))
             //Acknowledging Claim First
             .moveTo(NOTIFICATION_ACKNOWLEDGED).onlyWhen(notificationAcknowledged.and(not(isInHearingReadiness)))

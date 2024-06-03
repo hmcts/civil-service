@@ -30,8 +30,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_AP
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @Component
-public class FullDefenceTransitionBuilder extends MidTransitionBuilder{
-    
+public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
+
     public FullDefenceTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.FULL_DEFENCE, featureToggleService);
     }

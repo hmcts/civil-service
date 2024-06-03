@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SE
 
 @Component
 public class FullAdmitAgreeRepaymentTransitionBuilder extends MidTransitionBuilder {
+
     public FullAdmitAgreeRepaymentTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT, featureToggleService);
     }

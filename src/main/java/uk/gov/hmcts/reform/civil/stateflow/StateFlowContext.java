@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.ArrayList;

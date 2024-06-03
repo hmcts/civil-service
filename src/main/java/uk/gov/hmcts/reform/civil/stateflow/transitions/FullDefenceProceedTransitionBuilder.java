@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
+
     public FullDefenceProceedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.FULL_DEFENCE_PROCEED, featureToggleService);
     }

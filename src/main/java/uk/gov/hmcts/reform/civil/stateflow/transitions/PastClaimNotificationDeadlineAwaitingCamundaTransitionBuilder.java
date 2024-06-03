@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_D
 
 @Component
 public class PastClaimNotificationDeadlineAwaitingCamundaTransitionBuilder extends MidTransitionBuilder {
+
     public PastClaimNotificationDeadlineAwaitingCamundaTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, featureToggleService);
     }
