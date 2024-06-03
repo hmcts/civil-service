@@ -53,7 +53,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             notificationService.sendMail(
                 addEmail(caseData),
-                addTemplate(caseData),
+                addTemplate(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -61,7 +61,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String addTemplate(CaseData caseData) {
+    private String addTemplate() {
         return notificationsProperties.getNotifyClaimantAfterClaimIssue();
     }
 

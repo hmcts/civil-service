@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,8 +26,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN);
-
-    public static final List<String> TASK_IDS =
+    private final FeatureToggleService featureToggleService;
+    protected static final List<String> TASK_IDS =
         Arrays.asList("CaseProceedsInCasemanNotifyApplicantSolicitor1",
                       "CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForUnRegisteredFirm",
                       "NotifyClaimProceedsOfflineNotifyApplicantSolicitor1",
@@ -56,6 +57,9 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
     private CallbackResponse notifyApplicantSolicitorForCaseProceedsInCaseman(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getSolicitorCaseTakenOffline(),

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -79,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -123,6 +125,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -324,8 +327,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
         // persist party flags (ccd issue)
@@ -447,37 +450,54 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.claimMovedToMediationOn(LocalDate.now());
         }
 
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper));
-
-        putCaseStateInJudicialReferral(caseData, response);
+        BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
+        String nextState = putCaseStateInJudicialReferral(caseData);
 
         if (V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
-                response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
-                response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                nextState = CaseState.IN_MEDIATION.name();
+            } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+                if (featureToggleService.isJudgmentOnlineLive()
+                    && (caseData.isPayByInstallment() || caseData.isPayBySetDate())
+                    && caseData.isLRvLipOneVOne()) {
+                    nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+                    businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
+                } else {
+                    nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+                }
+                if (featureToggleService.isJudgmentOnlineLive()) {
+                    builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData));
+                    builder.joIsLiveJudgmentExists(YesOrNo.YES);
+                }
+            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+                nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
                     && ((caseData.hasClaimantNotAgreedToFreeMediation()
                     || caseData.hasDefendantNotAgreedToFreeMediation())
                     || caseData.isFastTrackClaim())) {
-                response.state(CaseState.JUDICIAL_REFERRAL.name());
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
-                response.state(CaseState.CASE_SETTLED.name());
+                nextState = CaseState.CASE_SETTLED.name();
             }
         }
 
         // must always move to in mediation for small claims when claimant proceeds
         if (shouldMoveToInMediationState(
             caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
-            response.state(CaseState.IN_MEDIATION.name());
+            nextState = CaseState.IN_MEDIATION.name();
+            businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         }
 
-        return response.build();
+        builder.businessProcess(businessProcess);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .state(nextState)
+            .build();
+
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
@@ -504,11 +524,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
+    private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
             && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
+            return CaseState.JUDICIAL_REFERRAL.name();
         }
+        return null;
     }
 
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
@@ -568,10 +589,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
-            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
-                caseData.getTotalClaimAmount(),
-                null,
-                null
+            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
+                                                                                null, null, featureToggleService, caseData
             ).name());
         }
         // add direction questionaire document from system generated documents, to placeholder field for preview during event.
