@@ -222,6 +222,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("paymentFrecuencyMessage").isEqualTo("You must pay the claim amount of £ 23.00 in biweekly instalments of £ 1.20 The first payment is due on 2022-12-12");
     }
+
     @Test
     public void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans_PayWeekly() {
 
