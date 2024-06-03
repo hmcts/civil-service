@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant',
         '{"Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithDef.Defendant ", "Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant", "Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithClaimant.Defendant"}',
-        '{"Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant": ["paymentFrecuencyMessage"]}');
+        '{"Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant": ["paymentFrequencyMessage"]}');
 
 /**
  * Add notification template
@@ -14,8 +14,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant',
         'A judgment by determination has been made against you',
         'A judgment by determination has been made against you',
-        '<p class="govuk-body">The instalments you need to pay have been decided by the court. They made a ‘determination of means’ and have determined an instalment amount that you can afford. <br> ${paymentFrecuencyMessage}.<br> The claimant’s details for payment and the full payment plan can be found on <a href="{VIEW_JUDGEMENT}" class="govuk-link">the judgment.</a>.<br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can <a href="{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}" class="govuk-link">make an application to set aside (remove) or vary the judgment.</a></p>',
-        '<p class="govuk-body">The instalments you need to pay have been decided by the court. They made a ‘determination of means’ and have determined an instalment amount that you can afford. <br> ${paymentFrecuencyMessage}.<br> The claimant’s details for payment and the full payment plan can be found on <a href="{VIEW_JUDGEMENT}" class="govuk-link">the judgment.</a>.<br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can <a href="{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}" class="govuk-link">make an application to set aside (remove) or vary the judgment.</a></p>',
+        '<p class="govuk-body">The instalments you need to pay have been decided by the court. They made a ‘determination of means’ and have determined an instalment amount that you can afford. <br> ${paymentFrequencyMessage}.<br> The claimant’s details for payment and the full payment plan can be found on <a href="{VIEW_JUDGEMENT}" class="govuk-link">the judgment.</a>.<br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can <a href="{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}" class="govuk-link">make an application to set aside (remove) or vary the judgment.</a></p>',
+        '<p class="govuk-body">The instalments you need to pay have been decided by the court. They made a ‘determination of means’ and have determined an instalment amount that you can afford. <br> ${paymentFrequencyMessage}.<br> The claimant’s details for payment and the full payment plan can be found on <a href="{VIEW_JUDGEMENT}" class="govuk-link">the judgment.</a>.<br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can <a href="{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}" class="govuk-link">make an application to set aside (remove) or vary the judgment.</a></p>',
         'DEFENDANT');
 
 /**

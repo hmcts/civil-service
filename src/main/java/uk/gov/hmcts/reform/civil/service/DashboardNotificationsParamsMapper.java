@@ -58,7 +58,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
         }
         if (caseData.getJoJudgmentRecordReason() != null && caseData.getJoJudgmentRecordReason().equals(JudgmentRecordedReason.DETERMINATION_OF_MEANS)) {
-            params.put("paymentFrecuencyMessage", getPaymentFrecuencyMessage(caseData).toString());
+            params.put("paymentFrequencyMessage", getPaymentFrequencyMessage(caseData).toString());
         }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
@@ -358,7 +358,7 @@ public class DashboardNotificationsParamsMapper {
         return null;
     }
 
-    private static StringBuilder getPaymentFrecuencyMessage(CaseData caseData) {
+    private static StringBuilder getPaymentFrequencyMessage(CaseData caseData) {
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
         StringBuilder paymentFrequencyMessage = new StringBuilder();
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
