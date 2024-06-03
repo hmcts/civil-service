@@ -40,6 +40,7 @@ public abstract class CallbackHandler {
         return String.format("%s%s%s", formattedVersion, type.getValue(), formattedPageId);
     }
 
+    @SuppressWarnings("java:S1172")
     public String camundaActivityId(CallbackParams callbackParams) {
         return DEFAULT;
     }
@@ -67,7 +68,9 @@ public abstract class CallbackHandler {
         callbackKey = callbackKey(callbackParams.getVersion(), callbackParams.getType(), callbackParams.getPageId());
 
         if (ofNullable(callbacks().get(callbackKey)).isEmpty()) {
-            LOG.info("No implementation found for {}, falling back to default", callbackKey);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No implementation found for {}", callbackKey);
+            }
             callbackKey = callbackKey(callbackParams.getType(), callbackParams.getPageId());
         }
 

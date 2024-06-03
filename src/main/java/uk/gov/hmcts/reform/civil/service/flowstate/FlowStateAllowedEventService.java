@@ -967,7 +967,10 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
         entry(
@@ -1213,7 +1216,10 @@ public class FlowStateAllowedEventService {
         entry(FULL_ADMIT_NOT_PROCEED.fullName(),
               List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
         entry(FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                      EDIT_JUDGMENT,
+                      JUDGMENT_PAID_IN_FULL,
+                      SET_ASIDE_JUDGMENT)),
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
@@ -1622,7 +1628,10 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
         entry(
