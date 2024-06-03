@@ -1396,9 +1396,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(CASE_MANAGEMENT_CATEGORY);
         assertThat(gaCaseManagementCategory.getValue().getLabel())
             .isEqualTo(CASE_MANAGEMENT_CATEGORY);
-        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getLabel())
+        assertThat(gaCaseManagementCategory.getListItems().get(0).getValue().getLabel())
             .isEqualTo(CASE_MANAGEMENT_CATEGORY);
-        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getCode())
+        assertThat(gaCaseManagementCategory.getListItems().get(0).getValue().getCode())
             .isEqualTo(CASE_MANAGEMENT_CATEGORY);
     }
 

@@ -135,7 +135,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
                     "RPA Reason: Judgement by Admission requested and claim moved offline.";
                 default -> {
-                    log.info("Unexpected flow state " + flowState.fullName());
+                    log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;
                 }
             };
@@ -170,27 +170,27 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 }
             }
 
+            final String and = " and ";
             switch (flowState) {
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
                                       StringUtils.join(
-                                          getDefendantNames(UNREPRESENTED, caseData), " and "
+                                          getDefendantNames(UNREPRESENTED, caseData), and
                                       ));
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return format("Unregistered defendant solicitor firm: %s",
                                      StringUtils.join(
                                          getDefendantNames(UNREGISTERED,
-                                                           caseData), " and "
+                                                           caseData), and
                                      ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return format("Unrepresented defendant and unregistered defendant solicitor firm. "
                                       + "Unrepresented defendant: %s. "
                                       + "Unregistered defendant solicitor firm: %s.",
-                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), and),
                                         StringUtils.join(
                                             getDefendantNames(UNREGISTERED,
-                                                              caseData), " and "
+                                                              caseData), and
                                         ));
                 case FULL_DEFENCE_PROCEED:
                     return !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -202,17 +202,19 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return null;
     }
 
+    final String proceed = "proceed";
+    final String notProceed = "not proceed";
+
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
                 return format(
                     "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? "proceed" : "not proceed",
+                        ? proceed : notProceed,
                     caseData.getRespondent1().getPartyName(),
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? "proceed" : "not proceed",
+                        ? proceed : notProceed,
                     caseData.getRespondent2().getPartyName()
                 );
             }
@@ -220,9 +222,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 return format(
                     "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
                     caseData.getApplicant1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed",
+                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? proceed : notProceed,
                     caseData.getApplicant2().getPartyName(),
-                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed"
+                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? proceed : notProceed
                 );
             }
             default: {

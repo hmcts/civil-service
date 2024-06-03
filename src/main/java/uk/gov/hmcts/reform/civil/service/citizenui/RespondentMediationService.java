@@ -22,10 +22,8 @@ public class RespondentMediationService {
                     return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
                 }
             } else {
-                if (caseData.isMultiPartyDefendant()) {
-                    if (caseData.hasDefendantAgreedToFreeMediation() || caseData.hasDefendant2AgreedToFreeMediation()) {
-                        return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
-                    }
+                if (caseData.isMultiPartyDefendant() && caseData.hasDefendantAgreedToFreeMediation() || caseData.hasDefendant2AgreedToFreeMediation()) {
+                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
                 }
             }
         }
@@ -41,11 +39,9 @@ public class RespondentMediationService {
                 break;
             case PART_ADMISSION:
                 if (caseData.hasDefendantAgreedToFreeMediation()) {
-                    if (caseData.hasDefendantNotPaid()) {
-                        return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                    } else if (caseData.isSettlementDeclinedByClaimant()) {
-                        return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                    } else if (caseData.isClaimantRejectsClaimAmount()) {
+                    if (caseData.hasDefendantNotPaid()
+                        || caseData.isSettlementDeclinedByClaimant()
+                        || caseData.isClaimantRejectsClaimAmount()) {
                         return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
                     }
                 }

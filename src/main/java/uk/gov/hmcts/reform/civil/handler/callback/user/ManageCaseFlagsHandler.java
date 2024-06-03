@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CASE_FLAGS;
@@ -47,7 +46,7 @@ public class ManageCaseFlagsHandler extends CallbackHandler {
         if (caseData.getCaseFlags() != null) {
             urgentFlags = caseData.getCaseFlags().getDetails().stream()
                 .filter(details -> (details.getValue().getFlagCode().equals("CF0007")
-                    && details.getValue().getStatus().equals("Active"))).collect(Collectors.toList());
+                    && details.getValue().getStatus().equals("Active"))).toList();
             updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
         } else {
             updatedData.urgentFlag(YesOrNo.NO);

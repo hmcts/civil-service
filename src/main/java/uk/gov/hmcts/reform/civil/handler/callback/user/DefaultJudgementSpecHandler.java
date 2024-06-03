@@ -182,7 +182,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -404,8 +404,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getRepaymentDate().isBefore(eligibleDate.plusDays(1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }

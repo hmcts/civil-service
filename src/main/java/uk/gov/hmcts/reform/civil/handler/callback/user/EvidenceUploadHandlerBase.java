@@ -169,6 +169,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
     private List<Element<UploadEvidenceDocumentType>> additionalBundleDocs;
 
+    @SuppressWarnings("java:S107")
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
                                         CoreCaseDataService coreCaseDataService,
@@ -255,6 +256,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     // or a second list containing an element, AND with the addition of the user being respondent2 solicitor, the below
     // combines the list condition into one single condition, which can then be used in CCD along with the
     // caseTypeFlag condition
+    @SuppressWarnings("java:S107")
     CallbackResponse showCondition(CaseData caseData, UserInfo userInfo,
                                    List<EvidenceUploadWitness> witnessStatementFastTrack,
                                    List<EvidenceUploadWitness> witnessStatementSmallTrack,
@@ -291,17 +293,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .getValue().getLabel().startsWith(OPTION_APP2)) {
                 caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
             }
-        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)) {
-            //1v2 same sol, def2 selected
-            if ((multiParts
-                    && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_DEF2))
-                    //1v2 dif sol, log in as def2
-                    || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
-                        && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
-                caseDataBuilder.caseTypeFlag("RespondentTwoFields");
-            }
+        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
+            && ((multiParts && caseData.getEvidenceUploadOptions().getValue().getLabel().startsWith(OPTION_DEF2))
+            || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)))) {
+            // 1v2 same sol, def2 selected OR 1v2 dif sol, log in as def2
+            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
 
         // clears the flag, as otherwise if the user returns to previous screen and unselects an option,
@@ -360,6 +357,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return validateValues(callbackParams, callbackParams.getCaseData());
     }
 
+    @SuppressWarnings("java:S107")
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness2,
@@ -1237,7 +1235,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 boolean containsValue = additionalBundleDocs.stream()
                     .map(Element::getValue)
                     .map(upload -> upload != null ? upload.getDocumentUpload() : null)
-                    .filter(docUpload -> docUpload != null)
+                    .filter(Objects::nonNull)
                     .map(Document::getDocumentUrl)
                     .anyMatch(docUrl -> docUrl.equals(documentToAdd.getDocumentUrl()));
                 // When a bundle is created, applicantDocsUploadedAfterBundle and respondentDocsUploadedAfterBundle

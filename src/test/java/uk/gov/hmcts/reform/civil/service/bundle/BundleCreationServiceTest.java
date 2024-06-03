@@ -167,7 +167,7 @@ class BundleCreationServiceTest {
     void testBundleApiClientIsInvoked() throws Exception {
         //Given: case details with all document type
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any(), any())).willReturn(null);
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
         given(userConfig.getUserName()).willReturn("test");

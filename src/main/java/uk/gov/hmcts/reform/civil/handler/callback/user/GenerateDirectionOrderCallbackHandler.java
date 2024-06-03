@@ -90,18 +90,41 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
-    public static final String BODY_1v1 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s";
-    public static final String BODY_2v1 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Claimant 2 \n %s"
-        + "\n ### Defendant 1 \n %s";
-    public static final String BODY_1v2 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s"
-        + "\n ### Defendant 2 \n %s";
+    public static final String BODY_1_V_1 = """
+    The order has been sent to:
+    ### Claimant 1
+    %s
+    ### Defendant 1
+    %s
+        """;
+
+    public static final String BODY_2_V_1 = """
+    The order has been sent to:
+    ### Claimant 1
+    %s
+    ### Claimant 2
+    %s
+    ### Defendant 1
+    %s
+        """;
+
+    public static final String BODY_1_V_2 = """
+    The order has been sent to:
+    ### Claimant 1
+    %s
+    ### Defendant 1
+    %s
+    ### Defendant 2
+    %s
+        """;
+
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
     public static final String FURTHER_HEARING_OTHER_EMPTY = "Further hearing, Length of new hearing, Other is empty";
-    public String defendantTwoPartyName;
-    public String claimantTwoPartyName;
+    private String defendantTwoPartyName;
+    private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
@@ -350,12 +373,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
-        if (pastDate) {
-            if (nonNull(date) && date.isBefore(LocalDate.now())) {
-                errors.add(String.format(errorMessage, dateDescription));
-            }
-        } else if (nonNull(date) && date.isAfter(LocalDate.now())) {
+    private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, boolean pastDate) {
+        if (nonNull(date) && pastDate && date.isBefore(LocalDate.now())) {
+            errors.add(String.format(errorMessage, dateDescription));
+        } else if (nonNull(date) && !pastDate && date.isAfter(LocalDate.now())) {
             errors.add(String.format(errorMessage, dateDescription));
         }
     }
@@ -377,12 +398,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDateRangeTo).orElse(null),
                      "Order made 'date to'", NOT_ALLOWED_DATE, errors, false);
 
-        if (nonNull(caseData.getFinalOrderDateHeardComplex())) {
-            if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
-                && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
-                .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
-                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order made"));
-            }
+        if (nonNull(caseData.getFinalOrderDateHeardComplex())
+            && nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
+            && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
+            .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
+            errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order made"));
         }
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderFurtherHearingComplex())
@@ -390,12 +410,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
                      "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
 
-        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())) {
-            if (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
-                    && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
-                    .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
-                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
-            }
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())
+            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
+            && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
+            .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
+            errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
         }
 
         validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
@@ -504,14 +523,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private String getBody(CaseData caseData) {
         if (caseData.getRespondent2() != null) {
-            return format(BODY_1v2, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName(),
+            return format(BODY_1_V_2, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName(),
                           caseData.getRespondent2().getPartyName());
         }
         if ((caseData.getApplicant2() != null)) {
-            return format(BODY_2v1, caseData.getApplicant1().getPartyName(), caseData.getApplicant2().getPartyName(),
+            return format(BODY_2_V_1, caseData.getApplicant1().getPartyName(), caseData.getApplicant2().getPartyName(),
                           caseData.getRespondent1().getPartyName());
         } else {
-            return format(BODY_1v1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
+            return format(BODY_1_V_1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
         }
     }
 }

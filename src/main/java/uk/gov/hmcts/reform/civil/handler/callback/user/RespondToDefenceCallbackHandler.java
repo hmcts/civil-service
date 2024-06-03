@@ -359,29 +359,31 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
+    final String claimant = "Claimant";
+
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, claimant,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant2())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, claimant,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getApplicant1DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, claimant,
                                       updatedCaseData.build().getApplicant1ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getApplicant2DQ())
             .map(Applicant2DQ::getApplicant2DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, claimant,
                                       updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
@@ -419,8 +421,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     break;
                 }
                 // FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
                 // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {

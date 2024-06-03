@@ -12,7 +12,7 @@ public class PartyFlags extends Flags {
     private final String partyId;
 
     public static PartyFlags from(Flags flags) {
-        return PartyFlags.builder()
+        return uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags.builder()
             .partyName(flags.getPartyName())
             .details(flags.getDetails())
             .roleOnCase(flags.getRoleOnCase())

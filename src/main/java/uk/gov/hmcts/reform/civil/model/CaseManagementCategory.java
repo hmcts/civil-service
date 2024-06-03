@@ -16,5 +16,5 @@ public class CaseManagementCategory {
 
     private CaseManagementCategoryElement value;
     @SuppressWarnings("checkstyle:MemberName")
-    private List<Element<CaseManagementCategoryElement>> list_items;
+    private List<Element<CaseManagementCategoryElement>> listItems;
 }

@@ -55,7 +55,7 @@ public class UpdateCaseManagementDetailsService {
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
         builder.caseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            CaseManagementCategory.builder().value(civil).listItems(itemList).build());
 
     }
 

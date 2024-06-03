@@ -24,16 +24,16 @@ public enum PersonalAllowance {
         if (hasPartner && over25 && partnerOver18) {
             return COUPLES_OVER_18;
         }
-        if (hasPartner && over25 && !partnerOver18) {
+        if (hasPartner && over25) {
             return COUPLES_UNDER_18_OVER_25;
         }
-        if (hasPartner && under25 && !partnerOver18) {
+        if (hasPartner && !partnerOver18) {
             return COUPLES_UNDER_18_UNDER_25;
         }
         if (!hasPartner && under25) {
             return SINGLE_UNDER_25;
         }
-        if (!hasPartner && over25) {
+        if (!hasPartner) {
             return SINGLE_OVER_25;
         }
         return COUPLES_UNDER_18;

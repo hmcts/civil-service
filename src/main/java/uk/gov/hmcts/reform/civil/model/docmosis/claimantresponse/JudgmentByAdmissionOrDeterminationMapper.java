@@ -103,10 +103,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
             return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
         } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
-            LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
+            return deadlineCalculatorService.calculateExtendedDeadline(
                 LocalDate.now(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            return whenBePaid;
         }
 
         return null;

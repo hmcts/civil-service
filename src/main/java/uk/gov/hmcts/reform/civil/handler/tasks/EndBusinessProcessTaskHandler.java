@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -39,11 +38,10 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
-        switch (businessProcess.getStatusOrDefault()) {
-            case FINISHED:
-                throw new NotRetryableException(NOT_RETRYABLE_MESSAGE);
-            default:
-                coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        if (businessProcess.getStatusOrDefault() == uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED) {
+            throw new uk.gov.hmcts.reform.civil.exceptions.NotRetryableException(NOT_RETRYABLE_MESSAGE);
+        } else {
+            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         }
     }
 

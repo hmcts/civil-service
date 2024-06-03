@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -56,11 +55,11 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     }
 
     private String getHeader() {
-        return format("# Judgment marked as paid in full");
+        return "# Judgment marked as paid in full";
     }
 
     private String getBody() {
-        return format("# The judgment has been marked as paid in full");
+        return "# The judgment has been marked as paid in full";
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {

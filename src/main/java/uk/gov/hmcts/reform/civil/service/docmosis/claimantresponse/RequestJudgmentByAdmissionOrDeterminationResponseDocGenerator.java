@@ -43,6 +43,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         );
     }
 
+    @Override
     public JudgmentByAdmissionOrDetermination getTemplateData(CaseData caseData, CaseEvent caseEvent) {
         return judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, caseEvent);
     }

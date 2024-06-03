@@ -29,13 +29,13 @@ public class EvidenceTemplateData {
     public static List<EvidenceTemplateData> toEvidenceTemplateDataList(List<Evidence> evidenceList) {
         return Optional.ofNullable(evidenceList).map(Collection::stream)
             .orElseGet(Stream::empty)
-            .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
+            .map(EvidenceTemplateData::toEvidenceTemplateData)
             .toList();
     }
 
     @JsonProperty("displayTypeValue")
     public String getDisplayTypeValue() {
-        return Optional.ofNullable(type).map(type -> getDisplayValueFromEvidenceType(type)).orElse("");
+        return Optional.ofNullable(type).map(this::getDisplayValueFromEvidenceType).orElse("");
     }
 
     private String getDisplayValueFromEvidenceType(String type) {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
 
-    private final Map<String, Callback> callbackMap = ImmutableMap.of(
+    private final Map<String, Callback> callbackMap = java.util.Map.of(
         callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
         callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
         callbackKey(ABOUT_TO_SUBMIT),
@@ -96,7 +95,6 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build());
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails;
             updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfCaseEvent(
                 PARTIAL_REMISSION_HWF_GRANTED).build());
         }

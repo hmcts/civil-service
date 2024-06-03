@@ -38,10 +38,7 @@ public class JudgmentsOnlineHelper {
 
     public static boolean validateIfFutureDate(LocalDate date) {
         LocalDate today = LocalDate.now();
-        if (date.isAfter(today)) {
-            return true;
-        }
-        return false;
+        return date.isAfter(today);
     }
 
     public static boolean checkIfDateDifferenceIsGreaterThan31Days(LocalDate firstDate, LocalDate secondDate) {

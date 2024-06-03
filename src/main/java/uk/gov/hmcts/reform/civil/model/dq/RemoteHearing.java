@@ -9,6 +9,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 public class RemoteHearing {
 
+    /**
+     * Deprecated. Use {@link #reasonForRemoteHearing} instead.
+     */
     @Deprecated(forRemoval = true)
     private final YesOrNo remoteHearingRequested;
     private final String reasonForRemoteHearing;

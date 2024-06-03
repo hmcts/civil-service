@@ -168,18 +168,17 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .map(list -> IntStream.range(0, list.size()).mapToObj(i -> new AccountSimpleTemplateData(
                     list.get(i),
                     i + 1
-                )).collect(Collectors.toList()))
+                )).toList())
                 .ifPresent(builder::bankAccountList);
             Optional.ofNullable(caseData.getRecurringIncomeForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
-                    .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).toList())
                 .ifPresent(builder::incomeList);
             Optional.ofNullable(caseData.getRecurringExpensesForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
-                    .map(item ->
-                             ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).toList())
                 .ifPresent(builder::expenseList);
         }
     }

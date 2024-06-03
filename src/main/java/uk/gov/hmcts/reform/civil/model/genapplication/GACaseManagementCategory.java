@@ -16,5 +16,5 @@ public class GACaseManagementCategory {
 
     private GACaseManagementCategoryElement value;
     @SuppressWarnings("checkstyle:MemberName")
-    private List<Element<GACaseManagementCategoryElement>> list_items;
+    private List<Element<GACaseManagementCategoryElement>> listItems;
 }

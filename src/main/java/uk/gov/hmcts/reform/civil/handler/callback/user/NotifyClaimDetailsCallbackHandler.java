@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -258,7 +257,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             caseData.getServedDocumentFiles().getOther()
                     .addAll(cosDoc.stream()
                             .map(document -> ElementUtils.element(new DocumentWithRegex(document)))
-                            .collect(Collectors.toList()));
+                            .toList());
         }
         return caseData;
     }
@@ -436,14 +435,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
-        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-            if (caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
-                .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
-                return true;
-            }
-        }
-        return false;
+        return (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2()))
+            || (caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
+            .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant()));
     }
 
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
@@ -456,20 +451,22 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
-            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+            || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
+
+    final String particularsOfClaim = "particularsOfClaim";
 
     private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                      Element::getValue, "particularsOfClaim");
+                                                      Element::getValue, particularsOfClaim);
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                      document -> document.getValue().getDocument(), particularsOfClaim);
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                      document -> document.getValue().getDocument(), particularsOfClaim);
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                      document -> document.getValue().getDocument(), particularsOfClaim);
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+                                                      document -> document.getValue().getDocument(), particularsOfClaim);
     }
 
 }

@@ -24,9 +24,9 @@ public class HearingDetailsMapper {
     public static final String WELSH_REGION_ID = "7";
     public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
-    private static String EMPTY_STRING = "";
+    private static String emptyString = "";
 
-    private static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
+    private static String audioVideoEvidenceFlag = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -109,10 +109,10 @@ public class HearingDetailsMapper {
     public static String getListingComments(CaseData caseData) {
         String comments = getAllActiveFlags(caseData).stream()
             .flatMap(flags -> flags.getDetails().stream())
-            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
+            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(audioVideoEvidenceFlag))
             .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
             .reduce("", String::concat)
-            .replaceAll("\n", " ")
+            .replace("\n", " ")
             .replaceAll("\\s+", " ");
 
         if (comments != null && !comments.isEmpty()) {
@@ -124,7 +124,7 @@ public class HearingDetailsMapper {
     }
 
     public static String getHearingRequester() {
-        return EMPTY_STRING;
+        return emptyString;
     }
 
     public static boolean getPrivateHearingRequiredFlag() {
@@ -136,7 +136,7 @@ public class HearingDetailsMapper {
     }
 
     public static String getLeadJudgeContractType() {
-        return EMPTY_STRING;
+        return emptyString;
     }
 
     public static JudiciaryModel getJudiciary() {
