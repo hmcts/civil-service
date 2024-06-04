@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
 @ExtendWith(MockitoExtension.class)
-public class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandlerTest extends BaseCallbackHandlerTest {
+class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private final ObjectMapper mapper = new ObjectMapper();
@@ -62,7 +62,7 @@ public class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandlerTest exte
                               .build())
             .build());
     }
-    
+
     @Test
     void shouldGenerateClaimantForm() {
         CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT;

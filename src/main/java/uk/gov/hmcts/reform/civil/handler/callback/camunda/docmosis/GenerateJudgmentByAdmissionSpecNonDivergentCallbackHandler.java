@@ -62,16 +62,14 @@ public class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandler extends 
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<CaseDocument> caseDocuments = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generateNonDivergentDocs(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             CaseEvent.valueOf(callbackParams.getRequest().getEventId())
         );
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-        caseDocuments.stream().forEach(caseDocument -> {
-            systemGeneratedDocuments.add(element(caseDocument));
-        });
+        caseDocuments.stream().forEach(caseDocument -> systemGeneratedDocuments.add(element(caseDocument)));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocuments);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

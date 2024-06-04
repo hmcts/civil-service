@@ -86,7 +86,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         List<CaseDocument> list = new ArrayList<>();
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            getTemplateDataForNonDivergentDocs(caseData, caseEvent),
+            getTemplateDataForNonDivergentDocs(caseData),
             getTemplateName(caseEvent)
         );
         list.add(documentManagementService.uploadDocument(
@@ -100,7 +100,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         return list;
     }
 
-    private JudgmentByAdmissionOrDetermination getTemplateDataForNonDivergentDocs(CaseData caseData, CaseEvent caseEvent) {
-        return judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData, caseEvent);
+    private JudgmentByAdmissionOrDetermination getTemplateDataForNonDivergentDocs(CaseData caseData) {
+        return judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData);
     }
 }

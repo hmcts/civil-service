@@ -80,7 +80,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
             .paymentType(getPaymentType(caseData))
-            .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
+            .paymentTypeDisplayValue(getPaymentType(caseData) != null ? getPaymentType(caseData).getDisplayedValue() : null)
             .payBy(setPayByDate(caseData))
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
@@ -269,7 +269,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return applicants;
     }
 
-    public JudgmentByAdmissionOrDetermination toNonDivergentDocs(CaseData caseData, CaseEvent caseEvent) {
+    public JudgmentByAdmissionOrDetermination toNonDivergentDocs(CaseData caseData) {
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
             .map(amount -> amount.setScale(2).toString())
             .orElse("0");
@@ -277,7 +277,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
-        LocalDateTime now = LocalDateTime.now();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .respondent1Name(caseData.getRespondent1().getPartyName())

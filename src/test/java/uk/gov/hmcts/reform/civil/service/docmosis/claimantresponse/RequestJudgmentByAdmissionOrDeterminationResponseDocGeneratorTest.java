@@ -151,7 +151,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
-        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData, GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT))
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
             .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
 
         // When
@@ -179,7 +179,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
-        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData, GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT))
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
             .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
 
         // When
