@@ -71,6 +71,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         LocalDateTime now = LocalDateTime.now();
+        ApplicantResponsePaymentPlan paymentPlan = getPaymentType(caseData);
         return builder
             .formHeader(getFormHeader(caseData, caseEvent))
             .formName(getFormName(caseData))
@@ -79,8 +80,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
-            .paymentType(getPaymentType(caseData))
-            .paymentTypeDisplayValue(getPaymentType(caseData) != null ? getPaymentType(caseData).getDisplayedValue() : null)
+            .paymentType(paymentPlan)
+            .paymentTypeDisplayValue(paymentPlan != null ? paymentPlan.getDisplayedValue() : null)
             .payBy(setPayByDate(caseData))
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
