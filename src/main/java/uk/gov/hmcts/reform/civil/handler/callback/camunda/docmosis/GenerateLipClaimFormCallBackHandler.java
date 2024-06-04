@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -82,7 +81,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         // Remove Draft form from documents
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
             systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
-                .collect(Collectors.toList());
+                .toList();
         }
 
         return caseData.toBuilder()
