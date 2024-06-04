@@ -467,7 +467,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (YES.equals(caseData.getIsRespondent1())
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
-            && scenario != ONE_V_TWO_ONE_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES) {
+            && (scenario != ONE_V_TWO_ONE_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES)) {
             return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
                 && caseData.getSpecDefenceFullAdmittedRequired() != YES
                 && caseData.getSpecDefenceAdmittedRequired() != YES;

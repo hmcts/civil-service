@@ -346,7 +346,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
 
         if (ofNullable(caseData.getRespondent1Copy()).isPresent()
-            || (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
+            && (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
             throw new IllegalArgumentException("Primary Address cannot be empty");
         }
 

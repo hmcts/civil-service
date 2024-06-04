@@ -554,7 +554,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return ofNullable(experts)
             .orElse(Experts.builder().build())
             .toBuilder()
-            .expertRequired(mappedExperts.isEmpty() ? NO : YES)
+            .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
             .details(mappedExperts).build();
     }
 
@@ -562,7 +562,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return ofNullable(witnesses)
             .orElse(Witnesses.builder().build())
             .toBuilder()
-            .witnessesToAppear(mappedWitnesses.isEmpty() ? NO : YES)
+            .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
             .details(mappedWitnesses).build();
     }
 
