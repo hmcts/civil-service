@@ -6495,6 +6495,111 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withApplicant1LRIndividualFlags() {
+        this.applicant1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1LRIndividualFlags() {
+        this.respondent1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2LRIndividualFlags() {
+        this.respondent2LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1OrgIndividualFlags() {
+        this.applicant1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2OrgIndividualFlags() {
+        this.applicant2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1OrgIndividualFlags() {
+        this.respondent1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2OrgIndividualFlags() {
+        this.respondent2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
     public List<Element<FlagDetail>> flagDetails() {
         FlagDetail details1 = FlagDetail.builder()
             .name("Vulnerable user")
