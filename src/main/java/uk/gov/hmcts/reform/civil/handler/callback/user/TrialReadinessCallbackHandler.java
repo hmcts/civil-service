@@ -51,27 +51,19 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private static final String TOO_LATE = "Trial arrangements had to be confirmed more than 3 weeks before the trial.";
     private static final String NO_SMALL_CLAIMS = "This event is not available for small claims cases.";
     public static final String READY_HEADER = "## You have said this case is ready for trial or hearing";
-    public static final String READY_BODY = """
-        ### What happens next
-
-        You can view your and other party's trial arrangements in documents in the case details.
-
-        If there are any additional changes between now and the hearing date,
-        you will need to make an application as soon as possible and pay the appropriate fee.
-        """;
+    public static final String READY_BODY = "### What happens next \n\n"
+        + "You can view your and other party's trial arrangements in documents in the case details.\n\n "
+        + "If there are any additional changes between now and the hearing date, "
+        + "you will need to make an application as soon as possible and pay the appropriate fee.";
     public static final String NOT_READY_HEADER = "## You have said this case is not ready for trial or hearing";
-    public static final String NOT_READY_BODY = """
-        ### What happens next
-
-        You can view your and other party's trial arrangements in documents in the case details.
-        If there are any additional changes between now and the hearing date,
-        you will need to make an application as soon as possible and pay the appropriate fee.
-
-        The trial will go ahead on the specified date
-        unless a judge makes an order changing the date of the hearing.
-        If you want the date of the hearing to be changed (or any other order to make the case ready for trial)
-        you will need to make an application to the court and pay the appropriate fee.
-        """;
+    public static final String NOT_READY_BODY = "### What happens next \n\n"
+        + "You can view your and other party's trial arrangements in documents in the case details. "
+        + "If there are any additional changes between now and the hearing date, "
+        + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
+        + "The trial will go ahead on the specified date "
+        + "unless a judge makes an order changing the date of the hearing. "
+        + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
+        + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
 
     private final UserService userService;
