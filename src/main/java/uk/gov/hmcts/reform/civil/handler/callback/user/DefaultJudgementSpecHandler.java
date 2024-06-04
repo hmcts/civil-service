@@ -135,8 +135,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             ));
         } else if (caseData.isLRvLipOneVOne()) {
             return format(JUDGMENT_REQUESTED_LIP_CASE);
-        }
-        else if (caseData.getRespondent2() != null
+        } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both")) {
             return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
