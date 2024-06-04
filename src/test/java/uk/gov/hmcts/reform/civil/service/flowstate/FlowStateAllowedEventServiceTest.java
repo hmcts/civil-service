@@ -216,7 +216,11 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
-                        SETTLE_CLAIM_MARK_PAID_FULL
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -233,7 +237,11 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
-                        SETTLE_CLAIM_MARK_PAID_FULL
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -250,7 +258,11 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
-                        SETTLE_CLAIM_MARK_PAID_FULL
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -281,7 +293,11 @@ class FlowStateAllowedEventServiceTest {
                         TRANSFER_ONLINE_CASE,
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
-                        INVALID_HWF_REFERENCE
+                        INVALID_HWF_REFERENCE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
