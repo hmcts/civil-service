@@ -435,10 +435,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
-        return (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails2()))
-            || (caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
-            .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant()));
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+            return caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
+                .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant());
+        }
+        return false;
     }
 
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
