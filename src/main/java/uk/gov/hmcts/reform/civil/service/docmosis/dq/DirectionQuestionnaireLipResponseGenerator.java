@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService,
                                                       DocumentGeneratorService documentGeneratorService,
-                                                      StateFlowEngine stateFlowEngine,
+                                                      IStateFlowEngine stateFlowEngine,
                                                       RepresentativeService representativeService,
                                                       FeatureToggleService featureToggleService,
                                                       LocationRefDataService locationRefDataService) {
