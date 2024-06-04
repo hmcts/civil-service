@@ -78,10 +78,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS;
@@ -105,6 +110,8 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT_1v2SS = format(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
@@ -404,6 +411,124 @@ class DirectionsQuestionnaireGeneratorTest {
                 any(DirectionsQuestionnaireForm.class),
                 eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
             );
+        }
+
+        @Nested
+        class MintiToggleIsOn {
+            @BeforeEach
+            void setup() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            }
+
+            @Test
+            void shouldGenerateDefendantDQWhen1v1() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .setMultiTrackClaim()
+                    .build();
+
+                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                          eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
+                );
+            }
+
+            @Test
+            void shouldGenerateDefendantDQWhen1v2SS() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE").build())
+                    .applicantsProceedIntention(YesOrNo.YES)
+                    .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                    .build();
+                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                          eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
+                );
+            }
+
+            @Test
+            void shouldGenerateClaimantDQWhen1v2DS() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .respondent2SameLegalRepresentative(NO)
+                    .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+                    .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                    .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+                    .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
+
+                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                          eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)
+                );
+            }
+
+            @Test
+            void shouldGenerateDQWhen2v1() {
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_2V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+
+                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                          eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)
+                );
+            }
         }
 
         @Nested
@@ -861,6 +986,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                           .draftOrderNumber(disclosureOrderNumber)
                                                                           .build())
                                        .build())
+                    .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
@@ -868,6 +994,80 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
                 assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
                 assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            }
+
+            @Test
+            void whenDisclosureReport_include_Minti() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+                assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
+                assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            }
+
+            @Test
+            void whenDisclosureReport_shouldNotinclude_Minti() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted).isEqualTo(null);
+            }
+
+            @Test
+            void whenDisclosureReport_shouldNotinclude_UnspecFast() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .build();
+                String disclosureOrderNumber = "123";
+                caseData = caseData.toBuilder()
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondent1DQDisclosureReport(DisclosureReport.builder()
+                                                                          .disclosureFormFiledAndServed(YES)
+                                                                          .disclosureProposalAgreed(YES)
+                                                                          .draftOrderNumber(disclosureOrderNumber)
+                                                                          .build())
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                    .caseAccessCategory(UNSPEC_CLAIM)
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                DisclosureReport extracted = templateData.getDisclosureReport();
+                assertThat(extracted).isEqualTo(null);
             }
 
             @Test
@@ -1711,6 +1911,48 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
+            void when1v2DiffSolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData_Minti() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                LocalDateTime createdDate = LocalDateTime.parse("2020-07-16T14:05:15.000550439");
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent1ResponseDate(createdDate)
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentResponseIsSame(YesOrNo.NO)
+                    .systemGeneratedCaseDocuments(new ArrayList<>())
+                    .build();
+                if (caseData.getRespondent2OrgRegistered() != null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
+                Optional<CaseDocument> caseDocument = generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN,
+                                                                                        "ONE"
+                );
+
+                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
+                );
+            }
+
+            @Test
             void when1v2DiffSolRespondsTo1stDefendantWithDivergentResponseSmallClaim_shouldGetRespondentDQData() {
 
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
@@ -1967,6 +2209,44 @@ class DirectionsQuestionnaireGeneratorTest {
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
                     eq(DQ_RESPONSE_1V1)
+                );
+            }
+
+            @Test
+            void when1v2SolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData_Minti() {
+                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentResponseIsSame(YesOrNo.NO)
+                    .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
+                CaseDocument caseDocument = generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN,
+                                                                                            "ONE"
+                );
+
+                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
+
+                verify(documentManagementService)
+                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
