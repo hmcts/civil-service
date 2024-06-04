@@ -132,7 +132,7 @@ payments:
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
-    url: http://localhost:8765
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   s2s-auth:
@@ -505,7 +505,7 @@ spring:
 
 fees:
   api:
-    url: http://localhost:8765
+    url: ${FEES_API_URL:http://localhost:8765}
 
 genApp:
   lrd:
@@ -515,17 +515,17 @@ genApp:
 
 payments:
   api:
-    url: http://localhost:8765
+    url: ${FEES_API_URL:http://localhost:8765}
 
 serviceRequest:
   api:
-    callback-url : http://localhost:4000/service-request-update
+    callback-url : ${SERVICE_REQUEST_UPDATE:http://localhost:4000/service-request-update}
     site_id : AAA7
     service : CIVIL
 
 serviceRequestClaimIssued:
   api:
-    callback-url: http://localhost:4000/service-request-update-claim-issued
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:http://localhost:4000/service-request-update-claim-issued}
     site_id: AAA7
     service: CIVIL
 
@@ -543,11 +543,11 @@ idam:
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
 
 document_management:
-  url: http://localhost:3453
+  url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:3453}
 
 docmosis:
   tornado:
-    url: http://localhost:5433
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:8080}
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -561,11 +561,11 @@ testing:
 
 rd_professional:
   api:
-    url: http://localhost:8765
+    url: ${RD_PROFESSIONAL_API_URL:http://localhost:8765}
 
 rd_commondata:
   api:
-    url: http://localhost:8765
+    url: ${RD_COMMONDATA_API_URL:http://localhost:8765}
 
 robotics:
   notification:
@@ -649,18 +649,18 @@ idam:
 
 core_case_data:
   api:
-    url: http://fake-ccd-data-store-api
+    url: ${CORE_CASE_DATA_API_URL:http://fake-ccd-data-store-api}
 
 reference:
   database:
     enabled: false
 
 document_management:
-  url: http://fake-document-management-api
+  url: ${DOCUMENT_MANAGEMENT_URL:http://fake-document-management-api}
 
 docmosis:
   tornado:
-    url: http://fake-docmosis-api
+    url: ${DOCMOSIS_TORNADO_URL:http://fake-docmosis-api}
     key: fake-key
 
 notifications:
@@ -672,14 +672,14 @@ testing:
 
 rd_professional:
   api:
-    url: http://fake-prd-api
+    url: ${RD_PROFESSIONAL_API_URL:http://fake-prd-api}
 
 rd_commondata:
   api:
-    url: http://fake-prd-api
+    url: ${RD_COMMONDATA_API_URL:http://fake-prd-api}
 
 sendgrid:
-  api-key: fake-key
+  api-key: ${SENDGRID_API_KEY:fake-key}
 ---
 
 spring:
