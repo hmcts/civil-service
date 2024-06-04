@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -29,9 +30,11 @@ import java.util.Map;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -41,9 +44,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    SystemUpdateUserConfiguration.class
 })
 class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    private static final String AUTH_TOKEN = "mock_token";
 
     @Autowired
     private AddOrAmendClaimDocumentsCallbackHandler handler;
@@ -155,6 +161,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                         .build()).build();
             Map<String, Object> beforeCaseData = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
+            when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
             CallbackParams params = callbackParamsOf(caseData,
                                                      MID,
                                                      CallbackVersion.V_2,
@@ -164,6 +171,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
             handler.handle(params);
             verifyNoInteractions(downloadService);
+            verify(userService).getAccessToken(anyString(), anyString());
         }
 
         @Test
@@ -186,6 +194,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                         .build()).build();
             Map<String, Object> beforeCaseData = objectMapper.convertValue(caseDataBefore, new TypeReference<>() {
             });
+            when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
             CallbackParams params = callbackParamsOf(caseData,
                                                      MID,
                                                      CallbackVersion.V_2,
@@ -195,6 +204,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
             handler.handle(params);
             verify(downloadService, times(5)).validateEncryptionOnUploadedDocument(any(), any(), any(), any());
+            verify(userService).getAccessToken(anyString(), anyString());
         }
 
         @Test
