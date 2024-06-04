@@ -661,9 +661,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if ((YES.equals(caseData.getIsRespondent1())
             && (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
             || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION))
-            || (YES.equals(caseData.getIsRespondent2())
+            || ((YES.equals(caseData.getIsRespondent2())
             && (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION))) {
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION)))) {
             updatedData.specFullAdmissionOrPartAdmission(YES);
         }
         if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())

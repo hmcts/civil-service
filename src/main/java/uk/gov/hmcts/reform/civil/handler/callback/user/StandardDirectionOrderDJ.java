@@ -534,12 +534,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isSdoR2Enabled()) {
             List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
             SdoDJR2TrialCreditHireDetails tempSdoDJR2TrialCreditHireDetails = SdoDJR2TrialCreditHireDetails.builder()
-                .input2("""
-                       The claimant must upload to the Digital Portal a witness
-                       statement addressing
-                       a) the need to hire a replacement vehicle; and
-                       b) impecuniosity
-                       """)
+                .input2("The claimant must upload to the Digital Portal a witness "
+                            + "statement addressing \na) the need to hire a replacement "
+                            + "vehicle; and \nb) impecuniosity")
                 .input3("This statement must be uploaded to the Digital Portal by 4pm on")
                 .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
                 .input4("A failure to comply will result in the claimant being "
