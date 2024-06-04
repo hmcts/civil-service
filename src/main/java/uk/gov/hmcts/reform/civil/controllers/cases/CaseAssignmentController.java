@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
@@ -41,6 +42,7 @@ public class CaseAssignmentController {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final AssignCaseService assignCaseService;
     private final LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+    private final CoreCaseDataService coreCaseDataService;
     private static final int OCMC_PIN_LENGTH = 8;
 
     @PostMapping(path = {
@@ -93,10 +95,20 @@ public class CaseAssignmentController {
     @Operation(summary = "Assigns case to defendant")
     public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                       @PathVariable("caseId") String caseId,
-                                      @PathVariable("caseRole") Optional<CaseRole> caseRole) {
+                                      @PathVariable("caseRole") Optional<CaseRole> caseRole,
+                                      @RequestBody Optional<PinDto> pinDto) {
         log.info("assigning case with id: {}", caseId);
+        Optional<CaseDetails> caseDetails = Optional.empty();
+        if (caseRole.isPresent() && CaseRole.DEFENDANT == caseRole.get()) {
+            caseDetails = Optional.of(coreCaseDataService.getCase(Long.valueOf(caseId)));
+            defendantPinToPostLRspecService.validatePin(caseDetails.get(), pinDto.get().getPin());
+        }
         assignCaseService.assignCase(authorisation, caseId, caseRole);
-        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
+            authorisation,
+            caseId,
+            caseRole,
+            caseDetails
+        );
     }
-
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -26,11 +27,15 @@ import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
+    private final FeatureToggleService featureToggleService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -40,6 +45,14 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
+
+        if (featureToggleService.isGeneralApplicationsEnabled()) {
+            params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+            params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+        } else {
+            params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
+            params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+        }
 
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
             LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
@@ -104,7 +117,8 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
             params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
-            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementEn", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementCy", getClaimantRepaymentPlanDecisionCy(caseData));
         });
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
@@ -152,6 +166,7 @@ public class DashboardNotificationsParamsMapper {
         });
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
+        params.put("claimantRepaymentPlanDecisionCy", getClaimantRepaymentPlanDecisionCy(caseData));
 
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate();
@@ -272,6 +287,24 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
+    }
+
+    private String getClaimantRepaymentPlanDecisionCy(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH;
+    }
+
+    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "week";
+            case ONCE_TWO_WEEKS -> "2 weeks";
+            case ONCE_THREE_WEEKS -> "3 weeks";
+            case ONCE_FOUR_WEEKS -> "4 weeks";
+            case ONCE_ONE_MONTH -> "month";
+            default -> null;
+        };
     }
 
     private Optional<LocalDate> getInstalmentStartDate(CaseData caseData) {
