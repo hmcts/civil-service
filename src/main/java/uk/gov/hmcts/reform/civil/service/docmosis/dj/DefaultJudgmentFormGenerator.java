@@ -42,6 +42,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Service
 @RequiredArgsConstructor
@@ -217,30 +221,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         }
     }
 
-    private String getApplicantSolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getApplicantSolicitor1Reference() != null) {
-            return caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
-        }
-        return null;
-    }
-
-    private String getRespondent1SolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getRespondentSolicitor1Reference() != null) {
-            return caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
-        }
-        return null;
-    }
-
-    private String getRespondent2SolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getRespondentSolicitor2Reference() != null) {
-            return caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
-        }
-        return null;
-    }
-
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
             return getPartyDetails(caseData.getApplicant1());
@@ -270,23 +250,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .name(party.getPartyName())
             .primaryAddress(party.getPrimaryAddress())
             .build();
-    }
-
-    private List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
-                                     uk.gov.hmcts.reform.civil.model.Party applicant2) {
-
-        List<Party> applicants = new ArrayList<>();
-        applicants.add(Party.builder()
-                           .name(applicant1.getPartyName())
-                           .primaryAddress(applicant1.getPrimaryAddress())
-                           .build());
-        if (applicant2 != null) {
-            applicants.add(Party.builder()
-                               .name(applicant2.getPartyName())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .build());
-        }
-        return applicants;
     }
 
     private Party getApplicantOrgDetails(OrganisationPolicy organisationPolicy) {
