@@ -117,7 +117,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 class StateFlowEngineTest {
 
     @Autowired
-    private IStateFlowEngine stateFlowEngine;
+    private StateFlowEngine stateFlowEngine;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -4132,8 +4132,8 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .build());
+                .applicant1ProceedWithClaim(YES)
+                .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4171,13 +4171,13 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(NO)
-                                                                      .build()
-                                                              )
-                                                              .build());
+                .applicant1ProceedWithClaim(YES)
+                .applicant1ClaimMediationSpecRequired(
+                    SmallClaimMedicalLRspec.builder()
+                        .hasAgreedFreeMediation(NO)
+                        .build()
+                )
+                .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4207,7 +4207,7 @@ class StateFlowEngineTest {
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .responseClaimMediationSpecRequired(YES)
                 .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(YES).build())
+                    .hasAgreedFreeMediation(YES).build())
                 .build();
 
             // When
@@ -4217,13 +4217,13 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(YES)
-                                                                      .build()
-                                                              )
-                                                              .build());
+                .applicant1ProceedWithClaim(YES)
+                .applicant1ClaimMediationSpecRequired(
+                    SmallClaimMedicalLRspec.builder()
+                        .hasAgreedFreeMediation(YES)
+                        .build()
+                )
+                .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));

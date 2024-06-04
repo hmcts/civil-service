@@ -110,12 +110,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
+    StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class
-})
+    TransitionsTestConfiguration.class})
+//CHECKSTYLE:OFF
 class SimpleStateFlowEngineTest {
 
     @Autowired
@@ -2201,7 +2200,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.SDO_ENABLED.name(), false)
+                    entry(FlowFlag.SDO_ENABLED.name(), true)
                 );
             }
         }
@@ -2283,7 +2282,8 @@ class SimpleStateFlowEngineTest {
             );
         }
 
-        @Test//1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+        @Test
+        //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
         void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -2546,7 +2546,7 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
@@ -2668,7 +2668,7 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(5).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
@@ -3466,7 +3466,8 @@ class SimpleStateFlowEngineTest {
         @Nested
         class DefendantResponseMultiparty {
 
-            @Test//1v2 Different solicitor scenario-first response FullDefence received
+            @Test
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3507,7 +3508,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//1v2 Different solicitor scenario-first response FullDefence received
+            @Test
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3548,7 +3550,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//1v2 Different solicitor scenario-first response FullDefence received
+            @Test
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3589,7 +3592,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//1v2 Different solicitor scenario-first party acknowledges, not responds second party submits response FullDefence
+            @Test
+            //1v2 Different solicitor scenario-first party acknowledges, not respond second party submits response FullDefence
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3630,7 +3634,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+            @Test
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3671,7 +3676,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            @Test
+            //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3713,7 +3719,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+            @Test
+            //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3756,7 +3763,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test// Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+            @Test
+            // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3799,7 +3807,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            @Test
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3840,7 +3849,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            @Test
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3881,8 +3891,8 @@ class SimpleStateFlowEngineTest {
                 );
             }
 
-            //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
             @Test
+            //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2Scenario_whenNeitherRespondentSubmitsFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
