@@ -273,7 +273,8 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, state.fullName());
             Map<String, Boolean> flags = new HashMap<>(getFlowFlags(state));
             if (state == FULL_DEFENCE_PROCEED) {
-                flags.put(FlowFlag.SDO_ENABLED.name(), false);
+                // case is fast claim
+                flags.put(FlowFlag.SDO_ENABLED.name(), true);
             }
             variables.putValue(
                 FLOW_FLAGS,

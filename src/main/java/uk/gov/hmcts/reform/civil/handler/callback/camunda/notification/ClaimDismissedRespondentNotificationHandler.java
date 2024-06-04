@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED;
@@ -106,7 +105,7 @@ public class ClaimDismissedRespondentNotificationHandler extends CallbackHandler
             stateFlowEngine.evaluate(caseData).getStateHistory()
                 .stream()
                 .map(State::getName)
-                .collect(Collectors.toList()),
+                .toList(),
             notificationsProperties
         );
     }

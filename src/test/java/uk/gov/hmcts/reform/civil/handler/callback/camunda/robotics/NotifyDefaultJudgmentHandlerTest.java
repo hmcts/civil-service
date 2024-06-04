@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
 @ExtendWith(SpringExtension.class)
 public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
 
@@ -106,8 +107,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
-                params.getParams().get(BEARER_TOKEN).toString());
+            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
         }
 
         @Test
@@ -133,8 +133,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             verify(roboticsNotificationService, times(0)).notifyRobotics(caseData, multiPartyScenario,
-                params.getParams().get(BEARER_TOKEN).toString()
-            );
+                                                                         BEARER_TOKEN);
         }
 
         @Test
@@ -150,7 +149,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
 
             //Then
-            verify(roboticsNotificationService).notifyJudgementLip(caseData);
+            verify(roboticsNotificationService).notifyJudgementLip(caseData, BEARER_TOKEN);
         }
     }
 
