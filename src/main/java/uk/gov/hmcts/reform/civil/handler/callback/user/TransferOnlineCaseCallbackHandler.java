@@ -135,7 +135,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
-        return matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
+        return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
