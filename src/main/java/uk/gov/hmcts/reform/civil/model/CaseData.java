@@ -138,6 +138,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
     private final String generalAppReasonsOfOrder;
+    private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;

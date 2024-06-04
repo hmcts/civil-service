@@ -268,6 +268,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
+        if (caseData.getGeneralAppPBADetails() == null) {
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().build();
+            CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
+            caseData = newCaseData;
+        }
         if (caseData.getGeneralAppPBADetails().getFee() == null) {
             Fee feeForGA = feesService.getFeeForGA(caseData);
             GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeForGA).build();
