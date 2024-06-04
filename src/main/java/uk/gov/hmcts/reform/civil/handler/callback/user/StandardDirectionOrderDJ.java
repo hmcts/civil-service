@@ -498,15 +498,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input1("The claimant must prepare a Scott Schedule of the defects,"
                                                              + " items of damage "
                                                              + "or any other relevant matters")
-                                                 .input2("""
-                                                       The columns should be headed:
-                                                       - Item
-                                                       - Alleged Defect
-                                                       - Claimant's costing
-                                                       - Defendant's response
-                                                       - Defendant's costing
-                                                       - Reserved for Judge's use
-                                                       """)
+                                                 .input2("The columns should be headed: \n - Item \n - "
+                                                             + "Alleged Defect "
+                                                             + "\n - Claimant's costing\n - Defendant's"
+                                                             + " response\n - Defendant's costing"
+                                                             + " \n - Reserved for Judge's use")
                                                  .input3("The claimant must upload to the Digital Portal the "
                                                              + "Scott Schedule with the relevant "
                                                              + "columns completed by 4pm on")
@@ -558,19 +554,25 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
             caseDataBuilder.sdoDJR2TrialCreditHire(SdoDJR2TrialCreditHire
                                                        .builder()
-                                                       .input1("""
-                                                                If impecuniosity is alleged by the claimant and not admitted by the defendant,
-                                                                the claimant's disclosure as ordered earlier in this order must include:
-                                                                a. Evidence of all income from all sources for a period of 3 months prior to the
-                                                                commencement of hire until the earlier of
-                                                                   i) 3 months after cessation of hire or
-                                                                   ii) the repair or replacement of the claimant's vehicle;
-                                                                b. Copy statements of all bank, credit card and savings account statements for a period
-                                                                of 3 months prior to the commencement of hire until the earlier of
-                                                                   i) 3 months after cessation of hire or
-                                                                   ii) the repair or replacement of the claimant's vehicle;
-                                                                c. Evidence of any loan, overdraft or other credit facilities available to the claimant
-                                                                """)
+                                                       .input1(
+                                                           "If impecuniosity is alleged by the claimant and not admitted "
+                                                               + "by the defendant, the claimant's "
+                                                               + "disclosure as ordered earlier in this order must "
+                                                               + "include:\n"
+                                                               + "a. Evidence of all income from all sources for a period "
+                                                               + "of 3 months prior to the "
+                                                               + "commencement of hire until the earlier of \n    i) 3 months "
+                                                               + "after cessation of hire or \n    ii) "
+                                                               + "the repair or replacement of the claimant's vehicle;\n"
+                                                               + "b. Copy statements of all bank, credit card and savings "
+                                                               + "account statements for a period of 3 months "
+                                                               + "prior to the commencement of hire until"
+                                                               + " the earlier of \n    i)"
+                                                               + " 3 months after cessation of hire "
+                                                               + "or \n    ii) the repair or replacement of the "
+                                                               + "claimant's vehicle;\n"
+                                                               + "c. Evidence of any loan, overdraft or other credit "
+                                                               + "facilities available to the claimant")
                                                        .input6(
                                                            "If the parties fail to agree rates subject to liability "
                                                                + "and/or other issues pursuant to the paragraph above, "
@@ -596,28 +598,27 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             caseDataBuilder.trialCreditHire(TrialCreditHire
                                                 .builder()
-                                                .input1("""
-                                                        If impecuniosity is alleged by the claimant and not admitted
-                                                        by the defendant, the claimant's disclosure as ordered earlier in this order must
-                                                        include:
-                                                        a. Evidence of all income from all sources for a period
-                                                        of 3 months prior to the commencement of hire until the earlier of
-                                                           i) 3 months after cessation of hire or
-                                                           ii) the repair or replacement of the claimant's vehicle;
-                                                        b. Copy statements of all bank, credit card and savings
-                                                        account statements for a period of 3 months prior to the commencement of hire until
-                                                        the earlier of
-                                                           i) 3 months after cessation of hire
-                                                           ii) the repair or replacement of the claimant's vehicle;
-                                                        c. Evidence of any loan, overdraft or other credit
-                                                        facilities available to the claimant
-                                                        """)
-                                                .input2("""
-                                                        The claimant must upload to the Digital Portal a witness
-                                                        statement addressing
-                                                        a) the need to hire a replacement vehicle; and
-                                                        b) impecuniosity
-                                                        """)
+                                                .input1("If impecuniosity is alleged by the claimant and not admitted "
+                                                            + "by the defendant, the claimant's "
+                                                            + "disclosure as ordered earlier in this order must "
+                                                            + "include:\n"
+                                                            + "a. Evidence of all income from all sources for a period "
+                                                            + "of 3 months prior to the "
+                                                            + "commencement of hire until the earlier of \n    i) 3 months "
+                                                            + "after cessation of hire or \n    ii) "
+                                                            + "the repair or replacement of the claimant's vehicle;\n"
+                                                            + "b. Copy statements of all bank, credit card and savings "
+                                                            + "account statements for a period of 3 months "
+                                                            + "prior to the commencement of hire until"
+                                                            + " the earlier of \n    i)"
+                                                            + " 3 months after cessation of hire "
+                                                            + "or \n    ii) the repair or replacement of the "
+                                                            + "claimant's vehicle;\n"
+                                                            + "c. Evidence of any loan, overdraft or other credit "
+                                                            + "facilities available to the claimant")
+                                                .input2("The claimant must upload to the Digital Portal a witness "
+                                                            + "statement addressing \na) the need to hire a replacement "
+                                                            + "vehicle; and \nb) impecuniosity")
                                                 .input3(
                                                     "This statement must be uploaded to the Digital Portal by 4pm on")
                                                 .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
@@ -682,13 +683,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
                                                   .input1("The claimant must prepare a Scott Schedule of the items "
                                                               + "in disrepair")
-                                                  .input2("""
-                                                        The columns should be headed:
-                                                        - Item
-                                                        - Alleged disrepair
-                                                        - Defendant's Response
-                                                        - Reserved for Judge's Use
-                                                        """)
+                                                  .input2("The columns should be headed: \n - Item \n - "
+                                                              + "Alleged disrepair "
+                                                              + "\n - Defendant's Response \n - "
+                                                              + "Reserved for Judge's Use")
                                                   .input3("The claimant must upload to the Digital Portal the "
                                                               + "Scott Schedule with the relevant columns "
                                                               + "completed by 4pm on")
