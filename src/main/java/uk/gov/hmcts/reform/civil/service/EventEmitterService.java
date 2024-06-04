@@ -28,13 +28,13 @@ public class EventEmitterService {
 
         boolean nullTenantAttempt = false;
         try {
+            if (dispatchProcess) {
+                applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
+            }
             runtimeService.createMessageCorrelation(camundaEvent)
                 .tenantId(TENANT_ID)
                 .setVariable("caseId", caseId)
                 .correlateStartMessage();
-            if (dispatchProcess) {
-                applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
-            }
             log.info("Camunda event emitted successfully with tenant");
         } catch (RemoteProcessEngineException ex) {
             nullTenantAttempt = true;
@@ -46,13 +46,13 @@ public class EventEmitterService {
 
         if (nullTenantAttempt) {
             try {
+                if (dispatchProcess) {
+                    applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
+                }
                 runtimeService.createMessageCorrelation(camundaEvent)
                     .setVariable("caseId", caseId)
                     .withoutTenantId()
                     .correlateStartMessage();
-                if (dispatchProcess) {
-                    applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
-                }
                 log.info("Camunda event emitted successfully without tenant");
             } catch (Exception e) {
                 log.error(format("Emitting %s camunda event failed for case: %d, message: %s",

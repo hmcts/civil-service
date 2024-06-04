@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.6.9'
   id "io.freefair.lombok" version "8.6"
-  id "org.flywaydb.flyway" version "10.13.0"
+  id "org.flywaydb.flyway" version "10.14.0"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -88,7 +88,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.2.1-jre') {
         entry 'guava'
       }
 
@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.732'
+        version: '1.12.735'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -401,7 +401,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.3'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -436,8 +436,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.16'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.16'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.17'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.17'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -449,7 +449,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.1:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
   //pact contract testing
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
