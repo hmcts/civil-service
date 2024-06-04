@@ -212,7 +212,11 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -227,7 +231,11 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -242,7 +250,11 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -271,7 +283,11 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         TRANSFER_ONLINE_CASE,
-                        INVALID_HWF_REFERENCE
+                        INVALID_HWF_REFERENCE,
+                        RECORD_JUDGMENT,
+                        EDIT_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
