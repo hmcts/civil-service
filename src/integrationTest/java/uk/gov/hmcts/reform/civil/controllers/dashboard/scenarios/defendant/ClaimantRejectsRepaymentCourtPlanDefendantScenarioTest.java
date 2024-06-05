@@ -53,7 +53,7 @@ public class ClaimantRejectsRepaymentCourtPlanDefendantScenarioTest extends Dash
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mi wnaeth Mr. John Rambo} wrthod eich <a href={CCJ_REPAYMENT_PLAN_DEFENDANT_URL} class=\"govuk-link\">" +
                         "cynllun ad-dalu</a> a chynllun arall a gynigwyd gan y llys yn seiliedig ar eich manylion ariannol. Mi wnaethant ofyn i farnwr wneud cynllun newydd.</p>" +
-                        "<p class=\"govuk-body\">Pan fydd barnwr wedi gwneud penderfyniad, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p> " +
+                        "<p class=\"govuk-body\">Pan fydd barnwr wedi gwneud penderfyniad, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>" +
                         "<p class=\"govuk-body\">Os byddwch yn talu’r ddyled o fewn mis o ddyddiad y dyfarniad, bydd y Dyfarniad Llys Sirol (CCJ) yn cael " +
                         "ei ddileu o’r gofrestr gyhoeddus. Gallwch dalu £15 i " +
                         "<a href=\"{APPLY_FOR_CERTIFICATE}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">" +
