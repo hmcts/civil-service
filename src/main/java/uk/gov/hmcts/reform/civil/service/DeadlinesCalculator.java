@@ -69,7 +69,7 @@ public class DeadlinesCalculator {
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadlineSpec(track);
+        int daysToAdd = getDaysToAddToDeadlineSpec();
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
@@ -134,5 +134,11 @@ public class DeadlinesCalculator {
 
     public LocalDateTime getRespondToSettlementAgreementDeadline(LocalDateTime fromDateTime) {
         return plusWorkingDays(fromDateTime.toLocalDate(), 7).atTime(END_OF_BUSINESS_DAY);
+    }
+
+    public LocalDateTime getRespondentToImmediateSettlementAgreement(LocalDateTime responseDate) {
+        LocalDate fromDate = is4pmOrAfter(responseDate) ? responseDate.toLocalDate().plusDays(1)
+                : responseDate.toLocalDate();
+        return plusWorkingDays(fromDate, 5).atTime(END_OF_BUSINESS_DAY);
     }
 }

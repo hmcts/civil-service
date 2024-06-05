@@ -88,6 +88,8 @@ public interface Claim {
 
     boolean isSDOOrderCreated();
 
+    boolean isSDOOrderLegalAdviserCreated();
+
     boolean isClaimantDefaultJudgement();
 
     boolean isPartialAdmissionAccepted();

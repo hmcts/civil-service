@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface ClaimStoreApi {
     @GetMapping("/claims/defendant/{submitterId}")
     List<CmcClaim> getClaimsForDefendant(@RequestHeader(AUTHORIZATION) String authorisation,
                                          @PathVariable String submitterId);
+
+    @GetMapping("/claims/{caseReference}/defendant-link-status")
+    DefendantLinkStatus isDefendantLinked(@PathVariable String caseReference);
 }
