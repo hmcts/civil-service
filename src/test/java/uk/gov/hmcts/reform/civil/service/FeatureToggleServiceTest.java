@@ -56,6 +56,42 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
+        var caseFlagsKey = "GaForLips";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
+        var bulkClaimKey = "bulk_claim_enabled";
+        givenToggle(bulkClaimKey, toggleStat);
+
+        assertThat(featureToggleService.isBulkClaimEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
+        var lipVlipKey = "cuiReleaseTwoEnabled";
+        givenToggle(lipVlipKey, toggleStat);
+
+        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDashboardServiceInvoked(Boolean toggleStat) {
+        var dashboardKey = "dashboard-service";
+        givenToggle(dashboardKey, toggleStat);
+
+        assertThat(featureToggleService.isDashboardServiceEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);

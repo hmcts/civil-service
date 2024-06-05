@@ -61,4 +61,40 @@ class AirlineEpimsServiceTest {
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> airlineEpimsService.getEpimsIdForAirline("NoLocationAirline"));
     }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_shouldReturnCorrespondingEpimsIdForAirline() {
+        // Given
+        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
+
+        // When
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("gulf air");
+
+        // Then
+        assertThat(result).isEqualTo("36791");
+    }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_givenInvalidAirline_shouldThrowException() {
+        // Given
+        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
+
+        // When
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE");
+
+        // Then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_givenNoLocationAirline_shouldThrowException() {
+        // Given
+        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
+
+        // When
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("NoLocationAirline");
+
+        // Then
+        assertThat(result).isNull();
+    }
 }
