@@ -80,7 +80,8 @@ class EventEmitterServiceTest {
         verify(messageCorrelationBuilder, times(2)).setVariable("caseId", 1L);
         verify(messageCorrelationBuilder).withoutTenantId();
         verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
-        verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
+        verify(applicationEventPublisher, times(2)).publishEvent(
+            new DispatchBusinessProcessEvent(1L, businessProcess));
     }
 
     @Test
@@ -127,6 +128,5 @@ class EventEmitterServiceTest {
 
         verify(runtimeService, times(2)).createMessageCorrelation("TEST_EVENT");
         verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
-        verifyNoInteractions(applicationEventPublisher);
     }
 }

@@ -277,6 +277,24 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
+        void default_types_with_notice_should_pay_275_forGALiP() {
+            List<GeneralApplicationTypes> allTypes =
+                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
+            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
+            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            //single
+            for (GeneralApplicationTypes generalApplicationType : allTypes) {
+                Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, true, null);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+            }
+            //mix
+            Fee feeDto = feesService.getFeeForGALiP(allTypes, false, true, null);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_275);
+        }
+
+        @Test
         void default_types_without_notice_should_pay_108() {
             List<GeneralApplicationTypes> allTypes =
                     Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
@@ -295,6 +313,24 @@ class GeneralAppFeesServiceTest {
             CaseData caseData = getFeeCase(
                     allTypes, YesOrNo.NO, YesOrNo.NO, null);
             Fee feeDto = feesService.getFeeForGA(caseData);
+            assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+        }
+
+        @Test
+        void default_types_without_notice_should_pay_108_forGALiP() {
+            List<GeneralApplicationTypes> allTypes =
+                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
+            allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
+            allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
+            allTypes.removeAll(GeneralAppFeesService.SD_CONSENT_TYPES);
+            //single
+            for (GeneralApplicationTypes generalApplicationType : allTypes) {
+                Fee feeDto = feesService.getFeeForGALiP(List.of(generalApplicationType), false, false, null);
+                assertThat(feeDto).isEqualTo(FEE_PENCE_108);
+            }
+            //mix
+            Fee feeDto = feesService.getFeeForGALiP(allTypes, false, false, null);
             assertThat(feeDto).isEqualTo(FEE_PENCE_108);
         }
 

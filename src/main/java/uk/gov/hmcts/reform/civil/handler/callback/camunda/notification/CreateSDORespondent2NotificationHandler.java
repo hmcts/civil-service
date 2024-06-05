@@ -35,6 +35,7 @@ public class CreateSDORespondent2NotificationHandler extends AbstractCreateSDORe
         return caseData.isRespondent2LiP();
     }
 
+    @Override
     protected CallbackResponse notifyRespondentSolicitorSDOTriggered(CallbackParams callbackParams) {
         if (callbackParams.getCaseData().getRespondent2() != null) {
             return super.notifyRespondentSolicitorSDOTriggered(callbackParams);

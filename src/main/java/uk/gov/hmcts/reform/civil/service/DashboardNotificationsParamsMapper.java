@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
@@ -33,6 +35,8 @@ public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
     private final FeatureToggleService featureToggleService;
 
@@ -46,8 +50,10 @@ public class DashboardNotificationsParamsMapper {
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
         if (featureToggleService.isGeneralApplicationsEnabled()) {
+            params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
             params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
         } else {
+            params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
             params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
         }
 
@@ -114,7 +120,8 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
             params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
-            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementEn", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementCy", getClaimantRepaymentPlanDecisionCy(caseData));
         });
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
@@ -166,6 +173,7 @@ public class DashboardNotificationsParamsMapper {
         });
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
+        params.put("claimantRepaymentPlanDecisionCy", getClaimantRepaymentPlanDecisionCy(caseData));
 
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate();
@@ -213,6 +221,12 @@ public class DashboardNotificationsParamsMapper {
         String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+
+        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
+            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
+            params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
+            params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
         }
 
         return params;
@@ -286,6 +300,13 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
+    }
+
+    private String getClaimantRepaymentPlanDecisionCy(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH;
     }
 
     private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
