@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
-import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
+import org.apache.commons.collections4.CollectionUtils;
+import org.camunda.community.rest.client.api.ExternalTaskApiClient;
+import org.camunda.community.rest.client.api.IncidentApiClient;
+import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
+import org.camunda.community.rest.client.model.IncidentDto;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.Optional;
 
@@ -13,25 +14,26 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CamundaRestEngineClient {
 
-    private final AuthTokenGenerator authTokenGenerator;
-    private final CamundaRestEngineApi camundaRestEngineApi;
+    private final ProcessInstanceApiClient processInstanceApiClient;
+    private final ExternalTaskApiClient externalTaskApiClient;
+    private final IncidentApiClient incidentApiClient;
 
     public Optional<String> findIncidentByProcessInstanceId(String processInstanceId) {
         return Optional.ofNullable(
-            camundaRestEngineApi.getActivityInstanceByProcessInstanceId(
-                processInstanceId, authTokenGenerator.generate()))
-            .map(ActivityInstanceDto::getChildActivityInstances)
-            .filter(ArrayUtils::isNotEmpty)
-            .map(activityInstances -> activityInstances[0])
-            .map(ActivityInstanceDto::getIncidentIds)
-            .filter(ArrayUtils::isNotEmpty)
-            .map(incidentIds -> incidentIds[0]);
+                processInstanceApiClient.getActivityInstanceTree(
+                    processInstanceId))
+            .map(response -> response.getBody().getChildActivityInstances())
+            .filter(CollectionUtils::isNotEmpty)
+            .map(activityInstances -> activityInstances.get(0))
+            .map(activityInstanceDto -> activityInstanceDto.getIncidentIds())
+            .filter(CollectionUtils::isNotEmpty)
+            .map(incidentIds -> incidentIds.get(0));
     }
 
     public String getIncidentMessage(String incidentId) {
-        IncidentDto incidentDto = camundaRestEngineApi.getIncidentById(incidentId, authTokenGenerator.generate());
+        IncidentDto incidentDto = incidentApiClient.getIncident(incidentId).getBody();
         String externalTaskId = incidentDto.getConfiguration();
 
-        return camundaRestEngineApi.getErrorDetailsByExternalTaskId(externalTaskId, authTokenGenerator.generate());
+        return externalTaskApiClient.getExternalTaskErrorDetails(externalTaskId).getBody();
     }
 }
