@@ -516,37 +516,37 @@ public class StateFlowEngine {
                                                        .or(lipFullDefenceProceed.and(isCarmApplicableLipCase).and(not(fullDefenceProceed))))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
-            })
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
+                })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                        .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
-            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
-                               JudicialReferralUtils::shouldMoveToJudicialReferral))
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
-                        .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
-            })
-            .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
-            .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(applicantOutOfTime)
+                .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                            .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
+                })
+                .transitionTo(FULL_DEFENCE_PROCEED)
+                .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                             .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+                .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
+                                   JudicialReferralUtils::shouldMoveToJudicialReferral))
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
+                            .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+                })
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
+                })
+                .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
+                .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                        .onlyIf(applicantOutOfTime)
             .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
