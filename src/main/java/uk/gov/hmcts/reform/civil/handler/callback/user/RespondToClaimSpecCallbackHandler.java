@@ -436,10 +436,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)) {
             if (caseData.getRespondent2().getType() != Party.Type.COMPANY
                 && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
-                if ((scenario == ONE_V_TWO_TWO_LEGAL_REP && needFinancialInfo21v2ds(caseData)) ||
-                    (scenario == ONE_V_TWO_ONE_LEGAL_REP &&
-                        ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData)) ||
-                            (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES)))) {
+                if ((scenario == ONE_V_TWO_TWO_LEGAL_REP && needFinancialInfo21v2ds(caseData))
+                    || (scenario == ONE_V_TWO_ONE_LEGAL_REP
+                    && ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData))
+                    || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES)))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
 
@@ -635,14 +635,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario) &&
-            ((YES.equals(caseData.getIsRespondent1()) &&
-                RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) ||
-                (YES.equals(caseData.getIsRespondent2()) &&
-                    RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())))) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)
+            && ((YES.equals(caseData.getIsRespondent1())
+            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            || (YES.equals(caseData.getIsRespondent2())
+            && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())))) {
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
         }
-
 
         if (YES.equals(caseData.getIsRespondent2())) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
@@ -818,7 +817,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return tags;
     }
 
-    final static String unknownMpScenario = "Unknown mp scenario";
+    static final String unknownMpScenario = "Unknown mp scenario";
 
     /**
      * Returns the flags that should be active because part admission has been chosen.

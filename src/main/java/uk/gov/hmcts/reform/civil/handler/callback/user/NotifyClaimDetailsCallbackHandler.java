@@ -456,7 +456,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
-    final static String particularsOfClaim = "particularsOfClaim";
+    static final String particularsOfClaim = "particularsOfClaim";
 
     private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
