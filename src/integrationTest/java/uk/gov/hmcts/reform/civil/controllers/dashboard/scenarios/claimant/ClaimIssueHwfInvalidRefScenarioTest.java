@@ -41,14 +41,14 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends DashboardBaseIntegratio
             jsonPath("$[0].titleEn").value("You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You've applied for help with the claim fee, but the reference"
-                    + " number is invalid.<br>You've been sent an email with instructions on what to do next."
-                    + " If you've already read the email and taken action, you can disregard this message.<br>You can pay by"
+                    + " number is invalid. You've been sent an email with instructions on what to do next."
+                    + " If you've already read the email and taken action, you can disregard this message. You can pay by"
                     + " phone by calling {civilMoneyClaimsTelephone}.</p>"),
             jsonPath("$[0].titleCy").value("Rydych wedi darparu cyfeirnod help i dalu ffioedd annilys"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu ffi’r hawliad, ond mae'r cyfeirnod yn annilys."
-                    + "<br>Anfonwyd e-bost atoch gyda chyfarwyddiadau ar beth i'w wneud nesaf. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu,"
-                    + " gallwch anwybyddu'r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
+                    + " Anfonwyd e-bost atoch gyda chyfarwyddiadau ar beth i'w wneud nesaf. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu,"
+                    + " gallwch anwybyddu'r neges hon. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>")
 
         );
     }
