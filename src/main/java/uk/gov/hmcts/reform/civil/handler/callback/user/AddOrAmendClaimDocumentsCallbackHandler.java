@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
@@ -95,7 +97,9 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
         List<String> errors = new ArrayList<>();
         List<Element<Document>> particularsOfClaimDocument = servedDocumentFiles.getParticularsOfClaimDocument();
         ServedDocumentFiles servedDocumentFilesBefore = getServedDocumentFiles(caseDataBefore);
+        log.info("Logging in as system user: {}", userConfig.getUserName());
         String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        log.info("Logging in as system user token: {}", authToken);
         if (particularsOfClaimDocument != null) {
             List<Element<Document>> particularsOfClaimDocumentBefore =
                 Optional.ofNullable(servedDocumentFilesBefore.getParticularsOfClaimDocument()).orElse(new ArrayList<>());

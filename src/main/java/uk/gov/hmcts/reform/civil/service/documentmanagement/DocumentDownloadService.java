@@ -23,6 +23,7 @@ public class DocumentDownloadService {
 
     public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId) {
         String documentPath = String.format("documents/%s", documentId);
+        log.info("Logging DownloadedDocumentResponse userTokem: {} ", authorisation);
         return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
     }
 
@@ -30,6 +31,8 @@ public class DocumentDownloadService {
                                                      String authorisation,
                                                      Long caseId,
                                                      List<String> errors) {
+        log.info("CaseId: {} ", caseId);
+        log.info("Logging userTokem: {} ", authorisation);
         if (document != null) {
             String documentFilename = document.getDocumentFileName();
             log.info("checking password protection for file {} for Case ID: {}", documentFilename, caseId);
