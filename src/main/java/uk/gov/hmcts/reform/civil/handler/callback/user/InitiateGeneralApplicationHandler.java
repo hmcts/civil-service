@@ -65,7 +65,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
-    private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
+    public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
+    public static final String NOT_ALLOWED_PRE_CASE_SDO = "Case is in a invalid state for general applications";
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -100,11 +101,18 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isEarlyAdoptersEnabled()
+
+        // If not pre SDO JUDICIAL REFERRAL prevent GA from triggering.
+        if (!featureToggleService.allowGenAppsInPreSdoStates(caseData.getCcdState().toString())) {
+            errors.add(NOT_ALLOWED_PRE_CASE_SDO);
+        }
+        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+        if (!featureToggleService.allowGenAppsInPreSdoStates(caseData.getCcdState().toString())
+            && featureToggleService.isEarlyAdoptersEnabled()
             && (Objects.isNull(caseData.getCaseManagementLocation())
-                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))
-                )) {
+            || !(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())))) {
+            // clear initial NOT_ALLOWED_PRE_CASE_SDO error
+            errors.clear();
             errors.add(NOT_IN_EA_REGION);
         }
 
