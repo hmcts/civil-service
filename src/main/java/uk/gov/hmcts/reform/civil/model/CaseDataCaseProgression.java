@@ -178,7 +178,9 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
 
     // Court officer order
     private FinalOrderFurtherHearing courtOfficerFurtherHearingComplex;
+    private String courtOfficerOrdered;
     private YesOrNo courtOfficerGiveReasonsYesNo;
+    private CaseDocument previewCourtOfficerOrder;
 
     //Hearing Scheduled
     private DynamicList hearingLocation;

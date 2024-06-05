@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -34,14 +33,7 @@ public class JudicialReferralUtils {
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
             };
         } else {
-            AllocatedTrack allocatedTrack =
-                getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
-                        ? caseData.getClaimValue().toPounds()
-                        : caseData.getTotalClaimAmount(),
-                    caseData.getClaimType(),
-                    caseData.getPersonalInjuryType()
-                );
+            AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
             if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
                 return false;
             }

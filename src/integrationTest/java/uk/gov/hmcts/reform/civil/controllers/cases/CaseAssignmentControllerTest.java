@@ -6,6 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -26,6 +27,8 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private static final String VALIDATE_OCMC_PIN_URL = CASES_URL + "/reference/{caseReference}/ocmc";
     private static final String ASSIGN_CASE = CASES_URL + "/case/{caseId}/{caseRole}";
 
+    private static final String DEFENDENT_LINK_CHECK_URL = CASES_URL + "/reference/{caseReference}/ocmc";
+
     @MockBean
     private CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     @MockBean
@@ -34,6 +37,8 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private AssignCaseService assignCaseService;
     @MockBean
     private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Test
     @SneakyThrows
@@ -85,6 +90,31 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void givenCorrectParams_whenAssignClaim_shouldReturnStatusOk() {
         doPost("authorization", "", ASSIGN_CASE, "123", "RESPONDENTSOLICITORONE")
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void givenCorrectParams_whenAssignClaim_forDefendant_shouldReturnStatusOk() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
+        doPost("authorization", "12345", ASSIGN_CASE, "123", "DEFENDANT")
+            .andExpect(status().isOk());
+    }
+  
+    @Test
+    @SneakyThrows
+    void givenCorrectClaim_whenDefendantLinkedStatusFalse_shouldReturnStatusOk() {
+        when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(false);
+        doGet("", DEFENDENT_LINK_CHECK_URL, "620MC123")
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void givenCorrectClaim_whenDefendantLinkedStatusTrue_shouldReturnStatusOk() {
+        when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(true);
+        doGet("", DEFENDENT_LINK_CHECK_URL, "620MC123")
             .andExpect(status().isOk());
     }
 
