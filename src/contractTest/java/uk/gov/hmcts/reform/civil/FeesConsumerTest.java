@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil;
 
-import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
@@ -101,7 +100,6 @@ public class FeesConsumerTest {
         assertThat(fee.getCode(), is(equalTo("FEE0003")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(8000))));
     }
-
 
     private RequestResponsePact buildRequestResponsePact(PactDslWithProvider builder, String jurisdiction2,
                                                          String keyword, String amount, BigDecimal feeAmount,
