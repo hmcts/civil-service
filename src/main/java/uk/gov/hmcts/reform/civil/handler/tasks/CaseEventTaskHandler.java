@@ -202,8 +202,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return null;
     }
 
-    final String proceed = "proceed";
-    final String notProceed = "not proceed";
+    static final String PROCEED = "proceed";
+    static final String NOT_PROCEED = "not proceed";
 
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
@@ -211,10 +211,10 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 return format(
                     "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? proceed : notProceed,
+                        ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent1().getPartyName(),
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? proceed : notProceed,
+                        ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent2().getPartyName()
                 );
             }
@@ -222,9 +222,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 return format(
                     "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
                     caseData.getApplicant1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? proceed : notProceed,
+                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED,
                     caseData.getApplicant2().getPartyName(),
-                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? proceed : notProceed
+                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED
                 );
             }
             default: {

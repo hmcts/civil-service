@@ -267,14 +267,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
 
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                hearing = caseData.getRespondent2DQ().getHearing();
-            } else if (respondent2HasSameLegalRep(caseData)
-                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
-                && (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null)) {
-                hearing = caseData.getRespondent2DQ().getHearing();
-            }
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || (respondent2HasSameLegalRep(caseData)
+            && caseData.getRespondentResponseIsSame() != null
+            && caseData.getRespondentResponseIsSame() == NO
+            && caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getHearing() != null))) {
+            hearing = caseData.getRespondent2DQ().getHearing();
         }
 
         List<String> errors = unavailableDateValidator.validate(hearing);

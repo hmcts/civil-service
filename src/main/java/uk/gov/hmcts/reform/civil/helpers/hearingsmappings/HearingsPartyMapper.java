@@ -380,17 +380,17 @@ public class HearingsPartyMapper {
             .build();
     }
 
-    static final String dateString = "yyyy-MM-dd";
+    static final String DATE_STRING = "yyyy-MM-dd";
 
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
         return UnavailabilityRangeModel.builder()
             .unavailabilityType(ALL_DAY)
             .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern(dateString)) : date.getFromDate()
-                .format(DateTimeFormatter.ofPattern(dateString)))
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getFromDate()
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
             .unavailableToDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern(dateString)) : date.getToDate()
-                .format(DateTimeFormatter.ofPattern(dateString)))
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getToDate()
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
             .build();
     }
 }

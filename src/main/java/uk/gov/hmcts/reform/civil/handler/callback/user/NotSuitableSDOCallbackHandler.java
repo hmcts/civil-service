@@ -145,22 +145,22 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if (isTransferOnlineCase(caseData)) {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeaderTOC())
-                .confirmationBody(getBodyTOC())
+                .confirmationHeader(getHeaderTOC(caseData))
+                .confirmationBody(getBodyTOC(caseData))
                 .build();
         } else {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeader())
-                .confirmationBody(getBody())
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
                 .build();
         }
     }
 
-    private String getHeader() {
+    private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
     }
 
-    private String getBody() {
+    private String getBody(CaseData caseData) {
         return format(NOT_SUITABLE_SDO_CONFIRMATION_BODY);
     }
 
@@ -169,11 +169,11 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
             == NotSuitableSdoOptions.CHANGE_LOCATION;
     }
 
-    private String getHeaderTOC() {
+    private String getHeaderTOC(CaseData caseData) {
         return format("# Your request was successful%n## This claim will be transferred to a different location");
     }
 
-    private String getBodyTOC() {
+    private String getBodyTOC(CaseData caseData) {
         return format(NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY);
     }
 }
