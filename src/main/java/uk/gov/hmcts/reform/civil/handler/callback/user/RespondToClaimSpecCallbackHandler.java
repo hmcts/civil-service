@@ -817,7 +817,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return tags;
     }
 
-    static final String unknownMpScenario = "Unknown mp scenario";
+    static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
 
     /**
      * Returns the flags that should be active because part admission has been chosen.
@@ -866,7 +866,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
                 break;
             default:
-                throw new UnsupportedOperationException(unknownMpScenario);
+                throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
         return tags;
     }
@@ -1014,7 +1014,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
                 break;
             default:
-                throw new UnsupportedOperationException(unknownMpScenario);
+                throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
         tags.addAll(bcoPartAdmission);
         if (tags.contains(ONLY_RESPONDENT_1_DISPUTES)
@@ -1236,7 +1236,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
                 break;
             default:
-                throw new UnsupportedOperationException(unknownMpScenario);
+                throw new UnsupportedOperationException(UNKNOWN_MP_SCENARIO);
         }
         return set;
     }

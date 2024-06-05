@@ -456,19 +456,28 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
-    static final String particularsOfClaim = "particularsOfClaim";
+    static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
 
     private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                      Element::getValue, particularsOfClaim);
+                                                      Element::getValue, PARTICULARS_OF_CLAIM
+        );
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                      document -> document.getValue().getDocument(), particularsOfClaim);
+                                                      document -> document.getValue().getDocument(),
+                                                      PARTICULARS_OF_CLAIM
+        );
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                      document -> document.getValue().getDocument(), particularsOfClaim);
+                                                      document -> document.getValue().getDocument(),
+                                                      PARTICULARS_OF_CLAIM
+        );
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                      document -> document.getValue().getDocument(), particularsOfClaim);
+                                                      document -> document.getValue().getDocument(),
+                                                      PARTICULARS_OF_CLAIM
+        );
         assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                      document -> document.getValue().getDocument(), particularsOfClaim);
+                                                      document -> document.getValue().getDocument(),
+                                                      PARTICULARS_OF_CLAIM
+        );
     }
 
 }
