@@ -178,7 +178,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             Optional.ofNullable(caseData.getRecurringExpensesForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
-                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).collect(Collectors.toList()))
+                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).toList())
                 .ifPresent(builder::expenseList);
         }
     }

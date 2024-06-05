@@ -202,8 +202,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return null;
     }
 
-    final String proceed = "proceed";
-    final String notProceed = "not proceed";
+    final static String proceed = "proceed";
+    final static String notProceed = "not proceed";
 
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {

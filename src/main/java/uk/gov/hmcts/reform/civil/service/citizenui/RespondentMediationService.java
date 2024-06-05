@@ -38,12 +38,11 @@ public class RespondentMediationService {
                 }
                 break;
             case PART_ADMISSION:
-                if (caseData.hasDefendantAgreedToFreeMediation()) {
-                    if (caseData.hasDefendantNotPaid()
-                        || caseData.isSettlementDeclinedByClaimant()
-                        || caseData.isClaimantRejectsClaimAmount()) {
-                        return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                    }
+                if (caseData.hasDefendantAgreedToFreeMediation()
+                    || (caseData.hasDefendantNotPaid()
+                    || caseData.isSettlementDeclinedByClaimant()
+                    || caseData.isClaimantRejectsClaimAmount())) {
+                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
                 }
                 break;
             case FULL_ADMISSION:

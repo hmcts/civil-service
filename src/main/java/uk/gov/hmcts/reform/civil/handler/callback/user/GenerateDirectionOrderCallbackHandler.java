@@ -373,9 +373,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, boolean pastDate) {
-        if (nonNull(date) && pastDate && date.isBefore(LocalDate.now())) {
-            errors.add(String.format(errorMessage, dateDescription));
-        } else if (nonNull(date) && !pastDate && date.isAfter(LocalDate.now())) {
+        if ((nonNull(date) && pastDate && date.isBefore(LocalDate.now()))
+        || (nonNull(date) && !pastDate && date.isAfter(LocalDate.now()))) {
             errors.add(String.format(errorMessage, dateDescription));
         }
     }

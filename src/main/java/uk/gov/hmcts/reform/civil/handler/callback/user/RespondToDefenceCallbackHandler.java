@@ -359,7 +359,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
-    final String claimant = "Claimant";
+    final static String claimant = "Claimant";
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
