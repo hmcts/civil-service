@@ -65,13 +65,10 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
             }
         }
 
-        if (caseData.isPayByInstallment()) {
-            if (caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec()) {
-                return caseData.getRespondent1().isCompanyOROrganisation()
-                    ? SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario()
-                    : SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
-
-            }
+        if (caseData.isPayByInstallment() && (caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())) {
+            return caseData.getRespondent1().isCompanyOROrganisation()
+                ? SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario()
+                : SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
         }
 
         if (caseData.isPayBySetDate()) {

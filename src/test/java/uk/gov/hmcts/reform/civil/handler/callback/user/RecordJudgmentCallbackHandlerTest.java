@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
+    RecordJudgmentOnlineMapper.class,
     RecordJudgmentCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
