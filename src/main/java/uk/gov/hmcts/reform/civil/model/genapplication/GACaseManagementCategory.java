@@ -16,7 +16,6 @@ import java.util.List;
 public class GACaseManagementCategory {
 
     private GACaseManagementCategoryElement value;
-    @JsonProperty("list_items")
     @SuppressWarnings("checkstyle:MemberName")
-    private List<Element<GACaseManagementCategoryElement>> listItems;
+    private List<Element<GACaseManagementCategoryElement>> list_items;
 }

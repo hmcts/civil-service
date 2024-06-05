@@ -174,7 +174,7 @@ public class InitiateGeneralApplicationService {
         List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
         applicationBuilder.caseManagementCategory(
-            GACaseManagementCategory.builder().value(civil).listItems(itemList).build());
+            GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
