@@ -66,8 +66,7 @@ public class NotifyDefendantJudgmentByAdmissionNotificationHandler extends Callb
     }
 
     private String getLIPTemplate() {
-        //TODO: Change when the notificationproperties in commons will be modify
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+        return notificationsProperties.getNotifyDefendantLIPJudgmentByAdmissionTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {

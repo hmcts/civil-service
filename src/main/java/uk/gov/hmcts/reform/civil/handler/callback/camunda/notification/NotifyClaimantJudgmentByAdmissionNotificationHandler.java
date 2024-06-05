@@ -78,8 +78,7 @@ public class NotifyClaimantJudgmentByAdmissionNotificationHandler extends Callba
     }
 
     private String getTemplate() {
-        //TODO: Change when the notificationproperties in commons will be modify
-        return notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate();
+        return notificationsProperties.getNotifyClaimantLRJudgmentByAdmissionTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
