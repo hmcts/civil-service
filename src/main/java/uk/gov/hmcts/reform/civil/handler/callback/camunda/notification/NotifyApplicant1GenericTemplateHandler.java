@@ -69,7 +69,9 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-        return caseData.isClaimantBilingual() ? notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual() : notificationsProperties.getNotifyLipUpdateTemplate();
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()
+            : notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     private String getRecipientEmail(CaseData caseData) {
