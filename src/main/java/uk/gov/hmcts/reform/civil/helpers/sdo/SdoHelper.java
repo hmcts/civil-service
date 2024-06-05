@@ -168,7 +168,7 @@ public class SdoHelper {
             && HearingOnRadioOptions.HEARING_WINDOW.equals(caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions());
     }
 
-    static final String minutes = " minutes";
+    static final String MINUTES = " minutes";
 
     public static String getSdoR2HearingTime(CaseData caseData) {
 
@@ -183,7 +183,7 @@ public class SdoHelper {
                 case OTHER:
                     return caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthDays() + " days, "
                         + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthHours() + " hours, "
-                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthMinutes() + minutes;
+                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthMinutes() + MINUTES;
                 default: return "";
             }
         }
@@ -262,7 +262,7 @@ public class SdoHelper {
         return hasDirection;
     }
 
-    static final String other = "Other";
+    static final String OTHER = "Other";
 
     public static String getDisposalHearingTimeLabel(CaseData caseData) {
         DisposalHearingHearingTime disposalHearingHearingTime = caseData.getDisposalHearingHearingTime();
@@ -272,7 +272,7 @@ public class SdoHelper {
         if (Optional.ofNullable(caseData.getDisposalHearingHearingTime())
             .map(DisposalHearingHearingTime::getTime)
             .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel).isPresent()) {
-            if (disposalHearingHearingTime.getTime().getLabel().equals(other)) {
+            if (disposalHearingHearingTime.getTime().getLabel().equals(OTHER)) {
                 StringBuilder otherLength = new StringBuilder();
                 if (disposalHearingHearingTime.getOtherHours() != null
                     && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
@@ -283,7 +283,7 @@ public class SdoHelper {
                 if (disposalHearingHearingTime.getOtherMinutes() != null
                     && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
                     String minuteString = Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) == 1
-                        ? " minute" : minutes;
+                        ? " minute" : MINUTES;
                     String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
                     otherLength.append(spaceBeforeMinute
                                            + disposalHearingHearingTime.getOtherMinutes().trim()
@@ -306,14 +306,14 @@ public class SdoHelper {
         if (Optional.ofNullable(caseData.getSmallClaimsHearing())
             .map(SmallClaimsHearing::getTime)
             .map(SmallClaimsTimeEstimate::getLabel).isPresent()) {
-            if (smallClaimHearing.getTime().getLabel().equals(other)) {
+            if (smallClaimHearing.getTime().getLabel().equals(OTHER)) {
                 StringBuilder otherLength = new StringBuilder();
                 if (smallClaimHearing.getOtherHours() != null) {
                     otherLength.append(smallClaimHearing.getOtherHours().toString().trim() +
                                            " hours ");
                 }
                 if (smallClaimHearing.getOtherMinutes() != null) {
-                    otherLength.append(smallClaimHearing.getOtherMinutes().toString().trim() + minutes);
+                    otherLength.append(smallClaimHearing.getOtherMinutes().toString().trim() + MINUTES);
                 }
                 return otherLength.toString();
             }
@@ -332,14 +332,14 @@ public class SdoHelper {
         if (Optional.ofNullable(caseData.getFastTrackHearingTime())
             .map(FastTrackHearingTime::getHearingDuration)
             .map(FastTrackHearingTimeEstimate::getLabel).isPresent()) {
-            if (fastTrackHearingTime.getHearingDuration().getLabel().equals(other)) {
+            if (fastTrackHearingTime.getHearingDuration().getLabel().equals(OTHER)) {
                 StringBuilder otherLength = new StringBuilder();
                 if (fastTrackHearingTime.getOtherHours() != null) {
                     otherLength.append(fastTrackHearingTime.getOtherHours().trim() +
                                            " hours ");
                 }
                 if (fastTrackHearingTime.getOtherMinutes() != null) {
-                    otherLength.append(fastTrackHearingTime.getOtherMinutes().trim() + minutes);
+                    otherLength.append(fastTrackHearingTime.getOtherMinutes().trim() + MINUTES);
                 }
                 return otherLength.toString();
             }
@@ -661,10 +661,10 @@ public class SdoHelper {
     public static String getSdoTrialHearingTimeAllocated(CaseData caseData) {
 
         if (caseData.getSdoR2Trial() != null) {
-            if (caseData.getSdoR2Trial().getLengthList().getLabel().equals(other)) {
+            if (caseData.getSdoR2Trial().getLengthList().getLabel().equals(OTHER)) {
                 return caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() + " days, "
                     + caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() + " hours and "
-                    + caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() + minutes;
+                    + caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() + MINUTES;
             } else {
                 return caseData.getSdoR2Trial().getLengthList().getLabel();
             }
