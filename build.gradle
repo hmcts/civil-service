@@ -502,9 +502,14 @@ task runAndPublishConsumerPactTests(type: Test) {
 
 }
 
-runAndPublishConsumerPactTests.dependsOn contract
+task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contractTest)
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contract.output.classesDirs
+  classpath = sourceSets.contract.runtimeClasspath
+  finalizedBy(pactPublish)
 
-runAndPublishConsumerPactTests.finalizedBy pactPublish
+}
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
