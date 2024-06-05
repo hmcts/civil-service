@@ -48,7 +48,7 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
                             "is removed from the public register. You can pay £15 to <a href={APPLY_FOR_CERTIFICATE} " +
                             "class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">apply for a certificate (opens in new tab)</a> " +
                             "that confirms this.</p><p class=\"govuk-body\"><a href=\"{CITIZEN_CONTACT_THEM_URL}\" class=\"govuk-link\">Contact Mr. John Rambo</a> " +
-                            "if you need their payment details.</p><p class=\"govuk-body\"><a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a></p>"),
+                            "if you need their payment details. <a href={VIEW_DEFENDANT_RESPONSE} class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].titleCy").value("Mae Mr. John Rambo wedi gwneud cais am Ddyfarniad Llys Sirol yn eich erbyn"),
                 jsonPath("$[0].descriptionCy")
                     .value(
