@@ -156,7 +156,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant"),
-    SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT("Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant");
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT("Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant"),
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Claimant"),
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE("Scenario.AAA6.CP.SDOMadebyLA.Delete");
 
     private final String scenario;
 
