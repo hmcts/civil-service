@@ -53,7 +53,7 @@ public interface DashboardApiClient {
     @DeleteMapping(path = {
         "notifications/{unique-notification-identifier}"
     })
-    ResponseEntity recordClick(
+    ResponseEntity<Void> recordClick(
         @PathVariable("unique-notification-identifier") UUID id,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     );
