@@ -501,7 +501,6 @@ task runAndPublishConsumerPactTests(type: Test) {
   testClassesDirs = sourceSets.contract.output.classesDirs
   classpath = sourceSets.contract.runtimeClasspath
   finalizedBy(pactPublish)
-
 }
 
 project.ext {
