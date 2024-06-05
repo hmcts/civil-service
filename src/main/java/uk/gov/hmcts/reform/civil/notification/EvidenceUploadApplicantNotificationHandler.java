@@ -29,7 +29,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         if (nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 getEmail(caseData, isApplicantLip),
-                getTemplate(isApplicantLip),
+                getTemplate(caseData, isApplicantLip),
                 addProperties(caseData),
                 getReference(caseData)
             );
@@ -40,7 +40,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getTemplate(boolean isApplicantLip) {
+    private String getTemplate(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip ? notificationsProperties.getEvidenceUploadLipTemplate()
             : notificationsProperties.getEvidenceUploadTemplate();
     }
