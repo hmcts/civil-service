@@ -496,13 +496,6 @@ wrapper {
 }
 
 task runAndPublishConsumerPactTests(type: Test) {
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-
-}
-
-task runAndPublishConsumerPactTests(type: Test) {
   dependsOn(contractTest)
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contract.output.classesDirs
