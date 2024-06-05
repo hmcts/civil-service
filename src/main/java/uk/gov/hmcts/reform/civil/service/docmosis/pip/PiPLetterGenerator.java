@@ -71,6 +71,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         byte[] letterContent;
 
         try {
+            log.error("Pip Stitched Letter authorisation :{} for caseID {}", authorisation, caseData.getCcdCaseReference());
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (IOException e) {
             log.error("Failed getting letter content for Pip Stitched Letter ");
