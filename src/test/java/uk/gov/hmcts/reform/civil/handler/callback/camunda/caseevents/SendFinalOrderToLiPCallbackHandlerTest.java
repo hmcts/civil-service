@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_DEFENDANT;
@@ -50,6 +50,19 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
     @BeforeEach
     public void before() {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+    }
+
+    @Test
+    void shouldReturnEmptyResponse_whenCaseProgressionIsDisabled() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).build())).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verifyNoInteractions(sendFinalOrderBulkPrintService);
+        verifyNoInteractions(documentDownloadService);
     }
 
     @Test

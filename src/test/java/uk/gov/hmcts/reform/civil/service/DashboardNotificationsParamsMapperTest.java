@@ -89,6 +89,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .hearingDate(LocalDate.of(2024, 4, 1))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
