@@ -85,6 +85,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -551,7 +552,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
-    public boolean isBilingual() {
+    public boolean isClaimantBilingual() {
         return null != claimantBilingualLanguagePreference
                 && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }
