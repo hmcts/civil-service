@@ -12,17 +12,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -77,6 +73,8 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-no-fee-claimant-id");
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-claimant-lip-id");
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
+                .thenReturn("test-template-claimant-lip-welsh-id");
             when(notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC())
                 .thenReturn("test-template-fee-claimant-id-hmc");
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC())
@@ -568,6 +566,32 @@ public class NotificationClaimantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "applicant1@example.com",
                 "test-template-claimant-lip-id",
+                getNotificationLipDataMap(caseData),
+                "notification-of-hearing-lip-000HN001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLipinWelsh_whenInvokedAnd1v1() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .hearingTimeHourMinute("1030")
+                .applicant1Represented(YesOrNo.NO)
+                .claimantUserDetails(IdamUserDetails.builder().email("applicant1@example.com").build())
+                .hearingReferenceNumber("000HN001")
+                .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue())
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicant1@example.com",
+                "test-template-claimant-lip-welsh-id",
                 getNotificationLipDataMap(caseData),
                 "notification-of-hearing-lip-000HN001"
             );

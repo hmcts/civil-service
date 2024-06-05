@@ -157,7 +157,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getEmailTemplate(CaseData caseData, boolean isApplicantLip) {
-        if (isApplicantLip) {
+        if (isApplicantLip && caseData.isClaimantBilingual()) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh();
+        } else if (isApplicantLip){
             return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         }
         // If fee already paid do not renotify upon hearing being relisted
