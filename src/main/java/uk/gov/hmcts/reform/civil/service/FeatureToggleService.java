@@ -130,4 +130,14 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("minti")
             && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
+
+    public boolean allowGenAppsInPreSdoStates(String caseState) {
+        return caseState != null && featureToggleApi.isFeatureEnabledForCaseState(
+            "ga-allowed-pre-sdo", caseState, false);
+    }
+
+    public boolean isPartOfNationalRollout(String locationEpimms) {
+        return locationEpimms != null && featureToggleApi
+            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
+    }
 }
