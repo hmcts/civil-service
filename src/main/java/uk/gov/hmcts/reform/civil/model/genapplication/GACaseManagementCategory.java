@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.genapplication;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.util.List;
 public class GACaseManagementCategory {
 
     private GACaseManagementCategoryElement value;
+    @JsonProperty("list_items")
     @SuppressWarnings("checkstyle:MemberName")
     private List<Element<GACaseManagementCategoryElement>> listItems;
 }
