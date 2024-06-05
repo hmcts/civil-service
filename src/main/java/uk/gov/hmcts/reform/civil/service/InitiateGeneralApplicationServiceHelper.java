@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
@@ -36,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 @SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationServiceHelper {
 
-    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final CaseAssignmentApi caseAssignmentApi;
     private final UserRoleCaching userRoleCaching;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
@@ -67,10 +69,10 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
+        CaseAssignmentUserRolesResource userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
-        List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
+        List<CaseAssignmentUserRole> respondentSolicitors = userRoles.getCaseAssignmentUserRoles().stream()
             .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
             .collect(Collectors.toList());
 
@@ -86,14 +88,14 @@ public class InitiateGeneralApplicationServiceHelper {
             .forename(userDetails.getForename())
             .surname(userDetails.getSurname());
 
-        List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles()
+        List<CaseAssignmentUserRole> applicantSolicitor = userRoles.getCaseAssignmentUserRoles()
             .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
         boolean sameDefSol1v2 = applicantSolicitor.size() == 2
                 && applicantSolicitor.get(0).getUserId()
                 .equals(applicantSolicitor.get(1).getUserId());
         if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
 
-            CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
+            CaseAssignmentUserRole applnSol = applicantSolicitor.get(0);
 
             if (applnSol.getCaseRole() != null) {
 
@@ -234,7 +236,7 @@ public class InitiateGeneralApplicationServiceHelper {
             && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
-    private GAParties getApplicantPartyData(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
+    private GAParties getApplicantPartyData(CaseAssignmentUserRolesResource userRoles, UserDetails userDetails,
                                             CaseData caseData) {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
@@ -243,10 +245,10 @@ public class InitiateGeneralApplicationServiceHelper {
         String respondent2OrgCaseRole = caseData.getRespondent2OrganisationPolicy() != null
                 ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
 
-        Optional<CaseAssignedUserRole> applicantSol = userRoles.getCaseAssignedUserRoles().stream()
+        Optional<CaseAssignmentUserRole> applicantSol = userRoles.getCaseAssignmentUserRoles().stream()
                 .filter(CA -> CA.getUserId().equals(userDetails.getId())).findFirst();
         if (applicantSol.isPresent()) {
-            CaseAssignedUserRole applicantSolicitor = applicantSol.get();
+            CaseAssignmentUserRole applicantSolicitor = applicantSol.get();
             if (applicant1OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
                 return GAParties.builder()
                         .applicantPartyName(caseData.getApplicant1().getPartyName())
@@ -299,8 +301,8 @@ public class InitiateGeneralApplicationServiceHelper {
         return false;
     }
 
-    public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+    public CaseAssignmentUserRolesResource getUserRoles(String parentCaseId) {
+        CaseAssignmentUserRolesResource userRoles = caseAssignmentApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
         log.info("UserRoles from API :" + userRoles);
         return userRoles;

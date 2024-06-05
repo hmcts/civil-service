@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -119,7 +121,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private InitiateGeneralApplicationServiceHelper helper;
 
     @MockBean
-    private CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private CaseAssignmentApi caseAssignmentApi;
 
     @MockBean
     private GeneralAppsDeadlinesCalculator calc;
@@ -156,9 +158,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
                             .builder().organisationIdentifier("OrgId1").build());
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-            .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseAssignmentApplicantUserRoles()).build());
 
         when(userService.getAccessToken(
             any(), any())).thenReturn(STRING_CONSTANT);
@@ -199,9 +201,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
             when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
         }
@@ -212,9 +214,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .caseReference(1L)
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
@@ -230,9 +232,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
             when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
         }
@@ -247,9 +249,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
             when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
         }
@@ -262,9 +264,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
@@ -277,9 +279,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
@@ -296,9 +298,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
             when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
         }
@@ -311,9 +313,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
@@ -326,9 +328,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
@@ -341,58 +343,58 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
             assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
         }
     }
 
-    public List<CaseAssignedUserRole> onlyApplicantSolicitorAssigned() {
+    public List<CaseAssignmentUserRole> onlyApplicantSolicitorAssigned() {
         return List.of(
-            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE)
+            getCaseAssignmentUserRole("org1Sol1", APPLICANTSOLICITORONE)
         );
     }
 
-    public List<CaseAssignedUserRole> applicant1Respondent1SolAssigned() {
+    public List<CaseAssignmentUserRole> applicant1Respondent1SolAssigned() {
         return List.of(
-            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE)
+            getCaseAssignmentUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignmentUserRole("org2Sol1", RESPONDENTSOLICITORONE)
         );
     }
 
-    public List<CaseAssignedUserRole> applicant1Respondent2SolAssigned() {
+    public List<CaseAssignmentUserRole> applicant1Respondent2SolAssigned() {
         return List.of(
-            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+            getCaseAssignmentUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignmentUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
         );
     }
 
-    public List<CaseAssignedUserRole> applicant1Respondent1Respondent2SolAssigned() {
+    public List<CaseAssignmentUserRole> applicant1Respondent1Respondent2SolAssigned() {
         return List.of(
-            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE),
-            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+            getCaseAssignmentUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignmentUserRole("org2Sol1", RESPONDENTSOLICITORONE),
+            getCaseAssignmentUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
         );
     }
 
-    public CaseAssignedUserRole getCaseAssignedUserRole(String userId, CaseRole caseRole) {
-        return CaseAssignedUserRole.builder().caseDataId("1").userId(userId)
+    public CaseAssignmentUserRole getCaseAssignmentUserRole(String userId, CaseRole caseRole) {
+        return CaseAssignmentUserRole.builder().caseDataId("1").userId(userId)
             .caseRole(caseRole.getFormattedName()).build();
     }
 
-    public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
+    public List<CaseAssignmentUserRole> getCaseAssignmentApplicantUserRoles() {
         return List.of(
-            CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+            CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                 .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-            CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+            CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                 .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-            CaseAssignedUserRole.builder().caseDataId("1").userId("3")
+            CaseAssignmentUserRole.builder().caseDataId("1").userId("3")
                 .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build(),
-            CaseAssignedUserRole.builder().caseDataId("1").userId("4")
+            CaseAssignmentUserRole.builder().caseDataId("1").userId("4")
                 .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build(),
-            CaseAssignedUserRole.builder().caseDataId("1").userId("5")
+            CaseAssignmentUserRole.builder().caseDataId("1").userId("5")
                 .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
         );
     }
@@ -966,9 +968,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
         when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-            .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
         boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), authToken);
         assertTrue(result);
@@ -984,9 +986,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
         when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-            .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
         boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), authToken);
 

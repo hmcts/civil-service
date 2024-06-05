@@ -14,10 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.math.BigDecimal;
@@ -28,7 +26,7 @@ import static org.hamcrest.Matchers.is;
 
 @ExtendWith(PactConsumerTestExt.class)
 @PactTestFor(providerName = "feeRegister_lookUp", port = "6666")
-public class HearingFeesConsumerTest {
+public class FeesConsumerTest {
 
     public static final String ENDPOINT = "/fees-register/fees/lookup";
     public static final String CHANNEL = "default";
@@ -45,15 +43,6 @@ public class HearingFeesConsumerTest {
                                     "county court", "civil", CHANNEL, HEARING_EVENT,
                                     "hearing", FAST_TRACK_KEYWORD, MULTI_TRACK_KEYWORD,
                                     SMALL_CLAIMS_KEYWORD
-        )
-    );
-
-    private GeneralAppFeesService generalAppFeesService = new GeneralAppFeesService(
-        new RestTemplate(),
-        new GeneralAppFeesConfiguration("http://localhost:6666", ENDPOINT, SERVICE, JURISDICTION1,
-                                        "county court", "civil", CHANNEL, HEARING_EVENT,
-                                        "hearing", FAST_TRACK_KEYWORD, MULTI_TRACK_KEYWORD,
-                                        SMALL_CLAIMS_KEYWORD
         )
     );
 
@@ -85,7 +74,7 @@ public class HearingFeesConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "getFeeForHearingSmallClaims")
-    public void verifyFeeForHearingSmallClaims(MockServer mockServer) {
+    public void verifyFeeForHearingSmallClaims() {
 
         Fee fee = hearingFeesService
             .getFeeForHearingSmallClaims(new BigDecimal(1000));
@@ -95,7 +84,7 @@ public class HearingFeesConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "getFeeForHearingFastTrackClaims")
-    public void verifyFeeForHearingFastTrackClaims(MockServer mockServer) {
+    public void verifyFeeForHearingFastTrackClaims() {
 
         Fee fee = hearingFeesService
             .getFeeForHearingFastTrackClaims(new BigDecimal(1000));
@@ -105,7 +94,7 @@ public class HearingFeesConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "getFeeForHearingMultiClaims")
-    public void verifyFeeForHearingMultiClaims(MockServer mockServer) {
+    public void verifyFeeForHearingMultiClaims() {
 
         Fee fee = hearingFeesService
             .getFeeForHearingMultiClaims(new BigDecimal(1000));
