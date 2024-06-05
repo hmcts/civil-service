@@ -226,6 +226,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
     }
+
     @Test
     void shouldNotThrowError_whenEpimsIdIsValidRegionPostSDO() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
@@ -258,6 +259,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors().get(0)).isEqualTo(NOT_ALLOWED_PRE_CASE_SDO);
     }
+
     @Test
     void shouldNotThrowError_whenStateIsValidState() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
