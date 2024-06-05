@@ -58,7 +58,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (Objects.nonNull(caseData.getApplicant1Email()) && CaseEvent.FULL_REMISSION_HWF != hwfEvent) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                caseData.isBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
+                caseData.isClaimantBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

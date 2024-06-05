@@ -45,7 +45,7 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = LocalDateTime.now();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        if (caseData.isBilingual()) {
+        if (caseData.isClaimantBilingual()) {
             builder.respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, currentDateTime));
         }
         CaseData updatedData = builder.build();

@@ -87,7 +87,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .applicant1ResponseDate(applicant1ResponseDate)
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .respondent1RespondToSettlementAgreementDeadline(caseData.isBilingual() ? null : getRespondToSettlementAgreementDeadline(
+            .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual() ? null : getRespondToSettlementAgreementDeadline(
                 caseData,
                 applicant1ResponseDate
             ));

@@ -44,7 +44,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
-            && caseData.isBilingual()
+            && caseData.isClaimantBilingual()
             && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
@@ -408,6 +408,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isRespondentResponseFullDefence()
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
-            && caseData.isBilingual();
+            && caseData.isClaimantBilingual();
     }
 }

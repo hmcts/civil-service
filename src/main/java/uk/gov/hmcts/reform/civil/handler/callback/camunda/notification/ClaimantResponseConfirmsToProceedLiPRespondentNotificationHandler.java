@@ -63,7 +63,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && (!caseData.isBilingual()
+            && (!caseData.isClaimantBilingual()
             || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
     }
 

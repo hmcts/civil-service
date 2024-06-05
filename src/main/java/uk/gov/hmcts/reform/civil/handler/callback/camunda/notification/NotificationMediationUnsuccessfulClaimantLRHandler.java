@@ -135,7 +135,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     }
 
     private String addTemplate(CaseData caseData) {
-        return caseData.isBilingual()
+        return caseData.isClaimantBilingual()
             ? notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate() :
             notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate();
     }
