@@ -113,7 +113,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
     StateFlowEngine.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class})
+    TransitionsTestConfiguration.class},
+    properties = { "stateflow.engine.simplification.enabled=false" })
 class StateFlowEngineTest {
 
     @Autowired
