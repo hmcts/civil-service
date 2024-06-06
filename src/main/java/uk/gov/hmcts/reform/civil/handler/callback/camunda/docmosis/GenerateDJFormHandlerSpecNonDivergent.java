@@ -78,9 +78,9 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
         } else {
             systemGeneratedCaseDocuments = new ArrayList<>();
         }
-        caseDocuments.forEach(caseDocument -> {
-            systemGeneratedCaseDocuments.add(element(caseDocument));
-        });
+        caseDocuments.forEach(caseDocument ->
+            systemGeneratedCaseDocuments.add(element(caseDocument))
+        );
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }
 

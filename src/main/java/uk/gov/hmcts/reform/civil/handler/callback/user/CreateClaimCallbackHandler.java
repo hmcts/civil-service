@@ -586,12 +586,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader())
             .confirmationBody(getBody(caseData))
             .build();
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
         return format("# Please now pay your claim fee%n# using the link below");
     }
 

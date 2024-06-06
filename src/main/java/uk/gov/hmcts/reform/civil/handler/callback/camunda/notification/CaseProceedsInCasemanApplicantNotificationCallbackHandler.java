@@ -27,7 +27,7 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN);
     private final FeatureToggleService featureToggleService;
-    public static final List<String> TASK_IDS =
+    protected static final List<String> TASK_IDS =
         Arrays.asList("CaseProceedsInCasemanNotifyApplicantSolicitor1",
                       "CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForUnRegisteredFirm",
                       "NotifyClaimProceedsOfflineNotifyApplicantSolicitor1",

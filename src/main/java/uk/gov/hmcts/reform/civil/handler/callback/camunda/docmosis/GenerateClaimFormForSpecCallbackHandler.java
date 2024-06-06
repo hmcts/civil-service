@@ -86,13 +86,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
-                                                                                 caseDataBuilder, callbackParams);
+        String categoryId = "detailsOfClaim";
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, categoryId);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim);
         if (caseData.getSpecClaimDetailsDocumentFiles() != null
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
-            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
-            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), categoryId);
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), categoryId);
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                     caseData.getSpecClaimDetailsDocumentFiles()))
                 .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
@@ -102,13 +102,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
                                .build());
         } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
-            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), categoryId);
             ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
                 caseData.getSpecClaimTemplateDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload(
                 wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
         } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
-            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), categoryId);
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                 caseData.getSpecClaimDetailsDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
@@ -123,7 +123,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 sealedClaim.getDocumentName(),
                 caseData
             );
-            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, categoryId);
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
@@ -140,8 +140,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     }
 
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument,
-                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CallbackParams callbackParams) {
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -62,30 +61,25 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
-        Supplier<Party.Type> getDefendantType;
-
-        if (leadDefendantIs1) {
-            getDefendantType = caseData.getRespondent1()::getType;
-        } else {
-            getDefendantType = caseData.getRespondent2()::getType;
-        }
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-
             locationHelper.getClaimantRequestedCourt(caseData)
-                    .filter(this::hasInfo)
-                    .ifPresent(requestedCourt -> {
-                        locationHelper.getMatching(locationRefDataService.getCourtLocationsForDefaultJudgments(
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()), requestedCourt)
-                            .ifPresent(matchingLocation -> LocationHelper.updateWithLocation(dataBuilder, matchingLocation));
-                    });
+                .filter(this::hasInfo)
+                .ifPresent(requestedCourt ->
+                               locationHelper.getMatching(
+                                       locationRefDataService.getCourtLocationsForDefaultJudgments(
+                                           callbackParams.getParams().get(BEARER_TOKEN).toString()),
+                                       requestedCourt)
+                                   .ifPresent(matchingLocation ->
+                                                  LocationHelper.updateWithLocation(caseData.toBuilder(), matchingLocation)
+                                   )
+                );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toBuilder().build().toMap(objectMapper))
             .build();
     }
 
@@ -93,13 +87,6 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
             || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
             .map(DynamicList::getValue).isPresent();
-    }
-
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
