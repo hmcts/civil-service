@@ -117,12 +117,12 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                     "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
                         + "a penalty against you. Your case will not be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
-                        + "attend your appointment.</a></p>"),
+                        + "attend your appointment</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Ni wnaethoch fynychu cyfryngu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Ni wnaethoch fynychu eich apwyntiad cyfryngu, ac efallai y " +
                         "bydd y barnwr yn eich cosbi. Ni fydd eich cais yn cael ei adolygu gan y llys. "
-                        + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Esboniwch pam na wnaethoch chi fynychu eich apwyntiad.</a></p>"));
+                        + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Esboniwch pam na wnaethoch chi fynychu eich apwyntiad</a>.</p>"));
 
         //Verify dashboard information
         String result = doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
