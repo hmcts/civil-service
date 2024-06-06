@@ -178,7 +178,7 @@ public class DashboardNotificationsParamsMapperTest {
 
     @ParameterizedTest
     @EnumSource(PaymentFrequency.class)
-    public void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans(PaymentFrequency paymentFrequency) {
+    void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans(PaymentFrequency paymentFrequency) {
 
         when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
