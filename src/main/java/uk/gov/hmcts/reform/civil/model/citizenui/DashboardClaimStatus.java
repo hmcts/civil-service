@@ -24,6 +24,9 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    SDO_ORDER_LEGAL_ADVISER_CREATED(
+        Claim::isSDOOrderLegalAdviserCreated
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
