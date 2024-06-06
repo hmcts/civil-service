@@ -77,6 +77,7 @@ public class HearingFormGeneratorTest {
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
     private static LocationRefData locationRefData = LocationRefData.builder()
         .siteName("SiteName")
+        .externalShortName("ExternalShortName")
         .venueName("VenueName")
         .courtAddress("1").postcode("1")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
