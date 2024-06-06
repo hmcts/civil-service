@@ -94,14 +94,23 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                 // LR scenarios
                 String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, claimId);
                 sendEmail(
-                    isRespondentSolicitor1Notification(callbackParams)
-                        ? caseData.getRespondentSolicitor1EmailAddress()
-                        : caseData.getRespondentSolicitor2EmailAddress(),
+                    setUpLrEmailAddress(callbackParams),
                     notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
                     lrDefendantProperties(caseData),
                     referenceTemplate
                 );
             }
+        } else if (featureToggleService.isLipVLipEnabled()
+            && caseData.isLipvLROneVOne()
+            && isRespondentSolicitor1Notification(callbackParams)) {
+            // Lip v LR scenario
+            String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, caseData.getLegacyCaseReference());
+            sendEmail(
+                setUpLrEmailAddress(callbackParams),
+                notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim(),
+                lrDefendantProperties(caseData),
+                referenceTemplate
+            );
         } else {
             if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
                 String referenceTemplate = String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
@@ -181,4 +190,10 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             .equals(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name());
     }
 
+    private String setUpLrEmailAddress(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return isRespondentSolicitor1Notification(callbackParams)
+            ? caseData.getRespondentSolicitor1EmailAddress()
+            : caseData.getRespondentSolicitor2EmailAddress();
+    }
 }
