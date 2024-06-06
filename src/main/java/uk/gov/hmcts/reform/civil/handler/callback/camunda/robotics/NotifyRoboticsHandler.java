@@ -50,6 +50,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
                 String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
                 if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
+                    log.info("JSON : "+roboticsCaseDataSpec.toJsonString());
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
