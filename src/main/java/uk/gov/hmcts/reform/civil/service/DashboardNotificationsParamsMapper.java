@@ -414,7 +414,7 @@ public class DashboardNotificationsParamsMapper {
                 .append(paymentFrecuencyString)
                 .append(" instalments of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
-                .append(" The first payment is due on ")
+                .append(". The first payment is due on ")
                 .append(instalmentDetails.getStartDate())
                 .append(".");
         }
