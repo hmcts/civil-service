@@ -102,6 +102,27 @@ To access Camunda visit url (login and password are both `admin`):
 
 - `https://camunda-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
+
+### PR Labels for targeted testing
+There are a variety of labels that can be added to PRs for the purpose of running subsects of functional tests, relevant to specific journeys. All functional test labels begin with the pr_ft_ prefix.
+
+Adding a functional test label allows the user to run a greater amount of tests relevant to the journey where changes are being made, and reduces the amount of time taken to run a build. 
+
+For example, if the label pr_ft_spec-part-admit is added to a PR, the PR will run only the API tests relevant to the Spec Part Admit journey.
+
+It is also possible to add two labels to a PR to target multiple journeys. For example, if the labels pr_ft_spec-part-admit, and pr_ft_spec-part-admit are added to a PR, the PR will run only the API tests relevant to the Spec Part Admit, and Spec Full Admit journeys.
+
+If no functional test label has been added to a PR, the full set of regression tests (api-nonprod) will be run.
+
+It is recommended that the set of tests that will be run on a particular PR are agreed upon in the refinement/3 amigos sessions, and documented in the related Jira ticket.
+
+As a general rule, the full set of regression tests should be run at least once before merging, following the dev and QA process. This is in order to confirm that the changes being made have not broken any other journeys in the system.
+
+There may be cases where changes made are exceptionally minor (e.g. only logging is being added). In this case, it may be appropriate to not run the full set of regression tests at all. If this is the case, this should be agreed upon in the refinement/3 amigos session, and documented in the relevant Jira ticket.
+
+For more details, please refer to this confluence page which lists the full range of functional test labels, and the tests each ft label runs: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
+
+
 ## Contract testing
 
 ### Generate contracts
