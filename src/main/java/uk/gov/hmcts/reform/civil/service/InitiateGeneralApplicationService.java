@@ -219,6 +219,7 @@ public class InitiateGeneralApplicationService {
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppHelpWithFees(caseData.getGeneralAppHelpWithFees())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
