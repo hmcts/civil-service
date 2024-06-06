@@ -229,12 +229,12 @@ public class InitiateGeneralApplicationService {
                                        .build());
 
         if (featureToggleService.isGaForLipsEnabled()) {
-            applicationBuilder.isGaApplicantLip(caseData.isApplicantNotRepresented() ? YES : NO)
-                .isGaRespondentOneLip(caseData.isRespondent1LiP() ? YES : NO)
-                .isGaRespondentTwoLip(caseData.isRespondent2LiP() ? YES : NO);
+            applicationBuilder.isGaApplicantLip(NO)
+                .isGaRespondentOneLip(NO)
+                .isGaRespondentTwoLip(NO);
         }
 
-        return helper.setRespondentDetailsIfPresent(dataBuilder, applicationBuilder.build(), caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(applicationBuilder.build(), caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
