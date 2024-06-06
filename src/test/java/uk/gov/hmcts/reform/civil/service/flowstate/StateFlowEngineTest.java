@@ -4957,7 +4957,7 @@ class StateFlowEngineTest {
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .build();
 
@@ -5036,7 +5036,7 @@ class StateFlowEngineTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .build();
 

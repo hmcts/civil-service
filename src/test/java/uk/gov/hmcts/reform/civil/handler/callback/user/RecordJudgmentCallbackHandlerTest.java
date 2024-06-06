@@ -58,9 +58,9 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(YesOrNo.class)
         void shouldPopulateAllJoFieldsAsNull(YesOrNo yesOrNo) {
-            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .joIsLiveJudgmentExists(yesOrNo)
                 .joIssuedDate(LocalDate.now())
                 .build();
@@ -83,9 +83,9 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotPopulateAllJoFieldsAsNull() {
-            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
                 .joIsLiveJudgmentExists(null)
                 .joIssuedDate(LocalDate.now())
                 .build();
@@ -104,7 +104,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -142,7 +142,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -175,7 +175,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -209,7 +209,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void whenAboutToSubmit_andRTLNo_thenSetIssuedDateToNull() {
-            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

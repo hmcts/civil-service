@@ -1010,7 +1010,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
@@ -1049,7 +1049,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
@@ -1148,7 +1148,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
         }
     }
 

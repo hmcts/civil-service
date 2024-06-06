@@ -64,7 +64,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateDate() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -83,7 +83,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsSatisfied() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -100,7 +100,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateJudgementStatusAsCancelled() {
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -127,7 +127,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            //Given: Casedata is in ALL_FINAL_ORDERS_ISSUED State and Record Judgement is done
             CaseData caseData = CaseDataBuilder.builder()
                 .getDefaultJudgment1v1CaseJudgmentPaid();
             caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build());

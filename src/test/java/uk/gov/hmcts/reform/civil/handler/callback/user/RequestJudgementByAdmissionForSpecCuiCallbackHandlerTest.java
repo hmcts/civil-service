@@ -469,7 +469,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
-                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                .isEqualTo(CaseState.ALL_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")

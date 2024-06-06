@@ -859,7 +859,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo("ALL_FINAL_ORDERS_ISSUED");
         }
 
         @Test
@@ -877,7 +877,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo("ALL_FINAL_ORDERS_ISSUED");
         }
 
         @Test

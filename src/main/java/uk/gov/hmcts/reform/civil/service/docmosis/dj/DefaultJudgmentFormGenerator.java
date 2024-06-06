@@ -53,10 +53,10 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final FeesService feesService;
     private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
-    private final String applicant1 = "applicant1";
-    private final String applicant2 = "applicant2";
-    private final String respondent1 = "respondent1";
-    private final String respondent2 = "respondent2";
+    private static final String applicant1 = "applicant1";
+    private static final String applicant2 = "applicant2";
+    private static final String respondent1 = "respondent1";
+    private static final String respondent2 = "respondent2";
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
@@ -138,6 +138,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 .getRespondentSolicitor1Reference()).build();
     }
 
+    @SuppressWarnings("java:S1172")
     private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData,
                                                        uk.gov.hmcts.reform.civil.model.Party party,
                                                        String event, String partyType) {

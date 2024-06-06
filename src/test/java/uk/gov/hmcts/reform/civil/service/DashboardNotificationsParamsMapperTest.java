@@ -197,7 +197,7 @@ public class DashboardNotificationsParamsMapperTest {
             .ccdCaseReference(1234L)
             .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
             .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
             .activeJudgment(JudgmentDetails.builder()
                                 .state(ISSUED)
                                 .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
