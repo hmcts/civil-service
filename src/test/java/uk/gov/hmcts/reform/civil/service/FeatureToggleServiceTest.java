@@ -255,13 +255,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenGenAppsInPreSdoStates(Boolean toggleStat) {
-        final String feature = "ga-allowed-pre-sdo";
-        String caseState = "case state";
-        when(featureToggleApi.isFeatureEnabledForCaseState(eq(feature), eq(caseState), eq(false)))
-            .thenReturn(toggleStat);
+    void shouldReturnCorrectValue_isNationalRolloutEnabled(Boolean toggleStat) {
+        var caseFlagsKey = "enable-national-rollout";
+        givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.allowGenAppsInPreSdoStates(caseState)).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isNationalRolloutEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

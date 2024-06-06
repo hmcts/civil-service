@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -61,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -74,7 +73,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_ALLOWED_PRE_CASE_SDO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_IN_EA_REGION;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
@@ -155,14 +153,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldThrowError_when_GaForLip_NotEnabled() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(AWAITING_APPLICANT_INTENTION)
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent2Represented(NO)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
@@ -175,14 +172,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldThrowError_whenDefendantIsNotAssigned_LIP() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent2Represented(NO)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
@@ -194,15 +190,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotThrowError_whenDefendantIsAssigned_LIP() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent2Represented(NO)
             .defendantUserDetails(IdamUserDetails.builder().email("test@gmail.com").id("ID").build())
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
@@ -212,31 +207,15 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldThrowError_whenEpimsIdIsNotAValidRegionPostSDO() {
+    void shouldNotThrowError_whenEpimsIdIsValidRegionPreSdoNationalRollout() {
+        // National rollout applies to all courts pre sdo
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("231596")
-                                        .region("2").build()).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(false);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(false);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
-    }
-
-    @Test
-    void shouldNotThrowError_whenEpimsIdIsValidRegionPostSDO() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .ccdState(AWAITING_APPLICANT_INTENTION)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
 
@@ -245,31 +224,31 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldThrowError_whenStateIsNotAValidState() {
+    void shouldThrowError_whenEpimsIdIsNotAValidRegionPostSdoNationalRollout() {
+        // National rollout applies to all courts post sdo, except Birmingham
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
+            .ccdState(CASE_PROGRESSION)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("231596")
                                         .region("2").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(false);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().get(0)).isEqualTo(NOT_ALLOWED_PRE_CASE_SDO);
+        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
     }
 
     @Test
-    void shouldNotThrowError_whenStateIsValidState() {
+    void shouldNotThrowError_whenEpimsIdIsValidRegionPostSdoNationalRollout() {
+        // National rollout applies to all courts  post sdo, except Birmingham
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .ccdState(CASE_PROGRESSION)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
 
@@ -1138,12 +1117,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .ccdState(PENDING_CASE_ISSUED)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
-            when(featureToggleService.allowGenAppsInPreSdoStates(any())).thenReturn(true);
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1166,10 +1143,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .ccdState(PENDING_CASE_ISSUED)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(false);
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 

@@ -131,9 +131,8 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 
-    public boolean allowGenAppsInPreSdoStates(String caseState) {
-        return caseState != null && featureToggleApi.isFeatureEnabledForCaseState(
-            "ga-allowed-pre-sdo", caseState, false);
+    public boolean isNationalRolloutEnabled() {
+        return featureToggleApi.isFeatureEnabled("enable-national-rollout");
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
