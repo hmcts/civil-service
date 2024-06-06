@@ -114,12 +114,6 @@ It is also possible to add two labels to a PR to target multiple journeys. For e
 
 If no functional test label has been added to a PR, the full set of regression tests (api-nonprod) will be run.
 
-It is recommended that the set of tests that will be run on a particular PR are agreed upon in the refinement/3 amigos sessions, and documented in the related Jira ticket.
-
-As a general rule, the full set of regression tests should be run at least once before merging, following the dev and QA process. This is in order to confirm that the changes being made have not broken any other journeys in the system.
-
-There may be cases where changes made are exceptionally minor (e.g. only logging is being added). In this case, it may be appropriate to not run the full set of regression tests at all. If this is the case, this should be agreed upon in the refinement/3 amigos session, and documented in the relevant Jira ticket.
-
 For more details, please refer to this confluence page which lists the full range of functional test labels, and the tests each ft label runs: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
 
 
