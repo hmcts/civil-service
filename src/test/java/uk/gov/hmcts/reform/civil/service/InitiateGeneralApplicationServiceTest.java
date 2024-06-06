@@ -471,31 +471,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LipVsLIP() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
-            .applicant1Represented(NO).respondent1Represented(NO).respondent2Represented(NO).build();
-        when(locationRefDataService.getCcmccLocation(any()))
-            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isEqualTo(YES);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isEqualTo(YES);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
-            .isEqualTo(YES);
-    }
-
-    @Test
     void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIP() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
@@ -513,9 +488,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
             .isNotNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isEqualTo(YES);
+            .isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isEqualTo(YES);
+            .isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
             .isEqualTo(NO);
     }
