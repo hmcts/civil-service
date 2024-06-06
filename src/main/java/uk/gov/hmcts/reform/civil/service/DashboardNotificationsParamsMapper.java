@@ -400,7 +400,7 @@ public class DashboardNotificationsParamsMapper {
         StringBuilder paymentFrequencyMessage = new StringBuilder();
         BigDecimal totalAmount = new BigDecimal(caseData.getJoAmountOrdered());
 
-        if((caseData.getJoAmountCostOrdered() != null) && !caseData.getJoAmountCostOrdered().isEmpty()) {
+        if ((caseData.getJoAmountCostOrdered() != null) && !caseData.getJoAmountCostOrdered().isEmpty()) {
             totalAmount.add(new BigDecimal(caseData.getJoAmountCostOrdered()));
         }
 
