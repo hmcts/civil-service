@@ -415,9 +415,6 @@ notifications:
   notifyClaimantLRJudgmentByAdmissionTemplate: "af5a407a-d295-48ae-9bd0-8ac029c0a697"
   notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
 
-  notifyLrDefendantSuccessfulMediationForLipVLrClaim: ""
-  mediationUnsuccessfulLRTemplateForLipVLr: ""
-
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

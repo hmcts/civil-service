@@ -56,7 +56,7 @@ public class NotifyDefendantJudgmentByAdmissionNotificationHandler extends Callb
         if (caseData.isRespondent1LiP()) {
             notificationService.sendMail(
                 caseData.getRespondent1Email(),
-                getLIPTemplate() ,
+                getLIPTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
