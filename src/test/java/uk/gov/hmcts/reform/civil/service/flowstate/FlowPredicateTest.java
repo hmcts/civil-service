@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.casemanM
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissalOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
@@ -2176,6 +2177,22 @@ class FlowPredicateTest {
         void shouldReturnTrue_whenCaseDismissedBeforeHearingFeeDue() {
             CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
             assertFalse(caseDismissedPastHearingFeeDue.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenClaimOutOfTime() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .claimDismissedDeadline(LocalDateTime.now().minusDays(30))
+                .build();
+            assertTrue(claimDismissalOutOfTime.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenClaimNotOutOfTime() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .claimDismissedDeadline(LocalDateTime.now().plusDays(30))
+                .build();
+            assertFalse(claimDismissalOutOfTime.test(caseData));
         }
     }
 
