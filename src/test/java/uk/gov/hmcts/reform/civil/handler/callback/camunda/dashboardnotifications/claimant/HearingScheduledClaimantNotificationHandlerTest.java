@@ -25,6 +25,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -59,6 +61,19 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT);
+    }
+
+    @Test
+    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardApiClient, never())
+            .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
     }
 
     @Test
