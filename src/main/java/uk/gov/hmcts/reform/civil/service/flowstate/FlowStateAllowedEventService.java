@@ -15,9 +15,12 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
@@ -94,6 +97,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
@@ -179,7 +184,8 @@ public class FlowStateAllowedEventService {
         MANAGE_CONTACT_INFORMATION,
         CASE_PROCEEDS_IN_CASEMAN,
         UpdateNextHearingInfo,
-        UPDATE_NEXT_HEARING_DETAILS
+        UPDATE_NEXT_HEARING_DETAILS,
+        DISPATCH_BUSINESS_PROCESS
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -199,7 +205,13 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -215,7 +227,13 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -230,7 +248,13 @@ public class FlowStateAllowedEventService {
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                     CREATE_CLAIM_AFTER_PAYMENT,
-                    TRANSFER_ONLINE_CASE
+                    TRANSFER_ONLINE_CASE,
+                    RECORD_JUDGMENT,
+                    EDIT_JUDGMENT,
+                    JUDGMENT_PAID_IN_FULL,
+                    SET_ASIDE_JUDGMENT,
+                    SETTLE_CLAIM,
+                    SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -260,7 +284,13 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
 
@@ -287,7 +317,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -329,7 +361,9 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 TRANSFER_ONLINE_CASE,
                 asyncStitchingComplete,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -360,7 +394,9 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -391,7 +427,9 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -431,7 +469,9 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 BUNDLE_CREATION_NOTIFICATION,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -455,7 +495,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -479,7 +521,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -503,7 +547,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CLAIMANT_RESPONSE_CUI,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -524,7 +570,9 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 CLAIMANT_RESPONSE_CUI,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -545,7 +593,9 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -564,7 +614,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -619,7 +671,9 @@ public class FlowStateAllowedEventService {
                 REQUEST_FOR_RECONSIDERATION,
                 DECISION_ON_RECONSIDERATION_REQUEST,
                 EDIT_JUDGMENT,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -638,7 +692,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -652,7 +708,9 @@ public class FlowStateAllowedEventService {
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -666,7 +724,9 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -695,7 +755,9 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 NotSuitable_SDO,
                 CREATE_SDO,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -708,7 +770,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -721,7 +785,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -731,7 +797,10 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                ADD_CASE_NOTE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -818,7 +887,9 @@ public class FlowStateAllowedEventService {
                 MEDIATION_UNSUCCESSFUL,
                 ADD_UNAVAILABLE_DATES,
                 INITIATE_GENERAL_APPLICATION,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -856,7 +927,9 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
                 INVALID_HWF_REFERENCE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -890,16 +963,23 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    ADD_CASE_NOTE,
-                    INITIATE_GENERAL_APPLICATION,
-                    CREATE_SDO,
-                    NotSuitable_SDO,
-                    migrateCase,
-                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT,
-                    TRANSFER_ONLINE_CASE
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ADD_CASE_NOTE,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
 
@@ -918,7 +998,13 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
             )
         ),
 
@@ -966,7 +1052,13 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                RECORD_JUDGMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1007,7 +1099,9 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1031,7 +1125,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1069,7 +1165,9 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 BUNDLE_CREATION_NOTIFICATION,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1097,7 +1195,9 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
                 CLAIMANT_RESPONSE_CUI,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1125,7 +1225,9 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 CLAIMANT_RESPONSE_CUI,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1154,7 +1256,9 @@ public class FlowStateAllowedEventService {
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 LIP_CLAIM_SETTLED,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1184,35 +1288,58 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
-        entry(PART_ADMIT_REJECT_REPAYMENT.fullName(),
-              List.of(
-                  DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                  REQUEST_JUDGEMENT_ADMISSION_SPEC
-              )
+        entry(
+            PART_ADMIT_REJECT_REPAYMENT.fullName(),
+            List.of(
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
+            )
         ),
-        entry(PART_ADMIT_PROCEED.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(PART_ADMIT_NOT_PROCEED.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(PART_ADMIT_PAY_IMMEDIATELY.fullName(),
-              List.of(
-                  DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                  CLAIMANT_RESPONSE_CUI
-              )
+        entry(
+            PART_ADMIT_PROCEED.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
         ),
-        entry(PART_ADMIT_AGREE_SETTLE.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(FULL_ADMIT_PROCEED.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(FULL_ADMIT_NOT_PROCEED.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
-        entry(FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(
+            PART_ADMIT_NOT_PROCEED.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+        ),
+        entry(
+            PART_ADMIT_PAY_IMMEDIATELY.fullName(),
+            List.of(
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                CLAIMANT_RESPONSE_CUI
+            )
+        ),
+        entry(
+            PART_ADMIT_AGREE_SETTLE.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+        ),
+        entry(
+            FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+        ),
+        entry(
+            FULL_ADMIT_PROCEED.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+        ),
+        entry(
+            FULL_ADMIT_NOT_PROCEED.fullName(),
+            List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)
+        ),
+        entry(
+            FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
+            List.of(
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT
+            )
+        ),
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
@@ -1260,7 +1387,9 @@ public class FlowStateAllowedEventService {
                 REQUEST_FOR_RECONSIDERATION,
                 DECISION_ON_RECONSIDERATION_REQUEST,
                 EDIT_JUDGMENT,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
 
@@ -1283,7 +1412,9 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1306,7 +1437,9 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1314,7 +1447,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1322,14 +1457,17 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -1356,7 +1494,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1366,7 +1506,9 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
                 migrateCase,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1379,7 +1521,9 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 INITIATE_GENERAL_APPLICATION,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1427,7 +1571,9 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1469,7 +1615,9 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1478,7 +1626,9 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 EXTEND_RESPONSE_DEADLINE,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
 
             )
         ),
@@ -1517,7 +1667,10 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                ADD_CASE_NOTE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1526,7 +1679,9 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1604,7 +1759,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
@@ -1619,7 +1776,12 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                EDIT_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL,
+                SET_ASIDE_JUDGMENT,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(

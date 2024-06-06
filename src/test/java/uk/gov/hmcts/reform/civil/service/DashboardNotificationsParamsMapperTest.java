@@ -3,11 +3,15 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -23,6 +27,10 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -36,9 +44,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,9 +60,12 @@ public class DashboardNotificationsParamsMapperTest {
 
     private CaseData caseData;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper();
+        mapper = new DashboardNotificationsParamsMapper(featureToggleService);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
@@ -89,9 +104,14 @@ public class DashboardNotificationsParamsMapperTest {
             .hearingFee(new Fee(new BigDecimal(10000), "Test", "Test"))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
+            .applicant1Represented(NO)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<u>make an application to set aside (remove) or vary the judgment</u>");
+
+        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<u>make an application to vary the judgment</u>");
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
 
@@ -125,7 +145,8 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
             .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
 
-        assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
+        assertThat(result).extracting("claimantSettlementAgreementEn").isEqualTo("accepted");
+        assertThat(result).extracting("claimantSettlementAgreementCy").isEqualTo("derbyn");
         assertThat(result).extracting("applicant1ClaimSettledDateEn")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
@@ -151,6 +172,57 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");
+    }
+
+    @Test
+    public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
+
+        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
+        caseData = caseData.toBuilder().build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+
+        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+    }
+
+    @ParameterizedTest
+    @EnumSource(PaymentFrequency.class)
+    public void shouldMapParameters_WhenJudgementByAdmissionInstalmentsIsIssued(PaymentFrequency paymentFrequency) {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        caseData = caseData.toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .activeJudgment(JudgmentDetails.builder()
+                                .state(ISSUED)
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
+                                .orderedAmount("150001")
+                                .instalmentDetails(JudgmentInstalmentDetails.builder()
+                                       .amount("20001")
+                                       .paymentFrequency(paymentFrequency)
+                                       .startDate(LocalDate.now())
+                                       .build())
+                                .build())
+            .build();;
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
+        assertThat(result).extracting("ccjInstallmentAmount").isEqualTo(BigDecimal.valueOf(200.01));
+        assertThat(result).extracting("ccjFirstRepaymentDateEn").isEqualTo(DateUtils.formatDate(LocalDate.now()));
+
+        if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("weekly");
+        } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("biweekly");
+        } else {
+            assertThat(result).extracting("ccjPaymentFrequency").isEqualTo("monthly");
+        }
     }
 
     @Test

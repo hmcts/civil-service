@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -21,7 +22,7 @@ public class MediationCase {
     private String casemanCaseNumber;
     private String caseTitle;
     private boolean caseFlags;
-    private String claimValue;
+    private BigDecimal claimValue;
     private List<MediationLitigant> litigants;
 
 }

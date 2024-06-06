@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.mock;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class MockTaskList {
 
@@ -18,10 +20,10 @@ public class MockTaskList {
             TaskList.builder()
                 .reference(reference)
                 .taskNameCy(
-                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>")
+                    "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">Gweld cytundeb setlo o ran cyfryngu</a>")
                 .taskNameEn(
                     "<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class=\"govuk-link\">View mediation settlement agreement</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.AVAILABLE.getName())
@@ -32,9 +34,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Upload mediation documents</a>")
+                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
                 .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -45,9 +47,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
                 .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -58,10 +60,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View hearings</a>")
+                .taskNameCy("<a>Gweld y gwrandawiad</a>")
                 .taskNameEn("<a>View hearings</a>")
-                .categoryCy("Hearings")
-                .categoryEn("Hearings")
+                .categoryCy("Gwrandawiad")
+                .categoryEn("Hearing")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -71,10 +73,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Upload hearing documents</a>")
+                .taskNameCy("<a>Llwytho dogfennau'r gwrandawiad</a>")
                 .taskNameEn("<a>Upload hearing documents</a>")
-                .categoryCy("Hearings")
-                .categoryEn("Hearings")
+                .categoryCy("Gwrandawiad")
+                .categoryEn("Hearing")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -84,10 +86,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Add the trial arrangements</a>")
+                .taskNameCy("<a>Ychwanegu trefniadau'r treial</a>")
                 .taskNameEn("<a>Add the trial arrangements</a>")
-                .categoryCy("Hearings")
-                .categoryEn("Hearings")
+                .categoryCy("Gwrandawiad")
+                .categoryEn("Hearing")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -97,10 +99,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Pay the hearing fee</a>")
+                .taskNameCy("<a>Talu ffi'r gwrandawiad</a>")
                 .taskNameEn("<a>Pay the hearing fee</a>")
-                .categoryCy("Hearings")
-                .categoryEn("Hearings")
+                .categoryCy("Gwrandawiad")
+                .categoryEn("Hearing")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -110,10 +112,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View the bundle</a>")
+                .taskNameCy("<a>Gweld y bwndel</a>")
                 .taskNameEn("<a>View the bundle</a>")
-                .categoryCy("Hearings")
-                .categoryEn("Hearings")
+                .categoryCy("Gwrandawiad")
+                .categoryEn("Hearing")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -123,10 +125,10 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View the judgment</a>")
+                .taskNameCy("<a>Gweld y Dyfarniad</a>")
                 .taskNameEn("<a>View the judgment</a>")
-                .categoryCy("Judgments from the court")
-                .categoryEn("Judgments from the court")
+                .categoryCy("Dyfarniad gan y llys")
+                .categoryEn("Judgment from the court")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
@@ -136,9 +138,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View applications</a>")
+                .taskNameCy("<a>Gweld y cais i gyd</a>")
                 .taskNameEn("<a>View applications</a>")
-                .categoryCy("Applications")
+                .categoryCy("Ceisiadau")
                 .categoryEn("Applications")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -155,10 +157,10 @@ public class MockTaskList {
             TaskList.builder()
                 .reference(reference)
                 .taskNameCy(
-                    "<a>View mediation settlement agreement</a>")
+                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
                 .taskNameEn(
                     "<a>View mediation settlement agreement</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -169,9 +171,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Uwchlwytho dogfennau cyfryngu</a>")
                 .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.ACTION_NEEDED.getName())
@@ -182,9 +184,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
                 .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
@@ -195,15 +197,51 @@ public class MockTaskList {
                 .build());
     }
 
+    public static List<TaskList> getUploadMediationTaskListMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .taskNameEn("<a href={UPLOAD_MEDIATION_DOCUMENTS} class=\"govuk-link\">Upload mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.IN_PROGRESS.getName())
+                .currentStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
+                .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
+                .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
+                .taskOrder(6)
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .build(),
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.AVAILABLE.getName())
+                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .nextStatusEn(TaskStatus.AVAILABLE.getName())
+                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .taskOrder(7)
+                .build());
+    }
+
     public static List<TaskList> getMediationUnsuccessfulTaskListViewMediationNotAvailableYetMock(String role, String reference) {
         return List.of(
             TaskList.builder()
                 .reference(reference)
                 .taskNameCy(
-                    "<a>View mediation settlement agreement</a>")
+                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
                 .taskNameEn(
                     "<a>View mediation settlement agreement</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -214,9 +252,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Upload mediation documents</a>")
+                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
                 .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -227,9 +265,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
                 .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
@@ -245,10 +283,10 @@ public class MockTaskList {
             TaskList.builder()
                 .reference(reference)
                 .taskNameCy(
-                    "<a>View mediation settlement agreement</a>")
+                    "<a>Gweld cytundeb setlo o ran cyfryngu</a>")
                 .taskNameEn(
                     "<a>View mediation settlement agreement</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -259,9 +297,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Upload mediation documents</a>")
+                .taskNameCy("<a>Uwchlwytho dogfennau cyfryngu</a>")
                 .taskNameEn("<a>Upload mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -272,9 +310,9 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>View mediation documents</a>")
+                .taskNameCy("<a>Gweld dogfennau cyfryngu</a>")
                 .taskNameEn("<a>View mediation documents</a>")
-                .categoryCy("Mediation")
+                .categoryCy("Cyfryngu")
                 .categoryEn("Mediation")
                 .role(role)
                 .currentStatusEn(TaskStatus.INACTIVE.getName())
@@ -286,4 +324,23 @@ public class MockTaskList {
         );
     }
 
+    public static List<TaskList> getUploadMediationTaskListViewMediationAvailableMock(String role, String reference) {
+        return List.of(
+            TaskList.builder()
+                .reference(reference)
+                .taskNameCy("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .taskNameEn("<a href={VIEW_MEDIATION_DOCUMENTS} class=\"govuk-link\">View mediation documents</a>")
+                .categoryCy("Mediation")
+                .categoryEn("Mediation")
+                .role(role)
+                .currentStatusEn(TaskStatus.AVAILABLE.getName())
+                .currentStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .nextStatusEn(TaskStatus.AVAILABLE.getName())
+                .nextStatusCy(TaskStatus.AVAILABLE.getWelshName())
+                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7"))
+                .taskOrder(7)
+                .build());
+    }
 }

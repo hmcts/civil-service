@@ -95,6 +95,17 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_respondentDeadlineHasPassed_whenGetStatus_thenReturnEligibleForCCJStatus() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
+    }
+
+    @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())

@@ -8,7 +8,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -48,8 +51,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
     private final FeesService feesService;
-    private final InterestCalculator interestCalculator;
     private final FeatureToggleService featureToggleService;
+    private final InterestCalculator interestCalculator;
     private final String applicant1 = "applicant1";
     private final String applicant2 = "applicant2";
     private final String respondent1 = "respondent1";
@@ -113,7 +116,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                                        uk.gov.hmcts.reform.civil.model.Party respondent,
                                                        String event) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? getDebtAmount(caseData).setScale(2) : new BigDecimal(0);
+            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : new BigDecimal(0);
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getClaimFee(caseData) : new BigDecimal(0);
 
@@ -138,7 +141,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData,
                                                        uk.gov.hmcts.reform.civil.model.Party party,
                                                        String event, String partyType) {
-        BigDecimal debtAmount = getDebtAmount(caseData).setScale(2);
+        BigDecimal debtAmount = JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2);
         BigDecimal cost = getClaimFee(caseData);
 
         DefaultJudgmentForm.DefaultJudgmentFormBuilder builder = DefaultJudgmentForm.builder();
@@ -157,8 +160,37 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent1Ref(getRespondent1SolicitorRef(caseData))
             .respondent2Ref(getRespondent2SolicitorRef(caseData))
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData));
+            .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .paymentPlan(caseData.getPaymentTypeSelection().name())
+            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
+            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
+            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
+            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
+            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
         return builder.build();
+    }
+
+    private String getInstallmentAmount(String amount) {
+        var regularRepaymentAmountPennies = new BigDecimal(amount);
+        return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
+    }
+
+    private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "each week";
+            case ONCE_ONE_MONTH: return "each month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
+        switch (repaymentFrequencyDJ) {
+            case ONCE_ONE_WEEK : return "per week";
+            case ONCE_ONE_MONTH: return "per month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
@@ -293,26 +325,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             claimFeePounds = claimFeePounds.add(calculateFixedCosts(caseData));
         }
         return claimFeePounds.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : claimFeePounds.setScale(2);
-    }
-
-    private BigDecimal getDebtAmount(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest);
-        subTotal = subTotal.subtract(getPartialPayment(caseData));
-
-        return subTotal;
-    }
-
-    private BigDecimal getPartialPayment(CaseData caseData) {
-
-        BigDecimal partialPaymentPounds = new BigDecimal(0);
-        //Check if partial payment was selected by user, and assign value if so.
-        if (caseData.getPartialPaymentAmount() != null) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies);
-        }
-        return partialPaymentPounds;
     }
 
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, String event) {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,9 @@ import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
@@ -21,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -54,43 +57,52 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
             = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
+    public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
+                              Boolean withNotice, LocalDate hearingDate) {
+        return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
+    }
+
     public Fee getFeeForGA(CaseData caseData) {
+        return getFeeForGA(caseData.getGeneralAppType().getTypes(), getRespondentAgreed(caseData), getInformOtherParty(caseData), getHearingDate(caseData));
+    }
+
+    private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
-        int typeSize = caseData.getGeneralAppType().getTypes().size();
-        if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
+        int typeSize = types.size();
+        if (CollectionUtils.containsAny(types, VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
             result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
         }
         if (typeSize > 0
-                && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
+            && CollectionUtils.containsAny(types, SD_CONSENT_TYPES)) {
             typeSize--;
             Fee sdConsentFeeForGA = getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
             if (sdConsentFeeForGA.getCalculatedAmountInPence()
-                    .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = sdConsentFeeForGA;
             }
         }
         if (typeSize > 0
-                && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SET_ASIDE)) {
+            && CollectionUtils.containsAny(types, SET_ASIDE)) {
             typeSize--;
             Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
             if (setAsideFeeForGA.getCalculatedAmountInPence()
-                    .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = setAsideFeeForGA;
             }
         }
         if (typeSize > 0) {
-            Fee defaultFee = getDefaultFee(caseData);
+            Fee defaultFee = getDefaultFee(types, respondentAgreed, informOtherParty, hearingScheduledDate);
             if (defaultFee.getCalculatedAmountInPence()
-                    .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = defaultFee;
             }
         }
         return result;
     }
 
-    public Fee getFeeForGA(String keyword, String event, String service) {
+    protected Fee getFeeForGA(String keyword, String event, String service) {
         if (Objects.isNull(event)) {
             event = feesConfiguration.getEvent();
         }
@@ -110,7 +122,10 @@ public class GeneralAppFeesService {
         FeeLookupResponseDto feeLookupResponseDto;
         try {
             uri = builder.buildAndExpand(new HashMap<>()).toUri();
+            log.info("Calling fee service uri: {}", uri);
             feeLookupResponseDto = restTemplate.getForObject(uri, FeeLookupResponseDto.class);
+            log.info("Received fee service response, amount: {}",
+                     Optional.ofNullable(feeLookupResponseDto).map(FeeLookupResponseDto::getFeeAmount).orElse(null));
         } catch (Exception e) {
             log.error("Fee Service Lookup Failed - " + e.getMessage(), e);
             throw new RuntimeException(e);
@@ -122,34 +137,31 @@ public class GeneralAppFeesService {
         return buildFeeDto(feeLookupResponseDto);
     }
 
-    private Fee getDefaultFee(CaseData caseData) {
-        if (isFreeApplication(caseData)) {
+    private Fee getDefaultFee(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+        if (isFreeApplication(types, respondentAgreed, hearingScheduledDate)) {
             return FREE_FEE;
         } else {
-            return getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
+            return getFeeForGA(getFeeRegisterKeyword(respondentAgreed, informOtherParty), null, null);
         }
     }
 
-    protected String getFeeRegisterKeyword(CaseData caseData) {
-        boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
-                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                && caseData.getGeneralAppInformOtherParty() != null
-                && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+    protected String getFeeRegisterKeyword(Boolean respondentAgreed, Boolean informOtherParty) {
+        boolean isNotified = respondentAgreed != null
+            && !respondentAgreed
+            && informOtherParty != null
+            && informOtherParty;
         return isNotified
-                ? feesConfiguration.getWithNoticeKeyword()
-                : feesConfiguration.getConsentedOrWithoutNoticeKeyword();
+            ? feesConfiguration.getWithNoticeKeyword()
+            : feesConfiguration.getConsentedOrWithoutNoticeKeyword();
     }
 
-    public boolean isFreeApplication(final CaseData caseData) {
-        if (caseData.getGeneralAppType().getTypes().size() == 1
-                && caseData.getGeneralAppType().getTypes()
-                .contains(GeneralApplicationTypes.ADJOURN_HEARING)
-                && caseData.getGeneralAppRespondentAgreement() != null
-                && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                && caseData.getGeneralAppHearingDate() != null
-                && caseData.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
-            return caseData.getGeneralAppHearingDate().getHearingScheduledDate()
-                    .isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
+    protected boolean isFreeApplication(List<GeneralApplicationTypes> types, Boolean respondentAgreed, LocalDate hearingScheduledDate) {
+        if (types.size() == 1
+            && types.contains(GeneralApplicationTypes.ADJOURN_HEARING)
+            && respondentAgreed != null
+            && respondentAgreed
+            && hearingScheduledDate != null) {
+            return hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
         }
         return false;
     }
@@ -164,5 +176,25 @@ public class GeneralAppFeesService {
                 .code(feeLookupResponseDto.getCode())
                 .version(feeLookupResponseDto.getVersion().toString())
                 .build();
+    }
+
+    protected Boolean getRespondentAgreed(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed)
+            .map(hasAgreed -> hasAgreed == YES)
+            .orElse(null);
+    }
+
+    protected Boolean getInformOtherParty(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .map(isWithNotice -> isWithNotice == YES)
+            .orElse(null);
+    }
+
+    protected LocalDate getHearingDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppHearingDate())
+            .map(GAHearingDateGAspec::getHearingScheduledDate)
+            .orElse(null);
     }
 }
