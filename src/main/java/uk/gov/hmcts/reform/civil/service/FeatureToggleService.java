@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
@@ -18,9 +19,19 @@ public class FeatureToggleService {
 
     private final FeatureToggleApi featureToggleApi;
 
+    List<String> featureToggleOffInProd = List.of("minti",
+                                                  "isJudgmentOnlineLive", "GaForLips", "dashboard-service", "multi-or-intermediate-track",
+                                                  "cam-enabled-for-case",
+                                                  "update-contact-details",
+                                                  "cuiReleaseTwoEnabled", "bulk_claim_enabled", "carm", "shutter-pcq", "ahn",
+                                                  "cui-case-progression", "hmc");
+
     public boolean isFeatureEnabled(String feature) {
         if (feature.equals("isSdoR2Enabled")) {
             return true;
+        }
+        if (featureToggleOffInProd.contains(feature)) {
+            return false;
         }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
@@ -30,7 +41,7 @@ public class FeatureToggleService {
     }
 
     public boolean isBulkClaimEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
+        return false;
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -50,11 +61,11 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
+        return false;
     }
 
     public boolean isFastTrackUpliftsEnabled() {
@@ -62,15 +73,15 @@ public class FeatureToggleService {
     }
 
     public boolean isUpdateContactDetailsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+        return false;
     }
 
     public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return false;
     }
 
     public boolean isDashboardServiceEnabled() {
-        return featureToggleApi.isFeatureEnabled("dashboard-service");
+        return false;
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
@@ -90,7 +101,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+        return false;
     }
 
     public boolean isEarlyAdoptersEnabled() {
@@ -102,24 +113,22 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+        return false;
     }
 
     public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
+        return false;
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
-            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false);
+        return false;
     }
 
     public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
+        return false;
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -130,7 +139,6 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        return false;
     }
 }
