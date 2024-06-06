@@ -401,7 +401,8 @@ public class DashboardNotificationsParamsMapper {
         BigDecimal totalAmount = new BigDecimal(caseData.getJoAmountOrdered());
 
         if ((caseData.getJoAmountCostOrdered() != null) && !caseData.getJoAmountCostOrdered().isEmpty()) {
-            totalAmount.add(new BigDecimal(caseData.getJoAmountCostOrdered()));
+            BigDecimal totalAmountCost = new BigDecimal(caseData.getJoAmountCostOrdered());
+            totalAmount = totalAmount.add(totalAmountCost);
         }
 
         JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
