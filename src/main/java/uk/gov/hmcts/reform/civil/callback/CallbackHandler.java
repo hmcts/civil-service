@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -39,17 +40,21 @@ public abstract class CallbackHandler {
         return String.format("%s%s%s", formattedVersion, type.getValue(), formattedPageId);
     }
 
+    @SuppressWarnings("java:S1172")
     public String camundaActivityId(CallbackParams callbackParams) {
         return DEFAULT;
     }
 
-    public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
-        if (camundaActivityId(callbackParams).equals(DEFAULT)) {
+    public List<String> camundaActivityIds(CallbackParams callbackParams) {
+        return Arrays.asList(camundaActivityId(callbackParams));
+    }
 
+    public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
+        if (camundaActivityIds(callbackParams).contains(DEFAULT)) {
             return false;
         }
 
-        return businessProcess != null && camundaActivityId(callbackParams).equals(businessProcess.getActivityId());
+        return businessProcess != null && camundaActivityIds(callbackParams).contains(businessProcess.getActivityId());
     }
 
     public void register(Map<String, CallbackHandler> handlers) {
@@ -63,7 +68,9 @@ public abstract class CallbackHandler {
         callbackKey = callbackKey(callbackParams.getVersion(), callbackParams.getType(), callbackParams.getPageId());
 
         if (ofNullable(callbacks().get(callbackKey)).isEmpty()) {
-            LOG.info(String.format("No implementation found for %s, falling back to default", callbackKey));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No implementation found for {}", callbackKey);
+            }
             callbackKey = callbackKey(callbackParams.getType(), callbackParams.getPageId());
         }
 

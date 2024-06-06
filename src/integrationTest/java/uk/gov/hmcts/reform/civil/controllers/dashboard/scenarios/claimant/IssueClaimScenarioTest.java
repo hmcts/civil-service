@@ -1,46 +1,36 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CreateClaimIssueNotificationsHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class IssueClaimScenarioTest extends BaseIntegrationTest {
+public class IssueClaimScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private CreateClaimIssueNotificationsHandler handler;
 
     @Test
     void should_create_claimIssue_response_await_scenario() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
-        String defendantName = "Dave Indent";
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(
-                       new HashMap<>(Map.of(
-                           "respondent1ResponseDeadlineEn", responseDeadline,
-                           "respondent1ResponseDeadlineCy", responseDeadline,
-                           "respondent1PartyName", defendantName
-                       ))
-                   )
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "4123456789111";
+        LocalDateTime responseDeadline = LocalDateTime.now();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .caseReference(Long.valueOf(caseId))
+            .respondent1ResponseDeadline(responseDeadline)
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
@@ -49,8 +39,8 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">" + defendantName + " has until "
-                        + responseDeadline + " to respond. They can request an extra 28 days if they need it.</p>")
+                    "<p class=\"govuk-body\">Mr. Sole Trader has until "
+                        + DateUtils.formatDate(responseDeadline) + " to respond. They can request an extra 28 days if they need it.</p>")
             );
 
         //Verify task Item is created
@@ -60,6 +50,8 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld yr hawliad</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[1].taskNameEn")
                     .value(

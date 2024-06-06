@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -72,14 +73,30 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(judgementService.ccjJudgmentClaimFee(caseData).setScale(2).toString())
+            .claimFee(getClaimFee(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
-            .ccjAlreadyPaidAmount(judgementService.ccjJudgmentPaidAmount(caseData).setScale(2).toString())
+            .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .defendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
             .generationDate(now.toLocalDate())
             .generationDateTime(now.format(formatter))
             .build();
+    }
+
+    private String getClaimFee(CaseData caseData) {
+        BigDecimal claimFee = judgementService.ccjJudgmentClaimFee(caseData);
+        if (BigDecimal.ZERO.compareTo(claimFee) == 0) {
+            return BigDecimal.ZERO.toString();
+        }
+        return claimFee.setScale(2).toString();
+    }
+
+    private String getAlreadyPaidAmount(CaseData caseData) {
+        BigDecimal paidAmount = judgementService.ccjJudgmentPaidAmount(caseData);
+        if (BigDecimal.ZERO.compareTo(paidAmount) == 0) {
+            return BigDecimal.ZERO.toString();
+        }
+        return paidAmount.setScale(2).toString();
     }
 
     private LocalDate setPayByDate(CaseData caseData) {

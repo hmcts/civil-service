@@ -12,19 +12,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentPaidInFullOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -37,6 +35,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDGMENT_PAID_IN_FULL);
     protected final ObjectMapper objectMapper;
+    private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
 
     @Override
@@ -66,27 +65,8 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-
-        if (nonNull(caseData.getJoOrderMadeDate())
-            && nonNull(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())) {
-            boolean paidAfter31Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days(caseData.getJoOrderMadeDate(),
-                                                                                                     caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade());
-            if (paidAfter31Days) {
-                caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.SATISFIED);
-                if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-                    caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SATISFIED));
-                }
-            } else {
-                caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.CANCELLED);
-                if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-                    caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED));
-                }
-            }
-            caseData.getJoJudgmentStatusDetails().setLastUpdatedDate(LocalDateTime.now());
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
-        }
-
+        caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
+        paidInFullJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

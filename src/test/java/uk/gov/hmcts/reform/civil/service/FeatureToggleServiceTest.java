@@ -56,6 +56,42 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
+        var caseFlagsKey = "GaForLips";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
+        var bulkClaimKey = "bulk_claim_enabled";
+        givenToggle(bulkClaimKey, toggleStat);
+
+        assertThat(featureToggleService.isBulkClaimEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
+        var lipVlipKey = "cuiReleaseTwoEnabled";
+        givenToggle(lipVlipKey, toggleStat);
+
+        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDashboardServiceInvoked(Boolean toggleStat) {
+        var dashboardKey = "dashboard-service";
+        givenToggle(dashboardKey, toggleStat);
+
+        assertThat(featureToggleService.isDashboardServiceEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);
@@ -175,6 +211,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
+        givenToggle(mintiKey, toggleStat);
+
+        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
@@ -190,6 +235,22 @@ class FeatureToggleServiceTest {
         }
 
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
+        var caseFileKey = "multi-or-intermediate-track";
+        givenToggle(mintiKey, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build();
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

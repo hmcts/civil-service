@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -74,13 +75,13 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
@@ -131,6 +132,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
+    private final CaseState previousCCDState;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final GAPbaDetails generalAppPBADetails;
@@ -266,6 +268,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
+
+    @Builder.Default
+    @JsonProperty("duplicateClaimantDefResponseDocs")
+    private final List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
@@ -574,6 +583,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
+    // GA for LIP
+    private final YesOrNo isGaApplicantLip;
+    private final YesOrNo isGaRespondentOneLip;
+    private final YesOrNo isGaRespondentTwoLip;
+
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentWithName>> documentAndNameToAdd;
@@ -613,15 +627,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
-    private JudgmentStatusDetails joJudgmentStatusDetails;
     private LocalDate joOrderMadeDate;
     private LocalDate joIssuedDate;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
     private YesOrNo joIsRegisteredWithRTL;
-    private PaymentPlanSelection joPaymentPlanSelection;
-    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
-    private LocalDate joPaymentToBeMadeByDate;
+    private JudgmentPaymentPlan joPaymentPlan;
+    private JudgmentInstalmentDetails joInstalmentDetails;
     private YesOrNo joIsLiveJudgmentExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
     private JudgmentSetAsideReason joSetAsideReason;
@@ -629,8 +641,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentSetAsideOrderType joSetAsideOrderType;
     private LocalDate joSetAsideOrderDate;
     private LocalDate joSetAsideDefenceReceivedDate;
-
     private YesOrNo joShowRegisteredWithRTLOption;
+    private JudgmentDetails activeJudgment;
+    private List<Element<JudgmentDetails>> historicJudgment;
 
     private final TransferCaseDetails transferCaseDetails;
 
@@ -644,6 +657,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
+    private CaseDocument decisionOnReconsiderationDocument;
+    private LocalDateTime requestForReconsiderationDeadline;
+    private YesOrNo requestForReconsiderationDeadlineChecked;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -724,7 +740,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasDefendantPayedTheAmountClaimed() {
+    public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
             .equals(getDefenceRouteRequired());
     }
@@ -841,6 +857,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasDefendant2AgreedToFreeMediation() {
+        return YES.equals(getResponseClaimMediationSpec2Required());
+    }
+
+    @JsonIgnore
     public boolean isMultiPartyDefendant() {
         return !YES.equals(getDefendantSingleResponseToBothClaimants())
             && YES.equals(getApplicant1ProceedWithClaim());
@@ -932,11 +953,22 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        LocalDate whenWillThisAmountBePaid =
-            Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+        LocalDate whenWillThisAmountBePaid = null;
+        LocalDate firstRepaymentDate;
+        if (hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            if (applicant1SuggestedPayImmediately()) {
+                whenWillThisAmountBePaid = getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec();
+            } else if (applicant1SuggestedPayBySetDate()) {
+                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(PaymentBySetDate::getPaymentSetDate).orElse(null);
+            }
+            firstRepaymentDate = getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
+        } else {
+            whenWillThisAmountBePaid =
+                Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                    null);
+            firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
                 null);
-        LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
-            null);
+        }
         LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
         YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
@@ -1442,5 +1474,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
+        return hasApplicant1CourtDecisionInFavourOfClaimant()
+                && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
     }
 }

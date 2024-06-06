@@ -54,8 +54,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -189,7 +187,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final LocationRefDataService locationRefDataService;
-    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
 
@@ -244,7 +242,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     CaseData::getSpecRespondent2CorrespondenceAddressdetails
                 )
             )
-            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
+            .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
             .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
@@ -277,14 +275,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
-        if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
+        if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -314,10 +312,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             CaseData caseData = callbackParams.getCaseData();
             List<String> errors = new ArrayList<>();
-            if (caseData.getInterestFromSpecificDate() != null) {
-                if (caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
-                    errors.add("Correct the date. You can’t use a future date.");
-                }
+            if (caseData.getInterestFromSpecificDate() != null && caseData.getInterestFromSpecificDate().isAfter(LocalDate.now())) {
+                errors.add("Correct the date. You can’t use a future date.");
             }
 
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -425,10 +421,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        StateFlow evaluation = stateFlowEngine.evaluate(caseData);
-        State state = evaluation.getState();
-        Map<String, Boolean> flags = evaluation.getFlags();
 
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
@@ -650,11 +642,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
+    static final String payFeeMessage = "# Please now pay your claim fee%n# using the link below";
+
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
@@ -673,7 +667,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
-                             caseDocLocation,
+                             CASE_DOC_LOCATION,
                              caseData.getCcdCaseReference()
                          ),
                          claimUrlsConfiguration.getResponsePackLink(),
@@ -682,16 +676,18 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 + exitSurveyContentService.applicantSurvey();
     }
 
+    static final String caseDetailsUrl = "/cases/case-details/%s#Service%%20Request";
+
     private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
             return format(
                 CONFIRMATION_SUMMARY_PBA_V3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference())
+                format(caseDetailsUrl, caseData.getCcdCaseReference())
             );
         } else {
             return format(
                 CONFIRMATION_SUMMARY,
-                format(caseDocLocation, caseData.getCcdCaseReference())
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
             );
         }
     }
@@ -773,12 +769,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         totalAmount = totalAmount.concat(stringBuilder.toString());
 
         List<String> errors = new ArrayList<>();
-        if (MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
+        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
             errors.add("Total Claim Amount cannot exceed £ 25,000");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
         }
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
@@ -858,12 +856,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         } else {
             if (featureToggleService.isPbaV3Enabled()) {
-                return format("# Please now pay your claim fee%n# using the link below");
+                return format(payFeeMessage);
             } else {
                 return format(
                     "# Your claim has been received and will progress offline%n## Claim number: %s",
@@ -883,8 +881,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 ? getSpecConfirmationSummary(caseData)
                 : toggleService.isPbaV3Enabled() ? format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
-                format(caseDocLocation, caseData.getCcdCaseReference()),
+                format(caseDetailsUrl, caseData.getCcdCaseReference()),
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
                 claimUrlsConfiguration.getN9bLink(),
@@ -892,7 +890,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 formattedServiceDeadline
             ) : format(
                 SPEC_LIP_CONFIRMATION_BODY,
-                format(caseDocLocation, caseData.getCcdCaseReference()),
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                 claimUrlsConfiguration.getResponsePackLink(),
                 claimUrlsConfiguration.getN9aLink(),
                 claimUrlsConfiguration.getN9bLink(),
@@ -905,22 +903,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (featureToggleService.isPbaV3Enabled()) {
             return format(
                 SPEC_CONFIRMATION_SUMMARY_PBA_V3,
-                format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference())
+                format(caseDetailsUrl, caseData.getCcdCaseReference())
             );
         } else {
             return format(
                 SPEC_CONFIRMATION_SUMMARY,
-                format(caseDocLocation, caseData.getCcdCaseReference())
+                format(CASE_DOC_LOCATION, caseData.getCcdCaseReference())
             );
         }
-    }
-
-    private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
-            .build();
     }
 
     private CallbackResponse validateSpecRespondent2RepEmail(CallbackParams callbackParams) {
@@ -958,29 +948,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
-        if (toggleService.isSdoR2Enabled()) {
-            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
-                LocalDate today = LocalDate.now();
-                LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
-                if (scheduledDate.isAfter(today)) {
-                    errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
-                }
+        if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+            LocalDate today = LocalDate.now();
+            LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+            if (scheduledDate.isAfter(today)) {
+                errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .errors(errors)
-            .build();
-    }
 
-    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<String> errors = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
-        if (scheduledDate.isAfter(today)) {
-            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)

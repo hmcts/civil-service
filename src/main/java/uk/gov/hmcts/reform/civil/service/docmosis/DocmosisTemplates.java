@@ -17,6 +17,8 @@ public enum DocmosisTemplates {
     N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-01142.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N11("CV-UNS-ACK-ENG-01146.docx", " acknowledgement_of_claim_form_%s.pdf"),
     N121_SPEC("CV-SPC-DEC-ENG-00910.docx", "default_judgment_spec_form_%s.pdf"),
+    N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", "default_judgment_spec_form_%s.pdf"),
+    N121_SPEC_CLAIMANT("CV-SPC-DEC-ENG-00912.docx", "default_judgment_spec_form_%s.pdf"),
     N121("CV-UNS-DEC-ENG-01280.docx", "default_judgment_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v1("CV-SPC-HRN-ENG-01361.docx", "%s_response_sealed_form.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
@@ -43,6 +45,9 @@ public enum DocmosisTemplates {
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0001.docx", "set_aside_letter.pdf"),
+    JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-PIP-0002.docx", "judgment_by_admission_non_divergent_spec_pip_letter.pdf"),
+    RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0003.docx", "record_judgment_determination_of_means_letter.pdf"),
+    DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0004.docx", "default_judgment_non_divergent_spec_pin_letter.pdf"),
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01377.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01357.docx", "%s_directions_questionnaire_form_%s.pdf"),
@@ -72,13 +77,16 @@ public enum DocmosisTemplates {
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
 
+    //Court officer order
+    COURT_OFFICER_ORDER_PDF("CV-UNS-DEC-ENG-01299.docx", "Order_%s.pdf"),
     SETTLEMENT_AGREEMENT_PDF("CV-SPC-CLM-ENG-00001-SETTLEMENT.docx", "%s-settlement-agreement.pdf"),
     CLAIMANT_LIP_MANUAL_DETERMINATION_PDF("CV-SPC-CLM-ENG-00001-LIP-MD.docx", "%s_request-org-repayment-amount.pdf"),
     JUDGMENT_BY_ADMISSION_OR_DETERMINATION("CV-SPC-CLM-ENG-00001-JBA-JBD.docx", "%s-ccj-request-%s.pdf"),
     INTERLOCUTORY_JUDGEMENT_DOCUMENT("CV-SPC-CLM-ENG-INTERLOCUTORY-JUDGEMENT.docx", "%s-request-interloc-judgment.pdf"),
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
-    RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf");
+    RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
+    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf");
 
     private final String template;
     private final String documentTitle;

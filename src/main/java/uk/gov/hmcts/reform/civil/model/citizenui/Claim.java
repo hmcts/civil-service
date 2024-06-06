@@ -88,6 +88,8 @@ public interface Claim {
 
     boolean isSDOOrderCreated();
 
+    boolean isSDOOrderLegalAdviserCreated();
+
     boolean isClaimantDefaultJudgement();
 
     boolean isPartialAdmissionAccepted();
@@ -109,6 +111,8 @@ public interface Claim {
     boolean isHwfInvalidRefNumber();
 
     boolean isHwfPaymentOutcome();
+
+    boolean defendantRespondedWithPreferredLanguageWelsh();
 
     boolean isWaitingForClaimantIntentDocUpload();
 

@@ -13,10 +13,12 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -65,8 +68,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
     InterestCalculator.class,
-    FeesService.class
-
+    FeesService.class,
+    DefaultJudgmentOnlineMapper.class
 })
 public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
@@ -961,6 +964,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled1v1AndIsJudgmentOnlineLiveDisabled() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
@@ -981,8 +987,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDocumentAndContinueOnline_whenIsCalled1v1() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPaymentAmount("10")
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .partialPayment(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Smith")
@@ -997,10 +1011,19 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+
         }
 
         @Test
         void shouldGenerateDocumentAndContinueOnline_whenIsCalled1v2NonDivergent() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1008,6 +1031,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .partialPaymentAmount("10")
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .partialPayment(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("Both Defendants")
@@ -1022,10 +1050,19 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+
         }
 
         @Test
         void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled1v2Divergent() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1033,6 +1070,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .partialPaymentAmount("10")
+                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .partialPayment(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Smith")
@@ -1047,10 +1089,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("REQUESTED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("No");
+
         }
 
         @Test
-        void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled2v1() {
+        void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled2v1JOIsNotLive() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .applicant1(PartyBuilder.builder().individual().build())
@@ -1064,12 +1112,43 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldMoveToFinalOrderIssued_whenIsJOOnlineAnd2v1() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .addApplicant2(YesOrNo.YES)
+                .partialPaymentAmount("10")
+                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .partialPayment(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Smith")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess").isNotNull();
+            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
     }
 

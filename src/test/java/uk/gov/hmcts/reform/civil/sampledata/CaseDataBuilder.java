@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -145,11 +147,11 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
@@ -259,6 +261,7 @@ public class CaseDataBuilder {
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected YesOrNo respondent2Represented;
+    protected IdamUserDetails defendantUserDetails;
     protected YesOrNo defendant1LIPAtClaimIssued;
     protected YesOrNo defendant2LIPAtClaimIssued;
     protected String respondentSolicitor1EmailAddress;
@@ -456,6 +459,11 @@ public class CaseDataBuilder {
     private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
+    private DJPaymentTypeSelection paymentTypeSelection;
+    private LocalDate paymentSetDate;
+    private RepaymentFrequencyDJ repaymentFrequency;
+    private LocalDate repaymentDate;
+    private String repaymentSuggestion;
 
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
@@ -1583,6 +1591,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder paymentTypeSelection(DJPaymentTypeSelection paymentTypeSelection) {
+        this.paymentTypeSelection = paymentTypeSelection;
+        return this;
+    }
+
+    public CaseDataBuilder paymentSetDate(LocalDate paymentSetDate) {
+        this.paymentSetDate = paymentSetDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentFrequency(RepaymentFrequencyDJ repaymentFrequency) {
+        this.repaymentFrequency = repaymentFrequency;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentDate(LocalDate repaymentDate) {
+        this.repaymentDate = repaymentDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentSuggestion(String repaymentSuggestion) {
+        this.repaymentSuggestion = repaymentSuggestion;
+        return this;
+    }
+
     public CaseDataBuilder applicant2(Party party) {
         this.applicant2 = party;
         return this;
@@ -1605,6 +1638,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder defendantUserDetails(IdamUserDetails defendantUserDetails) {
+        this.defendantUserDetails = defendantUserDetails;
         return this;
     }
 
@@ -1802,6 +1840,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder reasonNotSuitableSDO(ReasonNotSuitableSDO reasonNotSuitableSDO) {
         this.reasonNotSuitableSDO = reasonNotSuitableSDO;
+        return this;
+    }
+
+    public CaseDataBuilder defaultJudgmentDocuments(List<Element<CaseDocument>> defaultJudgmentDocuments) {
+        this.defaultJudgmentDocuments = defaultJudgmentDocuments;
         return this;
     }
 
@@ -5846,14 +5889,15 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
-            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
-                                             .instalmentAmount("120")
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .startDate(LocalDate.of(2022, 12, 12))
+                                             .amount("120")
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5861,13 +5905,13 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
-            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
-                                             .instalmentAmount("120")
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .startDate(LocalDate.of(2022, 12, 12))
+                                             .amount("120")
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -5884,8 +5928,9 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IMMEDIATELY)
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -5895,40 +5940,103 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_BY_DATE)
+            .joPaymentPlan(JudgmentPaymentPlan.builder()
+                    .type(PaymentPlanSelection.PAY_BY_DATE)
+                    .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
-            .joIsRegisteredWithRTL(YES).build();
+            .joIsRegisteredWithRTL(YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 2))
+                                      .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
-            .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 1))
+                                      .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
-            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v1Case() {
+        atStateNotificationAcknowledged();
+        return build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .partialPayment(YesOrNo.YES)
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v2DivergentCase() {
+        return CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Smith")
+                                                 .build())
+                                      .build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v1CaseJudgmentPaid() {
+        return build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .partialPayment(YesOrNo.YES)
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                         .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
+                                         .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                         .build())
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .build();
     }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
@@ -6443,6 +6551,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setClaimantMediationFlag(YesOrNo response) {
         respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder setDefendantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder setDefendant2MediationFlag(YesOrNo response) {
+        respondent2MediationRequired = response;
         return this;
     }
 
@@ -7014,6 +7132,7 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .defendantUserDetails(defendantUserDetails)
             .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
             .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)
@@ -7196,7 +7315,7 @@ public class CaseDataBuilder {
             .applicant1ClaimMediationSpecRequired(applicant1ClaimMediationSpecRequired)
             .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
             .responseClaimMediationSpecRequired(respondent1MediationRequired)
-            .responseClaimMediationSpec2Required(respondent1MediationRequired)
+            .responseClaimMediationSpec2Required(respondent2MediationRequired)
             .mediation(mediation)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
@@ -7337,6 +7456,11 @@ public class CaseDataBuilder {
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
+            .paymentTypeSelection(paymentTypeSelection)
+            .repaymentSuggestion(repaymentSuggestion)
+            .paymentSetDate(paymentSetDate)
+            .repaymentFrequency(repaymentFrequency)
+            .repaymentDate(repaymentDate)
             .build();
     }
 
@@ -7345,4 +7469,5 @@ public class CaseDataBuilder {
         ccdState = CaseState.CASE_SETTLED;
         return this;
     }
+
 }

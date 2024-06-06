@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -21,15 +27,23 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
+    private final FeatureToggleService featureToggleService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -40,11 +54,34 @@ public class DashboardNotificationsParamsMapper {
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
+        if (featureToggleService.isGeneralApplicationsEnabled()) {
+            params.put("djClaimantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+            params.put("djDefendantNotificationMessage", "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+        } else {
+            params.put("djClaimantNotificationMessage", "<u>make an application to vary the judgment</u>");
+            params.put("djDefendantNotificationMessage", "<u>make an application to set aside (remove) or vary the judgment</u>");
+        }
+
         if (nonNull(caseData.getApplicant1ResponseDeadline())) {
             LocalDateTime applicant1ResponseDeadline = caseData.getApplicant1ResponseDeadline();
             params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
             params.put("applicant1ResponseDeadlineCy",
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+        }
+
+        if (featureToggleService.isJudgmentOnlineLive()
+            && nonNull(caseData.getActiveJudgment())
+            && caseData.getActiveJudgment().getState().equals(ISSUED)
+            && nonNull(caseData.getActiveJudgment().getPaymentPlan())
+            && caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
+
+            JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
+
+            params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
+            params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
+            params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
+            params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -103,7 +140,8 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
             params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
-            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementEn", getClaimantRepaymentPlanDecision(caseData));
+            params.put("claimantSettlementAgreementCy", getClaimantRepaymentPlanDecisionCy(caseData));
         });
 
         LocalDate claimSettleDate = caseData.getApplicant1ClaimSettleDate();
@@ -155,6 +193,7 @@ public class DashboardNotificationsParamsMapper {
         });
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
+        params.put("claimantRepaymentPlanDecisionCy", getClaimantRepaymentPlanDecisionCy(caseData));
 
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate();
@@ -170,7 +209,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate().minusWeeks(3);
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
-            params.put("trialArrangementDeadlineCy", DateUtils.formatDate(date));
+            params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
         }
         if (nonNull(caseData.getHearingFee())) {
             params.put(
@@ -194,6 +233,32 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return params;
+    }
+
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData, CaseEvent caseEvent) {
+
+        Map<String, Object> params = mapCaseDataToParams(caseData);
+        String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
+        if (nonNull(orderDocumentUrl)) {
+            params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+
+        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
+            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
+            params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
+            params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
+        }
+
+        return params;
+    }
+
+    private String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
+        return switch (paymentFrequency) {
+            case WEEKLY -> "weekly";
+            case EVERY_TWO_WEEKS -> "biweekly";
+            case MONTHLY -> "monthly";
+            default -> "";
+        };
     }
 
     private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
@@ -266,6 +331,13 @@ public class DashboardNotificationsParamsMapper {
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
     }
 
+    private String getClaimantRepaymentPlanDecisionCy(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH;
+    }
+
     private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> "week";
@@ -291,30 +363,29 @@ public class DashboardNotificationsParamsMapper {
             .map(amount -> "£" + amount);
     }
 
-    public Map<String, Object> getMapWithDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
-        HashMap<String, Object> params = new HashMap<>();
+    private String addToMapDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
 
-        switch (caseEvent) {
-            case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getFinalOrderDocumentCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT:
-                params.put(ORDER_DOCUMENT, caseData.getOrderSDODocumentDJCollection()
-                    .get(0).getValue().getDocumentLink().getDocumentBinaryUrl());
-                return params;
-            case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
-                CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT:
-                caseData.getSDODocument().ifPresent(sdoDocument -> {
-                    params.put(
-                        ORDER_DOCUMENT,
-                        sdoDocument.getValue().getDocumentLink().getDocumentBinaryUrl()
-                    );
-                });
-                return params;
-            default: throw new IllegalArgumentException("Invalid caseEvent in " + caseEvent);
+        if (nonNull(caseEvent)) {
+            switch (caseEvent) {
+                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
+                    return caseData.getFinalOrderDocumentCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT -> {
+                    return caseData.getOrderSDODocumentDJCollection()
+                        .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                }
+                case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
+                    Optional<Element<CaseDocument>> sdoDocument = caseData.getSDODocument();
+                    if (sdoDocument.isPresent()) {
+                        return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
         }
+        return null;
     }
 }

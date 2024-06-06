@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -761,7 +762,7 @@ public class MediationJsonServiceTest {
 
         MediationCase mediationCase = service.generateJsonContent(caseData);
 
-        assertThat(mediationCase.getClaimValue()).isEqualTo("800");
+        assertThat(mediationCase.getClaimValue()).isEqualTo(BigDecimal.valueOf(800));
     }
 
     private HearingSupport supportRequired(YesOrNo option) {
@@ -916,20 +917,20 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(MEDIATION_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 
@@ -939,20 +940,20 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(MEDIATION_ALT_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_ALT_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 
@@ -963,20 +964,20 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(number)
             .mediationContactEmail(email)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 }

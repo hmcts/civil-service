@@ -1387,6 +1387,7 @@ class StateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .build();
 
             // When
@@ -2133,13 +2134,24 @@ class StateFlowEngineTest {
         )
         void shouldReturnFullDefenceProceed_whenCaseDataAtStateApplicantRespondToDefence(FlowState.Main flowState) {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atState(flowState)
-                .takenOfflineDate(LocalDateTime.now())
-                // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
-                .hearingReferenceNumber("12345")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
-
+            CaseData caseData;
+            if (flowState.fullName().equals(TAKEN_OFFLINE_AFTER_SDO.fullName())) {
+                caseData = CaseDataBuilder.builder().atState(flowState)
+                    .takenOfflineDate(LocalDateTime.now())
+                    .takenOfflineByStaffDate(null)
+                    // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
+                    .hearingReferenceNumber("12345")
+                    .listingOrRelisting(ListingOrRelisting.LISTING)
+                    .build();
+            } else {
+                caseData = CaseDataBuilder.builder().atState(flowState)
+                    .takenOfflineDate(LocalDateTime.now())
+                    .takenOfflineByStaffDate(LocalDateTime.now())
+                    // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
+                    .hearingReferenceNumber("12345")
+                    .listingOrRelisting(ListingOrRelisting.LISTING)
+                    .build();
+            }
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -2184,7 +2196,7 @@ class StateFlowEngineTest {
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.SDO_ENABLED.name(), false)
+                    entry(FlowFlag.SDO_ENABLED.name(), true)
                 );
             }
         }
@@ -2530,7 +2542,7 @@ class StateFlowEngineTest {
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
@@ -2652,7 +2664,7 @@ class StateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(5).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
 
@@ -3245,6 +3257,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -3285,6 +3298,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
 

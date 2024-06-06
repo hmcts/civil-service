@@ -24,6 +24,9 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    SDO_ORDER_LEGAL_ADVISER_CREATED(
+        Claim::isSDOOrderLegalAdviserCreated
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
@@ -86,6 +89,9 @@ public enum DashboardClaimStatus {
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
+    ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid

@@ -166,6 +166,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(helper.getCaaAccessToken()).thenReturn(STRING_CONSTANT);
 
         when(authTokenGenerator.generate()).thenReturn(STRING_CONSTANT);
+
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
     }
 
     @Nested
@@ -441,6 +443,76 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
+            .isNull();
+    }
+
+    @Test
+    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null);
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIP() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
+    }
+
+    @Test
+    void shouldNotPopulateGaForLipsFlagIfFeatureFlagIsOff() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null);
+
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
             .isNull();
     }
 

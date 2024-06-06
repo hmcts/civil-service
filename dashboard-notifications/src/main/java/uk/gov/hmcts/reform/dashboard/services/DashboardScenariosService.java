@@ -45,19 +45,20 @@ public class DashboardScenariosService {
         this.taskItemTemplateRepository = taskItemTemplateRepository;
     }
 
+    @SuppressWarnings("java:S1172")
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
 
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
 
-            //TODO create notifications based on notification template for given scenario Ref.
+            //create notifications based on notification template for given scenario Ref.
             createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
 
-            //TODO Create or update taskItem(s) based on task items template for given scenario ref.
+            //Create or update taskItem(s) based on task items template for given scenario ref.
             createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams);
 
-            //TODO Delete old notifications as notification template says for scenario ref (if exist for case ref)
+            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
             deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
         });
     }
@@ -142,7 +143,7 @@ public class DashboardScenariosService {
                 .build();
 
             log.info(
-                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
+                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, HintTextEn = {}",
                 scenarioReference,
                 taskItemEntity.getId(),
                 taskItemEntity.getTaskNameEn(),
@@ -153,7 +154,7 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        Arrays.asList(scenario.getNotificationsToDelete()).forEach((templateName) -> {
+        Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
 
             Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                 .findByName(templateName);

@@ -12,16 +12,23 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.OrderMadeDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
 public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
@@ -42,6 +49,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
@@ -54,11 +62,84 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                     "<p class=\"govuk-body\">The judge has made an order on your claim. "
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
                         + " class=\"govuk-link\">View the order</a>.</p>"),
-                jsonPath("$[0].titleCy").value("An order has been made"),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The judge has made an order on your claim. "
+                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad. "
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">View the order</a>.</p>")
+                        + " class=\"govuk-link\">Gweld y gorchymyn</a>.</p>")
+            );
+    }
+
+    @Test
+    void should_create_order_made_defendant_scenario_mediation_unsuccessful_sdo_carm() throws Exception {
+
+        String caseId = "72014545416";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .finalOrderDocumentCollection(List.of(ElementUtils.element(
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+            .responseClaimTrack(FAST_CLAIM.name())
+            .totalClaimAmount(BigDecimal.valueOf(999))
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                           .build())
+            .build();
+
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        handler.handle(callbackParamsTestSDO(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("You are no longer required to submit documents relating to mediation non-attendance"),
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">A judge has reviewed your case and you are no "
+                                                         + "longer required to submit documents relating to non-attendance of a mediation appointment. "
+                                                         + "There will be no penalties issued for your non-attendance.</p>"),
+                jsonPath("$[0].titleCy").value("Nid yw'n ofynnol bellach i chi gyflwyno dogfennau sy'n ymwneud â pheidio â mynychu cyfryngu"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae barnwr wedi adolygu " +
+                                                         "eich achos ac nid yw'n ofynnol i chi gyflwyno dogfennau bellach yn " +
+                                                         "ymwneud â pheidio â mynychu apwyntiad cyfryngu. Ni fydd unrhyw gosbau yn cael eu gosod am eich diffyg presenoldeb.</p>"));
+    }
+
+    @Test
+    void should_create_order_made_claimant_scenario_pre_cp_release() throws Exception {
+
+        String caseId = "72014545416";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1Represented(YesOrNo.NO)
+            .finalOrderDocumentCollection(List.of(ElementUtils.element(
+                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        handler.handle(callbackParamsTest(caseData));
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("An order has been issued by the court."),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">Please follow instructions in the order and comply with the deadlines. " +
+                        "Please send any documents to the court named in the order if required. " +
+                        "The claim will now proceed offline, you will receive further updates by post.</p>"),
+                jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i gyhoeddi gan y llys."),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Dilynwch y cyfarwyddiadau sydd yn y gorchymyn a chydymffurfiwch " +
+                        "â’r dyddiadau terfyn. Anfonwch unrhyw ddogfennau i’r llys a enwir yn y gorchymyn os oes angen. " +
+                        "Bydd yr hawliad nawr yn parhau all-lein a byddwch yn cael unrhyw ddiweddariadau pellach drwy’r post.</p>")
             );
     }
 
@@ -67,6 +148,15 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(
                 CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name()).build())
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
+    }
+
+    private static CallbackParams callbackParamsTestSDO(CaseData caseData) {
+        return CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(
+                CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
     }

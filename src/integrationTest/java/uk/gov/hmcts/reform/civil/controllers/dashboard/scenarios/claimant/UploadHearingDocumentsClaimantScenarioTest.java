@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +25,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
     void shouldCreateUploadDocumentCaseProgresionScenario() throws Exception {
 
         String caseId = "12345188432991";
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
@@ -46,17 +48,16 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
                         "class=\"govuk-link\">upload and submit documents</a> to support your claim. Follow the " +
-                        "instructions set out in the directions order. You must submit all documents by " +
+                        "instructions set out in the <a href=\"{VIEW_ORDERS_AND_NOTICES}\" class=\"govuk-link\">directions order</a>. You must submit all documents by " +
                         "${sdoDocumentUploadRequestedDateEn}. Any documents submitted after the deadline may not be " +
                         "considered by the judge.</p>"
                 ),
-                jsonPath("$[0].titleCy").value("Upload documents"),
+                jsonPath("$[0].titleCy").value("Llwytho dogfennau"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
-                        "class=\"govuk-link\">upload and submit documents</a> to support your claim. Follow the " +
-                        "instructions set out in the directions order. You must submit all documents by " +
-                        "${sdoDocumentUploadRequestedDateCy}. Any documents submitted after the deadline may not be " +
-                        "considered by the judge.</p>"
+                    "<p class=\"govuk-body\">Gallwch <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
+                        "class=\"govuk-link\">lwytho a chyflwyno dogfennau</a> i gefnogi eich hawliad. Dilynwch y cyfarwyddiadau a nodir yn y " +
+                        "<a href=\"{VIEW_ORDERS_AND_NOTICES}\" class=\"govuk-link\">gorchymyn cyfarwyddiadau</a>. Rhaid i chi gyflwyno’r holl ddogfennau erbyn " +
+                        "${sdoDocumentUploadRequestedDateCy}. Mae'n bosib na fydd y barnwr yn ystyried unrhyw ddogfennau a gyflwynir ar ôl y dyddiad hwn.</p>"
                 )
             );
     }
