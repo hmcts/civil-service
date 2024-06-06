@@ -134,7 +134,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName(caseManagementLocationDetails.getVenueName())
+            .courtName(caseManagementLocationDetails.getExternalShortName())
             .courtLocation(getHearingLocationText(caseData, authorisation));
         return freeFormOrderBuilder.build();
     }
@@ -158,7 +158,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
             .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .courtName(caseManagementLocationDetails.getVenueName())
+            .courtName(caseManagementLocationDetails.getExternalShortName())
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
             .courtLocation(getHearingLocationText(caseData, authorisation))
