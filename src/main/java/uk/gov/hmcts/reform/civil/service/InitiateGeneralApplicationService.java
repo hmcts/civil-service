@@ -221,6 +221,7 @@ public class InitiateGeneralApplicationService {
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppHelpWithFees(caseData.getGeneralAppHelpWithFees())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
+            .generalAppAskForCosts(caseData.getGeneralAppAskForCosts())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .generalAppSuperClaimType(caseType.name())
