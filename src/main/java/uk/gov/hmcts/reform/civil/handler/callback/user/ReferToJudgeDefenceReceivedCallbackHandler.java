@@ -45,8 +45,10 @@ public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler 
             .build();
     }
 
+    private static final String CASE_REFERRED_TO_JUDGE = "# The case has been referred to a judge for a decision";
+
     private String getHeader() {
-        return "# The case has been referred to a judge for a decision";
+        return CASE_REFERRED_TO_JUDGE;
     }
 
     private String getBody() {

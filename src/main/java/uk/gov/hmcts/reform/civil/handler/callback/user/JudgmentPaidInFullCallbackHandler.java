@@ -54,8 +54,10 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private static final String JUDGMENT_MARKED_AS_PAID_IN_FULL_HEADER = "# Judgment marked as paid in full";
+
     private String getHeader() {
-        return "# Judgment marked as paid in full";
+        return JUDGMENT_MARKED_AS_PAID_IN_FULL_HEADER;
     }
 
     private String getBody() {
