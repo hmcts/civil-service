@@ -204,10 +204,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
-                                                                                   "claim amount of £ 12.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12.");
+                                                                                   "claim amount of £ 12.00 in weekly instalments of £ 1.20 The first payment is due on 2022-12-12.");
         } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
-            assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the claim " +
-                                                                                   "amount of £ 12.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12.");
+            assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
+                                                                                   "claim amount of £ 12.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12.");
         } else {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the claim " +
                                                                                    "amount of £ 12.00 in monthly instalments of £ 1.20 The first payment is due on 2022-12-12.");
