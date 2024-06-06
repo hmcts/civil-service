@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -14,6 +15,7 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EvidenceUploadRespondentNotificationHandler implements NotificationData {
@@ -45,7 +47,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 email,
-                getTemplate(isRespondentLip),
+                getTemplate(caseData, isRespondentLip),
                 addProperties(caseData),
                 String.format(
                     REFERENCE_TEMPLATE,
@@ -55,9 +57,14 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    public String getTemplate(boolean isRespondentLip) {
-        return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                                    : notificationsProperties.getEvidenceUploadTemplate();
+    public String getTemplate(CaseData caseData, boolean isRespondentLip) {
+        if (isRespondentLip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getEvidenceUploadLipTemplateWelsh();
+        } else if (isRespondentLip) {
+            return notificationsProperties.getEvidenceUploadLipTemplate();
+        } else {
+            return notificationsProperties.getEvidenceUploadTemplate();
+        }
     }
 
     @Override
