@@ -82,6 +82,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
@@ -213,6 +215,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         migrateCase,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
@@ -232,6 +236,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         migrateCase,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
@@ -251,6 +257,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_CLAIM_AFTER_PAYMENT,
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
@@ -283,6 +291,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         INVALID_HWF_REFERENCE,
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
@@ -313,7 +323,9 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -353,6 +365,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         asyncStitchingComplete,
                         COURT_OFFICER_ORDER
                     }
@@ -384,6 +398,8 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         COURT_OFFICER_ORDER
                     }
                 ),
@@ -414,6 +430,8 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_SCHEDULED,
                         GENERATE_DIRECTIONS_ORDER,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         COURT_OFFICER_ORDER
 
                     }
@@ -442,6 +460,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         GENERATE_DIRECTIONS_ORDER,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
@@ -477,7 +497,9 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -500,7 +522,9 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -523,7 +547,9 @@ class FlowStateAllowedEventServiceTest {
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         CLAIMANT_RESPONSE_CUI,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -543,7 +569,9 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         CLAIMANT_RESPONSE_CUI,
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -563,7 +591,9 @@ class FlowStateAllowedEventServiceTest {
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -581,7 +611,9 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -629,6 +661,8 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         asyncStitchingComplete,
                         CLAIMANT_RESPONSE_CUI,
                         REQUEST_FOR_RECONSIDERATION,
@@ -652,7 +686,9 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -666,7 +702,9 @@ class FlowStateAllowedEventServiceTest {
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -680,7 +718,9 @@ class FlowStateAllowedEventServiceTest {
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -704,7 +744,9 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         NotSuitable_SDO,
                         CREATE_SDO,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -717,7 +759,9 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -730,7 +774,9 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -741,6 +787,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         ADD_CASE_NOTE
                     }
                 ),
@@ -800,7 +848,9 @@ class FlowStateAllowedEventServiceTest {
                         MEDIATION_UNSUCCESSFUL,
                         ADD_UNAVAILABLE_DATES,
                         INITIATE_GENERAL_APPLICATION,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL
                     }
                 ),
                 of(
@@ -845,6 +895,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
                         TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
                         INVALID_HWF_REFERENCE,
                         COURT_OFFICER_ORDER
                     }

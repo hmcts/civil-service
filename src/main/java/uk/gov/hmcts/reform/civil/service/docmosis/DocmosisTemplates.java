@@ -45,6 +45,7 @@ public enum DocmosisTemplates {
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0001.docx", "set_aside_letter.pdf"),
+    JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-PIP-0002.docx", "judgment_by_admission_non_divergent_spec_pip_letter.pdf"),
     RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0003.docx", "record_judgment_determination_of_means_letter.pdf"),
     DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0004.docx", "default_judgment_non_divergent_spec_pin_letter.pdf"),
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01377.docx", "disposal_hearing_sdo_%s.pdf"),
@@ -85,7 +86,9 @@ public enum DocmosisTemplates {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
-    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf");
+    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf"),
+    JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_claimant.pdf"),
+    JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_defendant.pdf");
 
     private final String template;
     private final String documentTitle;
