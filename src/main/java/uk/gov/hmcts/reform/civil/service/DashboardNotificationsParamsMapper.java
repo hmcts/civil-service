@@ -369,16 +369,23 @@ public class DashboardNotificationsParamsMapper {
     private static StringBuilder getPaymentFrequencyMessage(CaseData caseData) {
         PaymentPlanSelection paymentPlanType = caseData.getJoPaymentPlan().getType();
         StringBuilder paymentFrequencyMessage = new StringBuilder();
+        BigDecimal totalAmount = new BigDecimal(caseData.getJoAmountOrdered());
+
+        if((caseData.getJoAmountCostOrdered() != null) && !caseData.getJoAmountCostOrdered().isEmpty()) {
+            totalAmount.add(new BigDecimal(caseData.getJoAmountCostOrdered()));
+        }
+
         if (PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(paymentPlanType)) {
             JudgmentInstalmentDetails instalmentDetails = caseData.getJoInstalmentDetails();
             paymentFrequencyMessage.append("You must pay the claim amount of £ ")
-                .append(MonetaryConversions.penniesToPounds((new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(caseData.getJoAmountCostOrdered())))).toString())
+                .append(MonetaryConversions.penniesToPounds(totalAmount).toString())
                 .append(" in ")
                 .append(getStringPaymentFrequency(instalmentDetails))
                 .append(" instalments of £ ")
                 .append(MonetaryConversions.penniesToPounds((new BigDecimal(instalmentDetails.getAmount()))).toString())
                 .append(" The first payment is due on ")
-                .append(instalmentDetails.getStartDate());
+                .append(instalmentDetails.getStartDate())
+                .append(".");
         }
         return paymentFrequencyMessage;
     }
