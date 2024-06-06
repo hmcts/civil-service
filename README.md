@@ -114,7 +114,7 @@ It is also possible to add two labels to a PR to target multiple journeys. For e
 
 If no functional test label has been added to a PR, the full set of regression tests (api-nonprod) will be run.
 
-For more details, please refer to this confluence page which lists the full range of functional test labels, and the tests each ft label runs: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
+For more details about the functional test labels available, the tests that run under each label, and the guidelines for using them, please refer to this confluence page: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
 
 
 ## Contract testing
