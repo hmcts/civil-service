@@ -104,7 +104,7 @@ To access Camunda visit url (login and password are both `admin`):
 
 
 ### PR Labels for targeted testing
-There are a variety of labels that can be added to PRs for the purpose of running subsects of functional tests, relevant to specific journeys. All functional test labels begin with the pr_ft_ prefix.
+There are a variety of labels that can be added to PRs for the purpose of running sub-groups of functional tests, relevant to specific journeys. All functional test labels begin with the pr_ft_ prefix.
 
 Adding a functional test label allows the user to run a greater amount of tests relevant to the journey where changes are being made, and reduces the amount of time taken to run a build. 
 
