@@ -125,8 +125,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             if (featureToggleService.isEarlyAdoptersEnabled()
                 && (Objects.isNull(caseData.getCaseManagementLocation())
                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                      .getBaseLocation()))
-            )) {
+                                                                                      .getBaseLocation())))) {
                 errors.add(NOT_IN_EA_REGION);
             }
         }
