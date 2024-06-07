@@ -11,6 +11,8 @@ public interface DQ {
 
     FixedRecoverableCosts getFixedRecoverableCosts();
 
+    FixedRecoverableCosts getFixedRecoverableCostsIntermediate();
+
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 
     DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments();
