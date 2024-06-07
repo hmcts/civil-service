@@ -103,6 +103,7 @@ public class BundleApiConsumerTest {
     }
 
     private BundleCreateRequest getBundleCreateRequest() {
+
         return BundleCreateRequest.builder()
             .caseTypeId("caseTypeId")
             .jurisdictionId("jurisdictionId")
@@ -110,8 +111,8 @@ public class BundleApiConsumerTest {
                              .caseData(BundlingCaseData.builder()
                                            .bundleConfiguration("bundleConfiguration")
                                            .id(666)
-                                           /* .trialDocuments(List.of(getTestElement()))
-                                            .statementsOfCaseDocuments(List.of(getTestElement()))
+                                           .trialDocuments(List.of(getTestElement()))
+                                           .statementsOfCaseDocuments(List.of(getTestElement()))
                                            .directionsQuestionnaires(List.of(getTestElement()))
                                            .particularsOfClaim(List.of(getTestElement()))
                                            .ordersDocuments(List.of(getTestElement()))
@@ -133,12 +134,12 @@ public class BundleApiConsumerTest {
                                            .defendant1CostsBudgets(List.of(getTestElement()))
                                            .defendant2CostsBudgets(List.of(getTestElement()))
                                            .systemGeneratedCaseDocuments(List.of(getTestElement()))
-                                          .applicant1(getParty("applicant1"))
-                                            .hasApplicant2(true)
-                                            .applicant2(getParty("applicant2"))
-                                            .respondent1(getParty("respondent1"))
-                                            .hasRespondant2(true)
-                                            .respondent2(getParty("respondent2"))*/
+                                           .applicant1(getParty("applicant1"))
+                                           .hasApplicant2(true)
+                                           .applicant2(getParty("applicant2"))
+                                           .respondent1(getParty("respondent1"))
+                                           .hasRespondant2(true)
+                                           .respondent2(getParty("respondent2"))
                                            .hearingDate("2002-01-01")
                                            .ccdCaseReference(66666L)
                                            .build())
@@ -148,7 +149,7 @@ public class BundleApiConsumerTest {
 
     private Party getParty(String applicant) {
         return Party.builder()
-            .partyID(UUID.randomUUID().toString())
+            .partyID("partyID")
             .type(Party.Type.COMPANY)
             .individualTitle("Mr")
             .individualFirstName(applicant)
@@ -173,7 +174,7 @@ public class BundleApiConsumerTest {
     }
 
     private List<Element<UnavailableDate>> getUnavailableTestDates() {
-        return List.of(Element.<UnavailableDate>builder().id(UUID.randomUUID())
+        return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
                            .value(UnavailableDate.builder()
                                       .who("who")
                                       .date(LocalDate.now())
@@ -197,9 +198,9 @@ public class BundleApiConsumerTest {
             .build();
     }
 
-    private static Element<BundlingRequestDocument> getTestElement() {
+    private Element<BundlingRequestDocument> getTestElement() {
         return Element.<BundlingRequestDocument>builder()
-            .id(UUID.randomUUID())
+            .id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
             .value(BundlingRequestDocument.builder()
                        .documentFileName("docFileName")
                        .documentLink(DocumentLink.builder()
@@ -214,32 +215,35 @@ public class BundleApiConsumerTest {
 
     static DslPart buildBundleCreateResponseDsl() {
         return newJsonBody(response ->
-            response
-                .numberType("documentTaskId", 123)
-                .object("data", bundleData ->
-                    bundleData
-                        .minArrayLike("caseBundles", 1, caseBundle ->
-                            caseBundle
-                                .object("value", bundleDetails ->
-                                    bundleDetails
-                                        .stringType("id", "id")
-                                        .stringType("title", "title")
-                                        .stringType("description", "description")
-                                        .stringType("stitchStatus", "stitchStatus")
-                                        .stringType("fileName", "fileName")
-                                        .date("createdOn", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                                        .date("bundleHearingDate", "yyyy-MM-dd")
-                                        .object("stitchedDocument", stitchedDocument ->
-                                            stitchedDocument
-                                                .stringType("document_url", "documentStitchedUrl")
-                                                .stringType("document_binary_url", "documentBinaryUrl")
-                                                .stringType("document_filename", "documentFileName")
-                                                .stringType("document_hash", "documentHash")
-                                                .stringType("category_id", "categoryID")
-                                        )
-                                )
-                        )
-                )
+                               response
+                                   .numberType("documentTaskId", 123)
+                                   .object("data", bundleData ->
+                                       bundleData
+                                           .minArrayLike("caseBundles", 1, caseBundle ->
+                                               caseBundle
+                                                   .object("value", bundleDetails ->
+                                                       bundleDetails
+                                                           .stringType("id", "id")
+                                                           .stringType("title", "title")
+                                                           .stringType("description", "description")
+                                                           .stringType("stitchStatus", "stitchStatus")
+                                                           .stringType("fileName", "fileName")
+                                                           .date("createdOn", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                                                           .date("bundleHearingDate", "yyyy-MM-dd")
+                                                           .object("stitchedDocument", stitchedDocument ->
+                                                               stitchedDocument
+                                                                   .stringType("document_url", "documentStitchedUrl")
+                                                                   .stringType(
+                                                                       "document_binary_url",
+                                                                       "documentBinaryUrl"
+                                                                   )
+                                                                   .stringType("document_filename", "documentFileName")
+                                                                   .stringType("document_hash", "documentHash")
+                                                                   .stringType("category_id", "categoryID")
+                                                           )
+                                                   )
+                                           )
+                                   )
         ).build();
     }
 
