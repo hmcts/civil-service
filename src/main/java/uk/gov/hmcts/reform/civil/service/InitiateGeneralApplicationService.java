@@ -220,6 +220,7 @@ public class InitiateGeneralApplicationService {
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
+            .generalAppAskForCosts(caseData.getGeneralAppAskForCosts())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .generalAppSuperClaimType(caseType.name())
