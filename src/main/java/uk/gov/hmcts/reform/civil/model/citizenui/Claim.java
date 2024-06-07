@@ -90,6 +90,10 @@ public interface Claim {
 
     boolean isSDOOrderLegalAdviserCreated();
 
+    boolean isSDOOrderInReview();
+
+    boolean isSDOOrderInReviewOtherParty();
+
     boolean isClaimantDefaultJudgement();
 
     boolean isPartialAdmissionAccepted();

@@ -305,7 +305,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated();
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty();
     }
 
     @Override
@@ -314,7 +316,32 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty();
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return featureToggleService.isDashboardServiceEnabled()
+            && caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES);
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return featureToggleService.isDashboardServiceEnabled()
+            && caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isSDOOrderInReview();
     }
 
     @Override

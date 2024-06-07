@@ -47,6 +47,12 @@ public class CaseDataLiP {
     @JsonProperty("applicant1ClaimSettledDate")
     private LocalDate applicant1ClaimSettledDate;
 
+    @JsonProperty("requestForReviewCommentsClaimant")
+    private String requestForReviewCommentsClaimant;
+
+    @JsonProperty("requestForReviewCommentsDefendant")
+    private String requestForReviewCommentsDefendant;
+
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
