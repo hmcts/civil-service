@@ -139,4 +139,8 @@ public class FeatureToggleService {
         return locationEpimms != null && featureToggleApi
             .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
     }
+
+    public boolean isGenAppsAllowedPreSdo() {
+        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
+    }
 }

@@ -217,6 +217,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
+        when(featureToggleService.isGenAppsAllowedPreSdo()).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -254,6 +255,23 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenEpimsIdIsNotAValidRegionAndPreSdoRolloutFalse() {
+        // National rollout applies to all courts post sdo, except Birmingham
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("231596")
+                                        .region("2").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+        when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(false);
+        when(featureToggleService.isGenAppsAllowedPreSdo()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
     }
 
     @Nested

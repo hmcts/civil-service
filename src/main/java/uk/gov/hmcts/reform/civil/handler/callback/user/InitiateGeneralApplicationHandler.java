@@ -121,6 +121,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 errors.add(NOT_IN_EA_REGION);
             }
+            if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
+                errors.add(NOT_IN_EA_REGION);
+            }
         } else {
             if (featureToggleService.isEarlyAdoptersEnabled()
                 && (Objects.isNull(caseData.getCaseManagementLocation())

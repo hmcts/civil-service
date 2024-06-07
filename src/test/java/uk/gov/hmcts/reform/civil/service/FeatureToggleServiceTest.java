@@ -273,6 +273,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_isGenAppsAllowedPreSdo(Boolean toggleStat) {
+        var caseFlagsKey = "ga-allowed-pre-sdo";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
