@@ -32,6 +32,8 @@ class NotifyDefendantJudgmentByAdmissionNotificationHandlerTest extends BaseCall
 
     public static final String TEMPLATE_ID = "template-id";
 
+    private static final String REFERENCE_NUMBER = "8372942374";
+
     @MockBean
     private NotificationService notificationService;
 
@@ -46,14 +48,14 @@ class NotifyDefendantJudgmentByAdmissionNotificationHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            //TODO: Change when the notificationproperties in commons will be modify
-            when(notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyDefendantLIPJudgmentByAdmissionTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
         void shouldNotifyDefendantLip_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .atStateClaimDraft()
                 .specClaim1v1LrVsLip()
                 .buildJudmentOnlineCaseDataWithPaymentImmediately();
 
@@ -62,10 +64,10 @@ class NotifyDefendantJudgmentByAdmissionNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentLip@example.com",
+                "sole.trader@email.com",
                 TEMPLATE_ID,
                 getLipNotificationDataMap(caseData),
-                "defendant-judgment-by-admission-000DC001"
+                "defendant-judgment-by-admission-8372942374"
             );
         }
     }

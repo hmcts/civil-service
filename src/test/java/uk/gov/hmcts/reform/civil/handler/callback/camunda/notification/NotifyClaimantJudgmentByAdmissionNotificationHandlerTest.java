@@ -10,15 +10,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -27,9 +26,12 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -40,6 +42,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
+
+    private static final String REFERENCE_NUMBER = "8372942374";
 
     @MockBean
     private NotificationService notificationService;
@@ -58,16 +62,17 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
 
         @BeforeEach
         void setup() {
-            //TODO: Change when the notificationproperties in commons will be modify
-            when(notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyClaimantLRJudgmentByAdmissionTemplate()).thenReturn(
                 TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
         void shouldNotifyClaimantJudgmentByAdmission_whenInvoked() {
+
             CaseData caseData = CaseDataBuilder.builder()
-                .specClaim1v1LrVsLip()
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .atStateClaimDraft()
+                .applicant1Represented(YesOrNo.YES)
                 .buildJudmentOnlineCaseDataWithPaymentImmediately();
 
 
@@ -85,7 +90,7 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "claimant-judgment-by-admission-000DC001"
+                "claimant-judgment-by-admission-8372942374"
             );
         }
     }
