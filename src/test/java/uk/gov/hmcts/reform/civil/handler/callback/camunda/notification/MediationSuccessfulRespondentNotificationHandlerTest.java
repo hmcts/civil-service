@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_ONE;
@@ -64,6 +65,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     private MediationSuccessfulRespondentNotificationHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
+    public static final String TEMPLATE_ID_LIP_LR = "template-id-lip-v-lr";
     public static final String RESPONDENT_MAIL = "respondentsolicitor@example.com";
     private static final String REFERENCE_NUMBER = "8372942374";
     public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION = "notification-mediation-successful-defendant-LIP-" + REFERENCE_NUMBER;
@@ -84,6 +86,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             when(organisationDetailsService.getRespondent2LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim()).thenReturn(TEMPLATE_ID_LIP_LR);
         }
 
         @Test
@@ -97,6 +100,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -349,6 +353,95 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 TEMPLATE_ID,
                 lipDefendantProperties(caseData),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION
+            );
+        }
+
+        @Test
+        void shouldNotifyDefendantLipVLrNotifyDefendant_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .applicant1Represented(NO)
+                .specRespondent1Represented(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(
+                    CallbackRequest
+                        .builder()
+                        .eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
+                        .build())
+                .build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                RESPONDENT_MAIL,
+                TEMPLATE_ID_LIP_LR,
+                lrDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
+            );
+        }
+
+        @Test
+        void shouldNotifyDefendantLrVLipNotifyDefendant_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YES)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-successful-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotSendNotificationToDefendantForLipVLip_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(NO)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-successful-respondent-notification-000DC001"
             );
         }
 
