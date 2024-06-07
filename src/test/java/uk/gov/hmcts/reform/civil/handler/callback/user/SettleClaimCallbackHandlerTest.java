@@ -73,7 +73,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        public void Should_include_header_and_body() {
+        void should_include_header_and_body() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
