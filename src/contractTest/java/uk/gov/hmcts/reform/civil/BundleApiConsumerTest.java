@@ -46,25 +46,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "em_newBundle", port = "8084")
-@ExtendWith(PactConsumerTestExt.class)
-@ActiveProfiles("integration-test")
-@SpringBootTest
-public class BundleApiConsumerTest {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String SERVICE_AUTHORIZATION_HEADER = "ServiceAuthorization";
-    private static final String AUTHORIZATION_TOKEN = "Bearer some-access-token";
-    private static final String SERVICE_AUTH_TOKEN = "someServiceAuthToken";
+public class BundleApiConsumerTest extends BaseContractTest {
+
     public static final String ENDPOINT = "/api/new-bundle";
 
     @Autowired
     private BundleApiClient bundleApiClient;
-    private ObjectMapper objectMapper = JsonMapper
-        .builder()
-        .addModule(new JavaTimeModule())
-        .addModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .build();
 
     @Pact(consumer = "civil-service")
     public RequestResponsePact postCreateBundleServiceRequest(PactDslWithProvider builder)
@@ -74,8 +61,7 @@ public class BundleApiConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "postCreateBundleServiceRequest")
-    public void verifyNewBundle() throws IOException {
-        String json = createJsonObject(getBundleCreateRequest());
+    public void verifyNewBundle() {
         BundleCreateResponse response = bundleApiClient.createBundleServiceRequest(
             AUTHORIZATION_TOKEN,
             SERVICE_AUTH_TOKEN,
