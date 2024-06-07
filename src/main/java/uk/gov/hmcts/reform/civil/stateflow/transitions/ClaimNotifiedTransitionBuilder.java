@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
+import java.util.function.Predicate;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.hasNotifiedClaimDetailsToBoth;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
@@ -29,4 +33,10 @@ public class ClaimNotifiedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
             .onlyWhen(pastClaimDetailsNotificationDeadline);
     }
+
+    public static final Predicate<CaseData> claimDetailsNotified = caseData ->
+        !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.getClaimDetailsNotificationDate() != null
+            && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
+            || hasNotifiedClaimDetailsToBoth.test(caseData));
 }

@@ -11,19 +11,17 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @Component
@@ -93,4 +91,36 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                 .and(specClaim));
     }
 
+    public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
+        caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
+
+    public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
+        caseData.getIssueDate() != null
+            && caseData.getRespondent1OrgRegistered() == NO
+            && caseData.getRespondent1Represented() == YES;
+
+    public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
+        caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
+
+    public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
+        caseData.getIssueDate() != null
+            && caseData.getRespondent2Represented() == YES
+            && caseData.getRespondent2OrgRegistered() != YES;
+
+    public static final Predicate<CaseData> bothDefSameLegalRep = caseData ->
+        caseData.getRespondent2SameLegalRepresentative() == YES;
+
+    public static final Predicate<CaseData> oneVsOneCase = caseData ->
+        getPredicateFor1v1Case(caseData);
+
+    private static boolean getPredicateFor1v1Case(CaseData caseData) {
+        return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
+
+    public static final Predicate<CaseData> multipartyCase = caseData ->
+        getPredicateForMultipartyCase(caseData);
+
+    private static boolean getPredicateForMultipartyCase(CaseData caseData) {
+        return isMultiPartyScenario(caseData);
+    }
 }

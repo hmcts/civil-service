@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentFailedTransitionBuilderTest {
+public class MediationUnsuccessfulProceedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,30 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedPaymentFailedTransitionBuilder claimIssuedPaymentFailedTransitionBuilder = new ClaimIssuedPaymentFailedTransitionBuilder(
+        MediationUnsuccessfulProceedTransitionBuilder builder = new MediationUnsuccessfulProceedTransitionBuilder(
             mockFeatureToggleService);
-        result = claimIssuedPaymentFailedTransitionBuilder.buildTransitions();
+        result = builder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(5);
 
-        assertTransition(result.get(0), "MAIN.CLAIM_ISSUED_PAYMENT_FAILED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(0), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.IN_HEARING_READINESS");
+        assertTransition(result.get(1), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE");
+        assertTransition(result.get(2), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(3), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.TAKEN_OFFLINE_AFTER_SDO");
+        assertTransition(result.get(4), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
+    }
+
+    @Test
+    void shouldCorrectlyAssignSourceAndTargetStates() {
+        assertThat(result).isNotEmpty();
+
+        for (Transition transition : result) {
+            assertTransition(transition, transition.getSourceState(), transition.getTargetState());
+        }
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

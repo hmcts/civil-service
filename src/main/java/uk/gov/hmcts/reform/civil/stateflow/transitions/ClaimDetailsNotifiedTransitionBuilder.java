@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
+import java.util.function.Predicate;
+
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
@@ -13,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHear
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -52,5 +56,30 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
             .onlyWhen(caseDismissedAfterDetailNotified)
             .moveTo(IN_HEARING_READINESS).onlyWhen(isInHearingReadiness)
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterClaimDetailsNotified);
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified = caseData ->
+        getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(caseData);
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() == null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+        };
     }
 }

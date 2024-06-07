@@ -2,20 +2,17 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.util.Map;
+import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueHwF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
@@ -61,4 +58,27 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                 )));
     }
+
+    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
+        caseData.isBilingual();
+
+    public static final Predicate<CaseData> claimIssueHwF = caseData ->
+        caseData.isHelpWithFees();
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
+        getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
+        // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
+        return caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getClaimNotificationDeadline() == null
+            && caseData.getClaimNotificationDate() == null
+            && caseData.getSubmittedDate() != null;
+    }
+
+    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
+
+    public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
+
+
 }

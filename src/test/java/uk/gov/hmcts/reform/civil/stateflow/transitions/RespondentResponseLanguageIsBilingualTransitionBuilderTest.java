@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentFailedTransitionBuilderTest {
+public class RespondentResponseLanguageIsBilingualTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,20 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedPaymentFailedTransitionBuilder claimIssuedPaymentFailedTransitionBuilder = new ClaimIssuedPaymentFailedTransitionBuilder(
+        RespondentResponseLanguageIsBilingualTransitionBuilder builder = new RespondentResponseLanguageIsBilingualTransitionBuilder(
             mockFeatureToggleService);
-        result = claimIssuedPaymentFailedTransitionBuilder.buildTransitions();
+        result = builder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(4);
 
-        assertTransition(result.get(0), "MAIN.CLAIM_ISSUED_PAYMENT_FAILED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(0), "MAIN.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL", "MAIN.FULL_DEFENCE");
+        assertTransition(result.get(1), "MAIN.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL", "MAIN.PART_ADMISSION");
+        assertTransition(result.get(2), "MAIN.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL", "MAIN.FULL_ADMISSION");
+        assertTransition(result.get(3), "MAIN.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL", "MAIN.COUNTER_CLAIM");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentFailedTransitionBuilderTest {
+public class PendingClaimIssuedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,17 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedPaymentFailedTransitionBuilder claimIssuedPaymentFailedTransitionBuilder = new ClaimIssuedPaymentFailedTransitionBuilder(
+        PendingClaimIssuedTransitionBuilder builder = new PendingClaimIssuedTransitionBuilder(
             mockFeatureToggleService);
-        result = claimIssuedPaymentFailedTransitionBuilder.buildTransitions();
+        result = builder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
         assertThat(result).hasSize(1);
 
-        assertTransition(result.get(0), "MAIN.CLAIM_ISSUED_PAYMENT_FAILED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(0), "MAIN.PENDING_CLAIM_ISSUED", "MAIN.CLAIM_ISSUED");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

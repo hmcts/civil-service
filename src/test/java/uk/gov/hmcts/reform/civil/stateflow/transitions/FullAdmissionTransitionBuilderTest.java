@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentFailedTransitionBuilderTest {
+public class FullAdmissionTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,23 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedPaymentFailedTransitionBuilder claimIssuedPaymentFailedTransitionBuilder = new ClaimIssuedPaymentFailedTransitionBuilder(
-            mockFeatureToggleService);
-        result = claimIssuedPaymentFailedTransitionBuilder.buildTransitions();
+        FullAdmissionTransitionBuilder builder = new FullAdmissionTransitionBuilder(mockFeatureToggleService);
+        result = builder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(8);
 
-        assertTransition(result.get(0), "MAIN.CLAIM_ISSUED_PAYMENT_FAILED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(0), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_PAY_IMMEDIATELY");
+        assertTransition(result.get(1), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_PROCEED");
+        assertTransition(result.get(2), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_NOT_PROCEED");
+        assertTransition(result.get(3), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_AGREE_REPAYMENT");
+        assertTransition(result.get(4), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_REJECT_REPAYMENT");
+        assertTransition(result.get(5), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_JUDGMENT_ADMISSION");
+        assertTransition(result.get(6), "MAIN.FULL_ADMISSION", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(7), "MAIN.FULL_ADMISSION", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

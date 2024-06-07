@@ -1,28 +1,33 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
+import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantSettleTheClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.demageMultiClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isCarmApplicableLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
@@ -77,4 +82,81 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
             .onlyWhen(applicantOutOfTime);
     }
+
+    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
+        getPredicateIfLipCaseCarmApplicable(caseData);
+
+    private static boolean getPredicateIfLipCaseCarmApplicable(CaseData caseData) {
+        boolean basePredicate = getCarmEnabledForDate(caseData) && isSpecSmallClaim(caseData)
+            && caseData.getRespondent2() == null;
+        if (basePredicate) {
+            basePredicate = NO.equals(caseData.getApplicant1Represented())
+                || NO.equals(caseData.getRespondent1Represented());
+        }
+        return basePredicate;
+    }
+
+    private static boolean isSpecSmallClaim(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
+    private static boolean getCarmEnabledForDate(CaseData caseData) {
+        // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
+    }
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
+        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getApplicant1ResponseDate() == null;
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && YES.equals(caseData.getAddApplicant2())) {
+            return basePredicate && caseData.getApplicant2ResponseDate() == null;
+        }
+
+        return basePredicate;
+    }
+
+    public static final Predicate<CaseData> demageMultiClaim = caseData ->
+        AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+            && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+
+    public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
+        boolean result = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
+            if (caseData.getRespondent2() != null
+                && caseData.getRespondent2SameLegalRepresentative().equals(NO)
+                && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
+                result = false;
+            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent()
+                || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent() || caseData.hasClaimantAgreedToFreeMediation()) {
+                result = false;
+            } else {
+                result = true;
+            }
+        }
+        return result;
+    };
+
+    public static final Predicate<CaseData> declinedMediation = CaseData::hasClaimantNotAgreedToFreeMediation;
+
+    public static final Predicate<CaseData> isClaimantNotSettleFullDefenceClaim =
+        CaseData::isClaimantIntentionNotSettlePartAdmit;
+
+    public static final Predicate<CaseData> isClaimantSettleTheClaim =
+        CaseData::isClaimantIntentionSettlePartAdmit;
+
+    public static final Predicate<CaseData> isDefendantNotPaidFullDefenceClaim =
+        CaseData::isFullDefenceNotPaid;
+
 }

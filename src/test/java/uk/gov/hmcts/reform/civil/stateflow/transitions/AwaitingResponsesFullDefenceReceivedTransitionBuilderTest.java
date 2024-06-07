@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentFailedTransitionBuilderTest {
+public class AwaitingResponsesFullDefenceReceivedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,20 @@ public class ClaimIssuedPaymentFailedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedPaymentFailedTransitionBuilder claimIssuedPaymentFailedTransitionBuilder = new ClaimIssuedPaymentFailedTransitionBuilder(
+        AwaitingResponsesFullDefenceReceivedTransitionBuilder awaitingResponsesFullDefenceReceivedTransitionBuilder = new AwaitingResponsesFullDefenceReceivedTransitionBuilder(
             mockFeatureToggleService);
-        result = claimIssuedPaymentFailedTransitionBuilder.buildTransitions();
+        result = awaitingResponsesFullDefenceReceivedTransitionBuilder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(4);
 
-        assertTransition(result.get(0), "MAIN.CLAIM_ISSUED_PAYMENT_FAILED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
+        assertTransition(result.get(0), "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED", "MAIN.ALL_RESPONSES_RECEIVED");
+        assertTransition(result.get(1), "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED", "MAIN.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED");
+        assertTransition(result.get(2), "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(3), "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED", "MAIN.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
