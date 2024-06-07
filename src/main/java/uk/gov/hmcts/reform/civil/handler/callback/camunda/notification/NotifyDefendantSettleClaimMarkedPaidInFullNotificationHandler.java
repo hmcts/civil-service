@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLeg
 
 @Service
 @RequiredArgsConstructor
-public class NotifySettleClaimMarkedPaidInFullNotificationHandler extends CallbackHandler
+public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandler extends CallbackHandler
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_SOLICITOR1_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL,
@@ -87,14 +87,14 @@ public class NotifySettleClaimMarkedPaidInFullNotificationHandler extends Callba
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
             );
     }
 
     private Map<String, String> addRespondent2Properties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
+            LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
         );
     }
 
