@@ -217,8 +217,8 @@ task contract(type: Test) {
   useJUnitPlatform()
   description = "Runs pact contract tests"
   group = "Delivery pipeline"
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+  setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
+  setClasspath(sourceSets.contractTest.runtimeClasspath)
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -454,11 +454,13 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
 
   // dashboard specific changes
 
@@ -467,8 +469,6 @@ dependencies {
   testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
   // dashboard specific changes ends
 
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

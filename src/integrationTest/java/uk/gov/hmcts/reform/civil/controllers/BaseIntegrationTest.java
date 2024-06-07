@@ -27,8 +27,6 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
