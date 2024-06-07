@@ -20,7 +20,9 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @SpringBootTest(classes = {
@@ -71,7 +73,6 @@ class NotifyDefendantJudgmentByAdmissionNotificationHandlerTest extends BaseCall
             );
         }
     }
-
 
     public Map<String, String> getLipNotificationDataMap(CaseData caseData) {
         return Map.of(
