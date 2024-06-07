@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -24,6 +27,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
@@ -60,6 +67,21 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
             params.put("applicant1ResponseDeadlineCy",
                        DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+        }
+
+        if (featureToggleService.isJudgmentOnlineLive()
+            && nonNull(caseData.getActiveJudgment())
+            && caseData.getActiveJudgment().getState().equals(ISSUED)
+            && nonNull(caseData.getActiveJudgment().getPaymentPlan())
+            && caseData.getActiveJudgment().getPaymentPlan().getType().equals(PAY_IN_INSTALMENTS)) {
+
+            JudgmentDetails judgmentDetails = caseData.getActiveJudgment();
+            JudgmentInstalmentDetails instalmentDetails = judgmentDetails.getInstalmentDetails();
+
+            params.put("ccjDefendantAdmittedAmount", MonetaryConversions.penniesToPounds(new BigDecimal(judgmentDetails.getOrderedAmount())));
+            params.put("ccjPaymentFrequency", getStringPaymentFrequency(instalmentDetails.getPaymentFrequency()));
+            params.put("ccjInstallmentAmount", MonetaryConversions.penniesToPounds(new BigDecimal(instalmentDetails.getAmount())));
+            params.put("ccjFirstRepaymentDateEn", DateUtils.formatDate(instalmentDetails.getStartDate()));
         }
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
@@ -221,7 +243,22 @@ public class DashboardNotificationsParamsMapper {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
 
+        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
+            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
+            params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
+            params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
+        }
+
         return params;
+    }
+
+    private String getStringPaymentFrequency(PaymentFrequency paymentFrequency) {
+        return switch (paymentFrequency) {
+            case WEEKLY -> "weekly";
+            case EVERY_TWO_WEEKS -> "biweekly";
+            case MONTHLY -> "monthly";
+            default -> "";
+        };
     }
 
     private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
