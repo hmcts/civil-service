@@ -73,7 +73,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
         }
         if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
             return SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario();
-        };
+        }
         return null;
     }
 
