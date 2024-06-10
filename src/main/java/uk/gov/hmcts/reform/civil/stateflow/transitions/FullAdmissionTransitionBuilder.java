@@ -1,18 +1,22 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 
+import java.util.function.Predicate;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
@@ -37,16 +41,29 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(FULL_ADMIT_PROCEED).onlyWhen(fullDefenceProceed)
             .moveTo(FULL_ADMIT_NOT_PROCEED).onlyWhen(fullDefenceNotProceed)
             .moveTo(FULL_ADMIT_AGREE_REPAYMENT).onlyWhen(acceptRepaymentPlan)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-            })
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
             .moveTo(FULL_ADMIT_REJECT_REPAYMENT).onlyWhen(rejectRepaymentPlan)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-            })
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyWhen(ccjRequestJudgmentByAdmission.and(isPayImmediately))
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaff)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
             .onlyWhen(applicantOutOfTime);
     }
+
+    public static final Predicate<CaseData> fullAdmitPayImmediately = FullAdmissionTransitionBuilder::getPredicateForPayImmediately;
+
+    private static boolean getPredicateForPayImmediately(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
+                predicate = null != caseData.getWhenToBePaidText()
+                    &&  null == caseData.getApplicant1ProceedWithClaim();
+            }
+        }
+        return predicate;
+    }
+
+    public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
+
+
 }

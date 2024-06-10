@@ -1,22 +1,18 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.util.Map;
+import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted1v1RespondentOneUnregistered;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRegisteredRespondentRepresentatives;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
 public abstract class DraftTransitionBuilder extends TransitionBuilder {
@@ -100,4 +96,56 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )));
     }
+
+    public static final Predicate<CaseData> claimSubmittedOneRespondentRepresentative = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() != NO
+            && (caseData.getAddRespondent2() == null
+            || caseData.getAddRespondent2() == NO
+            || (caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES));
+
+    public static final Predicate<CaseData> claimSubmittedTwoRegisteredRespondentRepresentatives = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == NO
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent2OrgRegistered() == YES;
+
+    public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentativesOneUnregistered = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == NO
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2Represented() == YES
+            && ((caseData.getRespondent1OrgRegistered() == YES && caseData.getRespondent2OrgRegistered() == NO)
+            || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
+
+    public static final Predicate<CaseData> claimSubmitted1v1RespondentOneUnregistered = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == NO
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedOneUnrepresentedDefendantOnly = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() != YES;
+
+    public static final Predicate<CaseData> claimSubmittedRespondent1Unrepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedRespondent2Unrepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2Represented() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedBothUnregisteredSolicitors = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1OrgRegistered() == NO
+            && (caseData.getAddRespondent2() == YES && caseData.getRespondent2OrgRegistered() == NO
+            && (caseData.getRespondent2SameLegalRepresentative() == NO
+            || caseData.getRespondent2SameLegalRepresentative() == null));
 }

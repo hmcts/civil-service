@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
+import java.util.function.Predicate;
+
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
@@ -28,4 +31,11 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilder extends M
             .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyWhen(takenOfflineBySystem
                 .and(specClaim));
     }
+
+    public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
+        (caseData.getDefendant1LIPAtClaimIssued() != null
+            && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            ||
+            (caseData.getDefendant2LIPAtClaimIssued() != null
+                && caseData.getDefendant2LIPAtClaimIssued() == YES);
 }

@@ -50,13 +50,9 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PART_ADMIT_PAY_IMMEDIATELY).onlyWhen(partAdmitPayImmediately)
             .moveTo(PART_ADMIT_AGREE_SETTLE).onlyWhen(agreePartAdmitSettle)
             .moveTo(PART_ADMIT_AGREE_REPAYMENT).onlyWhen(acceptRepaymentPlan)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-            })
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
             .moveTo(PART_ADMIT_REJECT_REPAYMENT).onlyWhen(rejectRepaymentPlan)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-            })
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)))
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaff)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
             .onlyWhen(applicantOutOfTime);
@@ -66,5 +62,8 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
         CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
+
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
+        CaseData::isClaimantNotSettlePartAdmitClaim;
 
 }

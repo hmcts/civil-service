@@ -58,8 +58,8 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterClaimDetailsNotified);
     }
 
-    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified = caseData ->
-        getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(caseData);
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified =
+        ClaimDetailsNotifiedTransitionBuilder::getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified;
 
     private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {

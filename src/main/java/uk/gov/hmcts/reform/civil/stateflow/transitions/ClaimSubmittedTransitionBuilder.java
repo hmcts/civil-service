@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -10,8 +11,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
@@ -59,16 +60,21 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                 )));
     }
 
-    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
-        caseData.isBilingual();
+    public static final Predicate<CaseData> paymentFailed = caseData ->
+        !caseData.isApplicantNotRepresented()
+            && (caseData.getPaymentSuccessfulDate() == null
+            && (caseData.getPaymentDetails() != null
+            && caseData.getPaymentDetails().getStatus() == FAILED)
+            || (caseData.getClaimIssuedPaymentDetails() != null
+            && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
 
-    public static final Predicate<CaseData> claimIssueHwF = caseData ->
-        caseData.isHelpWithFees();
+    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isBilingual;
 
-    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
-        getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+    public static final Predicate<CaseData> claimIssueHwF = CaseData::isHelpWithFees;
 
-    public static final boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = ClaimSubmittedTransitionBuilder::getPredicateTakenOfflineByStaffBeforeClaimIssue;
+
+    public static boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
         // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
         return caseData.getTakenOfflineByStaffDate() != null
             && caseData.getClaimNotificationDeadline() == null

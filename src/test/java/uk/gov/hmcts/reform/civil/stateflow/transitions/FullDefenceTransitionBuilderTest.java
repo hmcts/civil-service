@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isCarmApplicableLipCase;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.declinedMediation;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.demageMultiClaim;
@@ -535,6 +536,15 @@ public class FullDefenceTransitionBuilderTest {
             .build();
 
         assertFalse(isDefendantNotPaidFullDefenceClaim.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenLipClaimantDoesNotSettle() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateLipClaimantDoesNotSettle()
+            .setClaimTypeToSpecClaim()
+            .build();
+        assertTrue(lipFullDefenceProceed.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

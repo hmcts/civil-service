@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueHwF;
@@ -51,6 +52,24 @@ public class ClaimSubmittedTransitionBuilderTest {
         assertTransition(result.get(3), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(4), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(5), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseDataAtIssuedStateClaimIssuedPayment() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
+        assertTrue(paymentFailed.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseDataAtIssuedState() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
+        assertTrue(paymentFailed.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataIsAtDraftState() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        assertFalse(paymentFailed.test(caseData));
     }
 
     @Test

@@ -27,7 +27,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
@@ -83,8 +82,17 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(applicantOutOfTime);
     }
 
-    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
-        getPredicateIfLipCaseCarmApplicable(caseData);
+    public static final Predicate<CaseData> lipFullDefenceProceed = FullDefenceTransitionBuilder::getPredicateForLipClaimantIntentionProceed;
+
+    private static boolean getPredicateForLipClaimantIntentionProceed(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            predicate = NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
+        }
+        return predicate;
+    }
+
+    public static final Predicate<CaseData> isCarmApplicableLipCase = FullDefenceTransitionBuilder::getPredicateIfLipCaseCarmApplicable;
 
     private static boolean getPredicateIfLipCaseCarmApplicable(CaseData caseData) {
         boolean basePredicate = getCarmEnabledForDate(caseData) && isSpecSmallClaim(caseData)
@@ -106,10 +114,10 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
         return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
     }
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
-        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
+        FullDefenceTransitionBuilder::getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
 
-    public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
+    public static boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
         boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
             && caseData.getApplicant1ResponseDate() == null;
 

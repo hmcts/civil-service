@@ -12,16 +12,15 @@ import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @Component
@@ -79,6 +78,15 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                         .and(respondent2NotRepresented)));
     }
 
+    public static final Predicate<CaseData> pendingClaimIssued = caseData ->
+        caseData.getIssueDate() != null
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == YES
+            && (caseData.getRespondent2() == null
+            || (caseData.getRespondent2Represented() == YES
+            && (caseData.getRespondent2OrgRegistered() == YES
+            || caseData.getRespondent2SameLegalRepresentative() == YES)));
+
     @NotNull
     public static Predicate<CaseData> pendingClaimIssuedUnrepresentedDefendentPredicate() {
         return (respondent1NotRepresented.and(respondent2NotRepresented))
@@ -110,15 +118,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
     public static final Predicate<CaseData> bothDefSameLegalRep = caseData ->
         caseData.getRespondent2SameLegalRepresentative() == YES;
 
-    public static final Predicate<CaseData> oneVsOneCase = caseData ->
-        getPredicateFor1v1Case(caseData);
+    public static final Predicate<CaseData> oneVsOneCase = ClaimIssuedPaymentSuccessfulTransitionBuilder::getPredicateFor1v1Case;
 
     private static boolean getPredicateFor1v1Case(CaseData caseData) {
         return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
     }
 
-    public static final Predicate<CaseData> multipartyCase = caseData ->
-        getPredicateForMultipartyCase(caseData);
+    public static final Predicate<CaseData> multipartyCase = ClaimIssuedPaymentSuccessfulTransitionBuilder::getPredicateForMultipartyCase;
 
     private static boolean getPredicateForMultipartyCase(CaseData caseData) {
         return isMultiPartyScenario(caseData);

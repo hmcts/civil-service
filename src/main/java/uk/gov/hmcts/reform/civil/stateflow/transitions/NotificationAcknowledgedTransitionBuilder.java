@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -52,8 +53,8 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyWhen(takenOfflineSDONotDrawnAfterNotificationAcknowledged);
     }
 
-    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged = caseData ->
-        getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(caseData);
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged =
+        NotificationAcknowledgedTransitionBuilder::getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged;
 
     private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
@@ -75,44 +76,38 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
         };
     }
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = caseData ->
-        getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged =
+        NotificationAcknowledgedTransitionBuilder::getPredicateTakenOfflineByStaffAfterNotificationAcknowledged;
 
-    public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1ResponseDate() == null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() == null
-                    && caseData.getRespondent2ResponseDate() == null);
-            default:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1ResponseDate() == null);
-        }
+    public static boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
     }
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledged = caseData -> {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() == null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
-
-            default:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1ResponseDate() == null;
+        if (Objects.requireNonNull(getMultiPartyScenario(caseData)) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
         }
+        return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1ResponseDate() == null;
     };
 
     public static final Predicate<CaseData> reasonNotSuitableForSdo = caseData ->
