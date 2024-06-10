@@ -95,7 +95,6 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
             // TODO CIV-13814 not contemplated response 2 currently
             isLip = true;
-            isLipWelsh = false;
         }
         if (isLip) {
             if (isLipWelsh) {
@@ -113,11 +112,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private boolean getIsSameRespondentSolicitor(CaseData caseData) {
-        boolean isSameRespondentSolicitor = false;
-        if (taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            isSameRespondentSolicitor = true;
-        }
-        return isSameRespondentSolicitor;
+        return taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES;
     }
 
     private String getReceipientEmail(CaseData caseData) {

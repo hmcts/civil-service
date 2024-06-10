@@ -93,26 +93,30 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         }
 
         if (emailAddress != null && !emailAddress.isEmpty()) {
-            String emailTemplate;
-            if (isLiP) {
-                if ((isApplicant && caseData.isLipApplicantRequiringWelsh())
-                    || caseData.isLipDefendant1RequiringWelsh()) {
-                    emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
-                } else {
-                    emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();
-                }
-            } else {
-                emailTemplate = notificationsProperties.getOtherPartyTrialReady();
-            }
             notificationService.sendMail(
                 emailAddress,
-                emailTemplate,
+                getTemplate(caseData, isLiP, isApplicant),
                 isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplate(CaseData caseData, boolean isLiP, boolean isApplicant) {
+        String emailTemplate;
+        if (isLiP) {
+            if ((isApplicant && caseData.isLipApplicantRequiringWelsh())
+                || caseData.isLipDefendant1RequiringWelsh()) {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            emailTemplate = notificationsProperties.getOtherPartyTrialReady();
+        }
+        return emailTemplate;
     }
 
     private String getEmail(boolean isApplicant, boolean isRespondent2, boolean isLiP, CaseData caseData) {
