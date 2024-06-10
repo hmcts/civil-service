@@ -287,6 +287,7 @@ notifications:
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
   evidenceUploadLipTemplate: "3495a863-338f-49cf-99e8-b94bc457a9d4"
+  evidenceUploadLipTemplateWelsh: "b1697ce8-1318-44c3-895d-4714124eb6dd"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
