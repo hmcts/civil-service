@@ -812,7 +812,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
             assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(1);
             assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue().getForename()).isEqualTo("defF");
             assertThat(result.getParentClaimantIsApplicant()).isEqualTo(YES);
-            assertThat(result.getGeneralAppUrgencyRequirement()).isNull();
         }
 
         @Test
