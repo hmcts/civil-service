@@ -114,7 +114,7 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_1v1_LRvLR() {
+    void shouldNotReturn_error_when_claim_is_1v1_LRvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1UnrepresentedDefendantSpec()
             .respondent1Represented(YesOrNo.YES)
@@ -126,7 +126,7 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_1v1_LRvLiP() {
+    void shouldNotReturn_error_when_claim_is_1v1_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1UnrepresentedDefendantSpec()
             .build();
@@ -137,7 +137,7 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_1v2_LRvLR() {
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
             .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
@@ -149,7 +149,7 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_2v1_LRvLR() {
+    void shouldNotReturn_error_when_claim_is_2v1_LRvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted2v1RespondentUnrepresented()
             .respondent1Represented(YesOrNo.YES)
@@ -161,7 +161,7 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_2v1_LRvLiP() {
+    void shouldNotReturn_error_when_claim_is_2v1_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted2v1RespondentUnrepresented()
             .build();
