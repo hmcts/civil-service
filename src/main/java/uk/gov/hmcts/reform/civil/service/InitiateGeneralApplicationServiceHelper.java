@@ -124,13 +124,13 @@ public class InitiateGeneralApplicationServiceHelper {
         return applicationBuilder.build();
     }
 
-    private Boolean setSingleGaApplicant(List<CaseAssignedUserRole> applicantSolicitor,
+    private Boolean setSingleGaApplicant(List<CaseAssignmentUserRole> applicantSolicitor,
                                       GeneralApplication.GeneralApplicationBuilder applicationBuilder,
                                       GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder applicantBuilder,
                                       String applicant1OrgCaseRole,
                                       String respondent1OrgCaseRole,
                                       CaseData caseData) {
-        CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
+        CaseAssignmentUserRole applnSol = applicantSolicitor.get(0);
         Boolean isGaAppSameAsParentCaseClLip = null;
         if (applnSol.getCaseRole() != null) {
             if (applnSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
@@ -184,7 +184,7 @@ public class InitiateGeneralApplicationServiceHelper {
         }
     }
 
-    private List<Element<GASolicitorDetailsGAspec>> collectGaRespondentSolicitors(List<CaseAssignedUserRole> respondentSolicitors,
+    private List<Element<GASolicitorDetailsGAspec>> collectGaRespondentSolicitors(List<CaseAssignmentUserRole> respondentSolicitors,
                                                                                   GeneralApplication.GeneralApplicationBuilder applicationBuilder,
                                                                                   CaseData caseData,
                                                                                   String applicant1OrgCaseRole,
@@ -278,7 +278,7 @@ public class InitiateGeneralApplicationServiceHelper {
         Optional<CaseAssignmentUserRole> applicantSol = userRoles.getCaseAssignmentUserRoles().stream()
             .filter(CA -> CA.getUserId().equals(userDetails.getId())).findFirst();
         if (applicantSol.isPresent()) {
-            CaseAssignedUserRole applicantSolicitor = applicantSol.get();
+            CaseAssignmentUserRole applicantSolicitor = applicantSol.get();
             /*GA for Lips is only 1v1*/
             if (applicant1OrgCaseRole.equals(applicantSolicitor.getCaseRole())
                 || applicantSolicitor.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())) {
