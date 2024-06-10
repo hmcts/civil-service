@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
@@ -604,7 +605,13 @@ public class CaseDataBuilder {
 
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
+    private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
+
+    public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
+        this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
 
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
@@ -3110,6 +3117,15 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
             .build();
         addLegalRepDeadline = DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1LiPBilingual() {
+        atStateClaimIssued1v1LiP();
+        this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
+        this.caseDataLiP = CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
         return this;
     }
 
@@ -6496,6 +6512,111 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withApplicant1LRIndividualFlags() {
+        this.applicant1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1LRIndividualFlags() {
+        this.respondent1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2LRIndividualFlags() {
+        this.respondent2LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1OrgIndividualFlags() {
+        this.applicant1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2OrgIndividualFlags() {
+        this.applicant2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1OrgIndividualFlags() {
+        this.respondent1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2OrgIndividualFlags() {
+        this.respondent2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
     public List<Element<FlagDetail>> flagDetails() {
         FlagDetail details1 = FlagDetail.builder()
             .name("Vulnerable user")
@@ -7081,7 +7202,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
+    public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
         return wrapElements(MediationNonAttendanceStatement.builder()
                                 .yourName("My name")
                                 .document(Document.builder()
@@ -7457,6 +7578,7 @@ public class CaseDataBuilder {
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
+            .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
             .paymentTypeSelection(paymentTypeSelection)
             .repaymentSuggestion(repaymentSuggestion)
             .paymentSetDate(paymentSetDate)
