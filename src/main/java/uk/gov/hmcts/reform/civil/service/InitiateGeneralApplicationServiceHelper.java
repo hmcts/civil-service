@@ -120,8 +120,23 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
-
+        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
         return applicationBuilder.build();
+    }
+
+    private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
+                                 GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                 CaseData caseData) {
+        if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
+                && Objects.nonNull(caseData.getHearingDate())
+                && LocalDate.now().plusDays(LIP_URGENT_DAYS).isAfter(caseData.getHearingDate())) {
+            applicationBuilder.generalAppUrgencyRequirement(
+                    GAUrgencyRequirement
+                            .builder()
+                            .generalAppUrgency(YES)
+                            .urgentAppConsiderationDate(caseData.getHearingDate())
+                            .reasonsForUrgency(LIP_URGENT_REASON).build());
+        }
     }
 
     private Boolean setSingleGaApplicant(List<CaseAssignedUserRole> applicantSolicitor,
