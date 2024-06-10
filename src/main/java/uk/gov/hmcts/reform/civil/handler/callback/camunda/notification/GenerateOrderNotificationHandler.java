@@ -84,10 +84,25 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private String getTemplate(CaseData caseData) {
-        if ((isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT))
-            || (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1))
-            || (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2))) {
-            return notificationsProperties.getNotifyLipUpdateTemplate();
+        boolean isLip = false;
+        boolean isLipWelsh = false;
+        if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
+            isLip = true;
+            isLipWelsh = caseData.isLipApplicantRequiringWelsh();
+        } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
+            isLip = true;
+            isLipWelsh = caseData.isLipDefendant1RequiringWelsh();
+        } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
+            // TODO CIV-13814 not contemplated response 2 currently
+            isLip = true;
+            isLipWelsh = false;
+        }
+        if (isLip) {
+            if (isLipWelsh) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
         } else {
             return notificationsProperties.getGenerateOrderNotificationTemplate();
         }

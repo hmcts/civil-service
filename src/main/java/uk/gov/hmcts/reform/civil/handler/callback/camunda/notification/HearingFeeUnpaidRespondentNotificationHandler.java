@@ -107,7 +107,11 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
 
     private String getTemplate(CaseData caseData) {
         if (isRespondent1Lip(caseData)) {
-            return notificationsProperties.getNotifyLipUpdateTemplate();
+            if (caseData.isLipDefendant1RequiringWelsh()) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
         }
         return notificationsProperties.getRespondentHearingFeeUnpaid();
     }

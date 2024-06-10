@@ -59,7 +59,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorForTrialReady(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String respondentEmail =  isForRespondentSolicitor1(callbackParams)
+        String respondentEmail = isForRespondentSolicitor1(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
 
@@ -67,7 +67,9 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipUpdateTemplate(),
+                    caseData.isLipDefendant1RequiringWelsh()
+                        ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                        : notificationsProperties.getNotifyLipUpdateTemplate(),
                     addPropertiesLRvLip(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );

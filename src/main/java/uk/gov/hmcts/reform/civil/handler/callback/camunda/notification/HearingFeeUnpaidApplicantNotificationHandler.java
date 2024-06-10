@@ -66,7 +66,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
         if (nonNull(recipient)) {
             notificationService.sendMail(
                 getRecipient(caseData, isApplicantLip),
-                getTemplate(isApplicantLip),
+                getTemplate(caseData, isApplicantLip),
                 isApplicantLip ? addPropertiesApplicantLip(caseData) : addProperties(caseData),
                 getReferenceTemplate(caseData, isApplicantLip)
             );
@@ -99,9 +99,16 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
-    private String getTemplate(boolean isApplicantLip) {
-        return isApplicantLip ? notificationsProperties.getNotifyLipUpdateTemplate()
-            : notificationsProperties.getApplicantHearingFeeUnpaid();
+    private String getTemplate(CaseData caseData, boolean isApplicantLip) {
+        if (isApplicantLip) {
+            if (caseData.isLipApplicantRequiringWelsh()) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            return notificationsProperties.getApplicantHearingFeeUnpaid();
+        }
     }
 
     private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {

@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -474,7 +475,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime unsuitableSDODate;
-    private final OtherDetails  otherDetails;
+    private final OtherDetails otherDetails;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
@@ -736,7 +737,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayImmediately() {
-        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+            getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
@@ -928,8 +930,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 respondent2Represented,
                 specRespondent2Represented
             )
-            .filter(Objects::nonNull)
-            .findFirst().orElse(null));
+                             .filter(Objects::nonNull)
+                             .findFirst().orElse(null));
     }
 
     @JsonIgnore
@@ -959,7 +961,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
             if (applicant1SuggestedPayImmediately()) {
                 whenWillThisAmountBePaid = getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec();
             } else if (applicant1SuggestedPayBySetDate()) {
-                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(PaymentBySetDate::getPaymentSetDate).orElse(null);
+                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(
+                    PaymentBySetDate::getPaymentSetDate).orElse(null);
             }
             firstRepaymentDate = getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         } else {
@@ -969,11 +972,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
             firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
                 null);
         }
-        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
+        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(
+            getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
-        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
+        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(
+            null);
         boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
-                                                    ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
+            || (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
             || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
@@ -985,7 +990,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(
+                extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
+                DATE_TIME_AT
+            );
         }
         return null;
     }
@@ -998,9 +1006,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitImmediatePaymentClaimSettled() {
         return (isPartAdmitClaimSpec()
-                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
-                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
+            && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+            && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+            && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
@@ -1119,8 +1127,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }
@@ -1213,8 +1221,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
     }
@@ -1479,6 +1487,32 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
         return hasApplicant1CourtDecisionInFavourOfClaimant()
-                && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
+            && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
+    }
+
+    /**
+     * LiP applicant requires Welsh if they selected Welsh or Both languages.
+     *
+     * @return true if applicant is LiP and they accept Welsh (or English+Welsh)
+     */
+    @JsonIgnore
+    public boolean isLipApplicantRequiringWelsh() {
+        return Optional.ofNullable(getClaimantBilingualLanguagePreference())
+            .filter(value -> List.of(Language.WELSH.toString(), Language.BOTH.toString()).contains(value))
+            .isPresent();
+    }
+
+    /**
+     * LiP applicant requires Welsh if they selected Welsh or Both languages.
+     *
+     * @return true if applicant is LiP and they accept Welsh (or English+Welsh)
+     */
+    @JsonIgnore
+    public boolean isLipDefendant1RequiringWelsh() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .filter(value -> List.of(Language.WELSH.toString(), Language.BOTH.toString()).contains(value))
+            .isPresent();
     }
 }

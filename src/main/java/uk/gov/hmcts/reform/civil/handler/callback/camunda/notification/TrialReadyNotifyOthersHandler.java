@@ -93,9 +93,20 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         }
 
         if (emailAddress != null && !emailAddress.isEmpty()) {
+            String emailTemplate;
+            if (isLiP) {
+                if ((isApplicant && caseData.isLipApplicantRequiringWelsh())
+                    || caseData.isLipDefendant1RequiringWelsh()) {
+                    emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+                } else {
+                    emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();
+                }
+            } else {
+                emailTemplate = notificationsProperties.getOtherPartyTrialReady();
+            }
             notificationService.sendMail(
                 emailAddress,
-                isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
+                emailTemplate,
                 isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -130,9 +141,12 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            PARTY_NAME,
+            isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT,
+            getAllPartyNames(caseData)
         );
     }
 
@@ -140,6 +154,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+        );
     }
 }
