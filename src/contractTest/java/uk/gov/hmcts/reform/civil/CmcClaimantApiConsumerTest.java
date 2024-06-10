@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
-import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArrayMinMaxUnordered;
-import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
