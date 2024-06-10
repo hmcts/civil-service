@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -14,7 +13,6 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EvidenceUploadApplicantNotificationHandler implements NotificationData {
