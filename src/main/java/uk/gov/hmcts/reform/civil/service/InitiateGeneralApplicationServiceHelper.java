@@ -151,14 +151,14 @@ public class InitiateGeneralApplicationServiceHelper {
 
                 applicantBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
-            } else if (caseData.getAddRespondent2().equals(YES)
+            } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
                     && applnSol.getCaseRole().equals(caseData.getRespondent2OrganisationPolicy()
                     .getOrgPolicyCaseAssignedRole())) {
 
                 applicantBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
 
             } else {
-                if (caseData.getAddApplicant2().equals(YES)
+                if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)
                         && applnSol.getCaseRole().equals(caseData
                         .getApplicant2OrganisationPolicy()
                         .getOrgPolicyCaseAssignedRole())) {
