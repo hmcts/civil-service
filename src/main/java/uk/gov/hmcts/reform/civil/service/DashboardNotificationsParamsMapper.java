@@ -156,14 +156,6 @@ public class DashboardNotificationsParamsMapper {
                 params.put("instalmentStartDateEn", DateUtils.formatDate(date));
                 params.put("instalmentStartDateCy", DateUtils.formatDateInWelsh(date));
             });
-            params.put(
-                "instalmentTimePeriodEn",
-                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
-            );
-            params.put(
-                "instalmentTimePeriodCy",
-                getInstalmentTimePeriod(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency())
-            );
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
@@ -173,6 +165,10 @@ public class DashboardNotificationsParamsMapper {
             params.put(
                 "paymentFrequency",
                 caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabel()
+            );
+            params.put(
+                "paymentFrequencyWelsh",
+                caseData.getRespondent1RepaymentPlan().getRepaymentFrequency().getDashboardLabelWelsh()
             );
             getFirstRepaymentDate(caseData).ifPresent(date -> {
                 params.put("firstRepaymentDateEn", DateUtils.formatDate(date));
