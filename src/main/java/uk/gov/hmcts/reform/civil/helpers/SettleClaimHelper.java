@@ -19,8 +19,8 @@ public class SettleClaimHelper {
         }
 
         if (caseData.isLipvLipOneVOne()
+            || MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)
             || (MultiPartyScenario.isOneVTwoLegalRep(caseData) && (caseData.isApplicantLiP() || caseData.isRespondent1LiP()))
-            || (MultiPartyScenario.isOneVTwoTwoLegalRep(caseData) && (caseData.isApplicantLiP() || caseData.isRespondent1LiP()))
             || (MultiPartyScenario.isTwoVOne(caseData) && caseData.isApplicantLiP())) {
             errors.add("This action is not available for this claim");
         }
