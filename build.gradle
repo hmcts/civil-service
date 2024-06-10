@@ -21,7 +21,6 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.32',
-  pact              : '3.5.24',
   springSecurity    : '5.8.12',
   camunda           : '7.19.0',
   jackson           : '2.17.1',
@@ -451,14 +450,15 @@ dependencies {
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
 
   // dashboard specific changes
 
@@ -467,8 +467,6 @@ dependencies {
   testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
   // dashboard specific changes ends
 
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -496,15 +494,12 @@ wrapper {
 }
 
 task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contract)
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-
+  finalizedBy(pactPublish)
 }
-
-runAndPublishConsumerPactTests.dependsOn contract
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
