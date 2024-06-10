@@ -81,7 +81,6 @@ public class SettleClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LRvLRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented()
-            .applicant1Represented(YesOrNo.NO)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
@@ -93,7 +92,6 @@ public class SettleClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LRvLiPvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented()
-            .applicant1Represented(YesOrNo.NO)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
