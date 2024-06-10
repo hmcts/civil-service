@@ -87,9 +87,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
 
-        if(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)){
-
-        }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
