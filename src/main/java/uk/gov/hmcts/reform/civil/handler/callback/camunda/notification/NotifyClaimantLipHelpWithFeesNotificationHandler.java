@@ -70,7 +70,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-        return caseData.isBilingual()
+        return caseData.isClaimantBilingual()
             ? notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh()
             : notificationsProperties.getNotifyClaimantLipHelpWithFees();
     }
