@@ -294,7 +294,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSame() {
-        CaseData caseData = caseDataBuilder
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .atStateRespondentFullDefenceAfterNotifyClaimDetails()
             .respondent2Responds(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
@@ -305,7 +305,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
 
     @Test
     void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesTheSameButMarkedDifferent() {
-        CaseData caseData = caseDataBuilder
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .atStateRespondentFullDefenceAfterNotifyClaimDetails()
             .respondent2Responds(FULL_DEFENCE)
             .respondentResponseIsSame(NO)
