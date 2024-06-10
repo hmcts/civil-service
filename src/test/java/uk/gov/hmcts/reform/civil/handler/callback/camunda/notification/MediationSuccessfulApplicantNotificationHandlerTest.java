@@ -84,6 +84,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate()).thenReturn(TEMPLATE_LIP_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate()).thenReturn(TEMPLATE_LIP_ID);
+            when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
@@ -310,6 +311,29 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                TEMPLATE_ID,
+                lipProperties(caseData),
+                MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
+            );
+        }
+
+        @Test
+        void shouldNotifyClaimantCarmLipVLipNotifyApplicantWithBilingualNotification_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiPBilingual()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
