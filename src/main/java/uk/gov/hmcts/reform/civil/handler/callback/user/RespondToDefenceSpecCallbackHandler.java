@@ -33,12 +33,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
-import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.dq.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -299,8 +294,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      *
      * @param caseData current case data
      * @return true if and only if either of the following conditions are satisfied: (a) applicant does not
-     *     accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
-     *     wants to proceed with the claim
+     * accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
+     * wants to proceed with the claim
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
@@ -369,7 +364,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
             if (!isFlightDelayAndSmallClaim(caseData)
                 || isFlightDelaySmallClaimAndOther(caseData)) {
-                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+                updateDQCourtLocations(
+                    callbackParams,
+                    caseData,
+                    builder,
+                    dq,
+                    isFlightDelaySmallClaimAndOther(caseData)
+                );
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -396,7 +397,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         } else if (caseData.getApplicant1DQ() != null
             && (NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())
-                || NO.equals(caseData.getApplicant1ClaimExpertSpecRequired()))) {
+            || NO.equals(caseData.getApplicant1ClaimExpertSpecRequired()))) {
             builder.applicant1DQ(
                 builder.build().getApplicant1DQ().toBuilder()
                     .applicant1DQExperts(Experts.builder()
@@ -425,9 +426,30 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .build())
                     .build());
         }
+        if (getMultiPartyScenario(caseData) == TWO_V_ONE
+            && caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+
+            if (caseData.getApplicant2DQ() == null
+                || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
+                FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
+
+                 builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
+                     FixedRecoverableCosts.builder()
+                        .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
+                         .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
+                         .band(app1Frc.getBand())
+                         .reasons(app1Frc.getReasons())
+                         .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
+                        .build())
+                 .build());
+            }
+        }
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder,
+            featureToggleService.isUpdateContactDetailsEnabled()
+        );
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
@@ -492,6 +514,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         builder.businessProcess(businessProcess);
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -590,7 +613,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                                null, null, featureToggleService, caseData
+                                                                                null,
+                                                                                null,
+                                                                                featureToggleService,
+                                                                                caseData
             ).name());
         }
         // add direction questionaire document from system generated documents, to placeholder field for preview during event.
@@ -714,8 +740,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return deadlineCalculatorService.calculateExtendedDeadline(
-                caseData.getRespondent1ResponseDate().toLocalDate(),
-                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
+                    caseData.getRespondent1ResponseDate().toLocalDate(),
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY
+                )
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
@@ -811,7 +838,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
-            &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
     private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
