@@ -18,10 +18,9 @@ public class SettleClaimHelper {
             errors.add("This action is not currently allowed at this stage");
         }
 
-        if (caseData.isLipvLipOneVOne()
+        if (caseData.isApplicantLiP()
             || MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)
-            || (MultiPartyScenario.isOneVTwoLegalRep(caseData) && (caseData.isApplicantLiP() || caseData.isRespondent1LiP()))
-            || (MultiPartyScenario.isTwoVOne(caseData) && caseData.isApplicantLiP())) {
+            || (MultiPartyScenario.isOneVTwoLegalRep(caseData) && caseData.isRespondent1LiP())) {
             errors.add("This action is not available for this claim");
         }
     }

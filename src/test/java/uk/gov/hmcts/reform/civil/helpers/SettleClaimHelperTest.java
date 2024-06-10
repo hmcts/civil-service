@@ -57,6 +57,7 @@ public class SettleClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
