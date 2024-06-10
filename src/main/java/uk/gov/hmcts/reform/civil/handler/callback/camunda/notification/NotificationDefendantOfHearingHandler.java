@@ -163,12 +163,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private String getEmailTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isHmc) {
         if (isHmc) {
             return notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC();
+        } else if (isRespondent1Lip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh();
         } else if (isRespondent1Lip) {
-            if (caseData.isLipDefendant1RequiringWelsh()) {
-                return notificationsProperties.getHearingNotificationLipDefendantTemplateBilingual();
-            } else {
-                return notificationsProperties.getHearingNotificationLipDefendantTemplate();
-            }
+            return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         } else {
             return notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
         }
