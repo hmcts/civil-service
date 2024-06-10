@@ -93,7 +93,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         if (!isRespondent1Lip || isHmc) {
             properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
         }
-        notificationService.sendMail(recipient, getEmailTemplate(isRespondent1Lip, isHmc), properties, getReferenceTemplate(caseData, isRespondent1Lip, isHmc));
+        notificationService.sendMail(recipient, getEmailTemplate(caseData, isRespondent1Lip, isHmc), properties, getReferenceTemplate(caseData, isRespondent1Lip, isHmc));
     }
 
     @Override
@@ -160,12 +160,15 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         return "";
     }
 
-    private String getEmailTemplate(boolean isRespondent1Lip, boolean isHmc) {
+    private String getEmailTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isHmc) {
         if (isHmc) {
             return notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC();
+        } else if (isRespondent1Lip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh();
+        } else if (isRespondent1Lip) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         } else {
-            return isRespondent1Lip ? notificationsProperties.getHearingNotificationLipDefendantTemplate()
-                : notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
+            return notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
         }
     }
 

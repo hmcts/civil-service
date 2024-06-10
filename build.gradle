@@ -119,7 +119,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.737'
+        version: '1.12.739'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -141,7 +141,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.12.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.13.0"
     }
   }
 
@@ -429,7 +429,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.49.0'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.49.1'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.0'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
