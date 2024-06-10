@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceDa
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1196,5 +1197,39 @@ class HmcDataUtilsTest {
                     "authToken",
                     locationRefDataService));
         }
+    }
+
+    @Nested
+    class GetLatestHearing {
+        private static final LocalDateTime TODAY = LocalDateTime.of(2024, 1, 22, 0, 0, 0);
+
+        @Test
+        void shouldGetLatestHearing() {
+            LocalDateTime hearingStartTime = TODAY.plusHours(10);
+            LocalDateTime requestedDateTime = TODAY.plusHours(9);
+            String hearingId = "12345";
+
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(List.of(
+                    hearing("11111", TODAY.minusDays(1), List.of(hearingStartTime)),
+                    hearing(hearingId, requestedDateTime, List.of(hearingStartTime)),
+                    hearing("33333", TODAY.minusDays(3), List.of(hearingStartTime)),
+                    hearing("22222", TODAY.minusDays(2), List.of(hearingStartTime))))
+                .build();
+
+            CaseHearing actual = HmcDataUtils.getLatestHearing(hearingsResponse);
+            CaseHearing expected = hearing(hearingId, requestedDateTime, List.of(hearingStartTime));
+            assertEquals(expected, actual);
+        }
+    }
+
+    private CaseHearing hearing(String hearingId, LocalDateTime hearingRequestTime, List<LocalDateTime> startTimes) {
+        return CaseHearing.builder()
+            .hearingId(Long.valueOf(hearingId))
+            .hearingRequestDateTime(hearingRequestTime)
+            .hearingDaySchedule(startTimes.stream().map(startTime -> HearingDaySchedule.builder().hearingStartDateTime(
+                startTime).build()).collect(
+                Collectors.toList()))
+            .build();
     }
 }
