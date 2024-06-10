@@ -551,7 +551,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
-    public boolean isBilingual() {
+    public boolean isClaimantBilingual() {
         return null != claimantBilingualLanguagePreference
                 && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }

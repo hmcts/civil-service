@@ -189,7 +189,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
-    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isBilingual;
+    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
+        caseData.isClaimantBilingual();
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -257,7 +258,8 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = FlowPredicate::isDivergentResponsesWithDQAndGoOffline;
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = caseData ->
+        isDivergentResponsesWithDQAndGoOffline(caseData);
 
     private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
