@@ -2247,7 +2247,7 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
-        if (caseData.getDefendantDetailsSpec() != null && !JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (caseData.getDefendantDetailsSpec() != null) {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
