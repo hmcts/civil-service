@@ -177,6 +177,37 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotifyRespondentLip_whenIsNotRepresentedBilingual() {
+            //Given: Case data at hearing scheduled state and callback param with Notify respondent1 Lip
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateHearingDateScheduled().build().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build())
+                                 .build())
+                .respondent1Represented(YesOrNo.NO).respondent1(
+                    Party.builder().partyName("John Doe").partyEmail("doe@doe.com").individualFirstName("John")
+                        .individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
+            ).build();
+
+            //When: handler is called
+            handler.handle(params);
+
+            //Then: verify email is sent to respondent1 lipy
+            verify(notificationService).sendMail(
+                "doe@doe.com",
+                TEMPLATE_ID_BILINGUAL,
+                getNotificationLipDataMap(caseData, "John Doe"),
+                "bundle-created-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(

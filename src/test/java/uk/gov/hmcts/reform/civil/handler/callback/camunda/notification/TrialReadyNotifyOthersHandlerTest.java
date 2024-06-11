@@ -60,6 +60,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("cui-template-id-bilingual");
         }
 
         @Test
@@ -108,7 +110,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                "cui-template-id",
+                "cui-template-id-bilingual",
                 getLiPNotificationDataMap(true, caseData),
                 "other-party-trial-ready-notification-000MC001"
             );
