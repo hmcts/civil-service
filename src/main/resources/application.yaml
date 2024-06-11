@@ -195,7 +195,7 @@ dashboard:
 stateflow:
   engine:
     simplification:
-      enabled: ${STATEFLOW_ENGINE_SIMPLIFICATION:true}
+      enabled: ${STATEFLOW_ENGINE_SIMPLIFICATION:false}
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
