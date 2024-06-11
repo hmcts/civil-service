@@ -23,7 +23,10 @@ public abstract class CcdDashboardClaimMatcher {
     }
 
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired() && !isSettled();
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && caseData.isSettlementAgreementDeadlineExpired()
+            && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean isSettled() {
