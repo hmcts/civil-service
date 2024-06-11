@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
@@ -604,6 +605,12 @@ public class CaseDataBuilder {
 
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
+    private String claimantBilingualLanguagePreference;
+
+    public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
+        this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
 
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
@@ -3109,6 +3116,15 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
             .build();
         addLegalRepDeadline = DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1LiPBilingual() {
+        atStateClaimIssued1v1LiP();
+        this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
+        this.caseDataLiP = CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
         return this;
     }
 
@@ -7561,6 +7577,7 @@ public class CaseDataBuilder {
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
+            .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
             .paymentTypeSelection(paymentTypeSelection)
             .repaymentSuggestion(repaymentSuggestion)
             .paymentSetDate(paymentSetDate)
