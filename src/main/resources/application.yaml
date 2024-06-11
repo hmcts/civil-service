@@ -288,7 +288,6 @@ notifications:
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
   evidenceUploadLipTemplate: "3495a863-338f-49cf-99e8-b94bc457a9d4"
   evidenceUploadLipTemplateWelsh: "b1697ce8-1318-44c3-895d-4714124eb6dd"
-  evidenceUploadLipTemplateBilingual: "b17c6aa4-23d0-4080-ab53-b293873de40a"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
@@ -343,7 +342,6 @@ notifications:
   notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
-  hearingNotificationLipDefendantTemplateBilingual: "7f65cac9-52d3-4dca-bf50-36d97b9ca8ac"
 
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
@@ -361,7 +359,6 @@ notifications:
 
   notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
   notifyClaimantLipHelpWithFeesWelsh: "f5f78e20-f80b-419d-9bd3-3cc41c2ecd00"
-  notifyClaimantLipHelpWithFeesBilingual: "dc8482b1-c76b-4576-aa6e-8f390e91b5e3"
 
   notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
   notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
