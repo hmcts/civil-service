@@ -143,6 +143,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1NotRepresented()) {
+                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+            }
         } else if (isRespondentSolicitorOne(roles)) {
             partyName.append("Defendant - ");
             partyName.append(caseData.getRespondent1().getPartyName());
@@ -152,6 +155,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicant1NotRepresented()) {
+                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+            }
         } else if (isRespondentSolicitorTwo(roles)) {
             partyName.append("Defendant - ");
             partyName.append(respondent2Present(caseData) ? caseData.getRespondent2().getPartyName() : "");
@@ -160,10 +166,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (isLIPClaimant(roles)) {
             updatedData.orderRequestedForReviewClaimant(YES);
+            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         } else if (isLIPDefendant(roles)) {
             updatedData.orderRequestedForReviewDefendant(YES);
-        }
-        if (featureToggleService.isCaseProgressionEnabled()) {
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
