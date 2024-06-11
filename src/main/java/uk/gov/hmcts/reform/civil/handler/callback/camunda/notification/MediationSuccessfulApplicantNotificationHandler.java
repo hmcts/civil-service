@@ -65,7 +65,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 && featureToggleService.isLipVLipEnabled()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    caseData.isClaimantBilingual() ? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipProperties(caseData),
                     referenceTemplate
                 );
