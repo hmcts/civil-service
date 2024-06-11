@@ -10,7 +10,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant',
         "Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant", "Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant", "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant",
         "Notice.AAA6.DefResponse.Full Defence. FullDispute.SuggestedMediation.Claimant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA6.ClaimantIntent.PartAdmit.Claimant",
         "Notice.AAA6.ClaimantIntent.FullAdmit.Claimant", "Notice.AAA6.ClaimantIntent.Mediation.Claimant", "Notice.AAA6.ClaimantIntent.GoToHearing.Claimant",
-        "Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant", "Notice.AAA6.ClaimantIntent.SettlementAgreement.NoDefendantResponse.Claimant",
+        "Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant", "Notice.AAA6.ClaimantIntent.SettlementNoResponse.Claimant",
         "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Claimant", "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantRejected.Claimant",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant", "Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant", "Notice.AAA6.MediationSuccessful.CARM.Claimant",
         "Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant", "Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant",
@@ -26,7 +26,7 @@ VALUES ('Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant',
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant', 'The claim is settled' , 'The claim is settled',
+VALUES ('Notice.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant', 'The claim is settled' , 'Mae’r hawliad wedi’i setlo',
         '<p class="govuk-body">You have confirmed that ${respondent1PartyName} paid  on ${applicant1ClaimSettledDateEn}.</p>',
-        '<p class="govuk-body">You have confirmed that ${respondent1PartyName} paid  on ${applicant1ClaimSettledDateCy}.</p>',
+        '<p class="govuk-body">Rydych wedi cadarnhau bod ${respondent1PartyName} wedi talu ar ${applicant1ClaimSettledDateCy}.</p>',
         'CLAIMANT')

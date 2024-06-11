@@ -31,7 +31,7 @@ public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
 
     protected JudgmentState getJudgmentState(CaseData caseData) {
         boolean paidAfter31Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days(
-            caseData.getJoOrderMadeDate(),
+            caseData.getActiveJudgment().getIssueDate(),
             caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade()
         );
         return paidAfter31Days ? JudgmentState.SATISFIED : JudgmentState.CANCELLED;

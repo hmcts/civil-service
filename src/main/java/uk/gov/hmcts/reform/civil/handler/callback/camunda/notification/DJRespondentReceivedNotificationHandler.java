@@ -70,16 +70,16 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             return emailTemplate;
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
@@ -107,9 +107,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 emailTemplate.template,
@@ -124,9 +124,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             );
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 emailTemplate.template,

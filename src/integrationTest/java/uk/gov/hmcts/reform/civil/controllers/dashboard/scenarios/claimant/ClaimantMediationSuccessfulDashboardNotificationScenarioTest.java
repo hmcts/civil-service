@@ -93,10 +93,13 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                 jsonPath("$[0].descriptionEn")
                     .value(
                         "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>"),
-                jsonPath("$[0].titleCy").value("You settled the claim through mediation"),
+                jsonPath("$[0].titleCy").value("Rydych wedi setlo’r hawliad drwy gyfryngu"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>")
+                        "<p class=\"govuk-body\">Mi wnaethoch gytundeb sy’n golygu bod yr hawliad nawr ar ben. " +
+                            "Mae’r cytundeb yn nodi’r telerau ar gyfer sut mae'n rhaid i Mr. Sole Trader eich ad-dalu.</p>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Lawrlwytho’r cytundeb</a></p>"
+                    )
             );
     }
 }

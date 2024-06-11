@@ -52,7 +52,18 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Mr. Sole Trader has said that they will pay you £500 immediately in full and final settlement of your claim and you have accepted this offer. Funds must be received in your account by 19 March 2024.</p> <p class=\"govuk-body\">If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>")
+                    "<p class=\"govuk-body\">Mr. Sole Trader has said that they will pay you £500 immediately " +
+                        "in full and final settlement of your claim and you have accepted this offer. " +
+                        "Funds must be received in your account by 19 March 2024.</p> " +
+                        "<p class=\"govuk-body\">If you don´t receive the money by then, " +
+                        "you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Talu ar unwaith"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi dweud y byddant yn talu £500 i chi ar " +
+                        "unwaith fel setliad llawn a therfynol o’ch hawliad ac rydych wedi derbyn y cynnig hwn. " +
+                        "Rhaid i’r arian gyrraedd eich cyfrif erbyn 19 Mawrth 2024.</p> " +
+                        "<p class=\"govuk-body\">Os nad ydych wedi cael yr arian erbyn hynny, gallwch " +
+                        "<a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
             );
     }
 }

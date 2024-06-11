@@ -55,10 +55,10 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You weren't able to resolve your claim against John Doe using mediation. "
                         + "The court will review the case. We'll contact you to tell you what to do next.</p>"),
-                jsonPath("$[0].titleCy").value("Mediation was unsuccessful"),
+                jsonPath("$[0].titleCy").value("Nid oedd y cyfryngu yn llwyddiannus"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You weren't able to resolve your claim against John Doe using mediation. "
-                        + "The court will review the case. We'll contact you to tell you what to do next.</p>"));
+                    "<p class=\"govuk-body\">Nid oeddech yn gallu datrys eich hawliad yn erbyn John Doe drwy gyfryngu. " +
+                        "Bydd y llys yn adolygu’r achos. Byddwn yn cysylltu â chi i ddweud wrthych beth i’w wneud nesaf.</p>"));
 
     }
 
@@ -115,13 +115,13 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
                 jsonPath("$[0].titleEn").value("You did not attend mediation"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue "
-                        + "a penalty against you. Your case will not be reviewed by the court. "
+                        + "a penalty against you. Your case will now be reviewed by the court. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not "
                         + "attend your appointment.</a></p>"),
                 jsonPath("$[0].titleCy").value("Ni wnaethoch fynychu cyfryngu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Ni wnaethoch fynychu eich apwyntiad cyfryngu, ac efallai y " +
-                        "bydd y barnwr yn eich cosbi. Ni fydd eich cais yn cael ei adolygu gan y llys. "
+                        "bydd y barnwr yn eich cosbi. Bydd yr achos hwn nawr yn cael ei adolygu gan y llys. "
                         + "<a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Esboniwch pam na wnaethoch chi fynychu eich apwyntiad.</a></p>"));
 
         //Verify dashboard information

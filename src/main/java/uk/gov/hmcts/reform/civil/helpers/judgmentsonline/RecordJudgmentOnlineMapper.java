@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -25,11 +24,14 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
+
         List<Element<Party>> defendants = new ArrayList<Element<Party>>();
         defendants.add(element(caseData.getRespondent1()));
         if (caseData.isMultiPartyDefendant()) {
             defendants.add(element(caseData.getRespondent2()));
         }
+        BigDecimal orderAmount = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered());
+        BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         return activeJudgment.toBuilder()
             .createdTimestamp(LocalDateTime.now())
@@ -39,9 +41,9 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .paymentPlan(caseData.getJoPaymentPlan())
             .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
             .issueDate(caseData.getJoOrderMadeDate())
-            .orderedAmount(caseData.getJoAmountOrdered())
-            .costs(caseData.getJoAmountCostOrdered())
-            .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(Optional.ofNullable(caseData.getJoAmountCostOrdered()).orElse("0"))).toString())
+            .orderedAmount(orderAmount.toString())
+            .costs(costs.toString())
+            .totalAmount(orderAmount.add(costs).toString())
             .build();
     }
 

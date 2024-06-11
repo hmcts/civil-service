@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -42,22 +43,20 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
     private CallbackResponse startBusinessProcess(CallbackParams callbackParams) {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
+        BusinessProcessStatus status = businessProcess.getStatusOrDefault();
 
-        switch (businessProcess.getStatusOrDefault()) {
-            case READY:
-            case DISPATCHED:
-                log.info("HANDLERSTART LegacyCaseReference ({}) businessProcessInstanceId({})",
-                         data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
-                return evaluateReady(callbackParams, businessProcess);
-            default:
-                log.error("----------------HANDLER START BUSINESS PROCESS ERROR -START------------------");
-                log.error("CAMUNDAHANDLERERROR LegacyCaseReference ({}) businessProcessInstanceId({})",
-                          data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
-                log.error("----------------HANDLER START BUSINESS PROCESS ERROR -END------------------");
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(List.of("Concurrency Error"))
-                    .build();
-
+        if (status == BusinessProcessStatus.READY || status == BusinessProcessStatus.DISPATCHED) {
+            log.info("HANDLERSTART LegacyCaseReference ({}) businessProcessInstanceId({})",
+                     data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
+            return evaluateReady(callbackParams, businessProcess);
+        } else {
+            log.error("----------------HANDLER START BUSINESS PROCESS ERROR -START------------------");
+            log.error("CAMUNDAHANDLERERROR LegacyCaseReference ({}) businessProcessInstanceId({})",
+                      data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
+            log.error("----------------HANDLER START BUSINESS PROCESS ERROR -END------------------");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("Concurrency Error"))
+                .build();
         }
     }
 

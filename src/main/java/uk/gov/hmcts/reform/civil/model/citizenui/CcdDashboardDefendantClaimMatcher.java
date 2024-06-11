@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -282,7 +283,17 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && !isSDOOrderLegalAdviserCreated();
+    }
+
+    @Override
+    public boolean isSDOOrderLegalAdviserCreated() {
+        return featureToggleService.isDashboardServiceEnabled()
+            && caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
     }
 
     @Override

@@ -105,10 +105,11 @@ class TaskListServiceTest {
             .thenThrow(new RuntimeException());
 
         //then
-        assertThrows(RuntimeException.class, () -> taskListRepository.findByReferenceAndTaskItemTemplateRole(
-            any(),
-            any()
-        ));
+        assertThrows(RuntimeException.class,
+                     () -> {
+                         taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any());
+                     }
+        );
 
     }
 

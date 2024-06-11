@@ -37,10 +37,6 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
 
-        if (caseData.isPayImmediately() || caseData.hasApplicantRejectedRepaymentPlan()) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
         CaseDocument claimantResponseForm = settlementAgreementFormGenerator.generate(
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()

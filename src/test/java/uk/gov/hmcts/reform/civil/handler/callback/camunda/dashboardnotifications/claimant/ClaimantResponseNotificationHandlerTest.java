@@ -193,7 +193,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         void shouldCreateDashboardNotificationsForSignSettlementAgreement() {
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimantSettlementAgreement", "accepted");
+            scenarioParams.put("claimantSettlementAgreementEn", "accepted");
+            scenarioParams.put("claimantSettlementAgreementCy", "derbyn");
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -304,6 +305,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("claimantRepaymentPlanDecisionCy", "derbyn");
             scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
