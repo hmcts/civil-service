@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
@@ -1144,6 +1143,7 @@ public class EventHistoryMapper {
     }
 
     final String rpaReasonOneRespondentNotified = "RPA Reason: Only one of the respondent is notified.";
+
     private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
             List.of(

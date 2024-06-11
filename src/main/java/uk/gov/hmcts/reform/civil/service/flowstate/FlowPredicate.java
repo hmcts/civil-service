@@ -191,7 +191,6 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
 
-
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
@@ -788,9 +787,9 @@ public class FlowPredicate {
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     && NO.equals(caseData.getRespondentResponseIsSame())
-                    && (uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE
+                    && (RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    || uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE
+                    || RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
             case ONE_V_TWO_TWO_LEGAL_REP ->
                 //scenario: latest response is full defence
@@ -801,12 +800,12 @@ public class FlowPredicate {
                     && (!caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     // for the time being, 1v2ds not full defence goes offline
-                    || caseData.getRespondent1ClaimResponseTypeForSpec() != uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE);
+                    || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE);
             case TWO_V_ONE ->
-                (uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
-                    || uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
-                    && !(uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
-                    && uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
+                (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+                    && !(RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
             default -> false;
         };
     }
