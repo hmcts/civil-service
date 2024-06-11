@@ -160,9 +160,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (isLIPClaimant(roles)) {
             updatedData.orderRequestedForReviewClaimant(YES);
-            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         } else if (isLIPDefendant(roles)) {
             updatedData.orderRequestedForReviewDefendant(YES);
+        }
+        if (featureToggleService.isCaseProgressionEnabled()) {
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
