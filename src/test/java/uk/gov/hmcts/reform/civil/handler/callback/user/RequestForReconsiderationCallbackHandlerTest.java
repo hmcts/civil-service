@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
@@ -55,6 +56,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     private ObjectMapper objectMapper;
     @MockBean
     private CoreCaseUserService coreCaseUserService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private UserService userService;
@@ -381,6 +384,38 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
                 .extracting("requestor")
                 .isEqualTo("Defendant - FirstName LastName and FirstName2 LastName2");
+        }
+
+        @Test
+        void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantRequest() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("orderRequestedForReviewClaimant")
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantRequest() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("orderRequestedForReviewDefendant")
+                .isEqualTo("Yes");
         }
     }
 
