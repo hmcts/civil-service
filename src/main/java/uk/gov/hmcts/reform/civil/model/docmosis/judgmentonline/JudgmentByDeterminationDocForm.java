@@ -15,8 +15,8 @@ import java.util.List;
 @EqualsAndHashCode
 public class JudgmentByDeterminationDocForm implements MappableObject {
 
-    private final String caseNumber;
-    private final List<Party> applicant;
+    private final String claimReferenceNumber;
+    private final Party applicant;
     private final String applicantReference;
     private final String respondentReference;
     private final Party respondent;
@@ -29,7 +29,7 @@ public class JudgmentByDeterminationDocForm implements MappableObject {
     private final String respondent2Name;
     private final String respondent1Ref;
     private final String respondent2Ref;
-    private final Party applicantDetails;
+    private final List<Party> applicants;
     private String paymentPlan;
     private final String payByDate;
     private final String repaymentFrequency;

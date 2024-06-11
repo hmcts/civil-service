@@ -85,6 +85,6 @@ public class GenerateJudgmentByDeterminationFormHandler extends CallbackHandler 
 
     private boolean isClaimantEvent(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
-            .equals(CaseEvent.GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
+            .equals(GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
     }
 }
