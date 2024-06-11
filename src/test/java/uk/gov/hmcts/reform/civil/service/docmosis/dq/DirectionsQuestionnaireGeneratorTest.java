@@ -2789,13 +2789,13 @@ class DirectionsQuestionnaireGeneratorTest {
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
-            DisclosureOfElectronicDocuments DisclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
+            DisclosureOfElectronicDocuments disclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
             DisclosureOfNonElectronicDocuments disclosureNonElecDocs = templateData.getDisclosureOfNonElectronicDocuments();
             DisclosureReport disclosureReport = templateData.getDisclosureReport();
 
-            assertThat(DisclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
-            assertThat(DisclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
-            assertThat(DisclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
+            assertThat(disclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
+            assertThat(disclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
+            assertThat(disclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
             assertThat(disclosureNonElecDocs.getBespokeDirections()).isEqualTo("non electric stuff");
             assertThat(disclosureReport.getDisclosureFormFiledAndServed()).isEqualTo(YES);
             assertThat(disclosureReport.getDisclosureProposalAgreed()).isEqualTo(YES);
@@ -2833,13 +2833,13 @@ class DirectionsQuestionnaireGeneratorTest {
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
-            DisclosureOfElectronicDocuments DisclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
+            DisclosureOfElectronicDocuments disclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
             DisclosureOfNonElectronicDocuments disclosureNonElecDocs = templateData.getDisclosureOfNonElectronicDocuments();
             DisclosureReport disclosureReport = templateData.getDisclosureReport();
 
-            assertThat(DisclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
-            assertThat(DisclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
-            assertThat(DisclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
+            assertThat(disclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
+            assertThat(disclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
+            assertThat(disclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
             assertThat(disclosureNonElecDocs.getBespokeDirections()).isEqualTo("non electric stuff");
             assertThat(disclosureReport).isEqualTo(null);
         }
