@@ -12,8 +12,8 @@ VALUES ('Scenario.AAA6.ClaimIssue.HWF.FullRemission',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.ClaimIssue.HWF.FullRemission', 'Your help with fees application has been approved', 'Mae eich cais am help i dalu ffioedd wedi cael ei gymeradwyo',
-        '<p class="govuk-body">The full claim fee of ${claimFee} will be covered by fee remission.<br>You do not need to make a payment.</p>',
-        '<p class="govuk-body">Bydd ffi lawn yr hawliad o ${claimFee} yn cael ei ddileu.<br>Nid oes angen i chi wneud taliad.</p>',
+        '<p class="govuk-body">The full claim fee of ${claimFee} will be covered by fee remission. You do not need to make a payment.</p>',
+        '<p class="govuk-body">Bydd ffi lawn yr hawliad o ${claimFee} yn cael ei ddileu. Nid oes angen i chi wneud taliad.</p>',
         'CLAIMANT');
 
 

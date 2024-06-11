@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -44,6 +45,7 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
         void setup() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn("template-id");
             when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getEvidenceUploadLipTemplateWelsh()).thenReturn("template-id-welsh-lip");
         }
 
         @Test
@@ -77,6 +79,26 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             verify(notificationService).sendMail(
                 "applicant@example.com",
                 "template-id-lip",
+                getNotificationDataMap(caseData),
+                "evidence-upload-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLipInWelsh_whenInvoked() {
+            //given: case where applicant litigant in person has email as applicant@example.com
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("example of uploaded documents")
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("Billy").partyEmail("applicant@example.com").build())
+                .build();
+            //when: ApplicantNotificationhandler is called
+            handler.notifyApplicantEvidenceUpload(caseData);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "applicant@example.com",
+                "template-id-welsh-lip",
                 getNotificationDataMap(caseData),
                 "evidence-upload-notification-000DC001"
             );

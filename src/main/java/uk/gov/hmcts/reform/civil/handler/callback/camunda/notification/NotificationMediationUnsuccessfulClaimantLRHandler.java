@@ -135,7 +135,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     }
 
     private String addTemplate(CaseData caseData) {
-        return caseData.isBilingual()
+        return caseData.isClaimantBilingual()
             ? notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate() :
             notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate();
     }
@@ -167,7 +167,9 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     private void sendMailUnrepresentedClaimant(CaseData caseData) {
         notificationService.sendMail(
             caseData.getApplicant1().getPartyEmail(),
-            notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+            caseData.isClaimantBilingual()
+                ? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()
+                : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
             addPropertiesCARMforLIP(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference()));
     }
