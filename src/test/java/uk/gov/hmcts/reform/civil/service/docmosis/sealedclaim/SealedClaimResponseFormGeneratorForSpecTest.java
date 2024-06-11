@@ -248,7 +248,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         generator.generate(CASE_DATA_WITH_RESPONDENT1, BEARER_TOKEN);
         //Then
         verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
-        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1);
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1);
     }
 
     @Test
@@ -268,7 +268,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         generator.generate(multipartyCaseData, BEARER_TOKEN);
         //Then
         verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
-        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2);
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2);
     }
 
     private static CaseData getCaseDataWithRespondent1Data() {

@@ -44,8 +44,8 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
@@ -428,7 +428,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
         if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            return DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
+            return DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
         }
         return getDocmosisTemplateForSingleParty();
     }
@@ -437,6 +437,6 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (featureToggleService.isPinInPostEnabled()) {
             return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
         }
-        return DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
+        return DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
     }
 }

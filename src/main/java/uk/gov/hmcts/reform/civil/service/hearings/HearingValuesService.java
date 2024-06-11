@@ -79,7 +79,7 @@ public class HearingValuesService {
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final FeatureToggleService featureToggleService;
 
-    public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
+    public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
         isEarlyAdopter(caseData);

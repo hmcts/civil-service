@@ -114,6 +114,9 @@ public class SdoGeneratorService {
         return updatedFileName.toString();
     }
 
+    final String applicant2 = "applicant2";
+    final String respondent2 = "respondent2";
+
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .writtenByJudge(isJudge)
@@ -122,12 +125,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                SdoHelper.hasSharedVariable(caseData, applicant2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                SdoHelper.hasSharedVariable(caseData, respondent2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -226,12 +229,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                SdoHelper.hasSharedVariable(caseData, applicant2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                SdoHelper.hasSharedVariable(caseData, respondent2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -361,12 +364,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                SdoHelper.hasSharedVariable(caseData, applicant2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                SdoHelper.hasSharedVariable(caseData, respondent2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -411,12 +414,14 @@ public class SdoGeneratorService {
             .hasSdoTrial(caseData.getSdoR2TrialToggle() != null)
             .hasNewDirections(caseData.getSdoR2AddNewDirection() != null)
             .sdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
-            .hasSdoR2TrialWindow((caseData.getSdoR2TrialToggle() != null
-                && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
+            .hasSdoR2TrialWindow(caseData.getSdoR2TrialToggle() != null
+                                     && TrialOnRadioOptions.TRIAL_WINDOW.equals(
+                caseData.getSdoR2Trial().getTrialOnOptions()))
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
             .hasSdoR2TrialPhysicalBundleParty(caseData.getSdoR2Trial() != null
-                && PhysicalTrialBundleOptions.PARTY.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions()) ? true : false)
+                                                  && PhysicalTrialBundleOptions.PARTY.equals(
+                caseData.getSdoR2Trial().getPhysicalBundleOptions()))
             .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
             .hasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
             .welshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
@@ -447,12 +452,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                SdoHelper.hasSharedVariable(caseData, applicant2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                SdoHelper.hasSharedVariable(caseData, respondent2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -548,12 +553,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                SdoHelper.hasSharedVariable(caseData, applicant2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                SdoHelper.hasSharedVariable(caseData, respondent2)
             )
             .respondent2(caseData.getRespondent2())
             .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
