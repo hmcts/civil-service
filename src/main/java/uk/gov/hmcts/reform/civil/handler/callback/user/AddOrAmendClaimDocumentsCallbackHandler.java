@@ -13,14 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
@@ -31,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -44,8 +43,6 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
     private static final List<CaseEvent> EVENTS = Collections.singletonList(ADD_OR_AMEND_CLAIM_DOCUMENTS);
     private final ExitSurveyContentService exitSurveyContentService;
     private final DocumentDownloadService service;
-    private final UserService userService;
-    private final SystemUpdateUserConfiguration userConfig;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -97,9 +94,7 @@ public class AddOrAmendClaimDocumentsCallbackHandler extends CallbackHandler imp
         List<String> errors = new ArrayList<>();
         List<Element<Document>> particularsOfClaimDocument = servedDocumentFiles.getParticularsOfClaimDocument();
         ServedDocumentFiles servedDocumentFilesBefore = getServedDocumentFiles(caseDataBefore);
-        log.info("Logging in as system user: {}", userConfig.getUserName());
-        String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        log.info("Logging in as system user token: {}", authToken);
+        final String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (particularsOfClaimDocument != null) {
             List<Element<Document>> particularsOfClaimDocumentBefore =
                 Optional.ofNullable(servedDocumentFilesBefore.getParticularsOfClaimDocument()).orElse(new ArrayList<>());
