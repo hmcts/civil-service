@@ -28,6 +28,8 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
@@ -125,11 +127,13 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null != rc.getCaseLocation()) {
             return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YES)
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .responseCourtName(rc.getCaseLocation().getBaseLocation())
                 .build();
         } else {
             return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         }
     }
