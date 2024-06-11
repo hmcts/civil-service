@@ -66,16 +66,6 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1(applicant)
-            .respondent1(defendant)
-            .judgmentPaidInFull(JudgmentPaidInFull.builder().dateOfFullPaymentMade(LocalDate.now()).build())
-            .legacyCaseReference("100DC001")
-            .build();
-
         when(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER)
@@ -98,6 +88,16 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(),
             any()
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+
+        Party applicant = PartyBuilder.builder().soleTrader().build();
+        Party defendant = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1(applicant)
+            .respondent1(defendant)
+            .judgmentPaidInFull(JudgmentPaidInFull.builder().dateOfFullPaymentMade(LocalDate.now()).build())
+            .legacyCaseReference("100DC001")
+            .build();
 
         // when
         settleClaimMarkedPaidInFullDefendantLiPLetterGenerator.generateAndPrintSettleClaimPaidInFullLetter(caseData, BEARER_TOKEN);
