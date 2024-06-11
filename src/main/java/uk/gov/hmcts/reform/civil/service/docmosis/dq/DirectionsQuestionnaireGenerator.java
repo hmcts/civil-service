@@ -61,6 +61,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -567,6 +568,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     rc.getCaseLocation().getBaseLocation()
                 ));
             RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YES)
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
@@ -576,6 +578,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             return builder.build();
         } else {
             return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         }
     }
@@ -1085,7 +1088,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                 .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
                                    .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
                 .build())
-            .toList();
+            .collect(toList());
     }
 
     private Witnesses getWitnesses(DQ dq) {
