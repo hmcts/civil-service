@@ -45,7 +45,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 email,
-                getTemplate(isRespondentLip),
+                getTemplate(caseData, isRespondentLip),
                 addProperties(caseData),
                 String.format(
                     REFERENCE_TEMPLATE,
@@ -55,9 +55,14 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    public String getTemplate(boolean isRespondentLip) {
-        return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                                    : notificationsProperties.getEvidenceUploadTemplate();
+    public String getTemplate(CaseData caseData, boolean isRespondentLip) {
+        if (isRespondentLip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getEvidenceUploadLipTemplateWelsh();
+        } else if (isRespondentLip) {
+            return notificationsProperties.getEvidenceUploadLipTemplate();
+        } else {
+            return notificationsProperties.getEvidenceUploadTemplate();
+        }
     }
 
     @Override
