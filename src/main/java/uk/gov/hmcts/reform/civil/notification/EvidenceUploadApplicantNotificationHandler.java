@@ -41,12 +41,10 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     }
 
     private String getTemplate(CaseData caseData, boolean isApplicantLip) {
-        if (isApplicantLip) {
-            if (caseData.isLipApplicantRequiringWelsh()) {
-                return notificationsProperties.getEvidenceUploadLipTemplateBilingual();
-            } else {
-                return notificationsProperties.getEvidenceUploadLipTemplate();
-            }
+        if (isApplicantLip && caseData.isClaimantBilingual()) {
+            return notificationsProperties.getEvidenceUploadLipTemplateWelsh();
+        } else if (isApplicantLip) {
+            return notificationsProperties.getEvidenceUploadLipTemplate();
         } else {
             return notificationsProperties.getEvidenceUploadTemplate();
         }

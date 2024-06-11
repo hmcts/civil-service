@@ -70,11 +70,9 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-        if (caseData.isLipApplicantRequiringWelsh()) {
-            return notificationsProperties.getNotifyClaimantLipHelpWithFeesBilingual();
-        } else {
-            return notificationsProperties.getNotifyClaimantLipHelpWithFees();
-        }
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh()
+            : notificationsProperties.getNotifyClaimantLipHelpWithFees();
     }
 
     private String getRecipientEmail(CaseData caseData) {
