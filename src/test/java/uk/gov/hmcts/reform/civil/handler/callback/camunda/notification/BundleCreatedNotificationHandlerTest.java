@@ -104,7 +104,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             //Then: verify email is sent to applicant
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
-                "template-id",
+                TEMPLATE_ID_BILINGUAL,
                 getNotificationDataMap(caseData),
                 "bundle-created-applicant-notification-000DC001"
             );

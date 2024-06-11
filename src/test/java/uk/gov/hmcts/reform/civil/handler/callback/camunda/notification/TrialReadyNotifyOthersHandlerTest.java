@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -81,6 +82,24 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyApplicant_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "cui-template-id",
+                getLiPNotificationDataMap(true, caseData),
+                "other-party-trial-ready-notification-000MC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_whenInvokedBilingual() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true)
+                .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
             ).build();
