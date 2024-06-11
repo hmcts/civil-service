@@ -57,7 +57,6 @@ public class SettleClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
-            .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
@@ -105,6 +104,62 @@ public class SettleClaimHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted2v1RespondentUnrepresented()
             .applicant1Represented(YesOrNo.NO)
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
+    }
+
+    @Test
+    void shouldReturn_error_when_claim_is_2v2_LRvLiP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateSpec2v1ClaimSubmitted()
+            .respondent1Represented(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
+    }
+
+    @Test
+    void shouldReturn_error_when_claim_is_2v2_LRvLRLiP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateSpec2v1ClaimSubmitted()
+            .respondent1Represented(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
+    }
+
+    @Test
+    void shouldReturn_error_when_claim_is_2v2_LRvLiPLR() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateSpec2v1ClaimSubmitted()
+            .respondent1Represented(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
+    }
+
+    @Test
+    void shouldReturn_error_when_claim_is_2v2_LRvLR_and_respondent_has_different_representative() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateSpec2v1ClaimSubmitted()
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
@@ -163,6 +218,20 @@ public class SettleClaimHelperTest {
     void shouldNotReturn_error_when_claim_is_2v1_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted2v1RespondentUnrepresented()
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturn_error_when_claim_is_2v2_LRvLR_and_respondent_has_same_representative() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateSpec2v1ClaimSubmitted()
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
