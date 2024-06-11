@@ -118,24 +118,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
-                                                             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
-                                                                 && document.getValue().getCreatedBy().equals("Defendant")) {
-                                                                 updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
-                                                                                                                  .file(document.getValue().getDocumentLink())
-                                                                                                                  .build());
-                                                             }
-                                                             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
-                                                                 && document.getValue().getCreatedBy().equals("Defendant 2")) {
-                                                                 updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
-                                                                                                                  .file(document.getValue().getDocumentLink())
-                                                                                                                  .build());
-                                                             }
-                                                             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                                                                 updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                                                                       .file(document.getValue().getDocumentLink())
-                                                                                                                       .build());
-                                                             }
-                                                         }
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant")) {
+                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant 2")) {
+                updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                                                                      .file(document.getValue().getDocumentLink())
+                                                                      .build());
+            }
+        }
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -258,6 +258,30 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
+        }
+
+        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
+            // moving statement of truth value to correct field, this was not possible in mid event.
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+
+            updateApplicants(caseData, builder, statementOfTruth, callbackParams);
+
+            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        }
+
+        assembleResponseDocuments(caseData, builder);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateDQPartyIds(builder);
             if (bothApplicantDecidesToProceedWithClaim2v1(caseData)
                 && caseData.getApplicant1DQ() != null
                 && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
@@ -274,36 +298,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                 .reasons(app1Frc.getReasons())
                                 .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
                                 .build())
-                           .build());
+                                             .build());
                 }
             }
-        }
-
-
-        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-
-            updateApplicants(caseData, builder, statementOfTruth, callbackParams);
-
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        }
-
-        assembleResponseDocuments(caseData, builder);
-
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
-            builder,
-            featureToggleService.isUpdateContactDetailsEnabled()
-        );
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
-
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
@@ -328,8 +325,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             && builder.build().getApplicant2DQ() != null) {
             builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
-
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -423,7 +418,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 DocCategory.APP1_DQ.getValue()
             );
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                claimantUploads, DocCategory.DQ_APP1.getValue());
+                    claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
                 duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
