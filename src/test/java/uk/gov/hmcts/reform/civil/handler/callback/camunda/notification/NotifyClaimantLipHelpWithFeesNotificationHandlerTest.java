@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -45,10 +46,12 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
         void setup() {
             when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
                 .thenReturn("test-template-received-id");
+            when(notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh())
+                .thenReturn("test-template-received-id-welsh");
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
+        void shouldNotifyClaimant_whenInvokedAnd1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build()).build();
 
@@ -59,6 +62,26 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "claimant@hmcts.net",
                 "test-template-received-id",
+                getNotificationDataMap(caseData),
+                "notify-claimant-lip-help-with-fees-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyClaimantInWelsh_whenInvokedAnd1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "claimant@hmcts.net",
+                "test-template-received-id-welsh",
                 getNotificationDataMap(caseData),
                 "notify-claimant-lip-help-with-fees-notification-000DC001"
             );
