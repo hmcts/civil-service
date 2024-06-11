@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -117,24 +118,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
-            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
-                && document.getValue().getCreatedBy().equals("Defendant")) {
-                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
-                                                                 .file(document.getValue().getDocumentLink())
-                                                                 .build());
-            }
-            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
-                && document.getValue().getCreatedBy().equals("Defendant 2")) {
-                updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
-                                                                 .file(document.getValue().getDocumentLink())
-                                                                 .build());
-            }
-            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                      .file(document.getValue().getDocumentLink())
-                                                                      .build());
-            }
-        }
+                                                             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                                                                 && document.getValue().getCreatedBy().equals("Defendant")) {
+                                                                 updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                                                                  .file(document.getValue().getDocumentLink())
+                                                                                                                  .build());
+                                                             }
+                                                             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                                                                 && document.getValue().getCreatedBy().equals("Defendant 2")) {
+                                                                 updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
+                                                                                                                  .file(document.getValue().getDocumentLink())
+                                                                                                                  .build());
+                                                             }
+                                                             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                                                                 updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                                                                                                                       .file(document.getValue().getDocumentLink())
+                                                                                                                       .build());
+                                                             }
+                                                         }
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -188,6 +189,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean bothApplicantDecidesToProceedWithClaim2v1(CaseData caseData) {
+        return YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
     private boolean anyApplicantDecidesToProceedWithClaim(CaseData caseData) {
@@ -252,7 +258,27 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
+            if (bothApplicantDecidesToProceedWithClaim2v1(caseData)
+                && caseData.getApplicant1DQ() != null
+                && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
+
+                if (caseData.getApplicant2DQ() == null
+                    || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
+                    FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
+
+                    builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
+                            FixedRecoverableCosts.builder()
+                                .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
+                                .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
+                                .band(app1Frc.getBand())
+                                .reasons(app1Frc.getReasons())
+                                .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
+                                .build())
+                           .build());
+                }
+            }
         }
+
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             // moving statement of truth value to correct field, this was not possible in mid event.
@@ -266,8 +292,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder,
+            featureToggleService.isUpdateContactDetailsEnabled()
+        );
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
@@ -300,6 +328,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             && builder.build().getApplicant2DQ() != null) {
             builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
+
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -393,7 +423,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 DocCategory.APP1_DQ.getValue()
             );
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                    claimantUploads, DocCategory.DQ_APP1.getValue());
+                claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
                 duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
