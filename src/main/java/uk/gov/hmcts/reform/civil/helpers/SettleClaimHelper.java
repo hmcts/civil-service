@@ -21,9 +21,7 @@ public class SettleClaimHelper {
 
         if (caseData.isApplicantLiP()
             || MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)
-            || (caseData.getAddRespondent2() == YesOrNo.YES && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()))
-            || (caseData.getAddApplicant2() == YesOrNo.YES && caseData.getAddRespondent2() == YesOrNo.YES
-                && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.getRespondent2SameLegalRepresentative() == YesOrNo.NO))) {
+            || (caseData.getAddRespondent2() == YesOrNo.YES && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()))) {
             errors.add("This action is not available for this claim");
         }
     }
