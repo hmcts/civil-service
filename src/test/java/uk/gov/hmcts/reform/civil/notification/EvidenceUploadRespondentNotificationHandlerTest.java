@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -44,6 +47,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void setup() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn("template-id");
             when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getEvidenceUploadLipTemplateWelsh()).thenReturn("template-id-lip-welsh");
         }
 
         @Test
@@ -78,6 +82,32 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id-lip",
+                getNotificationDataMap(caseData),
+                "evidence-upload-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent1LipinWelsh_whenInvoked() {
+            //given: case data has one respondent litigant in person
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build())
+                                 .build())
+                .build().toBuilder()
+                .notificationText("example of uploaded documents")
+                .respondent1Represented(YesOrNo.NO)
+                .respondent1(Party.builder().partyName("Billy").partyEmail("respondent@example.com").build())
+                .build();
+            //when: RepondentNotificationhandler for respondent 1 is called
+
+            handler.notifyRespondentEvidenceUpload(caseData, true);
+            //then: email should be sent to respondent
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id-lip-welsh",
                 getNotificationDataMap(caseData),
                 "evidence-upload-notification-000DC001"
             );
