@@ -117,10 +117,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
         DocmosisTemplates templateId;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = featureToggleService.isFastTrackUpliftsEnabled()
+                templateId = isFastTrackOrMinti
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
                 templateId = featureToggleService.isFastTrackUpliftsEnabled()

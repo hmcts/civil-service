@@ -2627,6 +2627,222 @@ class DirectionsQuestionnaireGeneratorTest {
                 eq(DQ_RESPONSE_1V2_SS)
             );
         }
+
+        @Test
+        void specGenerateClaimantDQ_MultiTrack_MintiEnabled() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
+                                          "claimant", REFERENCE_NUMBER
+            );
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("MULTI_CLAIM")
+                .atStateApplicantRespondToDefenceAndProceed()
+                .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+                .build().toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)
+            );
+        }
+
+        @Test
+        void specGenerateClaimantDQ_IntTrack_MintiEnabled() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
+                                          "claimant", REFERENCE_NUMBER
+            );
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack("INTERMEDIATE_CLAIM")
+                .atStateApplicantRespondToDefenceAndProceed()
+                .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+                .build().toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)
+            );
+        }
+
+        @Test
+        void whenIntermediateClaim_shouldUseFixedRecoverableCosts_ClaimantDQ() {
+            FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                .isSubjectToFixedRecoverableCostRegime(YES)
+                .frcSupportingDocument(Document.builder().build())
+                .complexityBandingAgreed(YES)
+                .band(ComplexityBand.BAND_1)
+                .reasons("Reasoning")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder()
+                .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                  .applicant1DQFixedRecoverableCosts(null)
+                                  .applicant1DQFixedRecoverableCostsIntermediate(frcIntermediate)
+                                  .build())
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+            FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+            assertThat(data.getIsSubjectToFixedRecoverableCostRegime()).isEqualTo(YES);
+            assertThat(data.getComplexityBandingAgreed()).isEqualTo(YES);
+            assertThat(data.getBand()).isEqualTo(ComplexityBand.BAND_1);
+            assertThat(data.getBandText()).isEqualTo(ComplexityBand.BAND_1.getLabel());
+            assertThat(data.getReasons()).isEqualTo("Reasoning");
+        }
+
+        @Test
+        void whenMultiClaim_shouldNotUseFixedRecoverableCosts_ClaimantDQ() {
+            FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
+                .isSubjectToFixedRecoverableCostRegime(YES)
+                .frcSupportingDocument(Document.builder().build())
+                .complexityBandingAgreed(YES)
+                .band(ComplexityBand.BAND_1)
+                .reasons("Reasoning")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                  .applicant1DQFixedRecoverableCosts(null)
+                                  .applicant1DQFixedRecoverableCostsIntermediate(frcIntermediate)
+                                  .build())
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+            FixedRecoverableCostsSection data = templateData.getFixedRecoverableCosts();
+            assertThat(data).isNull();
+        }
+
+        @Test
+        void shouldIncludeDisclosureDocInfo_ClaimantDQ_MultiTrack_Minti() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            String disclosureOrderNumber = "123";
+            caseData = caseData.toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                  .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                                                   .reachedAgreement(NO)
+                                                                                   .agreementLikely(NO)
+                                                                                   .reasonForNoAgreement("some reasons")
+                                                                                   .build())
+                                  .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                                      .bespokeDirections("non electric stuff")
+                                                                                      .build())
+                                  .applicant1DQDisclosureReport(DisclosureReport.builder()
+                                                                    .disclosureFormFiledAndServed(YES)
+                                                                    .disclosureProposalAgreed(YES)
+                                                                    .draftOrderNumber(disclosureOrderNumber)
+                                                                    .build())
+                                  .build())
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+            DisclosureOfElectronicDocuments DisclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
+            DisclosureOfNonElectronicDocuments disclosureNonElecDocs = templateData.getDisclosureOfNonElectronicDocuments();
+            DisclosureReport disclosureReport = templateData.getDisclosureReport();
+
+            assertThat(DisclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
+            assertThat(DisclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
+            assertThat(DisclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
+            assertThat(disclosureNonElecDocs.getBespokeDirections()).isEqualTo("non electric stuff");
+            assertThat(disclosureReport.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            assertThat(disclosureReport.getDisclosureProposalAgreed()).isEqualTo(YES);
+            assertThat(disclosureReport.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+        }
+
+        @Test
+        void shouldNotIncludeDicslosureReport_ClaimantDQ_MultiTrack_MintiNotEnabled() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            String disclosureOrderNumber = "123";
+            caseData = caseData.toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                  .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                                                   .reachedAgreement(NO)
+                                                                                   .agreementLikely(NO)
+                                                                                   .reasonForNoAgreement("some reasons")
+                                                                                   .build())
+                                  .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                                      .bespokeDirections("non electric stuff")
+                                                                                      .build())
+                                  .applicant1DQDisclosureReport(DisclosureReport.builder()
+                                                                    .disclosureFormFiledAndServed(YES)
+                                                                    .disclosureProposalAgreed(YES)
+                                                                    .draftOrderNumber(disclosureOrderNumber)
+                                                                    .build())
+                                  .build())
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+            DisclosureOfElectronicDocuments DisclosureElecDocs = templateData.getDisclosureOfElectronicDocuments();
+            DisclosureOfNonElectronicDocuments disclosureNonElecDocs = templateData.getDisclosureOfNonElectronicDocuments();
+            DisclosureReport disclosureReport = templateData.getDisclosureReport();
+
+            assertThat(DisclosureElecDocs.getReachedAgreement()).isEqualTo(NO);
+            assertThat(DisclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
+            assertThat(DisclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
+            assertThat(disclosureNonElecDocs.getBespokeDirections()).isEqualTo("non electric stuff");
+            assertThat(disclosureReport).isEqualTo(null);
+        }
     }
 
     @Nested
