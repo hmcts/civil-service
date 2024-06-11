@@ -64,6 +64,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         void setup() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-bilingual");
         }
 
         @Test
@@ -154,7 +156,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             //then: email should be sent to respondent1
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                "template-id-lip",
+                "template-id-lip-bilingual",
                 getRespondentNotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );

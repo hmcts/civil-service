@@ -88,59 +88,9 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedBilingual() {
-            //Given: Case data at hearing scheduled state and callback param with Notify applicant event
-            CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled()
-                .applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference(Language.WELSH.toString())
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
-            ).build();
-
-            //When: handler is called
-            handler.handle(params);
-
-            //Then: verify email is sent to applicant
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                TEMPLATE_ID_BILINGUAL,
-                getNotificationDataMap(caseData),
-                "bundle-created-applicant-notification-000DC001"
-            );
-        }
-
-        @Test
         void shouldNotifyRespondentSolicitorOne_whenInvoked() {
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
-            ).build();
-
-            //When: handler is called
-            handler.handle(params);
-
-            //Then: verify email is sent to respondent1
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "bundle-created-respondent-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondentSolicitorOne_whenInvokedBilingual() {
-            //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
-            CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled()
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.WELSH.toString())
-                                                             .build())
-                                 .build())
-                .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
             ).build();
