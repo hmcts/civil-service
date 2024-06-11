@@ -80,10 +80,10 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         boolean isLip = false;
         if (taskId.equals(TASK_ID_APPLICANT)) {
             isLip = isApplicant1Lip(caseData);
-            isLipWelsh = isLip && caseData.isLipApplicantRequiringWelsh();
+            isLipWelsh = isLip && caseData.isClaimantBilingual();
         } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
             isLip = isRespondent1Lip(caseData);
-            isLipWelsh = isLip && caseData.isLipDefendant1RequiringWelsh();
+            isLipWelsh = isLip && caseData.isRespondentResponseBilingual();
         }
         if (isLip) {
             if (isLipWelsh) {

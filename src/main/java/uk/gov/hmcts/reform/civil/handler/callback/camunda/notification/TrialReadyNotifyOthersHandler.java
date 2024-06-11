@@ -107,8 +107,8 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private String getTemplate(CaseData caseData, boolean isLiP, boolean isApplicant) {
         String emailTemplate;
         if (isLiP) {
-            if ((isApplicant && caseData.isLipApplicantRequiringWelsh())
-                || caseData.isLipDefendant1RequiringWelsh()) {
+            if ((isApplicant && caseData.isClaimantBilingual())
+                || caseData.isRespondentResponseBilingual()) {
                 emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
             } else {
                 emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();

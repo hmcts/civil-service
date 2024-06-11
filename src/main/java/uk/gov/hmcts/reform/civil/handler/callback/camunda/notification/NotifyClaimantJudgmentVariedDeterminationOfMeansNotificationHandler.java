@@ -94,7 +94,7 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
     }
 
     private String getLIPTemplate(CaseData caseData) {
-        if (caseData.isLipApplicantRequiringWelsh()) {
+        if (caseData.isClaimantBilingual()) {
             return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
         } else {
             return notificationsProperties.getNotifyLipUpdateTemplate();

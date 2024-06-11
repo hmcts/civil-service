@@ -1497,18 +1497,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
      * @return true if applicant is LiP and they accept Welsh (or English+Welsh)
      */
     @JsonIgnore
-    public boolean isLipApplicantRequiringWelsh() {
-        return Optional.ofNullable(getClaimantBilingualLanguagePreference())
-            .filter(value -> List.of(Language.WELSH.toString(), Language.BOTH.toString()).contains(value))
-            .isPresent();
-    }
-
-    /**
-     * LiP applicant requires Welsh if they selected Welsh or Both languages.
-     *
-     * @return true if applicant is LiP and they accept Welsh (or English+Welsh)
-     */
-    @JsonIgnore
     public boolean isLipDefendant1RequiringWelsh() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)

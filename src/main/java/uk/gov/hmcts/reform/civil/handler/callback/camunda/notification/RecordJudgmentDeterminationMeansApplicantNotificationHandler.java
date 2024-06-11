@@ -57,7 +57,7 @@ public class RecordJudgmentDeterminationMeansApplicantNotificationHandler extend
         boolean isApplicantLip = caseData.isApplicantNotRepresented();
         String emailTemplateID;
         if (isApplicantLip) {
-            if (caseData.isLipApplicantRequiringWelsh()) {
+            if (caseData.isClaimantBilingual()) {
                 emailTemplateID = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
             } else {
                 emailTemplateID = notificationsProperties.getNotifyLipUpdateTemplate();

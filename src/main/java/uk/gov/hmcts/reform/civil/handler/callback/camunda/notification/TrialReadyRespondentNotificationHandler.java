@@ -67,7 +67,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
-                    caseData.isLipDefendant1RequiringWelsh()
+                    caseData.isRespondentResponseBilingual()
                         ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
                         : notificationsProperties.getNotifyLipUpdateTemplate(),
                     addPropertiesLRvLip(caseData),

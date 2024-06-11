@@ -59,7 +59,7 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
             if (caseData.getApplicant1Email() != null) {
                 notificationService.sendMail(
                     caseData.getApplicant1Email(),
-                    caseData.isLipApplicantRequiringWelsh()
+                    caseData.isClaimantBilingual()
                         ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
                         : notificationsProperties.getNotifyLipUpdateTemplate(),
                     addPropertiesLip(caseData),

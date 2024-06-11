@@ -77,7 +77,7 @@ public class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHan
     }
 
     private String getTemplate(CaseData caseData) {
-        if (caseData.isLipDefendant1RequiringWelsh()) {
+        if (caseData.isRespondentResponseBilingual()) {
             return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
         } else {
             return notificationsProperties.getNotifyLipUpdateTemplate();

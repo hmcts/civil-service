@@ -88,10 +88,10 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         boolean isLipWelsh = false;
         if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
             isLip = true;
-            isLipWelsh = caseData.isLipApplicantRequiringWelsh();
+            isLipWelsh = caseData.isClaimantBilingual();
         } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
             isLip = true;
-            isLipWelsh = caseData.isLipDefendant1RequiringWelsh();
+            isLipWelsh = caseData.isRespondentResponseBilingual();
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
             // TODO CIV-13814 not contemplated response 2 currently
             isLip = true;
