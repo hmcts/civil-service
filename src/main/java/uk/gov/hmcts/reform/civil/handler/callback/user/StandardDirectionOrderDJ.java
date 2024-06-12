@@ -777,12 +777,15 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-
         if (featureToggleService.isNationalRolloutEnabled()) {
             if (featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YES);
+
+                if (featureToggleService.isHmcEnabled()) {
+                    caseDataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(NO);
@@ -802,11 +805,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             }
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
+        boolean isWhiteListedForHmc = featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+            && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+        log.info(("Case {} is{}whitelisted for HMC rollout."),
+                 caseData.getCcdCaseReference(), isWhiteListedForHmc ? " " : " NOT ");
+        return isWhiteListedForHmc;
     }
 
     private String getEpimmsId(CaseData caseData) {

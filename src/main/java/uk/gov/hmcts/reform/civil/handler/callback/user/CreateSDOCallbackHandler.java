@@ -1557,6 +1557,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
+
+                if (featureToggleService.isHmcEnabled()) {
+                    dataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(NO);
@@ -1602,6 +1606,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
+        boolean isWhiteListedForHmc = featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+            && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+        log.info(("Case {} is{}whitelisted for HMC rollout."),
+                 caseData.getCcdCaseReference(), isWhiteListedForHmc ? " " : " NOT ");
+        return isWhiteListedForHmc;
     }
 
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
