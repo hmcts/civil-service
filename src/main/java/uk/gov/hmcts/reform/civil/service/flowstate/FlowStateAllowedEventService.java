@@ -949,9 +949,7 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
                 INVALID_HWF_REFERENCE,
-                COURT_OFFICER_ORDER,
-                SETTLE_CLAIM,
-                SETTLE_CLAIM_MARK_PAID_FULL
+                COURT_OFFICER_ORDER
             )
         ),
         entry(
@@ -1417,6 +1415,7 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
+                REQUEST_FOR_RECONSIDERATION,
                 DECISION_ON_RECONSIDERATION_REQUEST,
                 EDIT_JUDGMENT,
                 COURT_OFFICER_ORDER,
