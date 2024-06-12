@@ -80,7 +80,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateSetAsideDate() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
@@ -106,7 +106,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefenceReceivedDate() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
@@ -131,7 +131,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
@@ -156,7 +156,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateOrderType() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
             when(deadlinesCalculator.plus28DaysAt4pmDeadline(now().atStartOfDay()))
                 .thenReturn(nextDeadline);
@@ -177,7 +177,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testSetAsideForDEfaultJudgment() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);

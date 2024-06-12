@@ -5903,7 +5903,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
@@ -5919,7 +5919,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseDataWithDeterminationMeans() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
                                              .startDate(LocalDate.of(2022, 12, 12))
@@ -5934,13 +5934,13 @@ public class CaseDataBuilder {
 
     public CaseData buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .confirmReferToJudgeDefenceReceived(List.of(ConfirmationToggle.CONFIRM)).build();
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -5952,7 +5952,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
@@ -5967,7 +5967,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
@@ -5980,7 +5980,7 @@ public class CaseDataBuilder {
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
         return build().toBuilder()
-            .ccdState(CaseState.ALL_FINAL_ORDERS_ISSUED)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.now().plusDays(15))

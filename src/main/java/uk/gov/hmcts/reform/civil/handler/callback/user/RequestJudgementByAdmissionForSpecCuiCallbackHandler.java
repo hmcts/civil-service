@@ -108,7 +108,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             && data.isLRvLipOneVOne()
             && data.isPayImmediately()) {
 
-            nextState = CaseState.ALL_FINAL_ORDERS_ISSUED.name();
+            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();

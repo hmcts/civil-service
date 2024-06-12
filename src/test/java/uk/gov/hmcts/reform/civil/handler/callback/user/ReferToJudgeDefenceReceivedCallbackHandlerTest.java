@@ -46,7 +46,7 @@ class ReferToJudgeDefenceReceivedCallbackHandlerTest extends BaseCallbackHandler
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateConfirmationToReferJudgeDefenceReceived() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithConfirmationForReferToJudgeDefenceReceived();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

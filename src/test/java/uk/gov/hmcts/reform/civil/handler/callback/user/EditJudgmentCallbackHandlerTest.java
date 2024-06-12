@@ -82,7 +82,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplay(YesOrNo value) {
-            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
@@ -104,7 +104,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplayForDJ(YesOrNo value) {
-            //Given: Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
@@ -138,7 +138,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment_WITH_RTL_YES_TO_YES() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper();
@@ -187,7 +187,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately_RTL_NO_TO_YES() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
@@ -226,7 +226,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date_RTL_NO_TO_NO() {
-            //Given : Casedata in ALL_FINAL_ORDERS_ISSUED State
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);

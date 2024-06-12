@@ -13,7 +13,7 @@ public class SettleClaimHelper {
 
     public static void checkState(CaseData caseData, List<String> errors) {
 
-        if (caseData.getCcdState().equals(CaseState.ALL_FINAL_ORDERS_ISSUED)) {
+        if (caseData.getCcdState().equals(CaseState.All_FINAL_ORDERS_ISSUED)) {
             errors.add("This action is not currently allowed at this stage");
         }
     }
