@@ -35,10 +35,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM_MARK_PAID_FULL);
-    public static final String PROCEED_HERITAGE_SYSTEM_NEXT_STEPS = "### Next step\n\n The case will now proceed offline " +
-        "and your online account will not be updated for this claim. Any updates will be sent by post.";
-    public static final String CLOSED_NEXT_STEPS = "### Next step\n\n Any hearing listed will be vacated. " +
-        "\n\n The defendants will be notified.";
+    public static final String PROCEED_HERITAGE_SYSTEM_NEXT_STEPS = """
+        ### Next step
+
+         The case will now proceed offline and your online account will not be updated for this claim. Any updates will be sent by post.""";
+    public static final String CLOSED_NEXT_STEPS = """
+        ### Next step
+
+         Any hearing listed will be vacated.
+
+         The defendants will be notified.""";
     public static final String PROCEED_HERITAGE_SYSTEM_HEADER = "### Request is being reviewed";
     public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
     private final ObjectMapper objectMapper;
@@ -80,13 +86,14 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String nextState;
 
         if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         } else {
             caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            //TODO in case no hearing centre allocated, set owning court as CTSC
             nextState = CaseState.CLOSED.name();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
