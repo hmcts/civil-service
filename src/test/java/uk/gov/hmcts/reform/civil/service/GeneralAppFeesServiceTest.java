@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -256,7 +257,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void default_types_with_notice_should_pay_275() {
             List<GeneralApplicationTypes> allTypes =
-                    Stream.of(GeneralApplicationTypes.values()).toList();
+                    Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
@@ -278,7 +279,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void default_types_with_notice_should_pay_275_forGALiP() {
             List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).toList();
+                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
@@ -296,7 +297,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void default_types_without_notice_should_pay_108() {
             List<GeneralApplicationTypes> allTypes =
-                    Stream.of(GeneralApplicationTypes.values()).toList();
+                    Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
@@ -318,7 +319,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void default_types_without_notice_should_pay_108_forGALiP() {
             List<GeneralApplicationTypes> allTypes =
-                Stream.of(GeneralApplicationTypes.values()).toList();
+                Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
@@ -446,7 +447,7 @@ class GeneralAppFeesServiceTest {
 
         private List<GeneralApplicationTypes> getRandomDefaultTypes() {
             List<GeneralApplicationTypes> allTypes =
-                    Stream.of(GeneralApplicationTypes.values()).toList();
+                    Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
             allTypes.removeAll(GeneralAppFeesService.SET_ASIDE);
             allTypes.removeAll(GeneralAppFeesService.ADJOURN_TYPES);
