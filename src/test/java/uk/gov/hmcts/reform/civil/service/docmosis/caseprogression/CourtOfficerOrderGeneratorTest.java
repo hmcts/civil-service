@@ -156,5 +156,4 @@ class CourtOfficerOrderGeneratorTest {
         assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, "BEARER_TOKEN"));
     }
 
-
 }
