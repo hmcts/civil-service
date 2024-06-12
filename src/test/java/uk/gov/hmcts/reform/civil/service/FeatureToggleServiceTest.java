@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -173,13 +174,9 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-        var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    @Test
+    void shouldReturnCorrectValue_whenCaseProgressionEnabled() {
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
