@@ -78,7 +78,9 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             if (featureToggleService.isCarmEnabledForCase(caseData)) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
-                    notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+                    caseData.isRespondentResponseBilingual()
+                        ? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()
+                        : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
                     addPropertiesCARM(caseData),
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference()));
             } else {
