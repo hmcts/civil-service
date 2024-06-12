@@ -1,20 +1,20 @@
-package uk.gov.hmcts.reform.fees.client;
+package uk.gov.hmcts.reform.civil.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.client.FeesApi;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 
 @Service
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
-public class FeesClient {
+public class FeesClientService {
 
     public static final String EVENT_ISSUE = "issue";
     public static final String EVENT_HEARING = "hearing";
@@ -22,7 +22,7 @@ public class FeesClient {
     public static final String HEARING_SMALL_CLAIMS = "HearingSmallClaims";
     public static final String MONEY_CLAIM = "MoneyClaim";
 
-    private final FeesApi feesApi;
+    private final uk.gov.hmcts.reform.civil.client.FeesApi feesApi;
     private final String service;
     private final String jurisdiction1;
     private final String jurisdiction2;
@@ -30,7 +30,7 @@ public class FeesClient {
     private final FeatureToggleService featureToggleService;
 
     @Autowired
-    public FeesClient(
+    public FeesClientService(
         FeesApi feesApi,
         FeatureToggleService featureToggleService,
         @Value("${fees.api.service:}") String service,
@@ -61,7 +61,7 @@ public class FeesClient {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return this.feesApi.lookupFee(
+            return this.feesApi.lookupFeeWithAmount(
                 service,
                 jurisdiction1,
                 jurisdiction2,

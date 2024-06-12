@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -14,7 +14,8 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,7 +35,8 @@ public class GeneralAppFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
     private static final int FREE_GA_DAYS = 14;
-    private final RestTemplate restTemplate;
+
+    private final FeesApi feesApi;
     private final GeneralAppFeesConfiguration feesConfiguration;
 
     private static final String CHANNEL = "channel";
@@ -45,17 +47,19 @@ public class GeneralAppFeesService {
     private static final String KEYWORD = "keyword";
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
-            .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+        .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
-            = Arrays.asList(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT,
-            GeneralApplicationTypes.VARY_ORDER);
+        = Arrays.asList(
+        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT,
+        GeneralApplicationTypes.VARY_ORDER
+    );
     protected static final List<GeneralApplicationTypes> SET_ASIDE
-            = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
+        = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
-            = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
+        = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
-            = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
+        = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
@@ -63,7 +67,12 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(CaseData caseData) {
-        return getFeeForGA(caseData.getGeneralAppType().getTypes(), getRespondentAgreed(caseData), getInformOtherParty(caseData), getHearingDate(caseData));
+        return getFeeForGA(
+            caseData.getGeneralAppType().getTypes(),
+            getRespondentAgreed(caseData),
+            getInformOtherParty(caseData),
+            getHearingDate(caseData)
+        );
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
@@ -109,29 +118,26 @@ public class GeneralAppFeesService {
         if (Objects.isNull(service)) {
             service = feesConfiguration.getService();
         }
-        String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
-                .queryParam(CHANNEL, feesConfiguration.getChannel())
-                .queryParam(EVENT, event)
-                .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
-                .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
-                .queryParam(SERVICE, service)
-                .queryParam(KEYWORD, keyword);
 
-        URI uri;
         FeeLookupResponseDto feeLookupResponseDto;
         try {
-            uri = builder.buildAndExpand(new HashMap<>()).toUri();
-            log.info("Calling fee service uri: {}", uri);
-            feeLookupResponseDto = restTemplate.getForObject(uri, FeeLookupResponseDto.class);
-            log.info("Received fee service response, amount: {}",
-                     Optional.ofNullable(feeLookupResponseDto).map(FeeLookupResponseDto::getFeeAmount).orElse(null));
+            feeLookupResponseDto = feesApi.lookupFee(
+                service,
+                feesConfiguration.getJurisdiction1(),
+                feesConfiguration.getJurisdiction2(),
+                feesConfiguration.getChannel(),
+                event,
+                keyword
+            );
+            log.info(
+                "Received fee service response, amount: {}",
+                Optional.ofNullable(feeLookupResponseDto).map(FeeLookupResponseDto::getFeeAmount).orElse(null)
+            );
         } catch (Exception e) {
             log.error("Fee Service Lookup Failed - " + e.getMessage(), e);
             throw new RuntimeException(e);
         }
         if (feeLookupResponseDto == null || feeLookupResponseDto.getFeeAmount() == null) {
-            log.error("No Fees returned for [{}].", uri);
             throw new RuntimeException("No Fees returned by fee-service while creating General Application");
         }
         return buildFeeDto(feeLookupResponseDto);
@@ -168,14 +174,14 @@ public class GeneralAppFeesService {
 
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
-                .multiply(PENCE_PER_POUND)
-                .setScale(0, RoundingMode.UNNECESSARY);
+            .multiply(PENCE_PER_POUND)
+            .setScale(0, RoundingMode.UNNECESSARY);
 
         return Fee.builder()
-                .calculatedAmountInPence(calculatedAmount)
-                .code(feeLookupResponseDto.getCode())
-                .version(feeLookupResponseDto.getVersion().toString())
-                .build();
+            .calculatedAmountInPence(calculatedAmount)
+            .code(feeLookupResponseDto.getCode())
+            .version(feeLookupResponseDto.getVersion().toString())
+            .build();
     }
 
     protected Boolean getRespondentAgreed(CaseData caseData) {

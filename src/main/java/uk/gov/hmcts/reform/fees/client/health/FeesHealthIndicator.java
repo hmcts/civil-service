@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import uk.gov.hmcts.reform.fees.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApi;
 
 public class FeesHealthIndicator implements HealthIndicator {
 

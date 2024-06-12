@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.fees.client.config;
+package uk.gov.hmcts.reform.civil.config;
 
 import feign.codec.Encoder;
 import feign.form.FormEncoder;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import uk.gov.hmcts.reform.fees.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApi;
 import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 @Configuration

@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.net.URI;
