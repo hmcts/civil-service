@@ -777,7 +777,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-
         if (featureToggleService.isNationalRolloutEnabled()) {
             if (featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
@@ -801,7 +800,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 }
             }
         }
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

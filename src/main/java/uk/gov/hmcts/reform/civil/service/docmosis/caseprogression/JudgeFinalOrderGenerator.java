@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -17,12 +18,12 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -30,10 +31,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -46,7 +45,6 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Slf4j
 @Service
@@ -58,14 +56,18 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final IdamClient idamClient;
     private final LocationRefDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    private final DocumentHearingLocationHelper documentHearingLocationHelper;
     private LocationRefData caseManagementLocationDetails;
-
     private static final String NOTICE_RECIEVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
     private static final String NOTICE_RECIEVED_CANNOT_PROCEED =     "received notice of the trial, the Judge was not satisfied that it was "
         + "reasonable to proceed in their absence.";
     private static final String NOTICE_NOT_RECIEVED_CANNOT_PROCEED =     "The Judge was not satisfied that they had received notice of the hearing "
         + "and it was not reasonable to proceed in their absence.";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    public String ccmccEpimmId;
+    @Value("${court-location.specified-claim.epimms-id}")
+    public String cnbcEpimmId;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
@@ -100,14 +102,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
-        var foundLocations = locationRefData.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
-        } else {
-            throw new IllegalArgumentException("Base Court Location not found, in location data");
-        }
+        caseManagementLocationDetails = documentHearingLocationHelper
+            .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -135,20 +131,14 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
             .courtName(caseManagementLocationDetails.getVenueName())
-            .courtLocation(getHearingLocationText(caseData, authorisation));
+            .courtLocation(getHearingLocationText(caseData));
         return freeFormOrderBuilder.build();
     }
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
-        var foundLocations = locationRefData.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
-        } else {
-            throw new IllegalArgumentException("Base Court Location not found, in location data");
-        }
+        caseManagementLocationDetails = documentHearingLocationHelper
+            .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -161,7 +151,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .courtName(caseManagementLocationDetails.getVenueName())
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
-            .courtLocation(getHearingLocationText(caseData, authorisation))
+            .courtLocation(getHearingLocationText(caseData))
             .judgeNameTitle(userDetails.getFullName())
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
@@ -630,28 +620,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-    private String getCaseManagementLocationText(CaseData caseData, String authorisation) {
-        String locationEpimms = caseData.getCaseManagementLocation().getBaseLocation();
-        List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-                        authorisation, caseData.getCaseManagementLocation().getBaseLocation())
-                .stream().filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList());
-
-        if (matchingLocations.size() != 1) {
-            throw new LocationRefDataException(
-                String.format(
-                    "Unexpected amount of locations (%d) where matched against location epimms id: %s",
-                    matchingLocations.size(),
-                    locationEpimms
-                ));
-        }
-
-        return LocationRefDataService.getDisplayEntry(matchingLocations.get(0));
-    }
-
-    private String getHearingLocationText(CaseData caseData, String authorisation) {
+    private String getHearingLocationText(CaseData caseData) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
-            : getCaseManagementLocationText(caseData, authorisation);
+            : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
     }
 
 }
