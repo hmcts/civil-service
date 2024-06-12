@@ -77,7 +77,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
         if (caseData.isLipvLipOneVOne()
             && toggleService.isLipVLipEnabled()) {
-            template = getLipEmailTemplate(caseData.isBilingual());
+            template = getLipEmailTemplate(caseData.isClaimantBilingual());
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         return template;
