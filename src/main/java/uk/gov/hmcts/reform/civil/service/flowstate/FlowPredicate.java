@@ -207,7 +207,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
-
     public static final Predicate<CaseData> claimIssueBilingual = caseData ->
         caseData.isClaimantBilingual();
 
