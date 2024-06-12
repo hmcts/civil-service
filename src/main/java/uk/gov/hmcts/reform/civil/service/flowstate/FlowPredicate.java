@@ -207,8 +207,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
-    //TODO Remove after DTSCCI-244
-    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isBilingual;
+
+    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
+        caseData.isClaimantBilingual();
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null

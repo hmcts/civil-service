@@ -44,13 +44,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
-            && caseData.isBilingual()
+            && caseData.isClaimantBilingual()
             && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
     @Override
     public boolean hasResponsePending() {
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
+            && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
@@ -408,6 +409,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isRespondentResponseFullDefence()
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
-            && caseData.isBilingual();
+            && caseData.isClaimantBilingual();
     }
 }

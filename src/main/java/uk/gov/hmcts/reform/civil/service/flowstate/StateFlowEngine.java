@@ -514,8 +514,8 @@ public class StateFlowEngine implements IStateFlowEngine {
             .state(FULL_DEFENCE)
                 .transitionTo(IN_MEDIATION).onlyIf((agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                                                        // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                                                       // and move to in mediation if applicant does chooses to proceed/not settle
-                                                       .or(lipFullDefenceProceed.and(isCarmApplicableLipCase)))
+                                                       // and move to in mediation if applicant does not settle
+                                                       .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
@@ -530,7 +530,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+            .onlyIf(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
