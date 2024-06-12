@@ -202,6 +202,6 @@ public class EventHistorySequencer {
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .filter(event -> event.getDateReceived() != null)
-            .toList();
+            .collect(Collectors.toList());
     }
 }

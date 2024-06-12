@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -372,12 +373,12 @@ public class CaseFlagUtils {
         flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
-        return flagCollection.stream().filter(flags -> flags != null).toList();
+        return flagCollection.stream().filter(flags -> flags != null).collect(Collectors.toList());
     }
 
     public static List<FlagDetail> getFlagDetails(Flags flags) {
         return flags != null && flags.getDetails() != null
-            ? flags.getDetails().stream().map(Element::getValue).toList() : Collections.emptyList();
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     public static List<FlagDetail> getFlagDetails(Party party) {
@@ -397,14 +398,14 @@ public class CaseFlagUtils {
             ? partyStructures.stream()
                 .map(party -> getFlagDetails(party.getValue().getFlags()))
                 .flatMap(List::stream)
-                .toList() : Collections.emptyList();
+                .collect(Collectors.toList()) : Collections.emptyList();
     }
 
     @SafeVarargs
     public static List<FlagDetail> filter(List<FlagDetail> flagDetails, Predicate<FlagDetail>... predicates) {
         return flagDetails.stream()
             .filter(List.of(predicates).stream().reduce(Predicate::and).orElse(x -> true))
-            .toList();
+            .collect(Collectors.toList());
     }
 
     private static String formattedPartyNameForFlags(String firstName, String lastName) {
