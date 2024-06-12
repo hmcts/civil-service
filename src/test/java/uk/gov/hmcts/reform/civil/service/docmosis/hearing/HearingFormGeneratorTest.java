@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,7 +37,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,25 +92,24 @@ public class HearingFormGeneratorTest {
     FeatureToggleService featureToggleService;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
-    private CourtLocationUtils courtLocationUtils;
     @Autowired
     private HearingFormGenerator generator;
+    @MockBean
+    private DocumentHearingLocationHelper locationHelper;
 
     @BeforeEach
     public void setUp() throws JsonProcessingException {
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
     }
 
     @Test
     void shouldThrowIllegalArg_whenCaseManagementLocationNotFound() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION.getDocumentTitle(), bytes));
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -132,11 +130,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_application() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION.getDocumentTitle(), bytes));
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -162,11 +157,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_small_claims() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_SMALL_CLAIMS)))
             .thenReturn(new DocmosisDocument(HEARING_SMALL_CLAIMS.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -192,11 +184,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK)))
             .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -222,12 +211,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_oher() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_OTHER)))
             .thenReturn(new DocmosisDocument(HEARING_OTHER.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -253,12 +238,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_application_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION_AHN.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -284,12 +265,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_small_claims_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_SMALL_CLAIMS_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_SMALL_CLAIMS_AHN.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -315,12 +292,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_fast_track_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_FAST_TRACK_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_FAST_TRACK_AHN.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -346,12 +319,8 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_hearing_other_ahn() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_OTHER_AHN)))
             .thenReturn(new DocmosisDocument(HEARING_OTHER_AHN.getDocumentTitle(), bytes));
-
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
-
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
