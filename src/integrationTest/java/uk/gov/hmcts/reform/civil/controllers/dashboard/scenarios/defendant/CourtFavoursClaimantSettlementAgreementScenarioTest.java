@@ -61,7 +61,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends Dashboa
                             "or reject the agreement, they can request a County Court Judgment (CCJ).</p>" +
                             "<p class=\"govuk-body\">You can <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" " +
                             "class=\"govuk-link\">view the repayment plan</a> or " +
-                            "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a>.</p>"),
+                            "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a></p>"),
                 jsonPath("$[0].descriptionCy")
                     .value(
                         "<p class=\"govuk-body\">Mae Mr. John Rambo wedi gwrthod eich cynnig ac wedi gofyn " +
@@ -72,7 +72,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends Dashboa
                             "ymateb erbyn hynny, neu os byddwch yn gwrthod y cytundeb, gallant wneud cais am Ddyfarniad Llys Sifil (CCJ).</p>" +
                             "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" " +
                             "class=\"govuk-link\">weld y cynllun ad-dalu</a> neu " +
-                            "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a>.</p>")
+                            "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a></p>")
             );
     }
 }
