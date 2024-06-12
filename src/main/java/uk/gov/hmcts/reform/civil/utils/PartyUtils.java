@@ -178,8 +178,7 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
-            .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference())
-            );
+            .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference()));
 
         return stringBuilder.toString();
     }
@@ -190,14 +189,12 @@ public class PartyUtils {
 
         if (!isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference())
-                );
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference()));
         }
 
         if (isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
-                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference())
-                );
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference()));
         }
         return stringBuilder.toString();
     }
