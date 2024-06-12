@@ -259,7 +259,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentDate(caseData.isPayByInstallment()
                                ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
-            .installmentAmount(String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)))
+            .installmentAmount(caseData.isPayByInstallment() ? String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)) : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
             .claimFee(getClaimFee(caseData))
