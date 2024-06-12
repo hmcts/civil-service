@@ -26,8 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_DETERMINATION_CLAIMANT;
@@ -109,7 +108,7 @@ public class JudgmentByDeterminationDocGeneratorTest {
 
         assertThat(caseDocuments.size()).isEqualTo(2);
 
-        verify(documentManagementService)
+        verify(documentManagementService, times(2))
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
                                                   DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT));
 
