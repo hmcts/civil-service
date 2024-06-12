@@ -696,7 +696,7 @@ public class CaseDataTest {
         caseData.setClaimantBilingualLanguagePreference("BOTH");
 
         //When
-        boolean result = caseData.isBilingual();
+        boolean result = caseData.isClaimantBilingual();
 
         //Then
         assertTrue(result);
