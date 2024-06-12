@@ -43,37 +43,48 @@ public class JudgmentByDeterminationDocGenerator {
 
     private final String applicant1 = "applicant1";
     private final String respondent1 = "respondent1";
+    private final String respondent2 = "respondent2";
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
 
     public List<CaseDocument> generateDocs(CaseData caseData, String authorisation, String event) {
-        JudgmentByDeterminationDocForm judgmentByDeterminationDocForm;
+        List<JudgmentByDeterminationDocForm> judgmentByDeterminationDocFormList = new ArrayList<>();
         if (event.equals(GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name())) {
-            judgmentByDeterminationDocForm = getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event,
-                applicant1);
+            judgmentByDeterminationDocFormList.add(
+                getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event,
+                applicant1));
         } else {
-            judgmentByDeterminationDocForm = getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent1(), event,
-                                                                        respondent1);
+            judgmentByDeterminationDocFormList.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent1(), event,
+                                                                        respondent1));
+            if (caseData.getRespondent2() != null) {
+                judgmentByDeterminationDocFormList.add(getDefaultJudgmentFormNonDivergent(caseData,
+                                                                                          caseData.getRespondent2(), event,
+                                                                                          respondent2));
+            }
         }
-        return generateDocmosisDocsForNonDivergent(judgmentByDeterminationDocForm, authorisation, caseData, event);
+        return generateDocmosisDocsForNonDivergent(judgmentByDeterminationDocFormList, authorisation, caseData, event);
     }
 
-    private List<CaseDocument> generateDocmosisDocsForNonDivergent(JudgmentByDeterminationDocForm judgmentByDeterminationDocForm,
+    private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<JudgmentByDeterminationDocForm> judgmentByDeterminationDocFormList,
                                                                    String authorisation, CaseData caseData, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        DocumentType documentType = getDocumentTypeBasedOnEvent(event);
-        DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(judgmentByDeterminationDocForm,
-                                                                                              docmosisTemplate);
-        caseDocuments.add(documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                getFileName(caseData, docmosisTemplate),
-                docmosisDocument.getBytes(),
-                documentType
-            )
-        ));
+        for (int i = 0; i < judgmentByDeterminationDocFormList.size(); i++) {
+            DocumentType documentType = getDocumentTypeBasedOnEvent(event);
+            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event);
+            DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+                judgmentByDeterminationDocFormList.get(i),
+                docmosisTemplate
+            );
+            caseDocuments.add(documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(
+                    getFileName(caseData, docmosisTemplate),
+                    docmosisDocument.getBytes(),
+                    documentType
+                )
+            ));
+        }
         return caseDocuments;
     }
 
