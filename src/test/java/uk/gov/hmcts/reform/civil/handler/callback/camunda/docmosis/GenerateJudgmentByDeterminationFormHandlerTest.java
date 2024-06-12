@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -26,10 +27,10 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallbackHandlerTest {
+class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private final ObjectMapper mapper = new ObjectMapper();
@@ -44,7 +45,7 @@ public class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallback
         .createdBy("John")
         .documentName("document name")
         .documentSize(0L)
-        .documentType(DEFENDANT_DEFENCE)
+        .documentType(JUDGMENT_BY_DETERMINATION_CLAIMANT)
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
@@ -81,5 +82,12 @@ public class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallback
         handler.handle(params);
         CaseEvent event = GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT;
         verify(formGenerator).generateDocs(caseData, BEARER_TOKEN, event.name());
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(
+            GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT,
+            GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT);
     }
 }

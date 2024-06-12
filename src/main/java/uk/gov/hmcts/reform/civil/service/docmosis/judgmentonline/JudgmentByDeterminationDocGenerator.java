@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByDeterminationDocForm;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -41,9 +42,9 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSo
 @Service
 public class JudgmentByDeterminationDocGenerator {
 
-    private final String applicant1 = "applicant1";
-    private final String respondent1 = "respondent1";
-    private final String respondent2 = "respondent2";
+    private static final String APPLICANT1 = "applicant1";
+    private static final String RESPONDENT1 = "respondent1";
+    private static final String RESPONDENT2 = "respondent2";
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
@@ -52,15 +53,11 @@ public class JudgmentByDeterminationDocGenerator {
         List<JudgmentByDeterminationDocForm> judgmentByDeterminationDocFormList = new ArrayList<>();
         if (event.equals(GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name())) {
             judgmentByDeterminationDocFormList.add(
-                getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event,
-                applicant1));
+                getJudgmentByDeterminationDocForm(caseData, APPLICANT1));
         } else {
-            judgmentByDeterminationDocFormList.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent1(), event,
-                                                                        respondent1));
+            judgmentByDeterminationDocFormList.add(getJudgmentByDeterminationDocForm(caseData, RESPONDENT1));
             if (caseData.getRespondent2() != null) {
-                judgmentByDeterminationDocFormList.add(getDefaultJudgmentFormNonDivergent(caseData,
-                                                                                          caseData.getRespondent2(), event,
-                                                                                          respondent2));
+                judgmentByDeterminationDocFormList.add(getJudgmentByDeterminationDocForm(caseData, RESPONDENT2));
             }
         }
         return generateDocmosisDocsForNonDivergent(judgmentByDeterminationDocFormList, authorisation, caseData, event);
@@ -108,9 +105,7 @@ public class JudgmentByDeterminationDocGenerator {
         }
     }
 
-    private JudgmentByDeterminationDocForm getDefaultJudgmentFormNonDivergent(CaseData caseData,
-                                                                   uk.gov.hmcts.reform.civil.model.Party party,
-                                                                   String event, String partyType) {
+    private JudgmentByDeterminationDocForm getJudgmentByDeterminationDocForm(CaseData caseData, String partyType) {
         BigDecimal orderAmount =
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered()));
         BigDecimal costs =
@@ -143,8 +138,7 @@ public class JudgmentByDeterminationDocGenerator {
                             : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency())
                 ? null : getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency()))
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-                                   : Objects.isNull(caseData.getJoInstalmentDetails().getAmount()) ? null
-                : getInstallmentAmount(caseData.getJoInstalmentDetails().getAmount()))
+                                   : getInstallmentAmount(caseData.getJoInstalmentDetails()))
             .repaymentDate(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                : Objects.isNull(caseData.getJoInstalmentDetails().getStartDate()) ? null
                 : DateFormatHelper.formatLocalDate(caseData.getJoInstalmentDetails().getStartDate(), DateFormatHelper.DATE));
@@ -160,9 +154,14 @@ public class JudgmentByDeterminationDocGenerator {
         }
     }
 
-    private String getInstallmentAmount(String amount) {
-        var regularRepaymentAmountPennies = new BigDecimal(amount);
-        return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
+    private String getInstallmentAmount(JudgmentInstalmentDetails instalmentDetails) {
+        if (instalmentDetails.getAmount() != null) {
+            String amount = instalmentDetails.getAmount();
+            var regularRepaymentAmountPennies = new BigDecimal(amount);
+            return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
+        } else {
+            return null;
+        }
     }
 
     private String getRepaymentString(PaymentFrequency repaymentFrequency) {
@@ -206,7 +205,7 @@ public class JudgmentByDeterminationDocGenerator {
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
-        if (partyType.equals(respondent1)) {
+        if (partyType.equals(RESPONDENT1)) {
             if (caseData.isRespondent1LiP()) {
                 return getPartyDetails(caseData.getRespondent1());
             } else {

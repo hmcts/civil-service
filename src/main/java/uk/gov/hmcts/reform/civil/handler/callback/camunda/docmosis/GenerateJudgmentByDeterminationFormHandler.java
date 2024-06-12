@@ -57,7 +57,7 @@ public class GenerateJudgmentByDeterminationFormHandler extends CallbackHandler 
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -65,7 +65,7 @@ public class GenerateJudgmentByDeterminationFormHandler extends CallbackHandler 
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?,?> caseDataBuilder) {
         List<CaseDocument> caseDocuments = judgmentByDeterminationDocGenerator.generateDocs(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),

@@ -39,7 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGM
     JudgmentByDeterminationDocGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class JudgmentByDeterminationDocGeneratorTest {
+class JudgmentByDeterminationDocGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -81,7 +81,7 @@ public class JudgmentByDeterminationDocGeneratorTest {
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
-        assertThat(caseDocuments.size()).isEqualTo(1);
+        assertThat(caseDocuments).hasSize(1);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
@@ -108,7 +108,7 @@ public class JudgmentByDeterminationDocGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,
                                                                   GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT.name());
 
-        assertThat(caseDocuments.size()).isEqualTo(2);
+        assertThat(caseDocuments).hasSize(2);
 
         verify(documentManagementService, times(2))
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
