@@ -1490,18 +1490,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return hasApplicant1CourtDecisionInFavourOfClaimant()
             && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
     }
-
-    /**
-     * LiP applicant requires Welsh if they selected Welsh or Both languages.
-     *
-     * @return true if applicant is LiP and they accept Welsh (or English+Welsh)
-     */
-    @JsonIgnore
-    public boolean isLipDefendant1RequiringWelsh() {
-        return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getRespondent1LiPResponse)
-            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(value -> List.of(Language.WELSH.toString(), Language.BOTH.toString()).contains(value))
-            .isPresent();
-    }
 }
