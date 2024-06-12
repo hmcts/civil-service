@@ -31,6 +31,13 @@ public class CaseFlagsHearingsUtilsTest {
             .withRespondent1LitigationFriendFlags()
             .withRespondent1WitnessFlags()
             .withRespondent1ExpertFlags()
+            .withApplicant1LRIndividualFlags()
+            .withRespondent1LRIndividualFlags()
+            .withRespondent2LRIndividualFlags()
+            .withApplicant1OrgIndividualFlags()
+            .withApplicant2OrgIndividualFlags()
+            .withRespondent1OrgIndividualFlags()
+            .withRespondent2OrgIndividualFlags()
             .build();
 
         List<Flags> expectedFlags = new ArrayList<>();
@@ -40,12 +47,20 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveFlagDetails()));
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getApplicant1OrgIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getApplicant2OrgIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getRespondent1OrgIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getRespondent2OrgIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getApplicant1LRIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getRespondent1LRIndividualFlags(caseData, getAllActiveFlagDetails()));
+        expectedFlags.add(getRespondent2LRIndividualFlags(caseData, getAllActiveFlagDetails()));
 
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
 
+    @SuppressWarnings("checkstyle:CommentsIndentation")
     @Test
     void shouldReturnAllHearingRelevantCaseFlags() {
         CaseData caseData = CaseDataBuilder.builder()
@@ -56,6 +71,13 @@ public class CaseFlagsHearingsUtilsTest {
             .withRespondent1LitigationFriendFlags()
             .withRespondent1WitnessFlags()
             .withRespondent1ExpertFlags()
+            .withApplicant1LRIndividualFlags()
+            .withRespondent1LRIndividualFlags()
+            .withRespondent2LRIndividualFlags()
+            .withApplicant1OrgIndividualFlags()
+            .withApplicant2OrgIndividualFlags()
+            .withRespondent1OrgIndividualFlags()
+            .withRespondent2OrgIndividualFlags()
             .build();
 
         List<Flags> expectedFlags = new ArrayList<>();
@@ -65,7 +87,13 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
-
+        expectedFlags.add(getApplicant1OrgIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getApplicant2OrgIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getRespondent1OrgIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getRespondent2OrgIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getApplicant1LRIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getRespondent1LRIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
+        expectedFlags.add(getRespondent2LRIndividualFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
         List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags(activeFlags);
 
@@ -82,6 +110,13 @@ public class CaseFlagsHearingsUtilsTest {
             .withRespondent1LitigationFriendFlags()
             .withRespondent1WitnessFlags()
             .withRespondent1ExpertFlags()
+            .withApplicant1OrgIndividualFlags()
+            .withApplicant2OrgIndividualFlags()
+            .withRespondent1OrgIndividualFlags()
+            .withRespondent2OrgIndividualFlags()
+            .withApplicant1LRIndividualFlags()
+            .withRespondent1LRIndividualFlags()
+            .withRespondent2LRIndividualFlags()
             .build();
 
         List<Flags> expectedFlags = new ArrayList<>();
@@ -91,6 +126,13 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveSMCodeFlagDetails()));
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveSMCodeFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getApplicant1OrgIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getApplicant2OrgIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1OrgIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent2OrgIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getApplicant1LRIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1LRIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent2LRIndividualFlags(caseData, getAllActiveSMCodeFlagDetails()));
 
         List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getSMCodeFlags(activeFlags);
@@ -108,6 +150,13 @@ public class CaseFlagsHearingsUtilsTest {
             .withRespondent1LitigationFriendFlags()
             .withRespondent1WitnessFlags()
             .withRespondent1ExpertFlags()
+            .withApplicant1OrgIndividualFlags()
+            .withApplicant2OrgIndividualFlags()
+            .withRespondent1OrgIndividualFlags()
+            .withRespondent2OrgIndividualFlags()
+            .withApplicant1LRIndividualFlags()
+            .withRespondent1LRIndividualFlags()
+            .withRespondent2LRIndividualFlags()
             .build();
 
         List<PartyFlags> expectedFlags = new ArrayList<>();
@@ -117,6 +166,13 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveRACodeFlagDetails()));
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveRACodeFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getApplicant1OrgIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getApplicant2OrgIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1OrgIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent2OrgIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getApplicant1LRIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1LRIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent2LRIndividualFlags(caseData, getAllActiveRACodeFlagDetails()));
 
         List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(activeFlags);
@@ -239,6 +295,41 @@ public class CaseFlagsHearingsUtilsTest {
     private PartyFlags getRespondent1ExpertsFlags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty("E First E Last", "Defendant 1 Expert", details,
                                 "res-1-expert-party-id");
+    }
+
+    private PartyFlags getApplicant1OrgIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "App 1 Org Individual", details,
+                                "app-1-org-individual-party-id");
+    }
+
+    private PartyFlags getApplicant2OrgIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "App 2 Org Individual", details,
+                                "app-2-org-individual-party-id");
+    }
+
+    private PartyFlags getRespondent1OrgIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "Res 1 Org Individual", details,
+                                "res-1-org-individual-party-id");
+    }
+
+    private PartyFlags getRespondent2OrgIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "Res 2 Org Individual", details,
+                                "res-2-org-individual-party-id");
+    }
+
+    private PartyFlags getApplicant1LRIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "App 1 Lr Individual", details,
+                                "app-1-lr-individual-party-id");
+    }
+
+    private PartyFlags getRespondent1LRIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "Res 1 Lr Individual", details,
+                                "res-1-lr-individual-party-id");
+    }
+
+    private PartyFlags getRespondent2LRIndividualFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("First Last", "Res 2 Lr Individual", details,
+                                "res-2-lr-individual-party-id");
     }
 
     private PartyFlags getFlagsForParty(String name, String role, List<Element<FlagDetail>> details, String partyId) {
