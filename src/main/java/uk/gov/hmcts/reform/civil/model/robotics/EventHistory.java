@@ -9,6 +9,7 @@ import net.minidev.json.annotate.JsonIgnore;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -79,6 +80,6 @@ public class EventHistory {
         return eventsList.stream()
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
-            .toList();
+            .collect(Collectors.toList());
     }
 }

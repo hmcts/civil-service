@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -172,7 +173,7 @@ public class EventHistorySequencer {
                      event.toBuilder()
                          .eventSequence(sequence.getAndIncrement())
                          .build()
-            ).toList();
+            ).collect(Collectors.toList());
     }
 
     private List<Event> flatEvents(EventHistory eventHistory) {
