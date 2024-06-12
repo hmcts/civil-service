@@ -81,7 +81,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -220,7 +219,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .getListItems()
                 .stream()
                 .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-                .collect(Collectors.toList());
+                .toList();
             hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
             hearingMethodList.setValue(hearingMethodListWithoutNotInAttendance.stream().filter(
                 elem -> HearingMethod.IN_PERSON.getLabel().equals(elem.getLabel())).findFirst().orElse(null));

@@ -23,7 +23,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService.CREATED_BY;
@@ -112,7 +111,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     private static List<Value<Document>> prepareCaseDocuments(List<DocumentMetaData> documents) {
         return documents.stream()
             .map(caseDocument -> new Value<>(caseDocument.getDocument().getDocumentFileName(), caseDocument.getDocument()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static List<IdValue<BundleDocument>> prepareBundleDocuments(List<DocumentMetaData> documents) {

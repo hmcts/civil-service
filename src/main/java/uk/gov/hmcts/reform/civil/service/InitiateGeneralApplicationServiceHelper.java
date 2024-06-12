@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -64,7 +63,7 @@ public class InitiateGeneralApplicationServiceHelper {
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
             .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
-            .collect(Collectors.toList());
+            .toList();
 
         /*
          * Set GA applicant solicitor details
@@ -79,7 +78,7 @@ public class InitiateGeneralApplicationServiceHelper {
             .surname(userDetails.getSurname());
 
         List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles()
-            .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
+            .stream().filter(user -> !respondentSolicitors.contains(user)).toList();
         boolean sameDefSol1v2 = applicantSolicitor.size() == 2
                 && applicantSolicitor.get(0).getUserId()
                 .equals(applicantSolicitor.get(1).getUserId());

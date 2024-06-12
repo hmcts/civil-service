@@ -286,7 +286,7 @@ public class BundleRequestMapper {
                 .filter(expertElement -> matchParty(
                     expertElement.getValue().getExpertOptionOtherParty(),
                     getPartyByPartyType(partyType, caseData)
-                )).collect(Collectors.toList());
+                )).toList();
             if (!tempList.isEmpty()) {
                 Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap = groupExpertStatementsByName(tempList);
                 expertReportMap.forEach((expertName, expertEvidenceList) -> bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(
@@ -519,11 +519,11 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                           .equals(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)).collect(Collectors.toList()),
+                                                                           .equals(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)).toList(),
                                                                        BundleFileNameList.DIRECTIONS_ORDER.getDisplayName()));
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                           .equals(DocumentType.SDO_ORDER)).collect(Collectors.toList()),
+                                                                           .equals(DocumentType.SDO_ORDER)).toList(),
                                                                        BundleFileNameList.DIRECTIONS_ORDER.getDisplayName()));
         if (caseData.getGeneralOrderDocStaff() != null) {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getGeneralOrderDocStaff(),
@@ -559,7 +559,7 @@ public class BundleRequestMapper {
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
                                                                                .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
-                                                                           .collect(Collectors.toList()),
+                                                                           .toList(),
                                                                        BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()));
         return bundlingRequestDocuments;
     }
@@ -571,13 +571,13 @@ public class BundleRequestMapper {
                         && nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
                         && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(category)))
                 .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement
-                        .getValue().getCreatedDatetime())).collect(Collectors.toList());
+                        .getValue().getCreatedDatetime())).toList();
         return docs.stream().map(caseDocumentElement -> {
             String docName = generateDocName(BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName(),
                     partyType.getDisplayName(), null,
                     caseDocumentElement.getValue().getCreatedDatetime().toLocalDate());
             return buildBundlingRequestDoc(docName, caseDocumentElement.getValue().getDocumentLink(), DocumentType.DIRECTIONS_QUESTIONNAIRE.name());
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private List<Element<BundlingRequestDocument>> mapStatementOfcaseDocs(CaseData caseData) {
@@ -587,7 +587,7 @@ public class BundleRequestMapper {
                                                                            .equals(DocumentType.SEALED_CLAIM)
                                                                                && null != caseDocumentElement.getValue().getDocumentLink().getCategoryID()
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
-                                                                           .collect(Collectors.toList()),
+                                                                           .toList(),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
@@ -628,11 +628,11 @@ public class BundleRequestMapper {
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply = new ArrayList<>();
         List<Element<CaseDocument>> dfDefence =
             systemGeneratedCaseDocuments.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                .equals(DocumentType.DEFENDANT_DEFENCE)).collect(Collectors.toList());
+                .equals(DocumentType.DEFENDANT_DEFENCE)).toList();
 
         List<Element<CaseDocument>> clDefence =
             systemGeneratedCaseDocuments.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                .equals(DocumentType.CLAIMANT_DEFENCE)).collect(Collectors.toList());
+                .equals(DocumentType.CLAIMANT_DEFENCE)).toList();
         if (CollectionUtils.isEmpty(dfDefence) || CollectionUtils.isEmpty(clDefence)) {
             sortedDefendantDefenceAndClaimantReply = CollectionUtils.isEmpty(dfDefence) ? clDefence : dfDefence;
             sortedDefendantDefenceAndClaimantReply.sort(Comparator.comparing(caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime()));
@@ -643,7 +643,7 @@ public class BundleRequestMapper {
         sortedDefendantDefenceAndClaimantReply = IntStream.range(0, Math.min(dfDefence.size(), clDefence.size()))
             .mapToObj(index -> Arrays.asList(dfDefence.get(index), clDefence.get(index)))
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .toList();
 
         int remainingIndex = Math.min(dfDefence.size(), clDefence.size());
         List<Element<CaseDocument>> remainingList = (dfDefence.size() > clDefence.size()) ? dfDefence : clDefence;
@@ -701,7 +701,7 @@ public class BundleRequestMapper {
         return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
             uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument(),
             displayNames, doesNotMatchType
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {

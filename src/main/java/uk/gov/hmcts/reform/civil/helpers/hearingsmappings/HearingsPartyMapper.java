@@ -339,7 +339,7 @@ public class HearingsPartyMapper {
                                                                Flags flags, List<Element<UnavailableDate>> unavailableDates) {
 
         List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
-            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
+            ? flags.getDetails().stream().map(Element::getValue).toList() : List.of();
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()

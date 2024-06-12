@@ -109,7 +109,7 @@ public class CaseFlagsToHearingValueMapper {
 
     public static List<String> getReasonableAdjustments(List<FlagDetail> flagDetails) {
         return getReasonableAdjustmentFlags(flagDetails).stream().map(FlagDetail::getFlagCode)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static boolean isLanguageInterpreterFlag(String flag) {

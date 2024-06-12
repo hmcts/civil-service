@@ -374,7 +374,7 @@ public class PartyUtils {
         return partyFlagStructures != null ? partyFlagStructures.stream().map(
             party -> Element.<PartyFlagStructure>builder()
                 .id(party.getId()).value(appendWithNewPartyId(party.getValue())).build()
-        ).collect(Collectors.toList()) : null;
+        ).toList() : null;
     }
 
     public static ExpertDetails appendWithNewPartyIds(ExpertDetails expert) {

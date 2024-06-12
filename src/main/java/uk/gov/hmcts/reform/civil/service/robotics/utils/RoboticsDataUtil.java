@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
@@ -46,7 +45,7 @@ public class RoboticsDataUtil {
             )
             .stream()
             .filter(litigantChange -> litigantChange != null)
-            .collect(Collectors.toList());
+            .toList();
         return latestChanges.size() > 0 ? latestChanges : null;
     }
 

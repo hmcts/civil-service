@@ -19,7 +19,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
@@ -46,7 +45,7 @@ public class HmcDataUtils {
             .map(day -> HearingDay.builder()
                 .hearingStartDateTime(convertFromUTC(day.getHearingStartDateTime()))
                 .hearingEndDateTime(convertFromUTC(day.getHearingEndDateTime()))
-                .build()).collect(Collectors.toList());
+                .build()).toList();
     }
 
     private static List<HearingDaySchedule> getScheduledDays(HearingGetResponse hearing) {
@@ -146,7 +145,7 @@ public class HmcDataUtils {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
             .sorted(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .map(day -> formatDay(day))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

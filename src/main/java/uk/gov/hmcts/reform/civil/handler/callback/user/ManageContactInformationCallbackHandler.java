@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -162,7 +161,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             List<UpdatePartyDetailsForm> expertsWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
                 .stream()
                 .filter(e -> e.getPartyId() == null)
-                .collect(Collectors.toList());
+                .toList();
 
             if (!expertsWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_EXPERTS);
@@ -187,7 +186,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             List<UpdatePartyDetailsForm> witnessesWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
                 .stream()
                 .filter(e -> e.getPartyId() == null)
-                .collect(Collectors.toList());
+                .toList();
 
             if (!witnessesWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_WITNESSES);

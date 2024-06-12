@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
@@ -239,7 +238,7 @@ public class RoboticsNotificationService {
             .filter(event ->
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
                             && event.getEventCode().equals(MISCELLANEOUS.getCode()))
-            .collect(Collectors.toList());
+            .toList();
 
         return lastMiscellaneousEvent.size() == 1 ? lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
@@ -268,7 +267,7 @@ public class RoboticsNotificationService {
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .filter(event -> event.getDateReceived() != null)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public static String findLatestEventTriggerReasonSpec(EventHistory eventHistory) {

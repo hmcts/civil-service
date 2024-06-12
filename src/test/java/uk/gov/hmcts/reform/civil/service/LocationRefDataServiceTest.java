@@ -287,7 +287,7 @@ class LocationRefDataServiceTest {
         private List<String> locationsFromDynamicList(DynamicList dynamicList) {
             return dynamicList.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
         }
     }
 
@@ -449,7 +449,7 @@ class LocationRefDataServiceTest {
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
             String prefferedCourtCode = result.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+                .toList().get(0).getCourtLocationCode();
 
             assertThat(result).isNotNull();
             verify(lrdConfiguration, times(1)).getUrl();
@@ -481,7 +481,7 @@ class LocationRefDataServiceTest {
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
             String prefferedCourtCode = result.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+                .toList().get(0).getCourtLocationCode();
 
             assertThat(result).isNotNull();
             verify(lrdConfiguration, times(1)).getUrl();
