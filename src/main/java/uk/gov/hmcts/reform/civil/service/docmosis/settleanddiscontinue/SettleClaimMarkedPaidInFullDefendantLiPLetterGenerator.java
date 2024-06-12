@@ -81,7 +81,7 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             .addressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
             .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
             .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
-            .paidInFullDate(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
+            .paidInFullDate(LocalDate.now())
             .build();
     }
 }

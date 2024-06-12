@@ -95,7 +95,6 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
             .respondent1(defendant)
-            .judgmentPaidInFull(JudgmentPaidInFull.builder().dateOfFullPaymentMade(LocalDate.now()).build())
             .legacyCaseReference("100DC001")
             .build();
 
