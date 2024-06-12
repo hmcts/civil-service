@@ -133,12 +133,12 @@ public class HearingValuesService {
     }
 
     private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if ((caseData.getEaCourtLocation() != null && caseData.getEaCourtLocation().equals(NO))
-                || !featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                     .getBaseLocation())) {
-                throw new NotEarlyAdopterCourtException();
-            }
+        if (featureToggleService.isEarlyAdoptersEnabled()
+            && (caseData.getEaCourtLocation() != null
+            && caseData.getEaCourtLocation().equals(NO))
+            || !featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+                                                                                 .getBaseLocation())) {
+            throw new NotEarlyAdopterCourtException();
         }
     }
 
