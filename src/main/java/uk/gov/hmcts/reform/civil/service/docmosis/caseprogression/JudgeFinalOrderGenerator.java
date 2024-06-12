@@ -64,10 +64,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private static final String NOTICE_NOT_RECIEVED_CANNOT_PROCEED =     "The Judge was not satisfied that they had received notice of the hearing "
         + "and it was not reasonable to proceed in their absence.";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
-    @Value("${court-location.unspecified-claim.epimms-id}")
-    public String ccmccEpimmId;
-    @Value("${court-location.specified-claim.epimms-id}")
-    public String cnbcEpimmId;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);

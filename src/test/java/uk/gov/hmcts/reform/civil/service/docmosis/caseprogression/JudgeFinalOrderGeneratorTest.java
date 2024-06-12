@@ -157,7 +157,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenThrow(IllegalArgumentException.class);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -174,7 +174,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -192,7 +192,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -210,7 +210,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .solicitorReferences(null)
@@ -229,7 +229,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -249,7 +249,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
@@ -278,7 +278,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(caseManagementLocation)
@@ -311,7 +311,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -359,7 +359,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -406,8 +406,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
-
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -471,7 +470,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
         DynamicList dynamicList = DynamicList.builder()
@@ -551,7 +550,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(ASSISTED_FROM_ORDER);
-        when(locationHelper.getCaseManagementLocationDetailsNro(any(),any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
         DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
         DynamicList dynamicList = DynamicList.builder()
