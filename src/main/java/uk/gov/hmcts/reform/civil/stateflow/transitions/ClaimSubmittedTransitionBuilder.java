@@ -68,7 +68,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
             || (caseData.getClaimIssuedPaymentDetails() != null
             && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
 
-    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isBilingual;
+    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
 
     public static final Predicate<CaseData> claimIssueHwF = CaseData::isHelpWithFees;
 
