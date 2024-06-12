@@ -948,10 +948,10 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
                 TRANSFER_ONLINE_CASE,
-                SETTLE_CLAIM,
-                SETTLE_CLAIM_MARK_PAID_FULL,
                 INVALID_HWF_REFERENCE,
-                COURT_OFFICER_ORDER
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL
             )
         ),
         entry(
