@@ -313,7 +313,6 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(ASSISTED_FROM_ORDER);
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
 
-
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(caseManagementLocation)
             .ccdState(CaseState.CASE_PROGRESSION)
