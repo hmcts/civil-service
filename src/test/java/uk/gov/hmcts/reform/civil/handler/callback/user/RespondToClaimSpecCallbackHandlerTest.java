@@ -774,7 +774,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -821,7 +821,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -850,7 +850,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -889,7 +889,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -917,7 +917,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -950,7 +950,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -1108,7 +1108,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDate(dateTime).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
             .thenReturn(LocalDateTime.now());
 
         // When

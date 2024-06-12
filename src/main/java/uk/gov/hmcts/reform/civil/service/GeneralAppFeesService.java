@@ -156,14 +156,11 @@ public class GeneralAppFeesService {
     }
 
     protected boolean isFreeApplication(List<GeneralApplicationTypes> types, Boolean respondentAgreed, LocalDate hearingScheduledDate) {
-        if (types.size() == 1
+        return types.size() == 1
             && types.contains(GeneralApplicationTypes.ADJOURN_HEARING)
-            && respondentAgreed != null
-            && respondentAgreed
-            && hearingScheduledDate != null) {
-            return hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
-        }
-        return false;
+            && Boolean.TRUE.equals(respondentAgreed)
+            && hearingScheduledDate != null
+            && hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
     }
 
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {

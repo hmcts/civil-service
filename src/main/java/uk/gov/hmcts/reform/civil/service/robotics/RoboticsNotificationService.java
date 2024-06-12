@@ -207,10 +207,9 @@ public class RoboticsNotificationService {
         if (isSpecClaim) {
             return roboticsEmailConfiguration.getSpecRecipient();
         }
-        String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
-        return recipient;
+        return isMultiParty ? roboticsEmailConfiguration
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {

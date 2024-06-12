@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -332,17 +331,6 @@ public class DashboardNotificationsParamsMapper {
             return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH;
         }
         return CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH;
-    }
-
-    private String getInstalmentTimePeriod(PaymentFrequencyLRspec repaymentFrequency) {
-        return switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK -> "week";
-            case ONCE_TWO_WEEKS -> "2 weeks";
-            case ONCE_THREE_WEEKS -> "3 weeks";
-            case ONCE_FOUR_WEEKS -> "4 weeks";
-            case ONCE_ONE_MONTH -> "month";
-            default -> null;
-        };
     }
 
     private Optional<LocalDate> getInstalmentStartDate(CaseData caseData) {
