@@ -6,17 +6,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.sdo.DesicionOnReconsiderationDocumentForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.LiPRequestForReconsiderationForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.time.LocalDate;
 
@@ -61,15 +58,20 @@ public class LiPRequestReconsiderationGeneratorService {
         LocationRefData locationData = locationHelper.getHearingLocation(null, caseData, authorisation);
         String venueName = nonNull(locationData) ? locationData.getVenueName() : "Online Civil Claims";
 
-
         LiPRequestForReconsiderationForm.LiPRequestForReconsiderationFormBuilder
             liPRequestForReconsiderationFormBuilder = LiPRequestForReconsiderationForm.builder()
             .currentDate(LocalDate.now())
             .caseNumber(caseData.getLegacyCaseReference())
             .countyCourt(venueName)
-            .partyName(isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName())
-            .partyAddress(isApplicant ? caseData.getApplicant1().getPrimaryAddress() : caseData.getRespondent1().getPrimaryAddress())
-            .requestReason(isApplicant ? caseData.getReasonForReconsiderationApplicant().getReasonForReconsiderationTxt() : caseData.getReasonForReconsiderationRespondent1().getReasonForReconsiderationTxt());
+            .partyName(isApplicant
+                           ? caseData.getApplicant1().getPartyName()
+                           : caseData.getRespondent1().getPartyName())
+            .partyAddress(isApplicant
+                              ? caseData.getApplicant1().getPrimaryAddress()
+                              : caseData.getRespondent1().getPrimaryAddress())
+            .requestReason(isApplicant
+                               ? caseData.getReasonForReconsiderationApplicant().getReasonForReconsiderationTxt()
+                               : caseData.getReasonForReconsiderationRespondent1().getReasonForReconsiderationTxt());
 
         return liPRequestForReconsiderationFormBuilder
             .build();
