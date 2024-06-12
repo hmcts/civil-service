@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DELETE_NOTIFICATION_R
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_DEFENDANT;
 
 @Service
-public class RequestForReconsiderationDeletionDefendantNotificationHandler extends DashboardCallbackHandler {
+public class RequestForReconsiderationDeletionDefendantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
         List.of(DELETE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_DEFENDANT);
