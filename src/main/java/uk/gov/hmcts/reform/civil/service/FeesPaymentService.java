@@ -53,7 +53,7 @@ public class FeesPaymentService {
                         .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)
                         .setScale(2, RoundingMode.CEILING))
             .currency("GBP")
-            .language(caseData.isBilingual() ? "cy" : "En")
+            .language(caseData.isClaimantBilingual() ? "cy" : "En")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
 
