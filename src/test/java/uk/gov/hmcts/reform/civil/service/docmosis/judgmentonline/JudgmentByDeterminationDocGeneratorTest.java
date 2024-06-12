@@ -107,7 +107,7 @@ public class JudgmentByDeterminationDocGeneratorTest {
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,
                                                                   GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT.name());
 
-        assertThat(caseDocuments.size()).isEqualTo(1);
+        assertThat(caseDocuments.size()).isEqualTo(2);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
