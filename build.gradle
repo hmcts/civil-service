@@ -369,7 +369,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.2'
 
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.2.1'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -407,7 +407,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.3'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
-  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.3'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
@@ -543,6 +543,7 @@ bootWithCCD {
 
   environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
   environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+
   doFirst() {
     project.file('./.aat-env').readLines().each() {
       def index = it.indexOf("=")

@@ -550,6 +550,7 @@ document_management:
 docmosis:
   tornado:
     url: ${DOCMOSIS_TORNADO_URL:http://localhost:8080}
+    key: ${DOCMOSIS_TORNADO_KEY:fake-key}
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -663,10 +664,10 @@ document_management:
 docmosis:
   tornado:
     url: ${DOCMOSIS_TORNADO_URL:http://fake-docmosis-api}
-    key: fake-key
+    key: ${DOCMOSIS_TORNADO_KEY:fake-key}
 
 notifications:
-  govNotifyApiKey: some-gov-uk-notify-api-key
+  govNotifyApiKey: ${GOV_NOTIFY_API_KEY:some-gov-uk-notify-api-key}
 
 testing:
   support:
@@ -691,6 +692,13 @@ spring:
 
 idam:
   web:
-    url: http://ccd-test-stubs-service:5555
+    url: ${IDAM_WEB_URL:http://localhost:9002}
   api:
-    url: http://ccd-test-stubs-service:5555
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
+  client:
+    id: civil-service
+    redirect_uri: https://localhost:3000/oauth2/callback
+    secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
