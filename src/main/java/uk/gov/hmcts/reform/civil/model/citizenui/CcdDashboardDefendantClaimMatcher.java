@@ -58,24 +58,16 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if (isClaimProceedInCaseMan()) {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
                 && isPayImmediately();
     }
 
-    private boolean isClaimProceedInCaseMan() {
-        return featureToggleService.isLipVLipEnabled()
-                && Objects.nonNull(caseData.getTakenOfflineDate())
-                && Objects.nonNull(caseData.getPreviousCCDState())
-                && (caseData.getPreviousCCDState().equals(CaseState.AWAITING_APPLICANT_INTENTION)
-                || caseData.getPreviousCCDState().equals(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT));
-    }
-
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if (isClaimProceedInCaseMan()) {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -85,7 +77,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if (isClaimProceedInCaseMan()) {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -123,7 +115,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
-        if (isClaimProceedInCaseMan()) {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -193,7 +185,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if (isClaimProceedInCaseMan()) {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()

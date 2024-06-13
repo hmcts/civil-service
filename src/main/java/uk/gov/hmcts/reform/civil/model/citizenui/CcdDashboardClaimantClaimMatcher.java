@@ -84,14 +84,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && isPayImmediately();
     }
 
-    private boolean isClaimProceedInCaseMan() {
-        return featureToggleService.isLipVLipEnabled()
-                && Objects.nonNull(caseData.getTakenOfflineDate())
-                && Objects.nonNull(caseData.getPreviousCCDState())
-                && (caseData.getPreviousCCDState().equals(CaseState.AWAITING_APPLICANT_INTENTION)
-                || caseData.getPreviousCCDState().equals(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT));
-    }
-
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
         if (isClaimProceedInCaseMan()) {

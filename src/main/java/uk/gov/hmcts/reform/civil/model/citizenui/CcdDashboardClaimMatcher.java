@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.Objects;
+
 @AllArgsConstructor
 public abstract class CcdDashboardClaimMatcher {
 
@@ -28,5 +30,12 @@ public abstract class CcdDashboardClaimMatcher {
 
     public boolean isSettled() {
         return caseData.getCcdState() == CaseState.CASE_SETTLED;
+    }
+
+    public boolean isClaimProceedInCaseMan() {
+        return  Objects.nonNull(caseData.getTakenOfflineDate())
+                && Objects.nonNull(caseData.getPreviousCCDState())
+                && (caseData.getPreviousCCDState().equals(CaseState.AWAITING_APPLICANT_INTENTION)
+                || caseData.getPreviousCCDState().equals(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT));
     }
 }
