@@ -516,7 +516,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return;
         }
 
-        if(Optional.ofNullable(caseData.getApplicant1DQ())
+        if (Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 

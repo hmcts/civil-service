@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -414,7 +412,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             return;
         }
 
-        if(Optional.ofNullable(caseData.getApplicant1DQ())
+        if (Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 

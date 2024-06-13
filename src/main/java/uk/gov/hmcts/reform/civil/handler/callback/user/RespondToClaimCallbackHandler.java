@@ -634,10 +634,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private void assembleFRCDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
-           return;
+            return;
         }
 
-        if(Optional.ofNullable(caseData.getRespondent1DQ())
+        if (Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 
@@ -653,7 +653,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                                                         DocCategory.DQ_DEF1.getValue());
         }
 
-        if(Optional.ofNullable(caseData.getRespondent2DQ())
+        if (Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 
