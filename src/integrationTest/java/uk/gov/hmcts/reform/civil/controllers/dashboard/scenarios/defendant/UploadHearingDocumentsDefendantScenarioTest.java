@@ -48,7 +48,7 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You can <a href=\"{UPLOAD_HEARING_DOCUMENTS}\" " +
                         "class=\"govuk-link\">upload and submit documents</a> to support your defence. Follow the " +
-                        "instructions set out in the <a href=\"{VIEW_ORDERS_AND_NOTICES}\" class=\"govuk-link\">directions order</a>. Any documents submitted after the deadline may not be " +
+                        "instructions set out in the <a href=\"{VIEW_ORDERS_AND_NOTICES}\" class=\"govuk-link\">directions order</a>. Any documents submitted after the deadline in the directions order may not be " +
                         "considered by the judge.</p>"
                 ),
                 jsonPath("$[0].titleCy").value("Llwytho dogfennau"),
