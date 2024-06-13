@@ -55,8 +55,14 @@ public class BundleCreationTriggerEventHandler {
         //        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
         //                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
         //            ).collect(Collectors.toList()));
-        //CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
-        //coreCaseDataService.submitUpdate(caseId, caseContent);
+        CaseDataContent caseContent = CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder()
+                       .id(startEventResponse.getEventId())
+                       .summary("bundle created")
+                       .build())
+            .build();
+        coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
