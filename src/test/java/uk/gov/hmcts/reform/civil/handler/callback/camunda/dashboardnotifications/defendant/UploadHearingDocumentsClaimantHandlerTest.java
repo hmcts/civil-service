@@ -68,7 +68,6 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
