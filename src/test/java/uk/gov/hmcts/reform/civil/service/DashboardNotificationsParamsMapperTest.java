@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -172,6 +174,47 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");
+    }
+
+    @ParameterizedTest
+    @EnumSource(PaymentFrequency.class)
+    void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans(PaymentFrequency paymentFrequency) {
+
+        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
+
+        caseData = caseData.toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
+            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                     .startDate(LocalDate.of(2022, 12, 12))
+                                     .amount("120")
+                                     .paymentFrequency(paymentFrequency).build())
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES)
+            .build();;
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
+            assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
+                                                                                   "claim amount of £ 23.00 in weekly instalments of £ 1.20. " +
+                                                                                   "The first payment is due on 2022-12-12.");
+        } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
+            assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
+                                                                                   "claim amount of £ 23.00 in biweekly instalments of £ 1.20. " +
+                                                                                   "The first payment is due on 2022-12-12.");
+        } else {
+            assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the " +
+                                                                                   "claim amount of £ 23.00 in monthly instalments of £ 1.20. " +
+                                                                                   "The first payment is due on 2022-12-12.");
+        }
     }
 
     @Test

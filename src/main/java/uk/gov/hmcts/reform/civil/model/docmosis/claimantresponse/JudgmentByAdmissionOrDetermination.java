@@ -9,10 +9,12 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Getter
@@ -45,4 +47,18 @@ public class JudgmentByAdmissionOrDetermination implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
+    private final String respondent1Name;
+    private final String respondent2Name;
+    private final String respondent1Ref;
+    private final String respondent2Ref;
+    private final Party applicant;
+    private final Party respondent;
+    private final List<Party> applicants;
+    private final String paymentPlan;
+    private final String repaymentFrequency;
+    private final String repaymentDate;
+    private final String paymentStr;
+    private final String installmentAmount;
+    private final String payByDate;
+    private final String applicantReference;
 }
