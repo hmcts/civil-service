@@ -791,18 +791,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseDataBuilder.eaCourtLocation(NO);
             }
         } else {
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
-            // check epimm from judge selected court in SDO journey
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                // check epimm from case management location
-                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+            if (featureToggleService.isEarlyAdoptersEnabled()) {
+                // check epimm from judge selected court in SDO journey
+                if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+                    // check epimm from case management location
+                    && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+                } else {
+                    log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+                }
             }
-        }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
