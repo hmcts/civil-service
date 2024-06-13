@@ -53,7 +53,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
                     .value(
                         "<p class=\"govuk-body\">Mr. John Rambo has accepted your offer to pay £100 immediately in full and final settlement of the claim. " +
                             "Funds must be received in <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a> by 1 January 2024.</p><p class=\"govuk-body\">" +
-                            "If they don´t receive the money by then, they can request a County Court Judgment (CCJ).</p>"),
+                            "If they don''t receive the money by then, they can request a County Court Judgment (CCJ).</p>"),
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy")
                     .value(
