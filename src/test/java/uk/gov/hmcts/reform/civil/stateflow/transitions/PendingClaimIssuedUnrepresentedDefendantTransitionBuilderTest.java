@@ -126,6 +126,21 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
     }
 
+    @Test
+    void shouldReturnTrue_whenEitherDefendant1LIPAtClaimIssuedOrDefendant2LIPAtClaimIssuedIsYes() {
+        CaseData caseData1 = CaseData.builder()
+            .defendant1LIPAtClaimIssued(YES)
+            .build();
+
+        assertTrue(PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled.test(caseData1));
+
+        CaseData caseData2 = CaseData.builder()
+            .defendant2LIPAtClaimIssued(YES)
+            .build();
+
+        assertTrue(PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled.test(caseData2));
+    }
+
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
         assertThat(transition.getTargetState()).isEqualTo(targetState);

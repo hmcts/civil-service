@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -57,7 +56,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)))
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true))
             .moveTo(FULL_DEFENCE).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
-                .and(not(pastClaimNotificationDeadline)))
+                                               .and(not(pastClaimNotificationDeadline)))
             .moveTo(PART_ADMISSION).onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
             .moveTo(FULL_ADMISSION).onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
             .moveTo(COUNTER_CLAIM).onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
@@ -75,70 +74,51 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
         !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getClaimNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
-            || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
+            || "Both".equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()));
 
     public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
         caseData.getClaimNotificationDate() != null
             && caseData.getDefendantSolicitorNotifyClaimOptions() != null
-            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
+            && !"Both".equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = ClaimIssuedTransitionBuilder::getPredicateTakenOfflineByStaffAfterClaimIssue;
-
-    public static boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
         // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
         // In case of UNSPEC ClaimNotificationDate will be set only after notification step
-        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+        caseData.getTakenOfflineByStaffDate() != null
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1ResponseDate() == null
             && caseData.getClaimNotificationDeadline() != null
-            && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now());
-
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return basePredicate && caseData.getClaimNotificationDate() != null;
-        }
-
-        return basePredicate && caseData.getClaimNotificationDate() == null;
-    }
+            && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now())
+            && ((SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.getClaimNotificationDate() != null)
+            || (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.getClaimNotificationDate() == null));
 
     public static final Predicate<CaseData> pastClaimNotificationDeadline = caseData ->
         caseData.getClaimNotificationDeadline() != null
             && caseData.getClaimNotificationDeadline().isBefore(LocalDateTime.now())
             && caseData.getClaimNotificationDate() == null;
 
-    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = ClaimIssuedTransitionBuilder::getPredicateForAwaitingResponsesFullDefenceReceivedSpec;
+    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = caseData -> {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
+            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+    };
 
-    private static boolean getPredicateForAwaitingResponsesFullDefenceReceivedSpec(CaseData caseData) {
-        if (Objects.requireNonNull(getMultiPartyScenario(caseData)) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-                && RespondentResponseTypeSpec.FULL_DEFENCE
-                .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-                ||
-                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                    && RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-        }
-        return false;
-    }
-
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = ClaimIssuedTransitionBuilder::getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec;
-
-    private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(CaseData caseData) {
-        if (Objects.requireNonNull(getMultiPartyScenario(caseData)) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-                && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData
-                                                                       .getRespondent1ClaimResponseTypeForSpec()))
-                ||
-                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                    && !RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-        }
-        return false;
-    }
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = caseData -> {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
+            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+    };
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());

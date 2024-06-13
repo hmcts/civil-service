@@ -30,7 +30,6 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
     public ClaimIssuedPaymentSuccessfulTransitionBuilder(
         FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL, featureToggleService);
-
     }
 
     @Override
@@ -63,10 +62,10 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                 ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                     .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                            .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                        .and(bothDefSameLegalRep.negate())
+                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                            .and(bothDefSameLegalRep.negate())
                     )
             )
             // Unrepresented and Unregistered
@@ -75,7 +74,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyWhen(
                 (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
                     .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
-                        .and(respondent2NotRepresented)));
+                            .and(respondent2NotRepresented)));
     }
 
     public static final Predicate<CaseData> pendingClaimIssued = caseData ->
@@ -89,14 +88,14 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
 
     @NotNull
     public static Predicate<CaseData> pendingClaimIssuedUnrepresentedDefendentPredicate() {
-        return (respondent1NotRepresented.and(respondent2NotRepresented))
-            .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-            .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
+        return respondent1NotRepresented.and(respondent2NotRepresented)
+            .or(respondent1NotRepresented.and(not(respondent2OrgNotRegistered)))
+            .or(not(respondent1OrgNotRegistered).and(respondent2NotRepresented))
             .and(not(specClaim))
             .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                    .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                    .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-                .and(specClaim));
+                                       .or(respondent1NotRepresented.and(not(respondent2OrgNotRegistered)))
+                                       .or(not(respondent1OrgNotRegistered).and(respondent2NotRepresented)))
+                    .and(specClaim));
     }
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->

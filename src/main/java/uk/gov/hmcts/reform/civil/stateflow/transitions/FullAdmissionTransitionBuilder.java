@@ -53,17 +53,11 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     public static final Predicate<CaseData> fullAdmitPayImmediately = FullAdmissionTransitionBuilder::getPredicateForPayImmediately;
 
     private static boolean getPredicateForPayImmediately(CaseData caseData) {
-        boolean predicate = false;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
-                predicate = null != caseData.getWhenToBePaidText()
-                    &&  null == caseData.getApplicant1ProceedWithClaim();
-            }
-        }
-        return predicate;
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && getMultiPartyScenario(caseData) == ONE_V_ONE
+            && caseData.getWhenToBePaidText() != null
+            && caseData.getApplicant1ProceedWithClaim() == null;
     }
 
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
-
-
 }

@@ -46,11 +46,11 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
             .onlyWhen(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
             .onlyWhen(awaitingResponsesFullDefenceReceived
-                .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
-                .and(not(caseDismissedAfterDetailNotified)))
+                          .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
+                          .and(not(caseDismissedAfterDetailNotified)))
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
             .onlyWhen(awaitingResponsesNonFullDefenceReceived
-                .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
+                          .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimDetailsNotified)
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
             .onlyWhen(caseDismissedAfterDetailNotified)
@@ -62,24 +62,20 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
         ClaimDetailsNotifiedTransitionBuilder::getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified;
 
     private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
+        boolean baseCondition = caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ResponseDate() == null
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getClaimDismissedDate() == null;
+
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
-                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-                && caseData.getTakenOfflineDate() != null
-                && caseData.getRespondent1AcknowledgeNotificationDate() == null
-                && caseData.getRespondent1ResponseDate() == null
-                && caseData.getRespondent1TimeExtensionDate() == null
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> baseCondition
                 && caseData.getRespondent2ResponseDate() == null
                 && caseData.getRespondent2AcknowledgeNotificationDate() == null
-                && caseData.getRespondent2TimeExtensionDate() == null
-                && caseData.getClaimDismissedDate() == null);
-            default -> (caseData.getReasonNotSuitableSDO() != null
-                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-                && caseData.getTakenOfflineDate() != null
-                && caseData.getRespondent1AcknowledgeNotificationDate() == null
-                && caseData.getRespondent1ResponseDate() == null
-                && caseData.getRespondent1TimeExtensionDate() == null
-                && caseData.getClaimDismissedDate() == null);
+                && caseData.getRespondent2TimeExtensionDate() == null;
+            default -> baseCondition;
         };
     }
 }

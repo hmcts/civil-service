@@ -33,9 +33,5 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilder extends M
     }
 
     public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
-        (caseData.getDefendant1LIPAtClaimIssued() != null
-            && caseData.getDefendant1LIPAtClaimIssued() == YES)
-            ||
-            (caseData.getDefendant2LIPAtClaimIssued() != null
-                && caseData.getDefendant2LIPAtClaimIssued() == YES);
+        (YES.equals(caseData.getDefendant1LIPAtClaimIssued()) || YES.equals(caseData.getDefendant2LIPAtClaimIssued()));
 }
