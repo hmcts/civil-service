@@ -214,7 +214,7 @@ If you're seeing errors after importing bpmn files then run it again.
 XUI will be running on http://localhost:3000/
 
 After creating a case in XUI, complete the payment using service request.
-To update the payment success callback on a created case, please use postman
+To update the payment success callback on a created case, please use [[civil-operation]](https://github.com/hmcts/civil-operations/)
 http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease to generate token
 then use http://localhost:4000/service-request-update-claim-issued endpoint with above token and then
 update body with case id and payment reference no
