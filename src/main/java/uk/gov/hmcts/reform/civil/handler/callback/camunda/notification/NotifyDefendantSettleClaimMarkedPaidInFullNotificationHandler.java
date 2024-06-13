@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR1_DEF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SOLICITOR2_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandler extends CallbackHandler
@@ -68,8 +70,13 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandler exten
         String recipient = callbackParams.getRequest().getEventId()
                 .equals(NOTIFY_SOLICITOR1_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL.name())
                 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
+        log.info("caseData.getRespondentSolicitor1EmailAddress(): {}" +
+                     ", caseData.getRespondentSolicitor2EmailAddress(): {}", caseData.getRespondentSolicitor1EmailAddress(),
+                 caseData.getRespondentSolicitor2EmailAddress());
+        log.info("recipient: {}", recipient);
 
         if (nonNull(recipient)) {
+            log.info("Sending notification..");
             notificationService.sendMail(
                 recipient,
                 getTemplate(),

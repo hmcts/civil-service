@@ -92,10 +92,12 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
   onMaster {
     env.ENVIRONMENT = "aat"
     loadVaultSecrets(secrets)
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
   onDemo {
     loadVaultSecrets(secrets)
@@ -173,9 +175,5 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-  }
-
-  onMaster() {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
 }
