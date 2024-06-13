@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.SettleClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +46,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse checkState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-
-        SettleClaimHelper.checkState(caseData, errors);
+        List<String> errors = SettleClaimHelper.checkCaseType(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
