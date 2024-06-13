@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -69,6 +70,7 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
             when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-EA");
             when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn("template-id-spec-EA");
             when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn("template-id-lip-bilingual");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
@@ -104,6 +106,26 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
             verify(notificationService).sendMail(
                 "applicantLip@example.com",
                 "template-id-lip",
+                getNotificationDataMapLip(),
+                "create-sdo-applicants-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvokedBilingual() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicantLip@example.com",
+                "template-id-lip-bilingual",
                 getNotificationDataMapLip(),
                 "create-sdo-applicants-notification-000DC001"
             );

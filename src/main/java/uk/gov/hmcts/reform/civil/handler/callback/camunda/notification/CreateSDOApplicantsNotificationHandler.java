@@ -98,7 +98,11 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
             ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
 
         if (caseData.isApplicantLiP()) {
-            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+            if (caseData.isClaimantBilingual()) {
+                return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+            } else {
+                return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+            }
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
                 return specTemplate;

@@ -76,7 +76,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
                              .type(Party.Type.INDIVIDUAL).build()).build();
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
 
-        when(notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()).thenReturn(
+        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(
             BILINGUAL_TEMPLATE_ID);
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
