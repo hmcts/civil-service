@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -296,26 +295,24 @@ class GeneralAppFeesServiceTest {
 
     @Nested
     class LowestFee {
-        @BeforeEach
-        void setUp() {
 
-            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(WithoutNotice)))
-                .thenReturn(FEE_POUNDS_108);
-            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(GAOnNotice)))
-                .thenReturn(FEE_POUNDS_275);
+        @Test
+        void default_types_with_notice_should_pay_275() {
             when(feesApi.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
                 anyString(),
                 anyString(),
-                eq(AppnToVaryOrSuspend)
-            ))
-                .thenReturn(FEE_POUNDS_14);
-        }
+                eq(GAOnNotice)
+            )).thenReturn(FEE_POUNDS_275);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
 
-        @Test
-        void default_types_with_notice_should_pay_275() {
             List<GeneralApplicationTypes> allTypes =
                 Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -338,6 +335,22 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_with_notice_should_pay_275_forGALiP() {
+
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(GAOnNotice)
+            )).thenReturn(FEE_POUNDS_275);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> allTypes =
                 Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -356,6 +369,21 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_without_notice_should_pay_108() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> allTypes =
                 Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -378,6 +406,21 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_without_notice_should_pay_108_forGALiP() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> allTypes =
                 Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -396,6 +439,29 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void adjourn_should_pay_default_or_free_fee() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(GAOnNotice)
+            )).thenReturn(FEE_POUNDS_275);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
             CaseData caseDataWithin14DaysWithNotice = getFeeCase(
                 List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                 YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1)
@@ -418,6 +484,17 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void vary_types_should_be_14() {
+            when(feesApi.lookupFee(anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
+
             for (GeneralApplicationTypes type : GeneralAppFeesService.VARY_TYPES) {
                 CaseData caseDataWithNotice = getFeeCase(
                     List.of(type),
@@ -436,6 +513,21 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void settle_should_be_108() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             CaseData caseDataWithNotice = getFeeCase(
                 List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
                 YesOrNo.YES, YesOrNo.YES, null
@@ -446,6 +538,20 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void setAside_should_be_275() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(GAOnNotice)
+            )).thenReturn(FEE_POUNDS_275);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
             CaseData caseDataWithNotice = getFeeCase(
                 List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
                 YesOrNo.YES, YesOrNo.YES, null
@@ -462,6 +568,21 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_adjourn_should_not_free() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.ADJOURN_HEARING);
             CaseData caseDataOutside14Days = getFeeCase(
@@ -474,10 +595,15 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_set_aside_should_be_108() {
+            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(WithoutNotice)))
+                .thenReturn(FEE_POUNDS_108);
+            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(GAOnNotice)))
+                .thenReturn(FEE_POUNDS_275);
             when(feesConfiguration.getService()).thenReturn("general");
             when(feesConfiguration.getChannel()).thenReturn("default");
             when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
             when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
             when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
             when(feesConfiguration.getEvent()).thenReturn("general application");
 
@@ -493,6 +619,28 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_vary_should_be_14() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesApi.lookupFee(anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseDataOutside14Days = getFeeCase(
@@ -514,6 +662,37 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_vary_set_aside_should_be_14() {
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(WithoutNotice)
+            )).thenReturn(FEE_POUNDS_108);
+            when(feesApi.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                eq(GAOnNotice)
+            )).thenReturn(FEE_POUNDS_275);
+            when(feesApi.lookupFee(anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   anyString(),
+                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesConfiguration.getService()).thenReturn("general");
+            when(feesConfiguration.getChannel()).thenReturn("default");
+            when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
+            when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+            when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+            when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
+            when(feesConfiguration.getEvent()).thenReturn("general application");
+
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
             randomList.add(GeneralApplicationTypes.VARY_ORDER);
             randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);

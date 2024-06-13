@@ -3,13 +3,18 @@ package uk.gov.hmcts.reform.civil.service.hearings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
-import uk.gov.hmcts.reform.civil.model.Fee;
+import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.FeesApiRequest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import static java.util.Objects.isNull;
 
 @Slf4j
 @Service
@@ -21,48 +26,67 @@ public class HearingFeesService {
     private final HearingFeeConfiguration feesConfiguration;
 
     public Fee getFeeForHearingSmallClaims(BigDecimal amount) {
+        FeesApiRequest builder = FeesApiRequest.builder()
+            .channel(feesConfiguration.getChannel())
+            .event(feesConfiguration.getHearingEvent())
+            .jurisdiction(feesConfiguration.getJurisdiction1())
+            .jurisdiction2(feesConfiguration.getJurisdiction2())
+            .service(feesConfiguration.getService())
+            .keyword(feesConfiguration.getSmallClaimHrgKey())
+            .amount(amount).build();
 
-        FeeLookupResponseDto feeDto = feesApi.lookupFeeWithAmount(
-            feesConfiguration.getService(),
-            feesConfiguration.getJurisdiction1(),
-            feesConfiguration.getJurisdiction2(),
-            feesConfiguration.getChannel(),
-            feesConfiguration.getHearingEvent(),
-            feesConfiguration.getSmallClaimHrgKey(),
-            amount
-        );
-
-        return buildFeeDto(feeDto);
+        return getRespond(builder);
     }
 
     public Fee getFeeForHearingFastTrackClaims(BigDecimal amount) {
 
-        FeeLookupResponseDto feeDto = feesApi.lookupFeeWithAmount(
-            feesConfiguration.getService(),
-            feesConfiguration.getJurisdiction1(),
-            feesConfiguration.getJurisdiction2Hearing(),
-            feesConfiguration.getChannel(),
-            feesConfiguration.getHearingEvent(),
-            feesConfiguration.getFastTrackHrgKey(),
-            amount
-        );
+        FeesApiRequest builder = FeesApiRequest.builder()
+            .channel(feesConfiguration.getChannel())
+            .event(feesConfiguration.getHearingEvent())
+            .jurisdiction(feesConfiguration.getJurisdiction1())
+            .jurisdiction2(feesConfiguration.getJurisdiction2())
+            .service(feesConfiguration.getService())
+            .keyword(feesConfiguration.getFastTrackHrgKey())
+            .amount(amount).build();
 
-        return buildFeeDto(feeDto);
+        return getRespond(builder);
     }
 
     public Fee getFeeForHearingMultiClaims(BigDecimal amount) {
+        FeesApiRequest builder = FeesApiRequest.builder()
+            .channel(feesConfiguration.getChannel())
+            .event(feesConfiguration.getHearingEvent())
+            .jurisdiction(feesConfiguration.getJurisdiction1())
+            .jurisdiction2(feesConfiguration.getJurisdiction2Hearing())
+            .service(feesConfiguration.getService())
+            .keyword(feesConfiguration.getMultiClaimKey())
+            .amount(amount).build();
 
-        FeeLookupResponseDto feeDto = feesApi.lookupFeeWithAmount(
-            feesConfiguration.getService(),
-            feesConfiguration.getJurisdiction1(),
-            feesConfiguration.getJurisdiction2Hearing(),
-            feesConfiguration.getChannel(),
-            feesConfiguration.getHearingEvent(),
-            feesConfiguration.getMultiClaimKey(),
-            amount
-        );
+        return getRespond(builder);
+    }
 
-        return buildFeeDto(feeDto);
+    private Fee getRespond(FeesApiRequest feesApiRequest) {
+        FeeLookupResponseDto feeLookupResponseDto;
+
+        try {
+            feeLookupResponseDto = feesApi.lookupFeeWithAmount(
+                feesApiRequest.getService(),
+                feesApiRequest.getJurisdiction(),
+                feesApiRequest.getJurisdiction2(),
+                feesApiRequest.getChannel(),
+                feesApiRequest.getEvent(),
+                feesApiRequest.getKeyword(),
+                feesApiRequest.getAmount()
+            );
+        } catch (RestClientException e) {
+            log.error("Fee Service Lookup Failed for [{}]", feesApiRequest);
+            throw e;
+        }
+        if (isNull(feeLookupResponseDto) || isNull(feeLookupResponseDto.getFeeAmount())) {
+            log.error("No Fees returned for [{}].", feesApiRequest);
+            throw new InternalServerErrorException("No Fees returned by fee-service while creating hearing fee");
+        }
+        return buildFeeDto(feeLookupResponseDto);
     }
 
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {

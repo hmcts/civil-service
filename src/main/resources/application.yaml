@@ -97,6 +97,10 @@ fees:
       multiTrackHrg: MultiTrackHrg
       smallClaimHrg: HearingSmallClaims
 
+location:
+  api:
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
+
 genApp:
   fee:
     endpoint: /fees-register/fees/lookup
