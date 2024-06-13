@@ -1836,6 +1836,37 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAssignCategoryId_frc_whenInvoked() {
+            //Given
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .setIntermediateTrackClaim()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1DQWithFixedRecoverableCostsIntermediate()
+                .respondent2DQWithFixedRecoverableCostsIntermediate()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+                .asString()
+                .contains("category_id=DQRespondent");
+
+            assertThat(response.getData())
+                .extracting("respondent2DQFixedRecoverableCostsIntermediate")
+                .asString()
+                .contains("category_id=DQRespondentTwo");
+        }
+
+        @Test
         void shouldRetainSolicitorReferences_WhenNoReferencesPresent() {
             //Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);

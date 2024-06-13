@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -70,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -518,6 +521,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+        assembleFRCDocuments(caseData, updatedData);
 
         if (toggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(updatedData);
@@ -625,6 +629,45 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .map(Object::toString).orElse(null) : null,
                 respondentSolicitor2Reference
             ));
+    }
+
+    private void assembleFRCDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
+           return;
+        }
+
+        if(Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getFixedRecoverableCostsIntermediate)
+            .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
+
+            Document respondent1FrcSupportingDocument = caseData
+                .getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+
+            buildElemCaseDocument(
+                respondent1FrcSupportingDocument, "Defendant",
+                updatedCaseData.build().getRespondent1ResponseDate(),
+                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
+            );
+            assignCategoryId.assignCategoryIdToDocument(respondent1FrcSupportingDocument,
+                                                        DocCategory.DQ_DEF1.getValue());
+        }
+
+        if(Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getFixedRecoverableCostsIntermediate)
+            .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
+
+            Document respondent2FrcSupportingDocument = caseData
+                .getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+
+            buildElemCaseDocument(
+                respondent2FrcSupportingDocument, "Defendant 2",
+                updatedCaseData.build().getRespondent2ResponseDate(),
+                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
+            );
+            assignCategoryId.assignCategoryIdToDocument(respondent2FrcSupportingDocument,
+                                                        DocCategory.DQ_DEF2.getValue());
+        }
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {

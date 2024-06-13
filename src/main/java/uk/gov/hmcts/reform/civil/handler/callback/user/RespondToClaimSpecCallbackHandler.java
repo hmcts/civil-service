@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -99,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -1637,6 +1640,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
+        assembleFRCDocuments(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -1671,6 +1675,45 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.specRespondent2CorrespondenceAddressdetails(
                     caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
                 .specAoSRespondent2CorrespondenceAddressdetails(Address.builder().build());
+        }
+    }
+
+    private void assembleFRCDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        if (!toggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
+            return;
+        }
+
+        if(Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getFixedRecoverableCostsIntermediate)
+            .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
+
+            Document respondent1FrcSupportingDocument = caseData
+                .getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+
+            buildElemCaseDocument(
+                respondent1FrcSupportingDocument, "Defendant",
+                updatedCaseData.build().getRespondent1ResponseDate(),
+                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
+            );
+            assignCategoryId.assignCategoryIdToDocument(respondent1FrcSupportingDocument,
+                                                        DocCategory.DQ_DEF1.getValue());
+        }
+
+        if(Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getFixedRecoverableCostsIntermediate)
+            .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
+
+            Document respondent2FrcSupportingDocument = caseData
+                .getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+
+            buildElemCaseDocument(
+                respondent2FrcSupportingDocument, "Defendant 2",
+                updatedCaseData.build().getRespondent2ResponseDate(),
+                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
+            );
+            assignCategoryId.assignCategoryIdToDocument(respondent2FrcSupportingDocument,
+                                                        DocCategory.DQ_DEF2.getValue());
         }
     }
 
