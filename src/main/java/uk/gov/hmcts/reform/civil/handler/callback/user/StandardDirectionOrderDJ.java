@@ -94,6 +94,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -775,6 +777,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
+                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YES);
+
+                if (featureToggleService.isHmcEnabled()) {
+                    caseDataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                }
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(NO);
+            }
+        } else {
         if (featureToggleService.isEarlyAdoptersEnabled()) {
             // check epimm from judge selected court in SDO journey
             if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
@@ -787,11 +803,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
             }
         }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
+        boolean isWhiteListedForHmc = featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+            && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+        log.info(("Case {} is{}whitelisted for HMC rollout."),
+                 caseData.getCcdCaseReference(), isWhiteListedForHmc ? " " : " NOT ");
+        return isWhiteListedForHmc;
     }
 
     private String getEpimmsId(CaseData caseData) {
