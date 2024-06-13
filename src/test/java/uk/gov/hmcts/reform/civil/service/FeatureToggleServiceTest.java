@@ -186,9 +186,8 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
         var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
