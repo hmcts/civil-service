@@ -243,7 +243,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                               && fileName.equals(element.getValue().getDocumentName()));
     }
 
-    final String defendant = "defendant";
+    static final String defendant = "defendant";
 
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         boolean isRespondent = isRespondentState(caseData);
@@ -298,7 +298,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return true;
     }
 
-    final String smallClaim = "SMALL_CLAIM";
+    static final String smallClaim = "SMALL_CLAIM";
 
     @NotNull
     protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
@@ -362,7 +362,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder;
     }
 
-    final String organisationName = "Organisation name";
+    static final String organisationName = "Organisation name";
 
     protected List<Party> getApplicants(CaseData caseData) {
         var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;

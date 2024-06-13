@@ -314,12 +314,12 @@ public class ManageContactInformationUtils {
         return String.format("%s_%s", partyChosen, isAdmin);
     }
 
-    static final String spaceFormat = "%s %s";
+    static final String SPACE_FORMAT = "%s %s";
 
     private static void addApplicant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 1 party name
         list.add(dynamicElementFromCode(CLAIMANT_ONE_ID,
-                                        String.format(spaceFormat, CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
+                                        String.format(SPACE_FORMAT, CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
         // applicant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant1().getType())) {
             if (caseData.getApplicant1LitigationFriend() != null) {
@@ -335,7 +335,7 @@ public class ManageContactInformationUtils {
 
     private static void addApplicant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 2 party name
-        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format(spaceFormat, CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
+        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format(SPACE_FORMAT, CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
         // applicant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant2().getType())) {
             if (caseData.getApplicant2LitigationFriend() != null) {
@@ -351,7 +351,7 @@ public class ManageContactInformationUtils {
 
     private static void addDefendant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 1 party name
-        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format(spaceFormat, DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format(SPACE_FORMAT, DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
         // defendant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent1().getType())) {
             if (caseData.getRespondent1LitigationFriend() != null) {
@@ -367,7 +367,7 @@ public class ManageContactInformationUtils {
 
     private static void addDefendant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 2 party name
-        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format(spaceFormat, DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format(SPACE_FORMAT, DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
         // defendant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent2().getType())) {
             if (caseData.getRespondent2LitigationFriend() != null) {
@@ -482,19 +482,19 @@ public class ManageContactInformationUtils {
     }
 
     private static void addOrganisationIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format(spaceFormat, party, ORG_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, ORG_INDIVIDUALS)));
     }
 
     private static void addLegalRepIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format(spaceFormat, party, LEGAL_REP_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, LEGAL_REP_INDIVIDUALS)));
     }
 
     private static void addWitnesses(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format(spaceFormat, party, WITNESSES)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, WITNESSES)));
     }
 
     private static void addExperts(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format(spaceFormat, party, EXPERTS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, EXPERTS)));
     }
 
     public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {

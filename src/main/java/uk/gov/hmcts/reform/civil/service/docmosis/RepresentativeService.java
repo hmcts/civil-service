@@ -29,7 +29,7 @@ public class RepresentativeService {
             || organisationIDCopy != null;
     }
 
-    final String organisationName = "Organisation name";
+    static final String organisationName = "Organisation name";
 
     public Representative getRespondent1Representative(CaseData caseData) {
         if (doesOrganisationPolicyExist(caseData.getRespondent1OrganisationPolicy(), caseData.getRespondent1OrganisationIDCopy())) {

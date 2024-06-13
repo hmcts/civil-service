@@ -291,7 +291,7 @@ public class PartyUtils {
         return responseIntentions.toString();
     }
 
-    static final String defendantString = "\nDefendant : ";
+    static final String DEFENDANT_STRING = "\nDefendant : ";
 
     public static String fetchDefendantName(CaseData caseData) {
         StringBuilder defendantNames = new StringBuilder();
@@ -300,23 +300,23 @@ public class PartyUtils {
                 if ((caseData.getRespondent1TimeExtensionDate() == null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     //case where respondent 2 extends first
-                    defendantNames.append(defendantString)
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent2().getPartyName());
                 } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     if (caseData.getRespondent2TimeExtensionDate()
                         .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                         //case where respondent 2 extends 2nd
-                        defendantNames.append(defendantString)
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent2().getPartyName());
                     } else {
                         //case where respondent 1 extends 2nd
-                        defendantNames.append(defendantString)
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent1().getPartyName());
                     }
                 } else {
                     //case where respondent 1 extends first
-                    defendantNames.append(defendantString)
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent1().getPartyName());
                 }
                 break;
@@ -328,7 +328,7 @@ public class PartyUtils {
                     .append(caseData.getRespondent2().getPartyName());
                 break;
             default:
-                defendantNames.append(defendantString)
+                defendantNames.append(DEFENDANT_STRING)
                     .append(caseData.getRespondent1().getPartyName());
                 break;
         }

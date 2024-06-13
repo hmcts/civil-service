@@ -126,8 +126,8 @@ public class EventHistoryMapper {
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
-    final String enter = "Enter";
-    final String lifted = "Lifted";
+    static final String enter = "Enter";
+    static final String lifted = "Lifted";
 
     public EventHistory buildEvents(CaseData caseData) {
         return buildEvents(caseData, null);
@@ -1142,7 +1142,7 @@ public class EventHistoryMapper {
                 .build());
     }
 
-    final String rpaReasonOneRespondentNotified = "RPA Reason: Only one of the respondent is notified.";
+    static final String rpaReasonOneRespondentNotified = "RPA Reason: Only one of the respondent is notified.";
 
     private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
@@ -1175,7 +1175,7 @@ public class EventHistoryMapper {
         }
     }
 
-    final String claimantProceeds = "Claimant proceeds.";
+    static final String claimantProceeds = "Claimant proceeds.";
 
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
@@ -1403,8 +1403,8 @@ public class EventHistoryMapper {
         );
     }
 
-    final String proceed = "proceed";
-    final String notProceed = "not proceed";
+    static final String proceed = "proceed";
+    static final String notProceed = "not proceed";
 
     private List<String> prepMultipartyProceedMiscText(CaseData caseData) {
         List<String> eventDetailsText = new ArrayList<>();

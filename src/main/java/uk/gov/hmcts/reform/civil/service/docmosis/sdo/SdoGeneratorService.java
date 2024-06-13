@@ -114,8 +114,8 @@ public class SdoGeneratorService {
         return updatedFileName.toString();
     }
 
-    final String applicant2 = "applicant2";
-    final String respondent2 = "respondent2";
+    static final String applicant2 = "applicant2";
+    static final String respondent2 = "respondent2";
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
