@@ -419,11 +419,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             Document frcSupportingDocument = caseData
                 .getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
 
-            buildElemCaseDocument(
-                frcSupportingDocument, "Defendant",
-                updatedCaseData.build().getApplicant1ResponseDate(),
-                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
-            );
             assignCategoryId.assignCategoryIdToDocument(frcSupportingDocument,
                                                         DocCategory.DQ_APP1.getValue());
         }

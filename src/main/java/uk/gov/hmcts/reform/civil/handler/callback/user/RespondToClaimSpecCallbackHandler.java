@@ -1691,11 +1691,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             Document respondent1FrcSupportingDocument = caseData
                 .getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
 
-            buildElemCaseDocument(
-                respondent1FrcSupportingDocument, "Defendant",
-                updatedCaseData.build().getRespondent1ResponseDate(),
-                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
-            );
             assignCategoryId.assignCategoryIdToDocument(respondent1FrcSupportingDocument,
                                                         DocCategory.DQ_DEF1.getValue());
         }
@@ -1707,11 +1702,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             Document respondent2FrcSupportingDocument = caseData
                 .getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
 
-            buildElemCaseDocument(
-                respondent2FrcSupportingDocument, "Defendant 2",
-                updatedCaseData.build().getRespondent2ResponseDate(),
-                DocumentType.FIXED_RECOVERABLE_COST_SUPPORTING_DOCUMENT
-            );
             assignCategoryId.assignCategoryIdToDocument(respondent2FrcSupportingDocument,
                                                         DocCategory.DQ_DEF2.getValue());
         }
