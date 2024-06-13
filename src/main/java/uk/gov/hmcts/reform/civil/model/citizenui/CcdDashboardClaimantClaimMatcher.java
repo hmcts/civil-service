@@ -77,7 +77,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if(isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -94,7 +94,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if(isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -104,7 +104,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if(isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -142,7 +142,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
-        if(isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan()) {
             return false;
         }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -212,7 +212,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if(isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()

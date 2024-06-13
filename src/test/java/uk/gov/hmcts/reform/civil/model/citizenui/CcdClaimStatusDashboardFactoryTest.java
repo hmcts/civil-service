@@ -656,11 +656,11 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnResponeByPost() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
-        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now())
-                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-                updatedClaim, featureToggleService));
+        DashboardClaimStatus status =
+                ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(updatedClaim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
 }
