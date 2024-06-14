@@ -64,7 +64,7 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
     public static final Predicate<CaseData> partAdmission = caseData ->
         getPredicateForResponseType(caseData, RespondentResponseType.PART_ADMISSION);
 
-    private static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
+    public static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseType() == responseType;
         return switch (getMultiPartyScenario(caseData)) {
@@ -78,7 +78,7 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
 
     public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = AllResponsesReceivedTransitionBuilder::isDivergentResponsesWithDQAndGoOffline;
 
-    private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
+    public static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP ->
                 //scenario: either of them have submitted full defence response

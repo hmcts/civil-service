@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -50,20 +49,24 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                 .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c));
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             })
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                 .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
-            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
-                JudicialReferralUtils::shouldMoveToJudicialReferral))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+            })
             .moveTo(FULL_DEFENCE_PROCEED)
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
                 .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
@@ -100,12 +103,12 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
             .isPresent();
 
-    private static boolean isSpecSmallClaim(CaseData caseData) {
+    public static boolean isSpecSmallClaim(CaseData caseData) {
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
-    private static boolean getCarmEnabledForDate(CaseData caseData) {
+    public static boolean getCarmEnabledForDate(CaseData caseData) {
         // Date of go live is 1st August, as we use "isAfter" we compare with 31st July
         return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 7, 31));
     }

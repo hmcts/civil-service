@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -42,8 +41,10 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
         this.moveTo(IN_MEDIATION).onlyWhen(agreedToMediation)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
             .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
-            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
-                JudicialReferralUtils::shouldMoveToJudicialReferral))
+            .set((c, flags) -> {
+                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+            })
             .moveTo(PART_ADMIT_PROCEED).onlyWhen(fullDefenceProceed)
             .moveTo(PART_ADMIT_NOT_PROCEED).onlyWhen(fullDefenceNotProceed)
             .moveTo(PART_ADMIT_PAY_IMMEDIATELY).onlyWhen(partAdmitPayImmediately)

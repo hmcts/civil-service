@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.AllResponsesReceivedTransitionBuilder.partAdmission;
 
 @ExtendWith(MockitoExtension.class)
 public class AllResponsesReceivedTransitionBuilderTest {
@@ -69,6 +70,76 @@ public class AllResponsesReceivedTransitionBuilderTest {
         assertTransition(result.get(11), "MAIN.ALL_RESPONSES_RECEIVED", "MAIN.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE");
         assertTransition(result.get(12), "MAIN.ALL_RESPONSES_RECEIVED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
         assertTransition(result.get(13), "MAIN.ALL_RESPONSES_RECEIVED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetails() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+            .build();
+        Predicate<CaseData> predicate =
+            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        assertTrue(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+            .build();
+        Predicate<CaseData> predicate =
+            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement1v2() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateTwoRespondentsFullDefenceAfterNotificationAcknowledgement().build().toBuilder()
+            .build();
+        Predicate<CaseData> predicate =
+            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetails() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+            .build();
+        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
+            fullDefence);
+        assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
+            .build();
+        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
+            fullDefence);
+        assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
+            .build();
+        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
+            fullDefence);
+        assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+            .build();
+        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
+            fullDefence);
+        assertTrue(predicate.test(caseData));
     }
 
     @Test
@@ -187,76 +258,6 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .build();
 
         assertFalse(divergentRespondWithDQAndGoOffline.test(caseData));
-    }
-
-    @Test
-    void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetails() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-            .build();
-        Predicate<CaseData> predicate =
-            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
-        assertTrue(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-            .build();
-        Predicate<CaseData> predicate =
-            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
-        assertFalse(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement1v2() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateTwoRespondentsFullDefenceAfterNotificationAcknowledgement().build().toBuilder()
-            .build();
-        Predicate<CaseData> predicate =
-            fullDefence.and(not(notificationAcknowledged.or(respondentTimeExtension)));
-        assertFalse(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetails() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-            .build();
-        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
-            fullDefence);
-        assertFalse(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterAcknowledgementTimeExtension() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
-            .build();
-        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
-            fullDefence);
-        assertFalse(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenCaseDataAtStateFullDefenceAfterNotifyClaimDetailsTimeExtension() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
-            .build();
-        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
-            fullDefence);
-        assertFalse(predicate.test(caseData));
-    }
-
-    @Test
-    void shouldReturnTrue_whenCaseDataAtStateFullDefenceAfterNotificationAcknowledgement() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-            .build();
-        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
-            fullDefence);
-        assertTrue(predicate.test(caseData));
     }
 
     @Test
@@ -419,6 +420,78 @@ public class AllResponsesReceivedTransitionBuilderTest {
         Predicate<CaseData> predicate =
             fullAdmission.and(not(notificationAcknowledged.or(respondentTimeExtension)));
         assertFalse(predicate.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenResponseDateIsNull_fullDefence() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(null)
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .build();
+
+        assertFalse(fullDefence.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenClaimResponseTypeIsNotFullDefence() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+            .build();
+
+        assertFalse(fullDefence.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenResponseDateIsNull_fullAdmission() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(null)
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
+            .build();
+
+        assertFalse(fullAdmission.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenClaimResponseTypeIsNotFullAdmission() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+            .build();
+
+        assertFalse(fullAdmission.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenResponseDateIsNull_partAdmission() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(null)
+            .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+            .build();
+
+        assertFalse(partAdmission.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenClaimResponseTypeIsNotPartAdmission() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .build();
+
+        assertFalse(partAdmission.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenGetPredicateForResponseTypeIsCalledWithFullDefenceAndScenarioIsOneVTwoOneLegalRep() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondentResponseIsSame(YES)
+            .build();
+
+        assertTrue(AllResponsesReceivedTransitionBuilder.getPredicateForResponseType(caseData, RespondentResponseType.FULL_DEFENCE));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
