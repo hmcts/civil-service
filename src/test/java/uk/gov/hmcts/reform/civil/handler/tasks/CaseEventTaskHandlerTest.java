@@ -664,6 +664,7 @@ class CaseEventTaskHandlerTest {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false,
                               FlowFlag.MINTI_ENABLED.name(), false
                 );
