@@ -109,6 +109,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
             && !hasSdoBeenDrawn();
     }

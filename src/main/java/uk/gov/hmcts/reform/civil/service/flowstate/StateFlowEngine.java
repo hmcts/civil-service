@@ -578,9 +578,9 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
+                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(not(takenOfflineByStaff)))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
+            .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
