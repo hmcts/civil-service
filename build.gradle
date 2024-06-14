@@ -23,7 +23,7 @@ def versions = [
   lombok            : '1.18.32',
   pact              : '3.5.24',
   springSecurity    : '5.8.12',
-  camunda           : '7.19.0',
+  camunda           : '7.20.0',
   jackson           : '2.17.1',
   testcontainers    : '1.19.8'
 ]
@@ -337,6 +337,7 @@ configurations.all {
 }
 
 dependencies {
+
   implementation 'com.github.hmcts:civil-commons:v1.0.94_CIV_10580'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
@@ -410,7 +411,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.89'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.21'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.22'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
