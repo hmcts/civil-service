@@ -81,14 +81,12 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
-        if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-        } else {
+        if (YES.equals(caseData.getMarkPaidForAllClaimants())) {
             nextState = CaseState.CLOSED.name();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(nextState)
+            .state(nextState)   //TODO else leave it in the actual state?
             .build();
     }
 
