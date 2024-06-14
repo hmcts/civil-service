@@ -50,6 +50,6 @@ public class BundleCreationService {
     private BundleCreateResponse createNewBundleRequest(String authorization, String serviceAuthorization,
                                               BundleCreateRequest bundleCreateRequest) {
 
-        return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
+        return bundleApiClient.createNewBundle(authorization, serviceAuthorization, bundleCreateRequest);
     }
 }

@@ -180,7 +180,7 @@ class BundleCreationServiceTest {
         bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
 
         //Then: BundleRest API should be called
-        verify(bundleApiClient).createBundleServiceRequest(anyString(), anyString(), any());
+        verify(bundleApiClient).createNewBundle(anyString(), anyString(), any());
     }
 
 }

@@ -14,9 +14,9 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.client.BundleApiClient;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -35,7 +35,7 @@ public class BundleRequestExecutor {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
-    private final RestTemplate restTemplate;
+    private final BundleApiClient bundleApiClient;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -54,7 +54,7 @@ public class BundleRequestExecutor {
         headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
 
         try {
-            ResponseEntity<CaseDetails> response1 = restTemplate.exchange(
+            ResponseEntity<CaseDetails> response1 = bundleApiClient.exchange(
                 endpoint,
                 HttpMethod.POST,
                 new HttpEntity<>(payload, headers),
