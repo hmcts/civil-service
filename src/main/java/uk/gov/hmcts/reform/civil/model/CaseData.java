@@ -664,6 +664,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDateTime requestForReconsiderationDeadline;
     private YesOrNo requestForReconsiderationDeadlineChecked;
 
+    //Settle And Discontinue
+    private YesOrNo markPaidForAllClaimants;
+    private DynamicList claimantWhoIsSettling;
+
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
