@@ -253,6 +253,35 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_isNationalRolloutEnabled(Boolean toggleStat) {
+        var caseFlagsKey = "enable-national-rollout";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isNationalRolloutEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
+        final String feature = "national-rollout-whitelist";
+        String location = "000000";
+        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_isGenAppsAllowedPreSdo(Boolean toggleStat) {
+        var caseFlagsKey = "ga-allowed-pre-sdo";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
