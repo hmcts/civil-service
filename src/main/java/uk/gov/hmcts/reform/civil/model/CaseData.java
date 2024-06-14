@@ -195,6 +195,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
+    private HelpWithFees generalAppHelpWithFees;
     private final HelpWithFeesDetails claimIssuedHwfDetails;
     private final HelpWithFeesDetails hearingHwfDetails;
     private final FeeType hwfFeeType;
@@ -663,6 +664,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private CaseDocument requestForReconsiderationDocumentRes;
     private LocalDateTime requestForReconsiderationDeadline;
     private YesOrNo requestForReconsiderationDeadlineChecked;
+
+    //Settle And Discontinue
+    private YesOrNo markPaidForAllClaimants;
+    private DynamicList claimantWhoIsSettling;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
