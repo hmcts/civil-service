@@ -89,6 +89,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -157,7 +158,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     PaymentDateService.class,
     ResponseOneVOneShowTagService.class,
     JudgmentByAdmissionOnlineMapper.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -175,6 +177,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ResponseOneVOneShowTagService responseOneVOneShowTagService;
+
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;

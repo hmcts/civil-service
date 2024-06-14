@@ -838,6 +838,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate(Document document) {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(document)
+                                                   .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate() {
         respondent1DQ = respondent1DQ.toBuilder()
             .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()

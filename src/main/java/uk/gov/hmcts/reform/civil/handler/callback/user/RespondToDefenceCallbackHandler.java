@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -28,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -37,6 +35,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -58,7 +57,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -90,6 +88,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final ToggleConfiguration toggleConfiguration;
     private final AssignCategoryId assignCategoryId;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -268,7 +267,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
-        assembleFRCDocuments(caseData, builder);
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
                                                                        featureToggleService.isUpdateContactDetailsEnabled());
@@ -403,24 +402,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             }
             updatedCaseData.claimantResponseDocuments(claimantUploads);
             updatedCaseData.duplicateClaimantDefendantResponseDocs(copy);
-        }
-    }
-
-    private void assembleFRCDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return;
-        }
-
-        if (Optional.ofNullable(caseData.getApplicant1DQ())
-            .map(Applicant1DQ::getFixedRecoverableCostsIntermediate)
-            .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
-
-            Document frcSupportingDocument = caseData
-                .getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
-
-            assignCategoryId.assignCategoryIdToDocument(frcSupportingDocument,
-                                                        DocCategory.DQ_APP1.getValue());
         }
     }
 
