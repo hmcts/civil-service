@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -234,7 +233,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -268,7 +267,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
                             .sorted()
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
@@ -297,8 +296,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private DynamicList formatLocationList(DynamicList locationList) {
         List<DynamicListElement> list = locationList.getListItems()
             .stream()
-            .filter(element -> checkLocationItemValue(element, locationList.getValue())).collect(
-                Collectors.toList());
+            .filter(element -> checkLocationItemValue(element, locationList.getValue())).toList();
         return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
     }
 

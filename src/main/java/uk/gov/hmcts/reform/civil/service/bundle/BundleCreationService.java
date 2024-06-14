@@ -37,7 +37,7 @@ public class BundleCreationService {
         return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
                             bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
                                 bundleConfig,
-                                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getId()));
+                                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
     }
 
     private String getAccessToken() {

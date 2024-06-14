@@ -1552,9 +1552,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
-            // ToDo: remove LiP check for CUI R2
-            if (!caseContainsLiP(caseData)
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
                 // If both SDO court AND case managment location is a EA approved court.
                 // check epimm from judge selected court in SDO journey
                 && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
@@ -1633,8 +1632,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
+    private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
+        return !featureToggleService.isCaseProgressionEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
     }
 
     private DynamicList deleteLocationList(DynamicList list) {
