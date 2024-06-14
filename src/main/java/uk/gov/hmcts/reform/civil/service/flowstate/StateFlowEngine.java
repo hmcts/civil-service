@@ -17,6 +17,7 @@ import java.util.Map;
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
@@ -211,6 +212,7 @@ public class StateFlowEngine {
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
@@ -225,6 +227,7 @@ public class StateFlowEngine {
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Only one unrepresented defendant
@@ -235,6 +238,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 1
@@ -248,6 +252,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 2
@@ -260,6 +265,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendants
@@ -272,6 +278,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
                         DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
