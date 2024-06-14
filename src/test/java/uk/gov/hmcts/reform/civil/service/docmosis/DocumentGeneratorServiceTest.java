@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
+import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
@@ -24,21 +30,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DocumentGeneratorService.class, JacksonAutoConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class DocumentGeneratorServiceTest {
 
-    @MockBean
+    @Mock
     private DocmosisApiClient docmosisApiClient;
 
     @Captor
     ArgumentCaptor<DocmosisRequest> argumentCaptor;
 
-    @Autowired
+    @InjectMocks
     private DocumentGeneratorService documentGeneratorService;
 
+    @Mock
+    private DocmosisConfiguration configuration;
+
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper();
+
     @Test
-    void shouldInvokesTornado() {
+    void shouldInvokeTornado() {
         SealedClaimForm sealedClaimForm = SealedClaimForm.builder().issueDate(LocalDate.now()).build();
 
         byte[] expectedResponse = {1, 2, 3};
