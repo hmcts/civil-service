@@ -219,6 +219,7 @@ public class InitiateGeneralApplicationService {
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
+            .generalAppHelpWithFees(caseData.getGeneralAppHelpWithFees())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppAskForCosts(caseData.getGeneralAppAskForCosts())
             .generalAppDateDeadline(deadline)
@@ -354,14 +355,26 @@ public class InitiateGeneralApplicationService {
                 }
             }
         } else {
-            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            CaseLocationCivil courtLocation = CaseLocationCivil.builder()
+            CaseLocationCivil courtLocation;
+            if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+                LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+                courtLocation = CaseLocationCivil.builder()
+                    .region(cnbcLocation.getRegionId())
+                    .baseLocation(cnbcLocation.getEpimmsId())
+                    .siteName(cnbcLocation.getSiteName())
+                    .address(cnbcLocation.getCourtAddress())
+                    .postcode(cnbcLocation.getPostcode())
+                    .build();
+            } else {
+                LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+                courtLocation = CaseLocationCivil.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
                     .address(ccmccLocation.getCourtAddress())
                     .postcode(ccmccLocation.getPostcode())
                     .build();
+            }
             return Pair.of(courtLocation, true);
         }
     }
