@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,6 +19,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class DocumentGeneratorService {
+
     private final DocmosisApiClient docmosisApiClient;
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;

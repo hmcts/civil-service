@@ -25,6 +25,29 @@ public class LocationReferenceDataService {
     private final LocationReferenceDataApiClient locationReferenceDataApiClient;
     private final AuthTokenGenerator authTokenGenerator;
 
+    public LocationRefData getCnbcLocation(String authToken) {
+        try {
+            List<LocationRefData> cnbcLocations =
+                locationReferenceDataApiClient.getCourtVenueByName(
+                    authTokenGenerator.generate(),
+                    authToken,
+                    "Civil National Business Centre"
+                );
+            if (cnbcLocations == null || cnbcLocations.isEmpty()) {
+                log.warn("Location Reference Data Lookup did not return any CNBC location");
+                return LocationRefData.builder().build();
+            } else {
+                if (cnbcLocations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CNBC location");
+                }
+                return cnbcLocations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
+    }
+
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             List<LocationRefData> ccmccLocations =
