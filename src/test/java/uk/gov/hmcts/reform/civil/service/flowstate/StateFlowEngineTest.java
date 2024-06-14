@@ -2595,11 +2595,12 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(7).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
@@ -2722,7 +2723,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(7).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
