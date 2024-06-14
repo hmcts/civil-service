@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled;
 
 @ExtendWith(MockitoExtension.class)
 public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
@@ -132,13 +132,13 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
             .defendant1LIPAtClaimIssued(YES)
             .build();
 
-        assertTrue(PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled.test(caseData1));
+        assertTrue(certificateOfServiceEnabled.test(caseData1));
 
         CaseData caseData2 = CaseData.builder()
             .defendant2LIPAtClaimIssued(YES)
             .build();
 
-        assertTrue(PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled.test(caseData2));
+        assertTrue(certificateOfServiceEnabled.test(caseData2));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -40,15 +40,6 @@ public class MediationUnsuccessfulProceedTransitionBuilderTest {
         assertTransition(result.get(4), "MAIN.MEDIATION_UNSUCCESSFUL_PROCEED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
     }
 
-    @Test
-    void shouldCorrectlyAssignSourceAndTargetStates() {
-        assertThat(result).isNotEmpty();
-
-        for (Transition transition : result) {
-            assertTransition(transition, transition.getSourceState(), transition.getTargetState());
-        }
-    }
-
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
         assertThat(transition.getTargetState()).isEqualTo(targetState);

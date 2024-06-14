@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTransitionBuilder.caseDismissedAfterClaimAcknowledged;
@@ -108,14 +107,14 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterNotificationAcknowledged() {
+    void shouldReturnTrue_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterNotificationAcknowledged()
             .build();
         assertTrue(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
     }
 
     @Test
-    void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterNotificationAcknowledged1v2() {
+    void shouldReturnTrue_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterNotificationAcknowledged()
             .respondent2(Party.builder().partyName("Respondent 2").build())
@@ -126,7 +125,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnFalse_whenCaseDataAtStateTakenOfflineAfterNotificationAcknowledged1v2() {
+    void shouldReturnFalse_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledgedRespondent1TimeExtension()
             .respondent2(Party.builder().partyName("Respondent 2").build())
@@ -188,16 +187,14 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Test").build())
             .build();
-
         assertTrue(reasonNotSuitableForSdo.test(caseData));
     }
 
     @Test
-    void reasonNotSuitableForSdoExt() {
+    void reasonNotSuitableForSdo_shouldReturnFalse_whenNoReason() {
         CaseData caseData = CaseData.builder()
             .reasonNotSuitableSDO(null)
             .build();
-
         assertFalse(reasonNotSuitableForSdo.test(caseData));
     }
 

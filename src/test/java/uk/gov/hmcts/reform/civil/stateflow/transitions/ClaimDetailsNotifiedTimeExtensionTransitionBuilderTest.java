@@ -34,8 +34,8 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimDetailsNotifiedTimeExtensionTransitionBuilder claimDetailsNotifiedTimeExtensionTransitionBuilder =
-            new ClaimDetailsNotifiedTimeExtensionTransitionBuilder(mockFeatureToggleService);
+        ClaimDetailsNotifiedTimeExtensionTransitionBuilder claimDetailsNotifiedTimeExtensionTransitionBuilder = new ClaimDetailsNotifiedTimeExtensionTransitionBuilder(
+            mockFeatureToggleService);
         caseDataBuilder = CaseDataBuilder.builder();
         result = claimDetailsNotifiedTimeExtensionTransitionBuilder.buildTransitions();
         assertNotNull(result);

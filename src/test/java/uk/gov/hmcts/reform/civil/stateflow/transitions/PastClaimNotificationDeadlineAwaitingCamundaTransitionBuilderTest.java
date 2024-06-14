@@ -36,15 +36,6 @@ public class PastClaimNotificationDeadlineAwaitingCamundaTransitionBuilderTest {
         assertTransition(result.get(0), "MAIN.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA", "MAIN.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE");
     }
 
-    @Test
-    void shouldCorrectlyAssignSourceAndTargetStates() {
-        assertThat(result).isNotEmpty();
-
-        for (Transition transition : result) {
-            assertTransition(transition, transition.getSourceState(), transition.getTargetState());
-        }
-    }
-
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
         assertThat(transition.getTargetState()).isEqualTo(targetState);

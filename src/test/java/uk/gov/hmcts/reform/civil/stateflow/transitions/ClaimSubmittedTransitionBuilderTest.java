@@ -20,11 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueHwF;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.paymentFailed;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.takenOfflineByStaffBeforeClaimIssued;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimSubmittedTransitionBuilderTest {

@@ -274,7 +274,6 @@ public class FlowPredicate {
         };
     }
 
-    //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = FlowPredicate::isDivergentResponsesWithDQAndGoOffline;
 
     private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
@@ -302,7 +301,6 @@ public class FlowPredicate {
         };
     }
 
-    //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> divergentRespondGoOffline = FlowPredicate::isDivergentResponsesGoOffline;
 
     private static boolean isDivergentResponsesGoOffline(CaseData caseData) {

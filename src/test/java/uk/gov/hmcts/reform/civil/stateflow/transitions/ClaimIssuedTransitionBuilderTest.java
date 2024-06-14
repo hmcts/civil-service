@@ -17,9 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesNonFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.contactDetailsChange;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.pastClaimNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineByStaffAfterClaimIssue;
@@ -34,7 +37,8 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        ClaimIssuedTransitionBuilder claimIssuedTransitionBuilder = new ClaimIssuedTransitionBuilder(mockFeatureToggleService);
+        ClaimIssuedTransitionBuilder claimIssuedTransitionBuilder = new ClaimIssuedTransitionBuilder(
+            mockFeatureToggleService);
         result = claimIssuedTransitionBuilder.buildTransitions();
         assertNotNull(result);
     }
@@ -178,6 +182,23 @@ public class ClaimIssuedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
         assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenContactDetailsChangedAlready() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .atSpecAoSApplicantCorrespondenceAddressRequired(NO).build();
+
+        assertTrue(contactDetailsChange.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenContactDetailsNotYetChanged() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued().atSpecAoSApplicantCorrespondenceAddressRequired(YES).build();
+
+        assertFalse(contactDetailsChange.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -36,15 +36,6 @@ public class PartAdmitAgreeRepaymentTransitionBuilderTest {
         assertTransition(result.get(0), "MAIN.PART_ADMIT_AGREE_REPAYMENT", "MAIN.SIGN_SETTLEMENT_AGREEMENT");
     }
 
-    @Test
-    void shouldCorrectlyAssignSourceAndTargetStates() {
-        assertThat(result).isNotEmpty();
-
-        for (Transition transition : result) {
-            assertTransition(transition, transition.getSourceState(), transition.getTargetState());
-        }
-    }
-
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
         assertThat(transition.getTargetState()).isEqualTo(targetState);

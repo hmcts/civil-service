@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimDetailsNotifiedTransitionBuilder.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimDetailsNotifiedTransitionBuilderTest {

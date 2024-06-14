@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -15,7 +14,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
@@ -73,54 +74,6 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
             case ONE_V_TWO_TWO_LEGAL_REP -> basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
             case ONE_V_ONE -> basePredicate;
             case TWO_V_ONE -> basePredicate && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
-        };
-    }
-
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = AllResponsesReceivedTransitionBuilder::isDivergentResponsesWithDQAndGoOffline;
-
-    public static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
-        return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP ->
-                //scenario: either of them have submitted full defence response
-                !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
-                    && (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    || caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE));
-            case ONE_V_TWO_TWO_LEGAL_REP ->
-                //scenario: latest response is full defence
-                !Objects.equals(caseData.getRespondent1ClaimResponseType(), caseData.getRespondent2ClaimResponseType())
-                    && ((caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
-                    || (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
-            case TWO_V_ONE ->
-                (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                    || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
-                    && !(RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                    && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
-            default -> false;
-        };
-    }
-
-    public static final Predicate<CaseData> divergentRespondGoOffline = AllResponsesReceivedTransitionBuilder::isDivergentResponsesGoOffline;
-
-    private static boolean isDivergentResponsesGoOffline(CaseData caseData) {
-        return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP ->
-                !Objects.equals(caseData.getRespondent1ClaimResponseType(), caseData.getRespondent2ClaimResponseType())
-                    && ((!caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
-                    || !caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()))
-                    || (!caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)));
-            case ONE_V_TWO_ONE_LEGAL_REP ->
-                !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
-                    && (!caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-                    && !caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE));
-            case TWO_V_ONE ->
-                !(RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                    || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
-            default -> false;
         };
     }
 }
