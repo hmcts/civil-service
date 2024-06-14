@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -22,7 +22,7 @@ import static java.util.Objects.isNull;
 public class HearingFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-    private final FeesApi feesApi;
+    private final FeesApiClient feesApiClient;
     private final HearingFeeConfiguration feesConfiguration;
 
     public Fee getFeeForHearingSmallClaims(BigDecimal amount) {
@@ -69,7 +69,7 @@ public class HearingFeesService {
         FeeLookupResponseDto feeLookupResponseDto;
 
         try {
-            feeLookupResponseDto = feesApi.lookupFeeWithAmount(
+            feeLookupResponseDto = feesApiClient.lookupFeeWithAmount(
                 feesApiRequest.getService(),
                 feesApiRequest.getJurisdiction(),
                 feesApiRequest.getJurisdiction2(),

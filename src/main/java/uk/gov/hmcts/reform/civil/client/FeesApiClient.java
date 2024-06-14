@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import java.math.BigDecimal;
 
 @FeignClient(name = "fees-api", url = "${fees.api.url}")
-public interface FeesApi {
+public interface FeesApiClient {
 
     String baseUrl = "/fees-register/fees";
 

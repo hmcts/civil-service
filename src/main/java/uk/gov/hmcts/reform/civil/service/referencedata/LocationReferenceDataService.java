@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApi;
+import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
@@ -22,13 +22,13 @@ import static org.apache.logging.log4j.util.Strings.concat;
 @RequiredArgsConstructor
 public class LocationReferenceDataService {
 
-    private final LocationReferenceDataApi locationReferenceDataApi;
+    private final LocationReferenceDataApiClient locationReferenceDataApiClient;
     private final AuthTokenGenerator authTokenGenerator;
 
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             List<LocationRefData> ccmccLocations =
-                locationReferenceDataApi.getCourtVenueByName(
+                locationReferenceDataApiClient.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
                     "County Court Money Claims Centre"
@@ -51,7 +51,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
         try {
             return
-                locationReferenceDataApi.getCourtVenue(
+                locationReferenceDataApiClient.getCourtVenue(
                     authTokenGenerator.generate(),
                     authToken,
                     "Y",
@@ -69,7 +69,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
         try {
             List<LocationRefData> responseEntity =
-                locationReferenceDataApi.getCourtVenue(
+                locationReferenceDataApiClient.getCourtVenue(
                     authTokenGenerator.generate(),
                     authToken,
                     "Y",
@@ -89,7 +89,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
         try {
             List<LocationRefData> responseEntity =
-                locationReferenceDataApi.getCourtVenueByEpimmsId(
+                locationReferenceDataApiClient.getCourtVenueByEpimmsId(
                     authTokenGenerator.generate(),
                     authToken, epimmsId
                 );
@@ -103,7 +103,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getCourtLocationsByEpimmsIdAndCourtType(String authToken, String epimmsId) {
         try {
             List<LocationRefData> responseEntity =
-                locationReferenceDataApi.getCourtVenueByEpimmsIdAndType(
+                locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                     authTokenGenerator.generate(),
                     authToken, epimmsId, "10"
                 );
@@ -124,7 +124,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getHearingCourtLocations(String authToken) {
         try {
             List<LocationRefData> responseEntity =
-                locationReferenceDataApi.getHearingVenue(
+                locationReferenceDataApiClient.getHearingVenue(
                     authTokenGenerator.generate(),
                     authToken, "Y", "Y", "Court"
                 );
@@ -169,7 +169,7 @@ public class LocationReferenceDataService {
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
             List<LocationRefData> responseEntity =
-                locationReferenceDataApi.getCourtVenueByLocationCode(
+                locationReferenceDataApiClient.getCourtVenueByLocationCode(
                     authTokenGenerator.generate(),
                     authToken, "Y", "10", threeDigitCode, "Open"
                 );

@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.BundleApiClient;
+import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -31,7 +31,7 @@ import static org.mockito.BDDMockito.given;
 class BundleRequestExecutorTest {
 
     @Mock
-    BundleApiClient bundleApiClient;
+    EvidenceManagementApiClient evidenceManagementApiClient;
     @Mock
     AuthTokenGenerator serviceAuthTokenGenerator;
     @Mock
@@ -41,10 +41,11 @@ class BundleRequestExecutorTest {
 
     @BeforeEach
     void setup() {
-        bundleRequestExecutor = new BundleRequestExecutor(bundleApiClient,
-                                                          serviceAuthTokenGenerator,
-                                                          caseDetailsConverter,
-                                                          new ObjectMapper()
+        bundleRequestExecutor = new BundleRequestExecutor(
+            evidenceManagementApiClient,
+            serviceAuthTokenGenerator,
+            caseDetailsConverter,
+            new ObjectMapper()
         );
     }
 
@@ -56,7 +57,7 @@ class BundleRequestExecutorTest {
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
         ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.OK);
         given(caseDetailsConverter.toCaseData(responseCaseDetails)).willReturn(expectedCaseData);
-        given(bundleApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willReturn(responseEntity);
 
         // When
@@ -75,7 +76,7 @@ class BundleRequestExecutorTest {
             + "[\"Stitching failed: prl-ccd-definitions-pr-662-cdam executing GET "
             + "http://prl-ccd-definitions-pr-662-cdam/cases/documents/5ce8143a-9a0a-45f2-9735-6b6f9236e4d3/binary\"],"
             + "\"warnings\":[],\"documentTaskId\":0}";
-        given(bundleApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willThrow(new RestClientResponseException("random exception", 500, "Internal server error",
                                                        HttpHeaders.EMPTY, errorData.getBytes(),
                                                        Charset.defaultCharset()
@@ -99,7 +100,7 @@ class BundleRequestExecutorTest {
             responseCaseDetails,
             HttpStatus.NOT_ACCEPTABLE
         );
-        given(bundleApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willReturn(responseEntity);
 
         // When

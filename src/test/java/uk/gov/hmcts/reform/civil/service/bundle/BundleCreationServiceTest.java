@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.BundleApiClient;
+import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
@@ -47,7 +47,7 @@ class BundleCreationServiceTest {
     @InjectMocks
     private BundleCreationService bundlingService;
     @Mock
-    private BundleApiClient bundleApiClient;
+    private EvidenceManagementApiClient evidenceManagementApiClient;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
@@ -180,7 +180,7 @@ class BundleCreationServiceTest {
         bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
 
         //Then: BundleRest API should be called
-        verify(bundleApiClient).createNewBundle(anyString(), anyString(), any());
+        verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
     }
 
 }

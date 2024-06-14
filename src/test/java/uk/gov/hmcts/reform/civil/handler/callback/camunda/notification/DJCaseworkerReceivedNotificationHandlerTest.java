@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
 import java.math.BigDecimal;
@@ -70,7 +70,7 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
     @MockBean
     private DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
     @MockBean
-    private FeesApi feesApi;
+    private FeesApiClient feesApiClient;
 
     @Nested
     class AboutToSubmitCallback {

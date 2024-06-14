@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,7 +32,7 @@ public class GeneralAppFeesService {
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
     private static final int FREE_GA_DAYS = 14;
 
-    private final FeesApi feesApi;
+    private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
 
     private static final String CHANNEL = "channel";
@@ -117,7 +117,7 @@ public class GeneralAppFeesService {
 
         FeeLookupResponseDto feeLookupResponseDto;
         try {
-            feeLookupResponseDto = feesApi.lookupFee(
+            feeLookupResponseDto = feesApiClient.lookupFee(
                 service,
                 feesConfiguration.getJurisdiction1(),
                 feesConfiguration.getJurisdiction2(),

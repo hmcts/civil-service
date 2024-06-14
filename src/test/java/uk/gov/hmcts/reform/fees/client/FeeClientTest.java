@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesClientService;
@@ -31,7 +31,7 @@ class FeeClientTest {
 
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS = new BigDecimal("1.00");
     @Mock
-    private FeesApi feesApi;
+    private FeesApiClient feesApiClient;
     @Mock
     private FeesConfiguration feesConfiguration;
     @Mock
@@ -41,7 +41,7 @@ class FeeClientTest {
     @BeforeEach
     void setUp() {
         feesClient = new FeesClientService(
-            feesApi,
+                feesApiClient,
             featureToggleService,
             "civil",
             "jurisdiction1",
@@ -53,7 +53,7 @@ class FeeClientTest {
     @Test
     void shouldReturnFeeData_whenValidClaimValueWhenFeatureIsEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
-        given(feesApi.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
+        given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -68,7 +68,7 @@ class FeeClientTest {
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
-        verify(feesApi).lookupFeeWithAmount(
+        verify(feesApiClient).lookupFeeWithAmount(
             "civil",
             "jurisdiction1",
             "jurisdiction2",
@@ -83,7 +83,7 @@ class FeeClientTest {
     @Test
     void shouldReturnFeeData_whenValidClaimValueWhenFeatureIsNotEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(false);
-        given(feesApi.lookupFeeWithoutKeyword(any(), any(), any(), any(), any(), any()))
+        given(feesApiClient.lookupFeeWithoutKeyword(any(), any(), any(), any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -98,7 +98,7 @@ class FeeClientTest {
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
-        verify(feesApi).lookupFeeWithoutKeyword(
+        verify(feesApiClient).lookupFeeWithoutKeyword(
             "civil",
             "jurisdiction1",
             "jurisdiction2",
@@ -114,7 +114,7 @@ class FeeClientTest {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        given(feesApi.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
+        given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -127,7 +127,7 @@ class FeeClientTest {
             new BigDecimal("10001.00")
         );
 
-        verify(feesApi).lookupFeeWithAmount(
+        verify(feesApiClient).lookupFeeWithAmount(
             "civil",
             "jurisdiction1",
             "jurisdictionFastTrackClaim",
@@ -142,7 +142,7 @@ class FeeClientTest {
     @Test
     void shouldCallLookupFeeWithKeyWordHearingSmallClaimsWhenEventIsNotIssue() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
-        given(feesApi.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
+        given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -151,7 +151,7 @@ class FeeClientTest {
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, "EventOtherThanIssueOrHearing", new BigDecimal("50.00"));
 
-        verify(feesApi).lookupFeeWithAmount(
+        verify(feesApiClient).lookupFeeWithAmount(
             "civil",
             "jurisdiction1",
             "jurisdiction2",

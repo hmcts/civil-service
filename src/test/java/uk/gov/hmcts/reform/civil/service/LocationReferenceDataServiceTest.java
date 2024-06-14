@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApi;
+import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 class LocationReferenceDataServiceTest {
 
     @Mock
-    private LocationReferenceDataApi locationReferenceDataApi;
+    private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -156,7 +156,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenue(
+            when(locationReferenceDataApiClient.getCourtVenue(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -175,7 +175,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenue(
+            when(locationReferenceDataApiClient.getCourtVenue(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -210,7 +210,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsOnlyScotlandLocations() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenue(
+            when(locationReferenceDataApiClient.getCourtVenue(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -245,7 +245,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenue(
+            when(locationReferenceDataApiClient.getCourtVenue(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -273,7 +273,7 @@ class LocationReferenceDataServiceTest {
                 .venueName("CCMCC").build();
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByName(
+            when(locationReferenceDataApiClient.getCourtVenueByName(
                 anyString(),
                 anyString(),
                 anyString()
@@ -289,7 +289,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsNullBody() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByName(
+            when(locationReferenceDataApiClient.getCourtVenueByName(
                 anyString(),
                 anyString(),
                 anyString()
@@ -315,7 +315,7 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> mockedResponse = List.of(ccmccLocation1, ccmccLocation2);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByName(
+            when(locationReferenceDataApiClient.getCourtVenueByName(
                 anyString(),
                 anyString(),
                 anyString()
@@ -331,7 +331,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnEmptyList_whenLRDThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByName(
+            when(locationReferenceDataApiClient.getCourtVenueByName(
                 anyString(),
                 anyString(),
                 anyString()
@@ -353,7 +353,7 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
                 anyString(),
                 anyString(),
                 anyString()
@@ -377,7 +377,7 @@ class LocationReferenceDataServiceTest {
                 .venueName("CCMCC").courtLocationCode("121").build();
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByEpimmsIdAndType(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -400,7 +400,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByEpimmsId(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
                 anyString(),
                 anyString(),
                 anyString()
@@ -415,7 +415,7 @@ class LocationReferenceDataServiceTest {
         @Test
         void shouldReturnEmptyList_whenEpimmsIdAndCourtTypeThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByEpimmsIdAndType(
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -451,7 +451,7 @@ class LocationReferenceDataServiceTest {
                 .postcode("postcode")
                 .build();
             String bearer = "bearer";
-            when(locationReferenceDataApi.getHearingVenue(
+            when(locationReferenceDataApiClient.getHearingVenue(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -483,7 +483,7 @@ class LocationReferenceDataServiceTest {
 
             List<LocationRefData> mockedResponse = List.of(ccmccLocation);
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByLocationCode(
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -512,7 +512,7 @@ class LocationReferenceDataServiceTest {
             List<LocationRefData> mockedResponse =
                 List.of(ccmccLocation, ccmccLocationDuplicate);
             when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(locationReferenceDataApi.getCourtVenueByLocationCode(
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
                 anyString(),
                 anyString(),
                 anyString(),

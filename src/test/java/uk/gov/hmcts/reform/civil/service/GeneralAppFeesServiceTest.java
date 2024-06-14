@@ -8,7 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -76,7 +76,7 @@ class GeneralAppFeesServiceTest {
     private ArgumentCaptor<String> keywordCaptor;
 
     @Mock
-    private FeesApi feesApi;
+    private FeesApiClient feesApiClient;
 
     @Mock
     private GeneralAppFeesConfiguration feesConfiguration;
@@ -91,7 +91,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
         when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
 
-        when(feesApi.lookupFee(
+        when(feesApiClient.lookupFee(
             anyString(),
             anyString(),
             anyString(),
@@ -117,7 +117,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
         when(feesConfiguration.getEvent()).thenReturn("general application");
 
-        when(feesApi.lookupFee(
+        when(feesApiClient.lookupFee(
             anyString(),
             anyString(),
             anyString(),
@@ -143,7 +143,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
         when(feesConfiguration.getEvent()).thenReturn("general application");
 
-        when(feesApi.lookupFee(
+        when(feesApiClient.lookupFee(
             anyString(),
             anyString(),
             anyString(),
@@ -169,7 +169,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getEvent()).thenReturn("general application");
 
-        when(feesApi.lookupFee(
+        when(feesApiClient.lookupFee(
             anyString(),
             anyString(),
             anyString(),
@@ -229,7 +229,7 @@ class GeneralAppFeesServiceTest {
 
     @Test
     void throwRuntimeException_whenFeeServiceThrowsException() {
-        when(feesApi.lookupFee(any(), any(), any(), any(), any(), any()))
+        when(feesApiClient.lookupFee(any(), any(), any(), any(), any(), any()))
             .thenThrow(new RuntimeException("Some Exception"));
 
         String keyword = feesConfiguration.getWithNoticeKeyword();
@@ -241,7 +241,7 @@ class GeneralAppFeesServiceTest {
 
     @Test
     void throwRuntimeException_whenNoFeeIsReturnedByFeeService() {
-        when(feesApi.lookupFee(any(), any(), any(), any(), any(), any()))
+        when(feesApiClient.lookupFee(any(), any(), any(), any(), any(), any()))
             .thenReturn(null);
         String keyword = feesConfiguration.getWithNoticeKeyword();
         Exception exception = assertThrows(RuntimeException.class, () -> feesService
@@ -260,7 +260,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getEvent()).thenReturn("general application");
 
-        when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+        when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
             .thenReturn(FeeLookupResponseDto.builder()
                             .code("test_fee_code")
                             .version(1)
@@ -298,7 +298,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_with_notice_should_pay_275() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -336,7 +336,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void default_types_with_notice_should_pay_275_forGALiP() {
 
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -369,7 +369,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_without_notice_should_pay_108() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -406,7 +406,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void default_types_without_notice_should_pay_108_forGALiP() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -439,7 +439,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void adjourn_should_pay_default_or_free_fee() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -447,7 +447,7 @@ class GeneralAppFeesServiceTest {
                 anyString(),
                 eq(WithoutNotice)
             )).thenReturn(FEE_POUNDS_108);
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -484,12 +484,12 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void vary_types_should_be_14() {
-            when(feesApi.lookupFee(anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesApiClient.lookupFee(anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
             when(feesConfiguration.getChannel()).thenReturn("default");
             when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
             when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
@@ -513,7 +513,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void settle_should_be_108() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -538,7 +538,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void setAside_should_be_275() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -568,7 +568,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_adjourn_should_not_free() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -595,9 +595,9 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_set_aside_should_be_108() {
-            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(WithoutNotice)))
+            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(WithoutNotice)))
                 .thenReturn(FEE_POUNDS_108);
-            when(feesApi.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(GAOnNotice)))
+            when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), eq(GAOnNotice)))
                 .thenReturn(FEE_POUNDS_275);
             when(feesConfiguration.getService()).thenReturn("general");
             when(feesConfiguration.getChannel()).thenReturn("default");
@@ -619,7 +619,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_vary_should_be_14() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -627,12 +627,12 @@ class GeneralAppFeesServiceTest {
                 anyString(),
                 eq(WithoutNotice)
             )).thenReturn(FEE_POUNDS_108);
-            when(feesApi.lookupFee(anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesApiClient.lookupFee(anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
             when(feesConfiguration.getService()).thenReturn("general");
             when(feesConfiguration.getChannel()).thenReturn("default");
             when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
@@ -662,7 +662,7 @@ class GeneralAppFeesServiceTest {
 
         @Test
         void mix_default_vary_set_aside_should_be_14() {
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -670,7 +670,7 @@ class GeneralAppFeesServiceTest {
                 anyString(),
                 eq(WithoutNotice)
             )).thenReturn(FEE_POUNDS_108);
-            when(feesApi.lookupFee(
+            when(feesApiClient.lookupFee(
                 anyString(),
                 anyString(),
                 anyString(),
@@ -678,12 +678,12 @@ class GeneralAppFeesServiceTest {
                 anyString(),
                 eq(GAOnNotice)
             )).thenReturn(FEE_POUNDS_275);
-            when(feesApi.lookupFee(anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   anyString(),
-                                   eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
+            when(feesApiClient.lookupFee(anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         anyString(),
+                                         eq(AppnToVaryOrSuspend))).thenReturn(FEE_POUNDS_14);
             when(feesConfiguration.getService()).thenReturn("general");
             when(feesConfiguration.getChannel()).thenReturn("default");
             when(feesConfiguration.getJurisdiction1()).thenReturn("civil");

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.BundleApiClient;
+import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -33,7 +33,7 @@ public class BundleRequestExecutor {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
-    private final BundleApiClient bundleApiClient;
+    private final EvidenceManagementApiClient evidenceManagementApiClient;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -52,9 +52,9 @@ public class BundleRequestExecutor {
         headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
 
         try {
-            ResponseEntity<CaseDetails> response1 = bundleApiClient.stitchBundle(authorisation,
-                                                                                 serviceAuthorizationToken,
-                                                                                 payload
+            ResponseEntity<CaseDetails> response1 = evidenceManagementApiClient.stitchBundle(authorisation,
+                                                                                             serviceAuthorizationToken,
+                                                                                             payload
             );
             if (response1.getStatusCode().equals(HttpStatus.OK)) {
                 return Optional.of(caseDetailsConverter.toCaseData(requireNonNull(response1.getBody())));

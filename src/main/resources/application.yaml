@@ -58,6 +58,10 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+docmosis:
+  tornado:
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:6666}
+
 hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}

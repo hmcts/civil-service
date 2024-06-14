@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 
 @FeignClient(name = "bundle", url = "${bundle.api.url}", configuration =
     FeignClientProperties.FeignClientConfiguration.class)
-public interface BundleApiClient {
+public interface EvidenceManagementApiClient {
 
     @PostMapping(value = "/api/new-bundle", consumes = "application/json")
     BundleCreateResponse createNewBundle(

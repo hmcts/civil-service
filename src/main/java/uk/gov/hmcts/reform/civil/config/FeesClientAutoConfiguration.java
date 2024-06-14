@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 @Configuration
@@ -22,8 +22,8 @@ import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 public class FeesClientAutoConfiguration {
 
     @Bean
-    public FeesHealthIndicator feesHealthIndicator(FeesApi feesApi) {
-        return new FeesHealthIndicator(feesApi);
+    public FeesHealthIndicator feesHealthIndicator(FeesApiClient feesApiClient) {
+        return new FeesHealthIndicator(feesApiClient);
     }
 
     @Autowired

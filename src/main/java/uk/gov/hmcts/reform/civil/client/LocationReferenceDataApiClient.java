@@ -12,7 +12,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @FeignClient(name = "location-ref-data-api", url = "${location.api.baseUrl}")
-public interface  LocationReferenceDataApi {
+public interface LocationReferenceDataApiClient {
 
     @GetMapping(value = "/refdata/location/court-venues",
         headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)

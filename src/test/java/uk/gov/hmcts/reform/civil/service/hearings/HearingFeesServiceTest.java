@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
-import uk.gov.hmcts.reform.civil.client.FeesApi;
+import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -33,7 +33,7 @@ class HearingFeesServiceTest {
     private ArgumentCaptor<String> keywordCaptor;
 
     @Mock
-    private FeesApi feesApi;
+    private FeesApiClient feesApiClient;
 
     @Mock
     private HearingFeeConfiguration feesConfiguration;
@@ -50,7 +50,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
         when(feesConfiguration.getSmallClaimHrgKey()).thenReturn("HearingSmallClaims");
 
-        given(feesApi.lookupFeeWithAmount(
+        given(feesApiClient.lookupFeeWithAmount(
             anyString(),
             anyString(),
             anyString(),
@@ -89,7 +89,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
         when(feesConfiguration.getFastTrackHrgKey()).thenReturn("FastTrackHrgKey");
         // Given
-        given(feesApi.lookupFeeWithAmount(
+        given(feesApiClient.lookupFeeWithAmount(
             anyString(),
             anyString(),
             anyString(),
@@ -128,7 +128,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
         when(feesConfiguration.getJurisdiction2Hearing()).thenReturn("civil");
         when(feesConfiguration.getMultiClaimKey()).thenReturn("MultiTrackHrg");
-        given(feesApi.lookupFeeWithAmount(
+        given(feesApiClient.lookupFeeWithAmount(
             anyString(),
             anyString(),
             anyString(),
@@ -167,7 +167,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
         when(feesConfiguration.getSmallClaimHrgKey()).thenReturn("HearingSmallClaims");
         // Given
-        given(feesApi.lookupFeeWithAmount(
+        given(feesApiClient.lookupFeeWithAmount(
             anyString(),
             anyString(),
             anyString(),
