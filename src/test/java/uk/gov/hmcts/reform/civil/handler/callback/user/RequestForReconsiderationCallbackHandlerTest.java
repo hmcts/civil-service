@@ -522,7 +522,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -539,7 +539,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
-
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

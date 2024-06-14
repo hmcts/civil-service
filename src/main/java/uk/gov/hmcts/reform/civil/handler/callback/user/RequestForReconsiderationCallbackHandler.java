@@ -171,11 +171,11 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent2();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
-        } else if (isLIPClaimant(roles)) {
+        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
             updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
             updatedData.orderRequestedForReviewClaimant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
-        } else if (isLIPDefendant(roles)) {
+        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
             updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
             updatedData.orderRequestedForReviewDefendant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
