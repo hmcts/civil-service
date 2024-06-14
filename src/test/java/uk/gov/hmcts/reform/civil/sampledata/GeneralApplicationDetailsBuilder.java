@@ -50,7 +50,6 @@ import static java.time.LocalDate.EPOCH;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -582,7 +581,6 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -687,7 +685,6 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -891,7 +888,6 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent2DQ respondent2DQ) {
         CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
-                .caseAccessCategory(claimType)
                 .ccdCaseReference(1234L)
                 .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
                                                                         .region("2")
