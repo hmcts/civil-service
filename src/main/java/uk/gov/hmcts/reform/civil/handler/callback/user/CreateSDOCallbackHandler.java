@@ -1551,26 +1551,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (!caseContainsLiP(caseData)
-                && featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
-                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
+                // If both SDO court AND case managment location is a EA approved court.
+                // check epimm from judge selected court in SDO journey
+                && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
 
                 if (featureToggleService.isHmcEnabled()) {
                     dataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
                 }
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(NO);
-            }
-        } else if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (!caseContainsLiP(caseData)
-                && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(NO);
@@ -1650,8 +1643,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
+    private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
+        return !featureToggleService.isCaseProgressionEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
     }
 
     private DynamicList deleteLocationList(DynamicList list) {

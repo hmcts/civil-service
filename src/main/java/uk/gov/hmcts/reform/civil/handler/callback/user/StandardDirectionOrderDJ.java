@@ -79,9 +79,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -222,7 +220,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .getListItems()
                 .stream()
                 .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-                .collect(Collectors.toList());
+                .toList();
             hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
             hearingMethodList.setValue(hearingMethodListWithoutNotInAttendance.stream().filter(
                 elem -> HearingMethod.IN_PERSON.getLabel().equals(elem.getLabel())).findFirst().orElse(null));
@@ -934,39 +932,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             return null;
         }
         return DynamicList.builder().value(list.getValue()).build();
-    }
-
-    private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
-                                                      DynamicList caseDataList) {
-        if (Objects.isNull(caseDataList) || Objects.isNull(locations)) {
-            return null;
-        }
-        String locationLabel = caseDataList.getValue().getLabel();
-        var preferredLocation =
-            locations
-                .stream()
-                .filter(locationRefData -> checkLocation(
-                    locationRefData,
-                    locationLabel
-                )).findFirst();
-        return preferredLocation.orElse(null);
-    }
-
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
-        String locationLabel = location.getSiteName()
-            + " - " + location.getCourtAddress()
-            + " - " + location.getPostcode();
-        return locationLabel.equals(locationTempLabel);
-    }
-
-    private DynamicList getLocationListFromCaseData(DynamicList hearingList, DynamicList trialList) {
-        if (nonNull(hearingList) && nonNull(hearingList.getValue())) {
-            return hearingList;
-        } else if (nonNull(trialList) && nonNull(trialList.getValue())) {
-            return trialList;
-        } else {
-            return null;
-        }
     }
 
     private String validateInputValue(CallbackParams callbackParams) {
