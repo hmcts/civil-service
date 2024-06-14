@@ -25,6 +25,8 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -79,6 +81,26 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse submitChanges(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        String nextState;
+
+        if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
+            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+        } else {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            //TODO in case no hearing centre allocated, set owning court as CTSC
+            nextState = CaseState.CLOSED.name();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(nextState)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
