@@ -660,8 +660,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
     private CaseDocument decisionOnReconsiderationDocument;
+    private CaseDocument requestForReconsiderationDocument;
+    private CaseDocument requestForReconsiderationDocumentRes;
     private LocalDateTime requestForReconsiderationDeadline;
     private YesOrNo requestForReconsiderationDeadlineChecked;
+
+    //Settle And Discontinue
+    private YesOrNo markPaidForAllClaimants;
+    private DynamicList claimantWhoIsSettling;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
