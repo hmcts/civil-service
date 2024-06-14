@@ -223,6 +223,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             userInfo.getUid()
         );
 
+        final String invalidParticipants = "Invalid participants";
+
         if (isAdmin) {
             switch (multiPartyScenario) {
                 case ONE_V_ONE -> {
@@ -242,14 +244,14 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                     addDefendant1Options(dynamicListOptions, caseData, true);
                     addDefendant2Options(dynamicListOptions, caseData, true);
                 }
-                default -> throw new CallbackException("Invalid participants");
+                default -> throw new CallbackException(invalidParticipants);
             }
         } else if (isApplicantSolicitor(roles)) {
             switch (multiPartyScenario) {
                 case ONE_V_ONE, ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     addApplicant1Options(dynamicListOptions, caseData, false);
                 case TWO_V_ONE -> addApplicantOptions2v1(dynamicListOptions, caseData, false);
-                default -> throw new CallbackException("Invalid participants");
+                default -> throw new CallbackException(invalidParticipants);
             }
         } else if (isRespondentSolicitorOne(roles)) {
             switch (multiPartyScenario) {
@@ -257,7 +259,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                     addDefendant1Options(dynamicListOptions, caseData, false);
                 case ONE_V_TWO_ONE_LEGAL_REP ->
                     addDefendantOptions1v2SameSolicitor(dynamicListOptions, caseData, false);
-                default -> throw new CallbackException("Invalid participants");
+                default -> throw new CallbackException(invalidParticipants);
             }
         } else if (isRespondentSolicitorTwo(roles)
             && ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
@@ -365,14 +367,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private Boolean partyHasLitigationFriend(String partyChosen, CaseData caseData) {
-        if (hasLitigationFriend(CLAIMANT_ONE_ID, partyChosen, caseData.getApplicant1LitigationFriendRequired())
+        return hasLitigationFriend(CLAIMANT_ONE_ID, partyChosen, caseData.getApplicant1LitigationFriendRequired())
             || hasLitigationFriend(CLAIMANT_TWO_ID, partyChosen, caseData.getApplicant2LitigationFriendRequired())
             || hasLitigationFriend(DEFENDANT_ONE_ID, partyChosen, caseData.getRespondent1LitigationFriend())
-            || hasLitigationFriend(DEFENDANT_TWO_ID, partyChosen, caseData.getRespondent2LitigationFriend())
-        ) {
-            return true;
-        }
-        return false;
+            || hasLitigationFriend(DEFENDANT_TWO_ID, partyChosen, caseData.getRespondent2LitigationFriend());
     }
 
     private Boolean hasLitigationFriend(String id, String partyChosen, YesOrNo litigationFriend) {
@@ -680,8 +678,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(format("# Contact information changed"))
-            .confirmationBody(format("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab."))
+            .confirmationHeader("# Contact information changed")
+            .confirmationBody("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab.")
             .build();
     }
 
@@ -708,18 +706,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private boolean showLitigationFriendUpdateWarning(String partyChosen, CaseData caseData) {
-        if ((CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
-            && bothClaimantsHaveLitigationFriends(caseData)) {
-            return true;
-        }
-
-        if ((DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
+        return ((CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
+            && bothClaimantsHaveLitigationFriends(caseData))
+            || ((DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
             && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && bothDefendantsHaveLitigationFriends(caseData)) {
-            return true;
-        }
-
-        return false;
+            && bothDefendantsHaveLitigationFriends(caseData));
     }
 
     private boolean bothClaimantsHaveLitigationFriends(CaseData caseData) {

@@ -79,7 +79,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );
-        } catch (Throwable e) {
+        } catch (Exception e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
@@ -108,7 +108,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         log.info(
             "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
                 "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
-            externalTask.getRetries() != null ? false : true,
+            externalTask.getRetries() == null,
             externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
             remainingRetries,
             externalTask.getRetries(),
@@ -149,8 +149,8 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     }
 
     private String getStackTrace(Throwable throwable) {
-        if (throwable instanceof FeignException) {
-            return ((FeignException) throwable).contentUTF8();
+        if (throwable instanceof FeignException feignexception) {
+            return feignexception.contentUTF8();
         }
 
         return Arrays.toString(throwable.getStackTrace());

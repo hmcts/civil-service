@@ -55,8 +55,7 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
         switch (businessProcess.getStatusOrDefault()) {
-            case READY:
-            case DISPATCHED:
+            case READY, DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
                 if (businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
