@@ -9,12 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
@@ -64,15 +59,21 @@ class DocumentGeneratorServiceTest {
 
     @Test
     void shouldThrowWhenTornadoFails() {
-        when(docmosisApiClient.createDocument(argumentCaptor.capture())
-        ).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "not found"));
+        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenThrow(new HttpClientErrorException(
+            HttpStatus.NOT_FOUND,
+            "not found"
+        ));
 
         Map<String, Object> placeholders = Map.of();
 
-        HttpClientErrorException httpClientErrorException = assertThrows(
-            HttpClientErrorException.class,
-            () -> documentGeneratorService.generateDocmosisDocument(placeholders, N1)
-        );
+        HttpClientErrorException httpClientErrorException =
+            assertThrows(
+                HttpClientErrorException.class,
+                () -> documentGeneratorService.generateDocmosisDocument(
+                    placeholders,
+                    N1
+                )
+            );
 
         assertThat(httpClientErrorException).hasMessageContaining("404 not found");
     }
