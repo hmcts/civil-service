@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.civil.service.stitching;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,27 +52,29 @@ public class BundleRequestExecutor {
         headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
 
         try {
-            ResponseEntity<CaseDetails> response1 = bundleApiClient.exchange(
-                endpoint,
-                HttpMethod.POST,
-                new HttpEntity<>(payload, headers),
-                CaseDetails.class
+            ResponseEntity<CaseDetails> response1 = bundleApiClient.stitchBundle(authorisation,
+                                                                                 serviceAuthorizationToken,
+                                                                                 payload
             );
             if (response1.getStatusCode().equals(HttpStatus.OK)) {
                 return Optional.of(caseDetailsConverter.toCaseData(requireNonNull(response1.getBody())));
             } else {
                 log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
                              + "cause problems down the line.", endpoint, response1.getStatusCode().value());
-                log.info("Stitching endpoint returned {} with reason {}",
-                         response1.getStatusCodeValue(),
-                         response1.getStatusCode().getReasonPhrase());
+                log.info(
+                    "Stitching endpoint returned {} with reason {}",
+                    response1.getStatusCodeValue(),
+                    response1.getStatusCode().getReasonPhrase()
+                );
                 throw new RetryableStitchingException();
             }
 
         } catch (RestClientResponseException e) {
             log.debug(e.getMessage(), e);
-            log.error("The call to the endpoint with URL {} failed. This is likely to cause problems down the line.",
-                      endpoint);
+            log.error(
+                "The call to the endpoint with URL {} failed. This is likely to cause problems down the line.",
+                endpoint
+            );
             logRelevantInfoQuietly(e);
             throw new RetryableStitchingException();
         }
@@ -82,9 +82,9 @@ public class BundleRequestExecutor {
 
     @Recover
     public Optional<CaseData> recover(RetryableStitchingException e,
-                                       final BundleRequest payload,
-                                       final String endpoint,
-                                       String authorisation) {
+                                      final BundleRequest payload,
+                                      final String endpoint,
+                                      String authorisation) {
         log.info("Tried to call {} too many times without success", endpoint);
         return Optional.empty();
     }
@@ -92,9 +92,9 @@ public class BundleRequestExecutor {
     //need to handle maximum retries exception as well, hence method overload
     @Recover
     public Optional<CaseData> recover(RuntimeException e,
-                                       final BundleRequest payload,
-                                       final String endpoint,
-                                       String authorisation) {
+                                      final BundleRequest payload,
+                                      final String endpoint,
+                                      String authorisation) {
         log.info("Tried to call {} too many times without success", endpoint);
         return Optional.empty();
     }
@@ -105,7 +105,7 @@ public class BundleRequestExecutor {
             log.error("  ^  HTTP Error: {}", e.getRawStatusCode());
             Map<String, Object> response = objectMapper.readValue(e.getResponseBodyAsString(), Map.class);
 
-            List<String> errors = (List<String>)response.get("errors");
+            List<String> errors = (List<String>) response.get("errors");
             errors.forEach(message -> log.error("  |  {}", message.substring(0, Math.min(message.length(), 250))));
 
         } catch (Throwable t) {
