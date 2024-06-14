@@ -84,7 +84,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> lipFullDefenceProceed = FullDefenceTransitionBuilder::getPredicateForLipClaimantIntentionProceed;
 
-    private static boolean getPredicateForLipClaimantIntentionProceed(CaseData caseData) {
+    public static boolean getPredicateForLipClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             predicate = NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
@@ -92,17 +92,13 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
         return predicate;
     }
 
-    public static final Predicate<CaseData> isCarmApplicableLipCase = FullDefenceTransitionBuilder::getPredicateIfLipCaseCarmApplicable;
-
-    private static boolean getPredicateIfLipCaseCarmApplicable(CaseData caseData) {
-        boolean basePredicate = getCarmEnabledForDate(caseData) && isSpecSmallClaim(caseData)
-            && caseData.getRespondent2() == null;
-        if (basePredicate) {
-            basePredicate = NO.equals(caseData.getApplicant1Represented())
-                || NO.equals(caseData.getRespondent1Represented());
-        }
-        return basePredicate;
-    }
+    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(FullDefenceTransitionBuilder::getCarmEnabledForDate)
+            .filter(FullDefenceTransitionBuilder::isSpecSmallClaim)
+            .filter(data -> data.getRespondent2() == null)
+            .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
+            .isPresent();
 
     private static boolean isSpecSmallClaim(CaseData caseData) {
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -134,26 +130,25 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
     public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
-        boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
+
             if (caseData.getRespondent2() != null
                 && caseData.getRespondent2SameLegalRepresentative().equals(NO)
                 && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
-                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()
-                || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
-                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent() || caseData.hasClaimantAgreedToFreeMediation()) {
-                result = false;
-            } else {
-                result = true;
+                return false;
             }
+
+            return Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isEmpty()
+                && Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isEmpty()
+                && !caseData.hasClaimantAgreedToFreeMediation();
         }
-        return result;
+        return false;
     };
 
     public static final Predicate<CaseData> declinedMediation = CaseData::hasClaimantNotAgreedToFreeMediation;

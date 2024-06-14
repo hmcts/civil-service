@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
@@ -57,58 +55,63 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
-                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-                && caseData.getTakenOfflineDate() != null
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> isNotSuitableSDO(caseData)
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() != null
                 && caseData.getRespondent1ResponseDate() == null
                 && caseData.getRespondent2AcknowledgeNotificationDate() != null
                 && caseData.getRespondent2TimeExtensionDate() != null
-                && caseData.getRespondent2ResponseDate() == null);
-            default -> (caseData.getReasonNotSuitableSDO() != null
-                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent2ResponseDate() == null;
+            default -> isNotSuitableSDO(caseData)
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() != null
-                && caseData.getRespondent1ResponseDate() == null);
+                && caseData.getRespondent1ResponseDate() == null;
         };
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension =
         NotificationAcknowledgedTimeExtensionTransitionBuilder::getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt;
 
-    public static boolean getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(CaseData caseData) {
+    private static boolean getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getTakenOfflineByStaffDate() != null
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> caseData.getTakenOfflineByStaffDate() != null
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() != null
                 && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                && caseData.getRespondent2TimeExtensionDate() != null);
-            default -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent2TimeExtensionDate() != null;
+            default -> caseData.getTakenOfflineByStaffDate() != null
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                && caseData.getRespondent1TimeExtensionDate() != null);
+                && caseData.getRespondent1TimeExtensionDate() != null;
         };
     }
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData -> {
-        if (Objects.requireNonNull(getMultiPartyScenario(caseData)) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                && (caseData.getRespondent1TimeExtensionDate() != null
-                || caseData.getRespondent2TimeExtensionDate() != null)
-                && caseData.getReasonNotSuitableSDO() == null
-                && caseData.getTakenOfflineByStaffDate() == null;
+        LocalDateTime deadline = caseData.getClaimDismissedDeadline();
+        if (deadline.isBefore(LocalDateTime.now())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    return caseData.getRespondent1AcknowledgeNotificationDate() != null
+                        && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                        && (caseData.getRespondent1TimeExtensionDate() != null || caseData.getRespondent2TimeExtensionDate() != null)
+                        && caseData.getReasonNotSuitableSDO() == null
+                        && caseData.getTakenOfflineByStaffDate() == null;
+                default:
+                    return caseData.getRespondent1AcknowledgeNotificationDate() != null
+                        && caseData.getRespondent1TimeExtensionDate() != null
+                        && caseData.getReasonNotSuitableSDO() == null
+                        && caseData.getTakenOfflineByStaffDate() == null;
+            }
         }
-        return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-            && caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getReasonNotSuitableSDO() == null
-            && caseData.getTakenOfflineByStaffDate() == null;
+        return false;
     };
 
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+
+    private static boolean isNotSuitableSDO(CaseData caseData) {
+        return caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getTakenOfflineDate() != null;
+    }
 }

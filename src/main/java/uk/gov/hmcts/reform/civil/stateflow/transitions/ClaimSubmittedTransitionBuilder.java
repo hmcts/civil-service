@@ -62,11 +62,8 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
         !caseData.isApplicantNotRepresented()
-            && (caseData.getPaymentSuccessfulDate() == null
-            && (caseData.getPaymentDetails() != null
-            && caseData.getPaymentDetails().getStatus() == FAILED)
-            || (caseData.getClaimIssuedPaymentDetails() != null
-            && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+            && ((caseData.getPaymentDetails() != null && caseData.getPaymentDetails().getStatus() == FAILED)
+            || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
 
     public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
 
@@ -85,6 +82,4 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
     public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
 
     public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
-
-
 }
