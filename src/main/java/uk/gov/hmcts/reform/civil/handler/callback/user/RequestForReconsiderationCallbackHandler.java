@@ -144,6 +144,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1NotRepresented()) {
+                updatedData.orderRequestedForReviewClaimant(YES);
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
             }
         } else if (isRespondentSolicitorOne(roles)) {
@@ -156,6 +157,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicant1NotRepresented()) {
+                updatedData.orderRequestedForReviewDefendant(YES);
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
             }
         } else if (isRespondentSolicitorTwo(roles)) {

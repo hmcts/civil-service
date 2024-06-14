@@ -25,14 +25,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DELETE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestForReconsiderationDeletionClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private RequestForReconsiderationDeletionClaimantNotificationHandler handler;
+    private RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler handler;
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
@@ -40,11 +41,11 @@ public class RequestForReconsiderationDeletionClaimantNotificationHandlerTest ex
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "DeleteNotificationRequestForReconsiderationClaimant";
+    public static final String TASK_ID = "CreateNotificationRequestForReconsiderationClaimant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(DELETE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT);
+        assertThat(handler.handledEvents()).contains(CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class RequestForReconsiderationDeletionClaimantNotificationHandlerTest ex
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(DELETE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT.name())
+                             .eventId(CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -68,7 +69,7 @@ public class RequestForReconsiderationDeletionClaimantNotificationHandlerTest ex
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
-            .orderRequestedForReviewClaimant(YesOrNo.YES)
+            .orderRequestedForReviewDefendant(YesOrNo.YES)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -79,7 +80,7 @@ public class RequestForReconsiderationDeletionClaimantNotificationHandlerTest ex
 
         verify(dashboardApiClient, times(1)).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );

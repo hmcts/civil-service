@@ -162,8 +162,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Claimant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE("Scenario.AAA6.CP.SDOMadebyLA.Delete"),
-    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Delete.Claimant"),
-    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Delete.Defendant");
+    SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT("Scenario.AAA6.CP.ReviewOrderRequestedbyOtherParty.Claimant"),
+    SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT("Scenario.AAA6.CP.ReviewOrderRequestedbyOtherParty.Defendant");
 
     private final String scenario;
 
