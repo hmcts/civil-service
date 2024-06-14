@@ -108,17 +108,17 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponse() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             assertThat(response).isNotNull();
 
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
@@ -130,16 +130,16 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(helper.getMatching(any(), any()))
                 .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             assertThat(response).isNotNull();
 
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
                 .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
@@ -154,16 +154,16 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(helper.getMatching(any(), any()))
                 .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             assertThat(response).isNotNull();
 
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio3() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmitted()
                 .setClaimTypeToSpecClaim()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
@@ -175,15 +175,15 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(helper.getMatching(any(), any()))
                 .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             assertThat(response).isNotNull();
 
         }
 
         @Test
-        public void thereIsAMatchingLocation() {
+        void thereIsAMatchingLocation() {
             CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
 
             helper.updateWithLocation(updatedData, LocationRefData.builder()
