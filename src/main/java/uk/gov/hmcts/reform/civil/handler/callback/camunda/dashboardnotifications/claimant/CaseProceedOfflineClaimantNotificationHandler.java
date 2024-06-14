@@ -47,7 +47,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
+        return (caseData.getPreviousCCDState() != null && caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
                 && caseData.isLipvLipOneVOne());
     }
 }

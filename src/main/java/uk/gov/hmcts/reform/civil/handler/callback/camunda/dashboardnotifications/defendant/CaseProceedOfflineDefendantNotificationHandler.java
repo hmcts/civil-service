@@ -48,6 +48,6 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
-        return (caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip);
+        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip);
     }
 }
