@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest {
+class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -120,7 +120,7 @@ public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandl
             .build();
 
         @Test
-        public void shouldGenerateClaimantForm_when1v1ClaimantEvent() {
+        void shouldGenerateClaimantForm_when1v1ClaimantEvent() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(documentClaimant);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
@@ -141,11 +141,11 @@ public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandl
                                                           eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
         }
 
         @Test
-        public void shouldGenerateDefendantForm_when1v1DefendantEvent() {
+        void shouldGenerateDefendantForm_when1v1DefendantEvent() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(documentClaimant);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
@@ -166,11 +166,11 @@ public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandl
                                                                           eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
         }
 
         @Test
-        public void shouldGenerateTwoDefendantForm_when1v2DefendantEvent() {
+        void shouldGenerateTwoDefendantForm_when1v2DefendantEvent() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(documentDefendant);
             documents.add(documentDefendant2);
@@ -194,11 +194,11 @@ public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandl
                                                                           eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
 
         @Test
-        public void shouldGenerateTwoApplicantForm_when2v1ClaimantEvent() {
+        void shouldGenerateTwoApplicantForm_when2v1ClaimantEvent() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(documentClaimant);
             documents.add(documentClaimant2);
@@ -222,7 +222,7 @@ public class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandl
                                                                           eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
     }
 

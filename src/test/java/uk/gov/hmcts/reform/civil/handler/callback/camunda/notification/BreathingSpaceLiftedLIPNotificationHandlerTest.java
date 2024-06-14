@@ -85,7 +85,7 @@ class BreathingSpaceLiftedLIPNotificationHandlerTest extends BaseCallbackHandler
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID,
                 APPLICANT_EMAIL_TEMPLATE,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
         }
@@ -114,12 +114,12 @@ class BreathingSpaceLiftedLIPNotificationHandlerTest extends BaseCallbackHandler
             verify(notificationService, times(1)).sendMail(
                 RESPONDENT_EMAIL_ID,
                 RESPONDENT_EMAIL_TEMPLATE,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,

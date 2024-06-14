@@ -175,7 +175,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(((List)(response.getData().get("generalApplications"))).size()).isZero();
+        assertThat(((List)(response.getData().get("generalApplications"))).isEmpty());
     }
 
     @Test
@@ -209,7 +209,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isEqualTo(null);
+        assertThat(response.getErrors()).isNull();
     }
 
     @Test
@@ -222,7 +222,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isEqualTo(null);
+        assertThat(response.getErrors()).isNull();
     }
 
     public Boolean checkGAExitsWithBusinessProcessReady(Element<GeneralApplication> generalApplication) {

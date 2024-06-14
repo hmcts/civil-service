@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
     FeesService.class,
     FeesClient.class
 })
-public class DJCaseworkerReceivedNotificationHandlerTest {
+class DJCaseworkerReceivedNotificationHandlerTest {
 
     @MockBean
     private NotificationService notificationService;

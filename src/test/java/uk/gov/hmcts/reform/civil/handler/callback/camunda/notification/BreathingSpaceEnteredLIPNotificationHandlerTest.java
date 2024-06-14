@@ -20,7 +20,7 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(SpringExtension.class)
-public class BreathingSpaceEnteredLIPNotificationHandlerTest {
+class BreathingSpaceEnteredLIPNotificationHandlerTest {
 
     @InjectMocks
     private BreathingSpaceEnteredLIPNotificationHandler handler;
@@ -32,7 +32,7 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
     private static String templateId = "templateId";
 
     @Test
-    public void notifyApplicant1BreathingSpace() {
+    void notifyApplicant1BreathingSpace() {
 
         Mockito.when(notificationsProperties.getNotifyApplicant1EnteredBreathingSpaceLip())
             .thenReturn(templateId);
@@ -45,15 +45,15 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("applicant1@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-breathing-space-lip-legacy ref")
+            "applicant1@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-breathing-space-lip-legacy ref"
         );
     }
 
     @Test
-    public void notifyRespondentBreathingSpace() {
+    void notifyRespondentBreathingSpace() {
 
         Mockito.when(notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip())
             .thenReturn(templateId);
@@ -66,10 +66,10 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("respondent@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-breathing-space-lip-legacy ref")
+            "respondent@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-breathing-space-lip-legacy ref"
         );
     }
 

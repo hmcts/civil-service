@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -72,7 +71,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             String mockSystemUserPassword = "password";
             when(userConfig.getUserName()).thenReturn(mockSystemUsername);
             when(userConfig.getPassword()).thenReturn(mockSystemUserPassword);
-            when(userService.getAccessToken(eq(mockSystemUsername), eq(mockSystemUserPassword)))
+            when(userService.getAccessToken(mockSystemUsername, mockSystemUserPassword))
                 .thenReturn("mock-token");
             when(datetime.now()).thenReturn(TODAY);
         }
@@ -487,8 +486,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             .hearingId(Long.valueOf(hearingId))
             .hearingRequestDateTime(hearingRequestTime)
             .hearingDaySchedule(startTimes.stream().map(startTime -> HearingDaySchedule.builder().hearingStartDateTime(
-                startTime).build()).collect(
-                Collectors.toList()))
+                startTime).build()).toList())
             .build();
     }
 

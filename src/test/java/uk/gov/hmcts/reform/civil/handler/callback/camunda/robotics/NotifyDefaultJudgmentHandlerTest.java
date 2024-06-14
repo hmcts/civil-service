@@ -44,7 +44,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
@@ -108,7 +107,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotNotifyRobotics_whenLrDisabled() {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
         }
@@ -118,7 +117,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
@@ -136,7 +135,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).respondent1Represented(YesOrNo.NO).build();
+                .toBuilder().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             //When
