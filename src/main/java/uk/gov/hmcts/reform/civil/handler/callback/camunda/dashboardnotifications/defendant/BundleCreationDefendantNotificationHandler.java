@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_DEFENDANT;
 
 @Service
-public class BundleCreationDefendantNotificationHandler extends DashboardCallbackHandler {
+public class BundleCreationDefendantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1);
     public static final String TASK_ID = "CreateBundleCreatedDashboardNotificationsForDefendant1";
