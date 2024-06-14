@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
@@ -55,11 +56,13 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
-    private final FeatureToggleService featureToggleService;
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
         " your notifications/dashboard for an update.";
+
+    private final LiPRequestReconsiderationGeneratorService documentGenerator;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -143,8 +146,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1NotRepresented()) {
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+                updatedData.orderRequestedForReviewClaimant(YES);
             }
         } else if (isRespondentSolicitorOne(roles)) {
             partyName.append("Defendant - ");
@@ -155,8 +160,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicant1NotRepresented()) {
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+                updatedData.orderRequestedForReviewDefendant(YES);
             }
         } else if (isRespondentSolicitorTwo(roles)) {
             partyName.append("Defendant - ");
@@ -165,9 +172,11 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (isLIPClaimant(roles)) {
+            updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
             updatedData.orderRequestedForReviewClaimant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         } else if (isLIPDefendant(roles)) {
+            updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
             updatedData.orderRequestedForReviewDefendant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
         }
