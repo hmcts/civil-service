@@ -530,7 +530,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
