@@ -62,8 +62,7 @@ public class StartHearingNoticeBusinessProcessTaskHandler implements BaseExterna
         }
 
         switch (businessProcess.getStatusOrDefault()) {
-            case READY:
-            case DISPATCHED:
+            case READY, DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
                 String businessProcessError = String.format("Hearing notice existing business process error: Aborting the hearing notice process on the case [%s]"
