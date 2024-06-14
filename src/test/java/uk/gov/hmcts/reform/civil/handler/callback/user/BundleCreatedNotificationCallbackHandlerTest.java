@@ -73,9 +73,6 @@ class BundleCreatedNotificationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            //When: Handler is called
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             //Then: Event should start BUNDLE_CREATION_NOTIFICATION
             assertTrue(handler.handledEvents().contains(BUNDLE_CREATION_NOTIFICATION));
         }

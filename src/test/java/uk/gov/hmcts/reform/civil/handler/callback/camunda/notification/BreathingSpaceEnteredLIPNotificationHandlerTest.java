@@ -17,8 +17,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
-
 @ExtendWith(SpringExtension.class)
 class BreathingSpaceEnteredLIPNotificationHandlerTest {
 
