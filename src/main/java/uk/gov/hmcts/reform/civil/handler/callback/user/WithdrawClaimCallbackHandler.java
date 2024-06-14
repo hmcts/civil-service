@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.validation.groups.ClaimWithdrawalDateGroup;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -48,7 +47,7 @@ public class WithdrawClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = validator.validate(caseData, ClaimWithdrawalDateGroup.class).stream()
             .map(ConstraintViolation::getMessage)
-            .collect(Collectors.toList());
+            .toList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
