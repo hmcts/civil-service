@@ -112,14 +112,19 @@ public class JudgmentByDeterminationDocGenerator {
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
 
         JudgmentByDeterminationDocForm.JudgmentByDeterminationDocFormBuilder builder = JudgmentByDeterminationDocForm.builder();
-        String payByDate = Objects.isNull(caseData.getJoInstalmentDetails()) ? null : Objects.isNull(caseData.getJoInstalmentDetails().getStartDate()) ? null
-            : DateFormatHelper.formatLocalDate(caseData.getJoInstalmentDetails().getStartDate(), DateFormatHelper.DATE);
-        String repaymentFrequency = Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-            : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency()) ? null
-            : getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency());
-        String paymentStr = Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-            : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency())
-            ? null : getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency());
+        String payByDate = null, repaymentFrequency = null, paymentStr = null;
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getStartDate() != null) {
+            payByDate = DateFormatHelper.formatLocalDate(
+                caseData.getJoInstalmentDetails().getStartDate(),
+                DateFormatHelper.DATE
+            );
+        }
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
+            repaymentFrequency = getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency());
+        }
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
+            paymentStr = getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency());
+        }
         builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .formText("No response,")
