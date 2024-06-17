@@ -1638,8 +1638,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
+    private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
+        return !featureToggleService.isCaseProgressionEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
     }
 
     private DynamicList deleteLocationList(DynamicList list) {

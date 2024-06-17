@@ -615,7 +615,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-    private String getHearingLocationText(CaseData caseData) {
+    private String getHearingLocationText(CaseData caseData, String authorisation) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
             : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
     }
