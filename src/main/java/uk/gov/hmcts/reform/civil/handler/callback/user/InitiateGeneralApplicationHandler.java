@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
@@ -113,22 +115,31 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
+        log.info("Overall national rollout enabled is {}", featureToggleService.isNationalRolloutEnabled());
         if (featureToggleService.isNationalRolloutEnabled()) {
             // If Pre SDO allow GA in all locations.
             // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+            log.info("Case state check is {}", inStateAfterJudicialReferral(caseData.getCcdState()));
+            log.info("NRO location check is {}",
+                featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())
+            );
             if (inStateAfterJudicialReferral(caseData.getCcdState())
                 && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                errors.add(NOT_IN_EA_REGION);
+                errors.add(NOT_IN_EA_REGION + "test NRO location");
             }
+            log.info("is GA allowed pre SDO toggle is {}", featureToggleService.isGenAppsAllowedPreSdo());
             if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
-                errors.add(NOT_IN_EA_REGION);
+                errors.add(NOT_IN_EA_REGION + "test GA not allowed pre SDO");
             }
         } else {
+            log.info("existing early adopters is {}", featureToggleService.isEarlyAdoptersEnabled());
+            log.info("case management location whitelisted is {}", featureToggleService
+                .isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation()));
             if (featureToggleService.isEarlyAdoptersEnabled()
                 && (Objects.isNull(caseData.getCaseManagementLocation())
                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
                                                                                       .getBaseLocation())))) {
-                errors.add(NOT_IN_EA_REGION);
+                errors.add(NOT_IN_EA_REGION + "legacy whitelisting");
             }
         }
 
