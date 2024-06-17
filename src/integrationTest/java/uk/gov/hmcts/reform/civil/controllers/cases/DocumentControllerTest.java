@@ -23,10 +23,12 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -116,7 +118,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private RepresentativeService representativeService;
 
     @MockBean
-    private RestTemplate restTemplate;
+    private DocmosisApiClient docmosisApiClient;
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
@@ -181,8 +183,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .totalClaimAmount(BigDecimal.ONE)
             .issueDate(DATE)
             .build();
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
-            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
+        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
+            .thenReturn(bytes);
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 
@@ -207,8 +209,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .build();
 
         //when
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
-            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
+        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
+            .thenReturn(bytes);
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenThrow(DocumentUploadException.class);
 
@@ -235,8 +237,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         );
 
         //when
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
-            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
+        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
+            .thenReturn(bytes);
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 
