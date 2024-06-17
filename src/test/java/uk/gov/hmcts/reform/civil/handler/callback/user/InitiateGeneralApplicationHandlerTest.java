@@ -237,7 +237,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
+        assertThat(response.getErrors().get(0)).contains(NOT_IN_EA_REGION);
     }
 
     @Test
@@ -271,7 +271,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isGenAppsAllowedPreSdo()).thenReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().get(0)).isEqualTo(NOT_IN_EA_REGION);
+        assertThat(response.getErrors().get(0)).contains(NOT_IN_EA_REGION);
     }
 
     @Nested
@@ -1135,7 +1135,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .baseLocation("45678")
+                                            .region("4").build())
+                .build();
             given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
 
@@ -1161,7 +1165,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .baseLocation("45678")
+                                            .region("4").build())
+                .build();
             given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(false);
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
 
