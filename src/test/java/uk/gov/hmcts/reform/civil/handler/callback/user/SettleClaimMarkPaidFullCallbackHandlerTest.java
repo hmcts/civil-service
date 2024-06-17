@@ -110,6 +110,18 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
         }
 
+        @Test
+        void should_return_empty_callback_if_only_1_claimant_paid_full() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setMarkPaidForAllClaimants(YesOrNo.NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getState()).isNull();
+        }
+
     }
 
     @Nested
@@ -143,7 +155,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void whenSubmitted_show_proceed_heritage_system_header_if_1_claimant_paid_full() {
+        void whenSubmitted_show_proceed_heritage_system_header_if_only_1_claimant_paid_full() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(YesOrNo.NO);
