@@ -21,7 +21,7 @@ class DQLipFormMapperFactoryTest {
     @Test
     void shouldReturnMapperForClaimant_whenCamundaProcessIsForClaimantResponse() {
         //Given
-        given(caseData.getCurrentCamundaBusinessProcessName()).willReturn(DQLipFormMapperFactory.claimant_response_cui);
+        given(caseData.getCurrentCamundaBusinessProcessName()).willReturn(DQLipFormMapperFactory.claimantResponseCui);
         //When
         DQLipFormMapper mapper = factory.getDQLipFormMapper(caseData);
         //Then

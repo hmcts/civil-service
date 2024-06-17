@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public class DQLipFormMapperFactory {
 
-    public static String claimant_response_cui = "CLAIMANT_RESPONSE_CUI";
+    public static String claimantResponseCui = "CLAIMANT_RESPONSE_CUI";
 
     public DQLipFormMapper getDQLipFormMapper(CaseData caseData) {
         if (isClaimantLipResponse(caseData)) {
@@ -14,6 +14,6 @@ public class DQLipFormMapperFactory {
     }
 
     private boolean isClaimantLipResponse(CaseData caseData) {
-        return claimant_response_cui.equals(caseData.getCurrentCamundaBusinessProcessName());
+        return claimantResponseCui.equals(caseData.getCurrentCamundaBusinessProcessName());
     }
 }

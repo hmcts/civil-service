@@ -688,7 +688,6 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING").build()).build())).isEqualTo(TASK_ID_CLAIMANT);
@@ -696,7 +695,6 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvokedHMC() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING_HMC").build()).build())).isEqualTo(TASK_ID_CLAIMANT_HMC);
