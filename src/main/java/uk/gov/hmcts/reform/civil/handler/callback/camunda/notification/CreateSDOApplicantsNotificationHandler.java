@@ -99,9 +99,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
 
         if (caseData.isApplicantLiP()) {
             if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
             } else {
-                return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+                return notificationsProperties.getNotifyLipUpdateTemplate();
             }
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
