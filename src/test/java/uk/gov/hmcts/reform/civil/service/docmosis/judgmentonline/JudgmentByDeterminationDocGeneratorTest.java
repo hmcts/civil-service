@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETER
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_BY_DATE;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_IN_INSTALMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
 
@@ -92,6 +93,74 @@ class JudgmentByDeterminationDocGeneratorTest {
             .activeJudgment(JudgmentDetails.builder()
                                 .state(ISSUED)
                                 .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
+                                .orderedAmount("150001")
+                                .instalmentDetails(JudgmentInstalmentDetails.builder()
+                                                       .amount("20001")
+                                                       .paymentFrequency(PaymentFrequency.MONTHLY)
+                                                       .startDate(LocalDate.now())
+                                                       .build())
+                                .build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
+
+        assertThat(caseDocuments).hasSize(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
+
+    }
+
+    @Test
+    void shouldDefaultJudgmentFormGeneratorOneFormClaimant_sceanrio2() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes,
+                                                       JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately()
+            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
+            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .activeJudgment(JudgmentDetails.builder()
+                                .state(ISSUED)
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
+                                .orderedAmount("150001")
+                                .instalmentDetails(JudgmentInstalmentDetails.builder()
+                                                       .amount("20001")
+                                                       .paymentFrequency(PaymentFrequency.MONTHLY)
+                                                       .startDate(LocalDate.now())
+                                                       .build())
+                                .build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
+
+        assertThat(caseDocuments).hasSize(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
+
+    }
+
+    @Test
+    void shouldDefaultJudgmentFormGeneratorOneFormClaimant_sceanrio3() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes,
+                                                       JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate()
+            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
+            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .activeJudgment(JudgmentDetails.builder()
+                                .state(ISSUED)
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).build())
                                 .orderedAmount("150001")
                                 .instalmentDetails(JudgmentInstalmentDetails.builder()
                                                        .amount("20001")

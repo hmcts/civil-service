@@ -132,8 +132,8 @@ public class JudgmentByDeterminationDocGenerator {
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                    : getInstallmentAmount(caseData.getJoInstalmentDetails()))
             .payByDate(getPayByDate(caseData))
-            .repaymentFrequency(getRepaymentFrequency(caseData))
-            .paymentStr(getPaymentStr(caseData))
+            .repaymentFrequency(getInstallmentFreqStr(caseData))
+            .paymentStr(getInstallmentFreqStr(caseData))
             .repaymentDate(getPayByDate(caseData));
         return builder.build();
     }
@@ -150,30 +150,13 @@ public class JudgmentByDeterminationDocGenerator {
     }
 
     @Nullable
-    private String getPaymentStr(CaseData caseData) {
+    private String getInstallmentFreqStr(CaseData caseData) {
         if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
             switch (caseData.getJoInstalmentDetails().getPaymentFrequency()) {
                 case WEEKLY:
                     return "each week";
                 case MONTHLY:
                     return "each month";
-                case EVERY_TWO_WEEKS:
-                    return "every 2 weeks";
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    private String getRepaymentFrequency(CaseData caseData) {
-        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
-            switch (caseData.getJoInstalmentDetails().getPaymentFrequency()) {
-                case WEEKLY:
-                    return "per week";
-                case MONTHLY:
-                    return "per month";
                 case EVERY_TWO_WEEKS:
                     return "every 2 weeks";
                 default:
