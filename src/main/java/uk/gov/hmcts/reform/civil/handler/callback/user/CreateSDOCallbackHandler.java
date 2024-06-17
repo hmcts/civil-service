@@ -1552,7 +1552,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isNationalRolloutEnabled()) {
-            if (!caseContainsLiP(caseData)
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
                 && featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
@@ -1562,7 +1563,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 dataBuilder.eaCourtLocation(NO);
             }
         } else if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (!caseContainsLiP(caseData)
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
                 && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
                 && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
