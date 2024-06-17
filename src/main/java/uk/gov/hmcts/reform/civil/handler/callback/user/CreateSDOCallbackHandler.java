@@ -1551,7 +1551,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
+                && featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
+                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+
+                if (featureToggleService.isHmcEnabled()) {
+                    dataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                }
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(NO);
+            }
+        } else if (featureToggleService.isEarlyAdoptersEnabled()) {
             // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
             if (!sdoSubmittedPreCPForLiPCase(caseData)
                 // If both SDO court AND case managment location is a EA approved court.
@@ -1560,10 +1574,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
-
-                if (featureToggleService.isHmcEnabled()) {
-                    dataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
-                }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(NO);
