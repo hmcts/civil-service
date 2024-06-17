@@ -48,7 +48,7 @@ public class StitchingCompleteCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.getCaseBundles().forEach(bundleIdValue -> bundleIdValue
                 .getValue().getStitchedDocument().ifPresent(
-                        (document) -> {
+                        document -> {
                             if (Objects.isNull(document.getCategoryID())) {
                                 document.setCategoryID(DocCategory.BUNDLES.getValue());
                             }
