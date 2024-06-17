@@ -19,9 +19,10 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,10 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
@@ -83,8 +85,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -102,6 +104,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -242,7 +245,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -658,7 +662,8 @@ class StateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
 
             // 1v2 spec
@@ -1012,7 +1017,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1038,7 +1044,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1072,7 +1079,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1111,7 +1119,8 @@ class StateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1150,7 +1159,8 @@ class StateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1184,7 +1194,8 @@ class StateFlowEngineTest {
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false));
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1212,7 +1223,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+            );
         }
 
         @Test
@@ -1249,7 +1261,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1309,7 +1322,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1342,7 +1356,8 @@ class StateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1378,7 +1393,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1414,7 +1430,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -1442,7 +1459,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Nested
@@ -1476,7 +1494,8 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true));
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+                );
             }
 
             @Test
@@ -1519,7 +1538,8 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true));
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+                );
             }
 
             @Test
@@ -1556,7 +1576,8 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
 
             @Test
@@ -1597,7 +1618,8 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
         }
 
@@ -1641,7 +1663,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1681,7 +1704,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1721,7 +1745,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                );
             }
 
             //1v2 Different solicitor scenario-first party acknowledges, not responds
@@ -1762,7 +1787,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
             }
 
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
@@ -1802,7 +1828,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
             }
 
             //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
@@ -1843,7 +1870,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
             }
 
             //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
@@ -1885,7 +1913,8 @@ class StateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true)
+                );
             }
 
             // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
@@ -2222,9 +2251,15 @@ class StateFlowEngineTest {
                 .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
-                    IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), TAKEN_OFFLINE_AFTER_SDO.fullName()
+                    SPEC_DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    FULL_DEFENCE.fullName(),
+                    IN_MEDIATION.fullName(),
+                    MEDIATION_UNSUCCESSFUL_PROCEED.fullName(),
+                    TAKEN_OFFLINE_AFTER_SDO.fullName()
                 );
 
         }
@@ -2279,7 +2314,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+            //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
         void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -2567,7 +2602,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
                     IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(),
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
@@ -3463,7 +3498,7 @@ class StateFlowEngineTest {
         class DefendantResponseMultiparty {
 
             @Test
-            //1v2 Different solicitor scenario-first response FullDefence received
+                //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3505,7 +3540,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //1v2 Different solicitor scenario-first response FullDefence received
+                //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3547,7 +3582,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //1v2 Different solicitor scenario-first response FullDefence received
+                //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3589,8 +3624,8 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //1v2 Different solicitor scenario-first party acknowledges, not responds
-            // second party submits response FullDefence
+                //1v2 Different solicitor scenario-first party acknowledges, not responds
+                // second party submits response FullDefence
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3631,7 +3666,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+            @Test
+//Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3672,7 +3708,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test//Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            @Test
+//Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3715,7 +3752,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+                //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3759,7 +3796,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+                // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3803,7 +3840,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3845,7 +3882,7 @@ class StateFlowEngineTest {
             }
 
             @Test
-            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -4442,8 +4479,9 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
+                entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+            );
         }
 
         @Test
@@ -4545,7 +4583,7 @@ class StateFlowEngineTest {
             .extracting(State::getName)
             .containsExactly(
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
                 IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
             );
 
@@ -4581,7 +4619,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+            );
         }
 
         @Test
@@ -4611,7 +4650,8 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -4648,14 +4688,18 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(
+                    MultiPartyScenario.ONE_V_ONE,
+                    true
+                )
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -4686,7 +4730,8 @@ class StateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            );
         }
 
         @Test
@@ -4710,9 +4755,15 @@ class StateFlowEngineTest {
                 .hasSize(9)
                 .extracting(State::getName)
                 .containsExactly(
-                    SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
-                    IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
+                    SPEC_DRAFT.fullName(),
+                    CLAIM_SUBMITTED.fullName(),
+                    CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(),
+                    CLAIM_ISSUED.fullName(),
+                    FULL_DEFENCE.fullName(),
+                    IN_MEDIATION.fullName(),
+                    MEDIATION_UNSUCCESSFUL_PROCEED.fullName(),
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
         }
@@ -4784,20 +4835,20 @@ class StateFlowEngineTest {
         void shouldContinueOnline_1v1Spec_HwF_whenDefendantIsUnrepresented() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .applicant1Represented(NO)
-                    .respondent1Represented(NO)
-                    .build().toBuilder()
-                    .takenOfflineDate(null)
-                    .paymentSuccessfulDate(null)
-                    .claimIssuedPaymentDetails(null)
-                    .hwfFeeType(CLAIMISSUED)
-                    .caseDataLiP(CaseDataLiP.builder().helpWithFees(
-                            HelpWithFees.builder()
-                                    .helpWithFee(YesOrNo.YES)
-                                    .helpWithFeesReferenceNumber("12345678912")
-                                    .build()).build())
-                    .caseAccessCategory(SPEC_CLAIM).build();
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .build().toBuilder()
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .hwfFeeType(CLAIMISSUED)
+                .caseDataLiP(CaseDataLiP.builder().helpWithFees(
+                    HelpWithFees.builder()
+                        .helpWithFee(YesOrNo.YES)
+                        .helpWithFeesReferenceNumber("12345678912")
+                        .build()).build())
+                .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -4805,15 +4856,15 @@ class StateFlowEngineTest {
 
             // Then
             assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                    entry(FlowFlag.PIP_ENABLED.name(), true),
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.LIP_CASE.name(), true),
-                    entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
+                entry(FlowFlag.PIP_ENABLED.name(), true),
+                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                entry(FlowFlag.LIP_CASE.name(), true),
+                entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
             );
         }
 
@@ -4951,7 +5002,8 @@ class StateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                                     MediationDecision.No).build())
                                  .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
@@ -4972,30 +5024,30 @@ class StateFlowEngineTest {
         void shouldReturnProceedsInHeritageSystem_whenPartAdmitRepaymentAcceptedWithCCJ() {
             // Given
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                    .ccjPaymentPaidSomeOption(YES)
-                    .build();
+                .ccjPaymentPaidSomeOption(YES)
+                .build();
             DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                    .accessCode("TEST")
-                    .build();
+                .accessCode("TEST")
+                .build();
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .applicant1Represented(NO)
-                    .build().toBuilder()
-                    .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
-                    .takenOfflineDate(null)
-                    .paymentSuccessfulDate(null)
-                    .claimIssuedPaymentDetails(null)
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .claimNotificationDeadline(LocalDateTime.now())
-                    .claimNotificationDate(LocalDateTime.now())
-                    .respondent1ResponseDate(LocalDateTime.now())
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .respondent1Represented(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.NO)
-                    .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-                    .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                    .ccjPaymentDetails(ccjPaymentDetails)
-                    .build();
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseAccessCategory(SPEC_CLAIM)
+                .claimNotificationDeadline(LocalDateTime.now())
+                .claimNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .build();
 
             // When
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -5003,11 +5055,11 @@ class StateFlowEngineTest {
 
             // Then
             assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(PART_ADMIT_AGREE_REPAYMENT.fullName());
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PART_ADMIT_AGREE_REPAYMENT.fullName());
             assertThat(stateFlow.getFlags()).contains(
-                    entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
+                entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
             );
         }
     }
@@ -5031,7 +5083,8 @@ class StateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                                     MediationDecision.No).build())
                                  .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
@@ -5092,6 +5145,47 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).contains(
                 entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
             );
+        }
+    }
+
+    @Nested
+    class TakenOfflineByDefendantNoc {
+        @Test
+        void shouldTakenOffline_whenNOCSubmittedForLipDefendant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .takenOfflineDate(LocalDateTime.now())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
+                                            .timestamp(LocalDateTime.now())
+                                            .organisationToAddID("HA160")
+                                            .build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC.fullName());
         }
     }
 }
