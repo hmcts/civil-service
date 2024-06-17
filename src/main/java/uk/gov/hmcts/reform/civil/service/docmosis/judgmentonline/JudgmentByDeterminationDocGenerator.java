@@ -106,32 +106,37 @@ public class JudgmentByDeterminationDocGenerator {
     }
 
     private JudgmentByDeterminationDocForm getJudgmentByDeterminationDocForm(CaseData caseData, String partyType) {
-        BigDecimal orderAmount =
-            MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered()));
-        BigDecimal costs =
-            MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
 
         JudgmentByDeterminationDocForm.JudgmentByDeterminationDocFormBuilder builder = JudgmentByDeterminationDocForm.builder();
-        String payByDate = null, repaymentFrequency = null, paymentStr = null;
+        String payByDate = null;
         if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getStartDate() != null) {
             payByDate = DateFormatHelper.formatLocalDate(
                 caseData.getJoInstalmentDetails().getStartDate(),
                 DateFormatHelper.DATE
             );
         }
+        String repaymentFrequency = null;
         if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
             repaymentFrequency = getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency());
         }
+        String paymentStr = null;
         if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
             paymentStr = getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency());
         }
+        BigDecimal orderAmount =
+            MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered()));
+        BigDecimal costs =
+            MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
         builder
+            .payByDate(payByDate)
+            .repaymentFrequency(repaymentFrequency)
+            .paymentStr(paymentStr)
+            .costs(costs.toString())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
+            .debt(orderAmount.toString())
             .formText("No response,")
             .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
             .respondent(getRespondentLROrLipDetails(caseData, partyType))
-            .debt(orderAmount.toString())
-            .costs(costs.toString())
             .totalCost(orderAmount.add(costs).setScale(2).toString())
             .applicantReference(getApplicantSolicitorRef(caseData))
             .respondentReference(getRespondent1SolicitorRef(caseData))
@@ -142,9 +147,6 @@ public class JudgmentByDeterminationDocGenerator {
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getJoPaymentPlan().getType().name())
-            .payByDate(payByDate)
-            .repaymentFrequency(repaymentFrequency)
-            .paymentStr(paymentStr)
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                    : getInstallmentAmount(caseData.getJoInstalmentDetails()))
             .repaymentDate(payByDate);
