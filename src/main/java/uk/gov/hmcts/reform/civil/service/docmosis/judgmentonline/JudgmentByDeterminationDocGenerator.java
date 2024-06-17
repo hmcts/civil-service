@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByDeterminationDocForm;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -108,29 +108,11 @@ public class JudgmentByDeterminationDocGenerator {
     private JudgmentByDeterminationDocForm getJudgmentByDeterminationDocForm(CaseData caseData, String partyType) {
 
         JudgmentByDeterminationDocForm.JudgmentByDeterminationDocFormBuilder builder = JudgmentByDeterminationDocForm.builder();
-        String payByDate = null;
-        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getStartDate() != null) {
-            payByDate = DateFormatHelper.formatLocalDate(
-                caseData.getJoInstalmentDetails().getStartDate(),
-                DateFormatHelper.DATE
-            );
-        }
-        String repaymentFrequency = null;
-        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
-            repaymentFrequency = getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency());
-        }
-        String paymentStr = null;
-        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
-            paymentStr = getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency());
-        }
         BigDecimal orderAmount =
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered()));
         BigDecimal costs =
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
         builder
-            .payByDate(payByDate)
-            .repaymentFrequency(repaymentFrequency)
-            .paymentStr(paymentStr)
             .costs(costs.toString())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .debt(orderAmount.toString())
@@ -149,17 +131,56 @@ public class JudgmentByDeterminationDocGenerator {
             .paymentPlan(caseData.getJoPaymentPlan().getType().name())
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                    : getInstallmentAmount(caseData.getJoInstalmentDetails()))
-            .repaymentDate(payByDate);
+            .payByDate(getPayByDate(caseData))
+            .repaymentFrequency(getRepaymentFrequency(caseData))
+            .paymentStr(getPaymentStr(caseData))
+            .repaymentDate(getPayByDate(caseData));
         return builder.build();
     }
 
-    private String getRepaymentFrequency(PaymentFrequency paymentFrequency) {
-        switch (paymentFrequency) {
-            case WEEKLY: return "per week";
-            case MONTHLY: return "per month";
-            case EVERY_TWO_WEEKS: return "every 2 weeks";
-            default: return null;
+    @Nullable
+    private static String getPayByDate(CaseData caseData) {
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getStartDate() != null) {
+            return DateFormatHelper.formatLocalDate(
+                caseData.getJoInstalmentDetails().getStartDate(),
+                DateFormatHelper.DATE
+            );
         }
+        return null;
+    }
+
+    @Nullable
+    private String getPaymentStr(CaseData caseData) {
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
+            switch (caseData.getJoInstalmentDetails().getPaymentFrequency()) {
+                case WEEKLY:
+                    return "each week";
+                case MONTHLY:
+                    return "each month";
+                case EVERY_TWO_WEEKS:
+                    return "every 2 weeks";
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private String getRepaymentFrequency(CaseData caseData) {
+        if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getPaymentFrequency() != null) {
+            switch (caseData.getJoInstalmentDetails().getPaymentFrequency()) {
+                case WEEKLY:
+                    return "per week";
+                case MONTHLY:
+                    return "per month";
+                case EVERY_TWO_WEEKS:
+                    return "every 2 weeks";
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 
     private String getInstallmentAmount(JudgmentInstalmentDetails instalmentDetails) {
@@ -169,15 +190,6 @@ public class JudgmentByDeterminationDocGenerator {
             return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
         } else {
             return null;
-        }
-    }
-
-    private String getRepaymentString(PaymentFrequency repaymentFrequency) {
-        switch (repaymentFrequency) {
-            case WEEKLY : return "each week";
-            case MONTHLY: return "each month";
-            case EVERY_TWO_WEEKS: return "every 2 weeks";
-            default: return null;
         }
     }
 
