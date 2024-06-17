@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -74,7 +73,7 @@ public class ClaimStoreService {
                                                                                            .orElse(null))
                                               .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
                                               .build()
-        ).collect(Collectors.toList());
+        ).toList();
     }
 
     private LocalDateTime createAtToCreateDate(CmcClaim claim) {

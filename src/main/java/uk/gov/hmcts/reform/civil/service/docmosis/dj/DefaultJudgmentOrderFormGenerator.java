@@ -295,11 +295,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return "";
     }
 
-    private String fillTypeBundleInfoTrial() {
-        return "An indexed electronic bundle of documents for trial, with each page "
-            + "clearly numbered including a case summary limited to 500 words";
-    }
-
     private String fillDisposalHearingTime(DisposalHearingFinalDisposalHearingTimeEstimate type) {
         switch (type) {
             case FIFTEEN_MINUTES:
@@ -316,11 +311,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private boolean addAdditionalDirection(CaseData caseData) {
-        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null
-            || caseData.getTrialHearingAddNewDirectionsDJ() != null) {
-            return true;
-        }
-        return false;
+        return caseData.getDisposalHearingAddNewDirectionsDJ() != null
+            || caseData.getTrialHearingAddNewDirectionsDJ() != null;
     }
 
     private String getCourt(CaseData caseData) {

@@ -49,7 +49,7 @@ class BundleRequestMapperTest {
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
-            ".yaml", "test", "test", 1L
+            ".yaml", "test", "test"
         );
 
         // Then
@@ -174,7 +174,7 @@ class BundleRequestMapperTest {
         CaseData caseData = getCaseDataWithNoId();
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
-            ".yaml", "test", "test", 1L
+            ".yaml", "test", "test"
         );
         // Then
         assertNotNull(bundleCreateRequest);
@@ -554,8 +554,7 @@ class BundleRequestMapperTest {
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
                                                                                                            ".yaml",
-                                                                                                       "test", "test",
-                                                                                                       1L
+                                                                                                       "test", "test"
         );
         // Then
         assertNotNull(bundleCreateRequest);
@@ -576,8 +575,7 @@ class BundleRequestMapperTest {
         // When: mapCaseDataToBundleCreateRequest is called
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
                                                                                                            ".yaml",
-                                                                                                       "test", "test",
-                                                                                                       1L
+                                                                                                       "test", "test"
         );
         // Then: hasApplicant2 and hasRespondant2 should return false
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
