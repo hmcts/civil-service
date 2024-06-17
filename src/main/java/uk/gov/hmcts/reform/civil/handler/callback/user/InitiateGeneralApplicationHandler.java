@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
@@ -118,9 +120,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
             if (inStateAfterJudicialReferral(caseData.getCcdState())
                 && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+                log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
                 errors.add(NOT_IN_EA_REGION);
             }
             if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
+                log.info("Gen apps for case {} not allowed pre sdo", caseData.getCcdCaseReference());
                 errors.add(NOT_IN_EA_REGION);
             }
         } else {
@@ -128,6 +132,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 && (Objects.isNull(caseData.getCaseManagementLocation())
                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
                                                                                       .getBaseLocation())))) {
+                log.info("Gen apps for case {} not whitelisted in case progression", caseData.getCcdCaseReference());
                 errors.add(NOT_IN_EA_REGION);
             }
         }
