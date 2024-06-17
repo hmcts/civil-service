@@ -129,20 +129,30 @@ public class JudgmentByDeterminationDocGenerator {
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getJoPaymentPlan().getType().name())
+            .paymentStr(getInstallmentFreqStr(caseData))
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                    : getInstallmentAmount(caseData.getJoInstalmentDetails()))
             .payByDate(getPayByDate(caseData))
             .repaymentFrequency(getInstallmentFreqStr(caseData))
-            .paymentStr(getInstallmentFreqStr(caseData))
-            .repaymentDate(getPayByDate(caseData));
+            .repaymentDate(getRepaymentDate(caseData));
         return builder.build();
     }
 
     @Nullable
-    private static String getPayByDate(CaseData caseData) {
+    private static String getRepaymentDate(CaseData caseData) {
         if (caseData.getJoInstalmentDetails() != null && caseData.getJoInstalmentDetails().getStartDate() != null) {
             return DateFormatHelper.formatLocalDate(
                 caseData.getJoInstalmentDetails().getStartDate(),
+                DateFormatHelper.DATE
+            );
+        }
+        return null;
+    }
+
+    private static String getPayByDate(CaseData caseData) {
+        if (caseData.getJoPaymentPlan() != null && caseData.getJoPaymentPlan().getPaymentDeadlineDate() != null) {
+            return DateFormatHelper.formatLocalDate(
+                caseData.getJoPaymentPlan().getPaymentDeadlineDate(),
                 DateFormatHelper.DATE
             );
         }

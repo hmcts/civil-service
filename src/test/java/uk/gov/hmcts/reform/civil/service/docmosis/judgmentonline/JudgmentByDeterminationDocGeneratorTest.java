@@ -160,13 +160,8 @@ class JudgmentByDeterminationDocGeneratorTest {
             .respondent2(PartyBuilder.builder().soleTrader().build())
             .activeJudgment(JudgmentDetails.builder()
                                 .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).build())
+                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).paymentDeadlineDate(LocalDate.now()).build())
                                 .orderedAmount("150001")
-                                .instalmentDetails(JudgmentInstalmentDetails.builder()
-                                                       .amount("20001")
-                                                       .paymentFrequency(PaymentFrequency.MONTHLY)
-                                                       .startDate(LocalDate.now())
-                                                       .build())
                                 .build())
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
