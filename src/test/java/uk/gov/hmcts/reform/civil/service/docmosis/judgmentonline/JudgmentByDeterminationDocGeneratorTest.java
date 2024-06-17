@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -42,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGM
 class JudgmentByDeterminationDocGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
-    private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final CaseDocument CASE_DOCUMENT_CLAIMANT = CaseDocumentBuilder.builder()
         .documentName("Judgment_by_determination_claimant.pdf")
@@ -89,6 +89,32 @@ class JudgmentByDeterminationDocGeneratorTest {
     }
 
     @Test
+    void shouldDefaultJudgmentFormGeneratorOneFormClaimantOrg() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes,
+                                                       JUDGMENT_BY_DETERMINATION_CLAIMANT)))
+            .thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
+            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
+            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                                        .organisationID("ORG_NAME").build()).build())
+            .build();
+        List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
+
+        assertThat(caseDocuments).hasSize(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_claimant.pdf", bytes, JUDGMENT_BY_DETERMINATION_CLAIMANT));
+
+    }
+
+    @Test
     void shouldDefaultJudgmentFormGeneratorDefendant() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
                                                                eq(JUDGMENT_BY_DETERMINATION_DEFENDANT)))
@@ -103,6 +129,36 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
+            .build();
+
+        List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,
+                                                                  GEN_JUDGMENT_BY_DETERMINATION_DOC_DEFENDANT.name());
+
+        assertThat(caseDocuments).hasSize(2);
+
+        verify(documentManagementService, times(2))
+            .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
+                                                  DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT));
+
+    }
+
+    @Test
+    void shouldDefaultJudgmentFormGeneratorDefendantOrg() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
+                                                               eq(JUDGMENT_BY_DETERMINATION_DEFENDANT)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_DETERMINATION_DEFENDANT.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF("Judgment_by_determination_defendant.pdf", bytes,
+                                                       DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT)))
+            .thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
+            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
+            .respondent1(PartyBuilder.builder().soleTrader().build())
+            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                                        .organisationID("ORG_NAME").build()).build())
             .build();
 
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,

@@ -112,6 +112,14 @@ public class JudgmentByDeterminationDocGenerator {
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
 
         JudgmentByDeterminationDocForm.JudgmentByDeterminationDocFormBuilder builder = JudgmentByDeterminationDocForm.builder();
+        String payByDate = Objects.isNull(caseData.getJoInstalmentDetails()) ? null : Objects.isNull(caseData.getJoInstalmentDetails().getStartDate()) ? null
+            : DateFormatHelper.formatLocalDate(caseData.getJoInstalmentDetails().getStartDate(), DateFormatHelper.DATE);
+        String repaymentFrequency = Objects.isNull(caseData.getJoInstalmentDetails()) ? null
+            : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency()) ? null
+            : getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency());
+        String paymentStr = Objects.isNull(caseData.getJoInstalmentDetails()) ? null
+            : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency())
+            ? null : getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency());
         builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .formText("No response,")
@@ -129,19 +137,12 @@ public class JudgmentByDeterminationDocGenerator {
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getJoPaymentPlan().getType().name())
-            .payByDate(Objects.isNull(caseData.getJoInstalmentDetails()) ? null : Objects.isNull(caseData.getJoInstalmentDetails().getStartDate()) ? null
-                : DateFormatHelper.formatLocalDate(caseData.getJoInstalmentDetails().getStartDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-                                    : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency()) ? null
-                : getRepaymentFrequency(caseData.getJoInstalmentDetails().getPaymentFrequency()))
-            .paymentStr(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-                            : Objects.isNull(caseData.getJoInstalmentDetails().getPaymentFrequency())
-                ? null : getRepaymentString(caseData.getJoInstalmentDetails().getPaymentFrequency()))
+            .payByDate(payByDate)
+            .repaymentFrequency(repaymentFrequency)
+            .paymentStr(paymentStr)
             .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
                                    : getInstallmentAmount(caseData.getJoInstalmentDetails()))
-            .repaymentDate(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-                               : Objects.isNull(caseData.getJoInstalmentDetails().getStartDate()) ? null
-                : DateFormatHelper.formatLocalDate(caseData.getJoInstalmentDetails().getStartDate(), DateFormatHelper.DATE));
+            .repaymentDate(payByDate);
         return builder.build();
     }
 
@@ -176,12 +177,10 @@ public class JudgmentByDeterminationDocGenerator {
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
             return getPartyDetails(caseData.getApplicant1());
+        } else if (caseData.getApplicant1OrganisationPolicy() != null) {
+            return getOrgDetails(caseData.getApplicant1OrganisationPolicy());
         } else {
-            if (caseData.getApplicant1OrganisationPolicy() != null) {
-                return getOrgDetails(caseData.getApplicant1OrganisationPolicy());
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -205,26 +204,16 @@ public class JudgmentByDeterminationDocGenerator {
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
-        if (partyType.equals(RESPONDENT1)) {
-            if (caseData.isRespondent1LiP()) {
-                return getPartyDetails(caseData.getRespondent1());
-            } else {
-                if (caseData.getRespondent1OrganisationPolicy() != null) {
-                    return getOrgDetails(caseData.getRespondent1OrganisationPolicy());
-                } else {
-                    return null;
-                }
-            }
+        if (partyType.equals(RESPONDENT1) && caseData.isRespondent1LiP()) {
+            return getPartyDetails(caseData.getRespondent1());
+        } else if (partyType.equals(RESPONDENT1) && caseData.getRespondent1OrganisationPolicy() != null) {
+            return getOrgDetails(caseData.getRespondent1OrganisationPolicy());
+        } else if (!partyType.equals(RESPONDENT1) && caseData.isRespondent2LiP()) {
+            return getPartyDetails(caseData.getRespondent2());
+        } else if (!partyType.equals(RESPONDENT1) && caseData.getRespondent2OrganisationPolicy() != null) {
+            return getOrgDetails(caseData.getRespondent2OrganisationPolicy());
         } else {
-            if (caseData.isRespondent2LiP()) {
-                return getPartyDetails(caseData.getRespondent2());
-            } else {
-                if (caseData.getRespondent2OrganisationPolicy() != null) {
-                    return getOrgDetails(caseData.getRespondent2OrganisationPolicy());
-                } else {
-                    return null;
-                }
-            }
+            return null;
         }
     }
 }
