@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public class DQLipFormMapperFactory {
 
-    public final static String claimantResponseCui = "CLAIMANT_RESPONSE_CUI";
+    public static final String claimantResponseCui = "CLAIMANT_RESPONSE_CUI";
 
     public DQLipFormMapper getDQLipFormMapper(CaseData caseData) {
         if (isClaimantLipResponse(caseData)) {
