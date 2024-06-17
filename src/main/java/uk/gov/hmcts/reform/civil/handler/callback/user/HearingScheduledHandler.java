@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -57,7 +56,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         + ", for example, book an interpreter.";
     public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n"
         + "# Your reference number\n" + "# %s";
-
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
@@ -133,7 +131,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
                             .sorted()
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private CallbackResponse checkPastDate(CallbackParams callbackParams) {

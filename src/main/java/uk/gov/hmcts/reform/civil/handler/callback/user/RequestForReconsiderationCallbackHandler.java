@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
@@ -54,6 +56,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
         " your notifications/dashboard for an update.";
+
+    private final LiPRequestReconsiderationGeneratorService documentGenerator;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -136,6 +141,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
+            }
         } else if (isRespondentSolicitorOne(roles)) {
             partyName.append("Defendant - ");
             partyName.append(caseData.getRespondent1().getPartyName());
@@ -145,6 +153,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
+            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
+            }
         } else if (isRespondentSolicitorTwo(roles)) {
             partyName.append("Defendant - ");
             partyName.append(respondent2Present(caseData) ? caseData.getRespondent2().getPartyName() : "");

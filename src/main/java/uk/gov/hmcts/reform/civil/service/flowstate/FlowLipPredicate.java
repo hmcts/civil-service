@@ -41,5 +41,4 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> nocSubmittedForLiPDefendant = CaseData::nocApplyForLiPDefendant;
 
-
 }
