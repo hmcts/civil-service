@@ -376,8 +376,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     private boolean isIndividualORSoleTrader() {
-        return nonNull(caseData.getRespondent1())
-            ? caseData.getRespondent1().isIndividualORSoleTrader() : false;
+        return nonNull(caseData.getRespondent1()) && caseData.getRespondent1().isIndividualORSoleTrader();
     }
 
     @Override
