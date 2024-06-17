@@ -97,6 +97,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
@@ -244,6 +245,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private EarlyAdoptersService earlyAdoptersService;
 
     @Nested
     class AboutToStartCallback extends LocationRefSampleDataBuilder {
@@ -1570,6 +1574,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(eq(caseData), eq("00002"))).thenReturn(isLocationWhiteListed);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))

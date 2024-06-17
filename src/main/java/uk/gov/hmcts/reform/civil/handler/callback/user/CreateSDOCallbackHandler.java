@@ -126,6 +126,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -219,6 +220,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
+    private final EarlyAdoptersService earlyAdoptersService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
     private final  List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
     static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
@@ -1559,7 +1561,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 dataBuilder.eaCourtLocation(YES);
 
                 if (featureToggleService.isHmcEnabled()) {
-                    dataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                    dataBuilder.hmcEaCourtLocation(
+                        earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData, getEpimmsId(caseData)) ? YES : NO);
                 }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
@@ -1609,14 +1612,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
-        boolean isWhiteListedForHmc = featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-            && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
-        log.info(("Case {} is{}whitelisted for HMC rollout."),
-                 caseData.getCcdCaseReference(), isWhiteListedForHmc ? " " : " NOT ");
-        return isWhiteListedForHmc;
     }
 
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {

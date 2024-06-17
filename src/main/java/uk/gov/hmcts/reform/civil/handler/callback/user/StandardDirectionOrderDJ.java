@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -122,6 +123,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
+    private final EarlyAdoptersService earlyAdoptersService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -782,7 +784,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseDataBuilder.eaCourtLocation(YES);
 
                 if (featureToggleService.isHmcEnabled()) {
-                    caseDataBuilder.hmcEaCourtLocation(isPartOfHmcEarlyAdoptersRollout(caseData) ? YES : NO);
+                    caseDataBuilder.hmcEaCourtLocation(
+                        earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData, getEpimmsId(caseData)) ? YES : NO);
                 }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
@@ -807,14 +810,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
-    }
-
-    private boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
-        boolean isWhiteListedForHmc = featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-            && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
-        log.info(("Case {} is{}whitelisted for HMC rollout."),
-                 caseData.getCcdCaseReference(), isWhiteListedForHmc ? " " : " NOT ");
-        return isWhiteListedForHmc;
     }
 
     private String getEpimmsId(CaseData caseData) {

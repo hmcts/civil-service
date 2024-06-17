@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -104,6 +105,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private EarlyAdoptersService earlyAdoptersService;
 
     @Nested
     class AboutToStartCallback {
@@ -1044,6 +1047,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(true);
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(eq(caseData), eq("00002"))).thenReturn(isLocationWhiteListed);
             when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(isLocationWhiteListed);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
