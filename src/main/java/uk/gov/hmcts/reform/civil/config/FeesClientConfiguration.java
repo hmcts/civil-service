@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 @Configuration
 @ConditionalOnProperty(prefix = "fees", name = "api.url")
 @EnableFeignClients(basePackages = "uk.gov.hmcts.reform.fees.client")
-public class FeesClientAutoConfiguration {
+public class FeesClientConfiguration {
 
     @Bean
     public FeesHealthIndicator feesHealthIndicator(FeesApiClient feesApiClient) {
