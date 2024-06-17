@@ -168,14 +168,12 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
     @Test
     void shouldThrowErrorWhenNoGAExits() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
+        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {});
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(((List)(response.getData().get("generalApplications"))).isEmpty());
+        List<?> generalApplications = (List<?>) response.getData().get("generalApplications");
+        assertThat(generalApplications).isEmpty();
     }
 
     @Test
