@@ -22,6 +22,8 @@ import static org.apache.logging.log4j.util.Strings.concat;
 @RequiredArgsConstructor
 public class LocationReferenceDataService {
 
+    public static final String CIVIL_NATIONAL_BUSINESS_CENTRE = "Civil National Business Centre";
+    public static final String COUNTY_COURT_MONEY_CLAIMS_CENTRE = "County Court Money Claims Centre";
     private final LocationReferenceDataApiClient locationReferenceDataApiClient;
     private final AuthTokenGenerator authTokenGenerator;
 
@@ -31,7 +33,7 @@ public class LocationReferenceDataService {
                 locationReferenceDataApiClient.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
-                    "Civil National Business Centre"
+                    CIVIL_NATIONAL_BUSINESS_CENTRE
                 );
             if (cnbcLocations == null || cnbcLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CNBC location");
@@ -54,7 +56,7 @@ public class LocationReferenceDataService {
                 locationReferenceDataApiClient.getCourtVenueByName(
                     authTokenGenerator.generate(),
                     authToken,
-                    "County Court Money Claims Centre"
+                    COUNTY_COURT_MONEY_CLAIMS_CENTRE
                 );
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
