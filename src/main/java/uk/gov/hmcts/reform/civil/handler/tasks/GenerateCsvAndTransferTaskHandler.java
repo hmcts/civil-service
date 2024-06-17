@@ -35,8 +35,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    private static final String subject = "OCMC Mediation Data";
-    private static final String filename = "ocmc_mediation_data.csv";
+    private static final String SUBJECT = "OCMC Mediation Data";
+    private static final String FILENAME = "ocmc_mediation_data.csv";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private final FeatureToggleService toggleService;
     private final RuntimeService runtimeService;
@@ -80,8 +80,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
         return Optional.of(EmailData.builder()
                                .to(mediationCSVEmailConfiguration.getRecipient())
-                               .subject(subject)
-                               .attachments(List.of(new EmailAttachment(inputSource, "text/csv", filename)))
+                               .subject(SUBJECT)
+                               .attachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME)))
                                .build());
     }
 
@@ -102,8 +102,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String[] getCSVHeaders() {
-        String[] csvHeaders = new String[] {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
+        return new String[] {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
             "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT"};
-        return csvHeaders;
     }
 }

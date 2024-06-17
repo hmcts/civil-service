@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,7 +52,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
         if (caseBundles != null) {
             isBundleCreated =
                 !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
-                    .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
+                    .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).toList().isEmpty());
         }
         return isBundleCreated;
     }
