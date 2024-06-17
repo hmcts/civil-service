@@ -6,12 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline.JudgmentByDeterminationDocGenerator;
 
@@ -54,6 +56,14 @@ class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallbackHandler
                           .build())
         .build();
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+
+    @Test
+    void shouldReturnCorrectCamundaTaskID() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                 .request(CallbackRequest.builder().eventId(
+                                                     "GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT").build()).build())).isEqualTo(
+            "GenerateClaimantJudgmentByDeterminationDoc");
+    }
 
     @Test
     void shouldGenerateForm() {
