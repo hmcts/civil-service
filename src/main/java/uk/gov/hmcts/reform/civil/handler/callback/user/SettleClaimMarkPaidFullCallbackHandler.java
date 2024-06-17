@@ -68,10 +68,10 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
         SettleClaimHelper.checkState(caseData, errors);
         if (errors.isEmpty() && (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES))) {
-                List<String> claimantNames = new ArrayList<>();
-                claimantNames.add(caseData.getApplicant1().getPartyName());
-                claimantNames.add(caseData.getApplicant2().getPartyName());
-                caseDataBuilder.claimantWhoIsSettling(DynamicList.fromList(claimantNames));
+            List<String> claimantNames = new ArrayList<>();
+            claimantNames.add(caseData.getApplicant1().getPartyName());
+            claimantNames.add(caseData.getApplicant2().getPartyName());
+            caseDataBuilder.claimantWhoIsSettling(DynamicList.fromList(claimantNames));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
