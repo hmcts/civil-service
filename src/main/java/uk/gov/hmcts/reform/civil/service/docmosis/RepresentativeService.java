@@ -29,7 +29,7 @@ public class RepresentativeService {
             || organisationIDCopy != null;
     }
 
-    static final String organisationName = "Organisation name";
+    static final String ORGANISATION_NAME = "Organisation name";
 
     public Representative getRespondent1Representative(CaseData caseData) {
         if (doesOrganisationPolicyExist(caseData.getRespondent1OrganisationPolicy(), caseData.getRespondent1OrganisationIDCopy())) {
@@ -48,7 +48,7 @@ public class RepresentativeService {
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
             representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                                                      ? "Name" : organisationName);
+                                                      ? "Name" : ORGANISATION_NAME);
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
                 representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
@@ -78,7 +78,7 @@ public class RepresentativeService {
             var representativeBuilder = representative.toBuilder();
 
             representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                                                      ? "Name" : organisationName);
+                                                      ? "Name" : ORGANISATION_NAME);
 
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
@@ -105,7 +105,7 @@ public class RepresentativeService {
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
         representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                                                  ? "Name" : organisationName);
+                                                  ? "Name" : ORGANISATION_NAME);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());

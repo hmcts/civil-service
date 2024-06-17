@@ -114,8 +114,8 @@ public class SdoGeneratorService {
         return updatedFileName.toString();
     }
 
-    static final String applicant2 = "applicant2";
-    static final String respondent2 = "respondent2";
+    static final String APPLICANT_2 = "applicant2";
+    static final String RESPONDENT_2 = "respondent2";
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
@@ -125,12 +125,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, applicant2)
+                SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, respondent2)
+                SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -229,12 +229,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, applicant2)
+                SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, respondent2)
+                SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -364,12 +364,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, applicant2)
+                SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, respondent2)
+                SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -452,12 +452,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, applicant2)
+                SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, respondent2)
+                SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
             .respondent2(caseData.getRespondent2())
             .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
@@ -553,12 +553,12 @@ public class SdoGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, applicant2)
+                SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, respondent2)
+                SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
             .respondent2(caseData.getRespondent2())
             .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)

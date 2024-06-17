@@ -126,8 +126,8 @@ public class EventHistoryMapper {
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
-    static final String enter = "Enter";
-    static final String lifted = "Lifted";
+    static final String ENTER = "Enter";
+    static final String LIFTED = "Lifted";
 
     public EventHistory buildEvents(CaseData caseData) {
         return buildEvents(caseData, null);
@@ -254,21 +254,21 @@ public class EventHistoryMapper {
         if (null != caseData.getBreathing()) {
             if (null != caseData.getBreathing().getEnter() && null == caseData.getBreathing().getLift()) {
                 if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
-                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, enter);
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, ENTER);
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, enter
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
                     );
                 }
             } else if (null != caseData.getBreathing().getLift()) {
                 if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
-                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, enter);
-                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, lifted);
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, ENTER);
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, LIFTED);
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, enter
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
                     );
-                    buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, lifted);
+                    buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, LIFTED);
                 }
             }
         }
@@ -403,7 +403,7 @@ public class EventHistoryMapper {
                 + caseData.getBreathing().getEnter().getReference() + ", ";
         }
 
-        if (bsStatus.equals(enter)) {
+        if (bsStatus.equals(ENTER)) {
             if (caseData.getBreathing().getEnter().getStart() != null) {
                 if (eventDetails == null) {
                     eventDetails = StringUtils.capitalize(BS_START_DT) + " "
@@ -421,7 +421,7 @@ public class EventHistoryMapper {
                         + LocalDateTime.now();
                 }
             }
-        } else if (bsStatus.equals(lifted) && caseData.getBreathing().getLift().getExpectedEnd() != null) {
+        } else if (bsStatus.equals(LIFTED) && caseData.getBreathing().getLift().getExpectedEnd() != null) {
             if (eventDetails == null) {
                 eventDetails = StringUtils.capitalize(BS_END_DATE) + " "
                     + caseData.getBreathing().getLift().getExpectedEnd();
@@ -1142,7 +1142,7 @@ public class EventHistoryMapper {
                 .build());
     }
 
-    static final String rpaReasonOneRespondentNotified = "RPA Reason: Only one of the respondent is notified.";
+    static final String RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED = "RPA Reason: Only one of the respondent is notified.";
 
     private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         builder.miscellaneous(
@@ -1151,9 +1151,9 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText(rpaReasonOneRespondentNotified)
+                    .eventDetailsText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(rpaReasonOneRespondentNotified)
+                                      .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                                       .build())
                     .build()
             ));
@@ -1175,7 +1175,7 @@ public class EventHistoryMapper {
         }
     }
 
-    static final String claimantProceeds = "Claimant proceeds.";
+    static final String CLAIMANT_PROCEEDS = "Claimant proceeds.";
 
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
@@ -1278,7 +1278,7 @@ public class EventHistoryMapper {
                     builder.miscellaneous(miscText);
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
-                    applicantProceedsText.add(claimantProceeds);
+                    applicantProceedsText.add(CLAIMANT_PROCEEDS);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                     buildTakenOfflineMultitrackUnspec(builder, caseData);
@@ -1302,7 +1302,7 @@ public class EventHistoryMapper {
                     builder.miscellaneous(miscText);
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
-                    applicantProceedsText.add(claimantProceeds);
+                    applicantProceedsText.add(CLAIMANT_PROCEEDS);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                     buildTakenOfflineMultitrackUnspec(builder, caseData);
@@ -1329,7 +1329,7 @@ public class EventHistoryMapper {
                     builder.miscellaneous(miscText);
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
-                    applicantProceedsText.add(claimantProceeds);
+                    applicantProceedsText.add(CLAIMANT_PROCEEDS);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                     buildTakenOfflineMultitrackUnspec(builder, caseData);
@@ -1403,8 +1403,8 @@ public class EventHistoryMapper {
         );
     }
 
-    static final String proceed = "proceed";
-    static final String notProceed = "not proceed";
+    static final String PROCEED = "proceed";
+    static final String NOT_PROCEED = "not proceed";
 
     private List<String> prepMultipartyProceedMiscText(CaseData caseData) {
         List<String> eventDetailsText = new ArrayList<>();
@@ -1416,16 +1416,16 @@ public class EventHistoryMapper {
                     "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
                     currentTime,
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? proceed
-                        : notProceed,
+                        ? PROCEED
+                        : NOT_PROCEED,
                     caseData.getRespondent1().getPartyName()
                 ));
                 eventDetailsText.add(String.format(
                     "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
                     currentTime,
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? proceed
-                        : notProceed,
+                        ? PROCEED
+                        : NOT_PROCEED,
                     caseData.getRespondent2().getPartyName()
                 ));
                 break;
@@ -1445,16 +1445,16 @@ public class EventHistoryMapper {
                     currentTime,
                     caseData.getApplicant1().getPartyName(),
                     YES.equals(app1Proceeds)
-                        ? proceed
-                        : notProceed
+                        ? PROCEED
+                        : NOT_PROCEED
                 ));
                 eventDetailsText.add(String.format(
                     "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s",
                     currentTime,
                     caseData.getApplicant2().getPartyName(),
                     YES.equals(app2Proceeds)
-                        ? proceed
-                        : notProceed
+                        ? PROCEED
+                        : NOT_PROCEED
                 ));
                 break;
             }
@@ -1726,9 +1726,9 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(caseData.getSubmittedDate())
-                    .eventDetailsText(rpaReasonOneRespondentNotified)
+                    .eventDetailsText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(rpaReasonOneRespondentNotified)
+                                      .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                                       .build())
                     .build()
             ));

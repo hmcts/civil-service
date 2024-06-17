@@ -243,11 +243,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                               && fileName.equals(element.getValue().getDocumentName()));
     }
 
-    static final String defendant = "defendant";
+    static final String DEFENDANT = "defendant";
 
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         boolean isRespondent = isRespondentState(caseData);
-        String userPrefix = isRespondent ? defendant : "claimant";
+        String userPrefix = isRespondent ? DEFENDANT : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
@@ -298,7 +298,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return true;
     }
 
-    static final String smallClaim = "SMALL_CLAIM";
+    static final String SMALL_CLAIM = "SMALL_CLAIM";
 
     @NotNull
     protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
@@ -334,7 +334,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         boolean specAndSmallClaim = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && smallClaim.equals(caseData.getResponseClaimTrack())) {
+            && SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             specAndSmallClaim = true;
         }
 
@@ -527,7 +527,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
-        Respondent1DQ respondent1dq = dq instanceof Respondent1DQ ? (Respondent1DQ) dq : null;
+        Respondent1DQ respondent1dq = null;
+        if (dq instanceof Respondent1DQ r1dq) {
+            respondent1dq = r1dq;
+        }
         Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
             .map(Respondent1DQ::getFutureApplications);
 
@@ -640,7 +643,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .experts(smallClaim.equals(caseData.getResponseClaimTrack())
+            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
@@ -675,7 +678,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .experts(smallClaim.equals(caseData.getResponseClaimTrack())
+            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
@@ -1181,8 +1184,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private String createStatementOfTruthText(Boolean respondentState) {
-        String role = respondentState ? defendant : "claimant";
-        String statementOfTruth = role.equals(defendant)
+        String role = Boolean.TRUE.equals(respondentState) ? DEFENDANT : "claimant";
+        String statementOfTruth = role.equals(DEFENDANT)
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
         statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
