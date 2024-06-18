@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
+import uk.gov.hmcts.reform.civil.config.CarmDateConfiguration;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
@@ -13,11 +15,12 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
 
-    private static final LocalDate CARM_DATE = LocalDate.of(2024, 8, 1);
+    @Mock
+    protected CarmDateConfiguration carmDateConfiguration;
 
     @BeforeEach
     void setup() {
-        searchService = new MediationCasesSearchService(coreCaseDataService);
+        searchService = new MediationCasesSearchService(coreCaseDataService,carmDateConfiguration);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
-                            .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
+                            .must(boolQuery().must(rangeQuery("data.submittedDate").gte(carmDateConfiguration.getCarmDate())))
                             .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
             return new Query(query, Collections.emptyList(), fromValue);
         } else {
@@ -42,7 +45,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
-                            .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
+                            .must(boolQuery().must(rangeQuery("data.submittedDate").lt(carmDateConfiguration.getCarmDate())))
                             .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
 
             return new Query(query, Collections.emptyList(), fromValue);
