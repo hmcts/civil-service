@@ -1554,6 +1554,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isNationalRolloutEnabled()) {
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
             if (!sdoSubmittedPreCPForLiPCase(caseData)
                 && featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
