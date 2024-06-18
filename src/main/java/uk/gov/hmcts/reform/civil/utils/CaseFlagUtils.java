@@ -374,7 +374,7 @@ public class CaseFlagUtils {
         flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
-        return flagCollection.stream().filter(Objects::nonNull).toList();
+        return flagCollection.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static List<FlagDetail> getFlagDetails(Flags flags) {

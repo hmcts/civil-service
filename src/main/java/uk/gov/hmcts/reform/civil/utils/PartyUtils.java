@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -387,7 +388,7 @@ public class PartyUtils {
         return experts.toBuilder().details(
             wrapElements(unwrapElements(
                 experts.getDetails()).stream().map(
-                PartyUtils::appendWithNewPartyIds).toList())).build();
+                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
     }
 
     public static Witness appendWithNewPartyIds(Witness witness) {
@@ -402,7 +403,7 @@ public class PartyUtils {
         return witnesses.toBuilder().details(
             wrapElements(unwrapElements(
                 witnesses.getDetails()).stream().map(
-                PartyUtils::appendWithNewPartyIds).toList())).build();
+                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
     }
 
     public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {
