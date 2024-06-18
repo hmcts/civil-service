@@ -66,10 +66,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
-    public boolean isDashboardServiceEnabled() {
-        return featureToggleApi.isFeatureEnabled("dashboard-service");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true

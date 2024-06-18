@@ -83,15 +83,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsDashboardServiceInvoked(Boolean toggleStat) {
-        var dashboardKey = "dashboard-service";
-        givenToggle(dashboardKey, toggleStat);
-
-        assertThat(featureToggleService.isDashboardServiceEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);
