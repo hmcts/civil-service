@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,8 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     public Map<String, String> addPropertiesLip(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
