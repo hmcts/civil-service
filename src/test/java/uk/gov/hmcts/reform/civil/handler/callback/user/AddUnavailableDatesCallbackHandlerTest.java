@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -216,7 +217,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .fromDate(LocalDate.of(2020, 5, 2))
                 .toDate(LocalDate.of(2020, 6, 2))
                 .build()
-        ).toList();
+        ).collect(Collectors.toList());
 
         List<UnavailableDate> expectedNewDatesFromUnavailableDatesEvent = Stream.of(
             UnavailableDate.builder()
@@ -232,7 +233,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .dateAdded(issueDate)
                 .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                 .build()
-        ).toList();
+        ).collect(Collectors.toList());
 
         @BeforeEach
         void setup() {
@@ -293,7 +294,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                             .date(LocalDate.of(2022, 5, 2))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -315,7 +316,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -350,7 +351,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                             .date(LocalDate.of(2022, 5, 2))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -372,7 +373,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -412,7 +413,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .fromDate(LocalDate.of(2023, 8, 20))
                             .toDate(LocalDate.of(2023, 8, 22))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -441,7 +442,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()
@@ -479,7 +480,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -507,7 +508,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -651,7 +652,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                             .date(LocalDate.of(2022, 5, 2))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -673,7 +674,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -753,7 +754,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                             .date(LocalDate.of(2022, 5, 2))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -775,7 +776,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -823,7 +824,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .fromDate(LocalDate.of(2023, 8, 20))
                             .toDate(LocalDate.of(2023, 8, 22))
                             .build()
-                    ).map(ElementUtils::element).toList();
+                    ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<UnavailableDate> expectedDates = Stream.of(
                         UnavailableDate.builder()
@@ -852,7 +853,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .dateAdded(issueDate)
                             .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
                             .build()
-                    ).toList();
+                    ).collect(Collectors.toList());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()

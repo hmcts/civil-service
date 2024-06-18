@@ -71,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -408,7 +409,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             List<String> actualPbas = dynamicList.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .toList();
+                .collect(Collectors.toList());
 
             assertThat(actualPbas).containsOnly("12345", "98765");
             assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
@@ -499,7 +500,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
-                    .toList();
+                    .collect(Collectors.toList());
 
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
             }

@@ -91,14 +91,14 @@ class CaseDataToTextGeneratorTest {
 
         List<T> generators = allGenerators.stream().filter(intentionInterface::isInstance)
             .map(intentionInterface::cast)
-            .toList();
+            .collect(Collectors.toList());
         List<T> usedGenerators = new ArrayList<>();
         List<Pair<CaseData, Class<? extends T>>> cases = config.getCasesToExpectedImplementation();
         for (int i = 0; i < cases.size(); i++) {
             CaseData currentCase = cases.get(i).getLeft();
             List<T> suitable = generators.stream()
                 .filter(generator -> generator.generateTextFor(currentCase).isPresent())
-                .toList();
+                .collect(Collectors.toList());
             Assertions.assertEquals(1, suitable.size(),
                                     "There should be exactly 1 suitable generator per case."
                                         + "Case in position " + i + " has " + suitable.size()
