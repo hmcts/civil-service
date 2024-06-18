@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingFeePaidClaimantNotificationHandler;
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingFeePaidClaimantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
     @Autowired
     private HearingFeePaidClaimantNotificationHandler handler;
@@ -54,8 +54,8 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
                     "<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 
@@ -89,8 +89,8 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
                     "<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Pay the hearing fee</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 }

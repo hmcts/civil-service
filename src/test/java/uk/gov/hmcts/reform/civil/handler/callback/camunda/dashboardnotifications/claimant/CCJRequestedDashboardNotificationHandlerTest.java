@@ -144,6 +144,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     public void createDashboardNotificationsWhenDefendantBreakSSA(CaseData caseData) {
 
         params.put("claimantRepaymentPlanDecision", "accepted");
+        params.put("claimantRepaymentPlanDecisionCy", "derbyn");
         params.put("respondent1PartyName", "Mr Defendant Guy");
 
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ public class GeneralApplication implements MappableObject {
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
+    private final YesOrNo generalAppAskForCosts;
     private final String generalAppDetailsOfOrder;
     private final String generalAppReasonsOfOrder;
     private final GAInformOtherParty generalAppInformOtherParty;
@@ -64,6 +66,7 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
     private final YesOrNo isGaRespondentTwoLip;
+    private final HelpWithFees generalAppHelpWithFees;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -72,6 +75,7 @@ public class GeneralApplication implements MappableObject {
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
+                       @JsonProperty("generalAppAskForCosts") YesOrNo generalAppAskForCosts,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
                        @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
                        @JsonProperty("generalAppInformOtherParty") GAInformOtherParty generalAppInformOtherParty,
@@ -109,13 +113,15 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
                        @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
                        @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
-                       @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip) {
+                       @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
+                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
         this.generalAppPBADetails = generalAppPBADetails;
+        this.generalAppAskForCosts = generalAppAskForCosts;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
         this.generalAppReasonsOfOrder = generalAppReasonsOfOrder;
         this.generalAppInformOtherParty = generalAppInformOtherParty;
@@ -153,5 +159,6 @@ public class GeneralApplication implements MappableObject {
         this.isGaApplicantLip = isGaApplicantLip;
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;
+        this.generalAppHelpWithFees = generalAppHelpWithFees;
     }
 }

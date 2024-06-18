@@ -55,13 +55,14 @@ public class ClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegr
                         "must respond by " + DateUtils.formatDate(respondent1SettlementDeadline) +
                         ".</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, " +
                         "you can request a County Court Judgment(CCJ).</p>"),
-                jsonPath("$[0].titleCy").value("Settlement agreement"),
+                jsonPath("$[0].titleCy").value("Cytundeb setlo"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have accepted the Mr. Sole Trader offer" +
-                        " and asked them to sign a settlement agreement.</p><p class=\"govuk-body\">The defendant must " +
-                        "respond by " +  DateUtils.formatDateInWelsh(respondent1SettlementDeadline.toLocalDate()) +
-                        ".</p><p class=\"govuk-body\">If they do not respond by then, or reject the agreement, " +
-                        "you can request a County Court Judgment(CCJ).</p>")
+                    "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Mr. Sole Trader ac wedi gofyn " +
+                        "iddynt lofnodi cytundeb setlo.</p><p class=\"govuk-body\">Mae’n rhaid i’r diffynnydd ymateb " +
+                        "erbyn " +
+                        DateUtils.formatDateInWelsh(respondent1SettlementDeadline.toLocalDate()) +
+                        ".</p><p class=\"govuk-body\">Os na fyddant wedi ymateb erbyn hynny, neu os byddant yn gwrthod " +
+                        "y cytundeb, gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ).</p>")
             );
     }
 }

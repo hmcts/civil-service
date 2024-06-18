@@ -19,13 +19,16 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
 
@@ -43,7 +46,7 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
     private ObjectMapper objectMapper;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
+    private UploadMediationService uploadMediationService;
 
     private static final List<MediationDocumentsType> MEDIATION_NON_ATTENDANCE_OPTION = List.of(NON_ATTENDANCE_STATEMENT);
     private static final List<MediationDocumentsType> DOCUMENTS_REFERRED_OPTION = List.of(REFERRED_DOCUMENTS);
@@ -84,7 +87,24 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
+            }
 
+            @Test
+            void shouldUploadRespondent1Documents_whenInvokedForMediationNonAttendance_WithCarmIsEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                List<Element<MediationNonAttendanceStatement>> actual = updatedData.getRes1MediationNonAttendanceDocs();
+
+                assertThat(updatedData.getRes1MediationNonAttendanceDocs()).isEqualTo(actual);
+                assertThat(updatedData.getRes1MediationNonAttendanceDocs()).hasSize(1);
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
         }
 
@@ -104,7 +124,24 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
                 assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
+            }
 
+            @Test
+            void shouldUploadRespondent1Documents_whenInvokedForDocumentsReferred_withCarmEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .uploadMediationByDocumentTypes(DOCUMENTS_REFERRED_OPTION)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                List<Element<MediationDocumentsReferredInStatement>>  actual = updatedData.getRes1MediationDocumentsReferred();
+
+                assertThat(updatedData.getRes1MediationDocumentsReferred()).isEqualTo(actual);
+                assertThat(updatedData.getRes1MediationDocumentsReferred()).hasSize(1);
+                verify(uploadMediationService, times(1)).uploadMediationDocumentsTaskList(any());
             }
 
         }

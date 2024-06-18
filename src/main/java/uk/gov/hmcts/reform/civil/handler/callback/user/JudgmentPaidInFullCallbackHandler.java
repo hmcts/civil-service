@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -35,7 +34,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDGMENT_PAID_IN_FULL);
     protected final ObjectMapper objectMapper;
-    private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+    private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
 
     @Override
@@ -55,12 +54,14 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private static final String JUDGMENT_MARKED_AS_PAID_IN_FULL_HEADER = "# Judgment marked as paid in full";
+
     private String getHeader() {
-        return format("# Judgment marked as paid in full");
+        return JUDGMENT_MARKED_AS_PAID_IN_FULL_HEADER;
     }
 
     private String getBody() {
-        return format("# The judgment has been marked as paid in full");
+        return "# The judgment has been marked as paid in full";
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {

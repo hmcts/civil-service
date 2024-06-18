@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.TrialArrangementsNotifyOtherPartyNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBaseIntegrationTest {
+public class TrialArrangementsNotifyOtherPartyScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
     @Autowired
     private TrialArrangementsNotifyOtherPartyNotificationHandler handler;
@@ -56,8 +56,8 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
                     "<a>Add the trial arrangements</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.DONE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getName())
+                    "<a>Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.DONE.getWelshName())
             );
     }
 }

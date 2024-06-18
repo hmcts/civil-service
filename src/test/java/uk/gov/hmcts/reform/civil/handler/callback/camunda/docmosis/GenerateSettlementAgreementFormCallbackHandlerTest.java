@@ -10,8 +10,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -26,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM;
@@ -72,27 +69,6 @@ public class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCall
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldNotGenerateForm_whenApplicantNotAcceptedRepaymentPlan() {
-        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(caseDocument);
-
-        CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.ORGANISATION)
-                        .build())
-                .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM.name());
-
-        handler.handle(params);
-        verify(formGenerator, never()).generate(any(CaseData.class), anyString());
-        verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
     @Test

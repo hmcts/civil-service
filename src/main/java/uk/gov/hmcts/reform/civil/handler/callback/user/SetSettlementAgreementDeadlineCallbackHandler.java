@@ -45,7 +45,7 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = LocalDateTime.now();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        if (caseData.isBilingual()) {
+        if (caseData.isClaimantBilingual()) {
             builder.respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, currentDateTime));
         }
         CaseData updatedData = builder.build();
@@ -57,7 +57,11 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement()
-            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+            return caseData.isCourtDecisionInClaimantFavourImmediateRePayment()
+                    ? deadlinesCalculator.getRespondentToImmediateSettlementAgreement(responseDate)
+                    : deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate);
+        }
+        return null;
     }
 }

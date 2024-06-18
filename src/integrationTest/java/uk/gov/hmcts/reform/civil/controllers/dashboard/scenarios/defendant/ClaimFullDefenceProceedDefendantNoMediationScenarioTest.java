@@ -43,11 +43,16 @@ public class ClaimFullDefenceProceedDefendantNoMediationScenarioTest extends Das
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed to court.</p>" +
-                               "<p class=\"govuk-body\">They rejected your response.</p>" +
-                               "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
-                               "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a><br>" +
-                               "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">View the claimant's hearing requirements</a></p>")
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim." +
+                               " The case will be referred to a judge who will decide what should happen next.</p>" +
+                               "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">view your response</a> or " +
+                               "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">view the claimant's hearing requirements</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad." +
+                                     " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>" +
+                                     "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">weld eich ymateb</a> neu " +
+                                     "<a href=\"{VIEW_CLAIMANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">weld gofynion ar gyfer y gwrandawiad yr hawlydd</a>.</p>")
             );
     }
 }

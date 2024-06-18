@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.ClaimData;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.CmcParty;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +23,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -106,5 +110,21 @@ public class ClaimStoreServiceTest {
         List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
         assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldReturnDefendantLinkStatusFalseIfLinked() {
+        given(claimStoreApi.isDefendantLinked(anyString())).willReturn(DefendantLinkStatus.builder().linked(true).build());
+        DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked("620MC123");
+        verify(claimStoreApi).isDefendantLinked(anyString());
+        assertTrue(status.isLinked());
+    }
+
+    @Test
+    void shouldReturnDefendantLinkStatusFalseWhenCmcClaimStoreIsUnavailable() {
+        given(claimStoreApi.isDefendantLinked(anyString())).willThrow(FeignException.FeignClientException.class);
+        DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked("620MC123");
+        verify(claimStoreApi).isDefendantLinked(anyString());
+        assertFalse(status.isLinked());
     }
 }

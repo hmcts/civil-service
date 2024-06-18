@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -16,7 +15,8 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-
+        BigDecimal orderAmount = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered());
+        BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         if (activeJudgment != null) {
             activeJudgment = activeJudgment.toBuilder()
@@ -25,9 +25,9 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
                 .paymentPlan(caseData.getJoPaymentPlan())
                 .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
                 .issueDate(caseData.getJoOrderMadeDate())
-                .orderedAmount(caseData.getJoAmountOrdered())
-                .costs(caseData.getJoAmountCostOrdered())
-                .totalAmount(new BigDecimal(caseData.getJoAmountOrdered()).add(new BigDecimal(Optional.ofNullable(caseData.getJoAmountCostOrdered()).orElse("0"))).toString())
+                .orderedAmount(orderAmount.toString())
+                .costs(costs.toString())
+                .totalAmount(orderAmount.add(costs).toString())
                 .build();
         }
         return activeJudgment;
@@ -37,4 +37,5 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return JudgmentState.MODIFIED;
     }
+
 }

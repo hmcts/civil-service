@@ -8,7 +8,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -39,6 +42,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Service
 @RequiredArgsConstructor
@@ -48,12 +55,12 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
     private final FeesService feesService;
-    private final InterestCalculator interestCalculator;
     private final FeatureToggleService featureToggleService;
-    private final String applicant1 = "applicant1";
-    private final String applicant2 = "applicant2";
-    private final String respondent1 = "respondent1";
-    private final String respondent2 = "respondent2";
+    private final InterestCalculator interestCalculator;
+    private static final String APPLICANT_1 = "applicant1";
+    private static final String APPLICANT_2 = "applicant2";
+    private static final String RESPONDENT_1 = "respondent1";
+    private static final String RESPONDENT_2 = "respondent2";
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
@@ -113,7 +120,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                                                        uk.gov.hmcts.reform.civil.model.Party respondent,
                                                        String event) {
         BigDecimal debtAmount = event.equals(GENERATE_DJ_FORM_SPEC.name())
-            ? getDebtAmount(caseData).setScale(2) : new BigDecimal(0);
+            ? JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2) : new BigDecimal(0);
         BigDecimal cost = event.equals(GENERATE_DJ_FORM_SPEC.name())
             ? getClaimFee(caseData) : new BigDecimal(0);
 
@@ -135,10 +142,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 .getRespondentSolicitor1Reference()).build();
     }
 
-    private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData,
-                                                       uk.gov.hmcts.reform.civil.model.Party party,
-                                                       String event, String partyType) {
-        BigDecimal debtAmount = getDebtAmount(caseData).setScale(2);
+    private DefaultJudgmentForm getDefaultJudgmentFormNonDivergent(CaseData caseData, String partyType) {
+        BigDecimal debtAmount = JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator).setScale(2);
         BigDecimal cost = getClaimFee(caseData);
 
         DefaultJudgmentForm.DefaultJudgmentFormBuilder builder = DefaultJudgmentForm.builder();
@@ -157,12 +162,41 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .respondent1Ref(getRespondent1SolicitorRef(caseData))
             .respondent2Ref(getRespondent2SolicitorRef(caseData))
             .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData));
+            .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .paymentPlan(caseData.getPaymentTypeSelection().name())
+            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
+            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency()))
+            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency()))
+            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
+            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null : DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
         return builder.build();
     }
 
+    private String getInstallmentAmount(String amount) {
+        var regularRepaymentAmountPennies = new BigDecimal(amount);
+        return String.valueOf(MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies));
+    }
+
+    private String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "each week";
+            case ONCE_ONE_MONTH: return "each month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
+        switch (repaymentFrequencyDJ) {
+            case ONCE_ONE_WEEK : return "per week";
+            case ONCE_ONE_MONTH: return "per month";
+            case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
-        if (partyType.equals(respondent1)) {
+        if (partyType.equals(RESPONDENT_1)) {
             if (caseData.isRespondent1LiP()) {
                 return getPartyDetails(caseData.getRespondent1());
             } else {
@@ -183,30 +217,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
                 }
             }
         }
-    }
-
-    private String getApplicantSolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getApplicantSolicitor1Reference() != null) {
-            return caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
-        }
-        return null;
-    }
-
-    private String getRespondent1SolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getRespondentSolicitor1Reference() != null) {
-            return caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
-        }
-        return null;
-    }
-
-    private String getRespondent2SolicitorRef(CaseData caseData) {
-        if (caseData.getSolicitorReferences() != null && caseData.getSolicitorReferences()
-            .getRespondentSolicitor2Reference() != null) {
-            return caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
-        }
-        return null;
     }
 
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
@@ -238,23 +248,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .name(party.getPartyName())
             .primaryAddress(party.getPrimaryAddress())
             .build();
-    }
-
-    private List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
-                                     uk.gov.hmcts.reform.civil.model.Party applicant2) {
-
-        List<Party> applicants = new ArrayList<>();
-        applicants.add(Party.builder()
-                           .name(applicant1.getPartyName())
-                           .primaryAddress(applicant1.getPrimaryAddress())
-                           .build());
-        if (applicant2 != null) {
-            applicants.add(Party.builder()
-                               .name(applicant2.getPartyName())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .build());
-        }
-        return applicants;
     }
 
     private Party getApplicantOrgDetails(OrganisationPolicy organisationPolicy) {
@@ -295,39 +288,19 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return claimFeePounds.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : claimFeePounds.setScale(2);
     }
 
-    private BigDecimal getDebtAmount(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest);
-        subTotal = subTotal.subtract(getPartialPayment(caseData));
-
-        return subTotal;
-    }
-
-    private BigDecimal getPartialPayment(CaseData caseData) {
-
-        BigDecimal partialPaymentPounds = new BigDecimal(0);
-        //Check if partial payment was selected by user, and assign value if so.
-        if (caseData.getPartialPaymentAmount() != null) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies);
-        }
-        return partialPaymentPounds;
-    }
-
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, String event) {
         List<DefaultJudgmentForm> defaultJudgmentForms = new ArrayList<>();
         if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name())) {
-            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant1(), event, applicant1));
+            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, APPLICANT_1));
             if (caseData.getApplicant2() != null) {
-                defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getApplicant2(), event, applicant2));
+                defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, APPLICANT_2));
             }
         } else {
-            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent1(), event,
-                                                                        respondent1));
+            defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData,
+                                                                        RESPONDENT_1
+            ));
             if (caseData.getRespondent2() != null) {
-                defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, caseData.getRespondent2(),
-                                                                            event, respondent2));
+                defaultJudgmentForms.add(getDefaultJudgmentFormNonDivergent(caseData, RESPONDENT_2));
             }
         }
         return generateDocmosisDocsForNonDivergent(defaultJudgmentForms, authorisation, caseData, event);

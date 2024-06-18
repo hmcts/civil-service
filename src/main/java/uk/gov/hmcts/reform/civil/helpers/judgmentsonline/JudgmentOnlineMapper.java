@@ -28,7 +28,7 @@ public abstract class JudgmentOnlineMapper {
         return activeJudgment.toBuilder()
             .isJointJudgment(YesOrNo.YES)
             .lastUpdateTimeStamp(LocalDateTime.now())
-            .courtLocation(caseData.getCaseManagementLocation().getBaseLocation())
+            .courtLocation(caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation().getBaseLocation() : null)
             .build();
     }
 
@@ -59,6 +59,6 @@ public abstract class JudgmentOnlineMapper {
     private boolean isHistoricJudgment(JudgmentDetails activeJudgment) {
         return JudgmentState.CANCELLED.equals(activeJudgment.getState())
             || JudgmentState.SET_ASIDE_ERROR.equals(activeJudgment.getState())
-            || JudgmentState.SET_ASIDE.equals(activeJudgment.getState()) ? true : false;
+            || JudgmentState.SET_ASIDE.equals(activeJudgment.getState());
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
+import uk.gov.hmcts.reform.civil.exceptions.StitchingFailedException;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BundleDocument;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -36,7 +37,11 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     private final ObjectMapper objectMapper;
     private final StitchingConfiguration stitchingConfiguration;
 
-    public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData) {
+    public CaseDocument bundle(List<DocumentMetaData> documents,
+                               String authorisation,
+                               String bundleTitle,
+                               String bundleFilename,
+                               CaseData caseData) {
         CaseDetails payload = createBundlePayload(documents, bundleTitle, bundleFilename, caseData);
         log.info(
             "Calling stitching api end point for {}, Bundle Title {}, File Name {}",
@@ -45,17 +50,17 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             bundleFilename
         );
 
-        CaseData caseDataFromBundlePayload = bundleRequestExecutor.post(
+        Optional<CaseData> caseDataFromBundlePayload = bundleRequestExecutor.post(
             BundleRequest.builder().caseDetails(payload).build(),
             stitchingConfiguration.getStitchingUrl(),
             authorisation
         );
         log.info("Called stitching api end point for {}", caseData.getLegacyCaseReference());
-        if (caseDataFromBundlePayload == null) {
-            log.info("Case data is null----------");
-            return null;
-        }
-        Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
+
+        Optional<Document> stitchedDocument = caseDataFromBundlePayload
+            .map(data -> data.getCaseBundles().get(0).getValue().getStitchedDocument())
+            .orElseThrow(() -> new StitchingFailedException(
+                String.format("Stitching / bundling failed for %s", caseData.getLegacyCaseReference())));
 
         log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(), caseData.getLegacyCaseReference());
         return retrieveCaseDocument(stitchedDocument);

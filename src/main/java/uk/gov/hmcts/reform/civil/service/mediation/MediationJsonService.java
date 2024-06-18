@@ -65,7 +65,7 @@ public class MediationJsonService {
             .casemanCaseNumber(caseData.getLegacyCaseReference())
             .caseTitle(caseData.getCaseNameHmctsInternal())
             .caseFlags(activeCaseFlags)
-            .claimValue(String.valueOf(caseData.getTotalClaimAmount()))
+            .claimValue(caseData.getTotalClaimAmount())
             .litigants(litigantList)
             .build();
     }

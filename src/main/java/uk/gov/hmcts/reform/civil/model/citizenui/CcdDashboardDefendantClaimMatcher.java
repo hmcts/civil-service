@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -14,8 +10,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
@@ -30,7 +31,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasResponsePending() {
-        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse();
+        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
+            && caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
@@ -55,12 +58,18 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
-            && isPayImmediately();
+                && isPayImmediately();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
             && caseData.isPayBySetDate()
             && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
@@ -68,6 +77,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
             && caseData.isPayByInstallment()
             && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
@@ -97,12 +109,18 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
             && !hasSdoBeenDrawn();
     }
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
             && caseData.getApplicant1ResponseDate() == null;
     }
@@ -170,6 +188,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
+        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+            return false;
+        }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
             && !caseData.getApplicant1ResponseDeadlinePassed()
             && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
@@ -226,9 +247,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
             && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
             || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
-                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -280,7 +301,17 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && !isSDOOrderLegalAdviserCreated();
+    }
+
+    @Override
+    public boolean isSDOOrderLegalAdviserCreated() {
+        return featureToggleService.isDashboardServiceEnabled()
+            && caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
     }
 
     @Override
@@ -295,7 +326,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (!featureToggleService.isLipVLipEnabled()) {
             return false;
         }
-        return  caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();

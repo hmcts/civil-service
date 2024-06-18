@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -75,6 +76,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final AssignCategoryId assignCategoryId;
+    private final UploadMediationService uploadMediationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -140,6 +142,8 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         // clear form
         builder.uploadMediationDocumentsForm(null);
 
+        //create dashboard scenarios
+        uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();

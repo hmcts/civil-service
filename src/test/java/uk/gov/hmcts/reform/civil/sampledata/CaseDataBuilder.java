@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -31,10 +32,12 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
@@ -145,6 +148,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
@@ -456,6 +460,11 @@ public class CaseDataBuilder {
     private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
+    private DJPaymentTypeSelection paymentTypeSelection;
+    private LocalDate paymentSetDate;
+    private RepaymentFrequencyDJ repaymentFrequency;
+    private LocalDate repaymentDate;
+    private String repaymentSuggestion;
 
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
@@ -596,6 +605,12 @@ public class CaseDataBuilder {
 
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
+    private String claimantBilingualLanguagePreference;
+
+    public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
+        this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
 
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
@@ -1580,6 +1595,31 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1(Party party) {
         this.applicant1 = party;
+        return this;
+    }
+
+    public CaseDataBuilder paymentTypeSelection(DJPaymentTypeSelection paymentTypeSelection) {
+        this.paymentTypeSelection = paymentTypeSelection;
+        return this;
+    }
+
+    public CaseDataBuilder paymentSetDate(LocalDate paymentSetDate) {
+        this.paymentSetDate = paymentSetDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentFrequency(RepaymentFrequencyDJ repaymentFrequency) {
+        this.repaymentFrequency = repaymentFrequency;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentDate(LocalDate repaymentDate) {
+        this.repaymentDate = repaymentDate;
+        return this;
+    }
+
+    public CaseDataBuilder repaymentSuggestion(String repaymentSuggestion) {
+        this.repaymentSuggestion = repaymentSuggestion;
         return this;
     }
 
@@ -3076,6 +3116,15 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
             .build();
         addLegalRepDeadline = DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1LiPBilingual() {
+        atStateClaimIssued1v1LiP();
+        this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
+        this.caseDataLiP = CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
         return this;
     }
 
@@ -5921,10 +5970,11 @@ public class CaseDataBuilder {
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 2))
+                                      .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
     }
 
@@ -5933,10 +5983,75 @@ public class CaseDataBuilder {
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                                      .dateOfFullPaymentMade(LocalDate.of(2023, 4, 1))
+                                      .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
                                       .build())
             .joIsRegisteredWithRTL(YES)
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v1Case() {
+        atStateNotificationAcknowledged();
+        return build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .partialPayment(YesOrNo.YES)
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v2DivergentCase() {
+        return CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Smith")
+                                                 .build())
+                                      .build())
+            .build();
+    }
+
+    public CaseData getDefaultJudgment1v1CaseJudgmentPaid() {
+        return build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .partialPayment(YesOrNo.YES)
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .partialPaymentAmount("10")
+            .totalClaimAmount(BigDecimal.valueOf(1010))
+            .paymentConfirmationDecisionSpec(YesOrNo.YES)
+            .partialPayment(YesOrNo.YES)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                         .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
+                                         .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                         .build())
+            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
     }
 
@@ -6393,6 +6508,111 @@ public class CaseDataBuilder {
                        .details(flagDetails())
                        .build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1LRIndividualFlags() {
+        this.applicant1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1LRIndividualFlags() {
+        this.respondent1LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2LRIndividualFlags() {
+        this.respondent2LRIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-lr-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Lr Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1OrgIndividualFlags() {
+        this.applicant1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2OrgIndividualFlags() {
+        this.applicant2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("app-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("App 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent1OrgIndividualFlags() {
+        this.respondent1OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 1 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2OrgIndividualFlags() {
+        this.respondent2OrgIndividuals = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-2-org-individual-party-id")
+                .firstName("First")
+                .lastName("Last")
+                .flags(Flags.builder()
+                           .partyName("First Last")
+                           .roleOnCase("Res 2 Org Individual")
+                           .details(flagDetails())
+                           .build())
+                .build());
         return this;
     }
 
@@ -6981,7 +7201,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
+    public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
         return wrapElements(MediationNonAttendanceStatement.builder()
                                 .yourName("My name")
                                 .document(Document.builder()
@@ -7357,6 +7577,12 @@ public class CaseDataBuilder {
             .resp1MediationAvailability(resp1MediationAvailability)
             .resp2MediationAvailability(resp2MediationAvailability)
             .sdoR2FastTrackCreditHire(sdoR2FastTrackCreditHire)
+            .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
+            .paymentTypeSelection(paymentTypeSelection)
+            .repaymentSuggestion(repaymentSuggestion)
+            .paymentSetDate(paymentSetDate)
+            .repaymentFrequency(repaymentFrequency)
+            .repaymentDate(repaymentDate)
             .build();
     }
 
@@ -7365,4 +7591,5 @@ public class CaseDataBuilder {
         ccdState = CaseState.CASE_SETTLED;
         return this;
     }
+
 }

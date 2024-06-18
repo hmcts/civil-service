@@ -39,20 +39,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -60,18 +51,24 @@ import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -79,6 +76,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -128,11 +126,14 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -152,7 +153,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     LocationRefDataService.class,
     JudgementService.class,
     PaymentDateService.class,
-    ResponseOneVOneShowTagService.class
+    ResponseOneVOneShowTagService.class,
+    JudgmentByAdmissionOnlineMapper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -1280,6 +1282,107 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("No");
                 assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo("No");
             }
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndNotLrVLiP() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("company name").build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndFlagV2WithJudgementLive() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent1(Party.builder()
+                                 .primaryAddress(Address.builder().build())
+                                 .type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test

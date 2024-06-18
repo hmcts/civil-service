@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.eq;
@@ -27,6 +30,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_DEF;
 
 @SpringBootTest(classes = {
     InterimJudgmentDefendantNotificationHandler.class,
@@ -65,6 +69,41 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                 getNotificationDataMap(),
                 "interim-judgment-approval-notification-def-000DC001"
             );
+        }
+
+        @Test
+        void shouldReturnPartyNameIfRespondentIsLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Don")
+                                 .individualLastName("Smith")
+                                 .build())
+                .respondent1OrganisationPolicy(null)
+                .legacyCaseReference("12DC910")
+                .respondent2OrganisationPolicy(null).build();
+
+            Map<String, String> propertyMap = handler.addProperties(caseData);
+            assertEquals("Mr. Don Smith", propertyMap.get(LEGAL_ORG_DEF));
+        }
+
+        @Test
+        void shouldReturnPartyNameIfOrgnisationPolicyIsSetButOrgIdMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Don")
+                                 .individualLastName("Smith")
+                                 .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole("[RESPSOLICITORONE]")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model
+                                                                     .Organisation.builder().build()).build())
+                .legacyCaseReference("12DC910")
+                .respondent2OrganisationPolicy(null).build();
+
+            Map<String, String> propertyMap = handler.addProperties(caseData);
+            assertEquals("Mr. Don Smith", propertyMap.get(LEGAL_ORG_DEF));
         }
 
         @Test

@@ -18,12 +18,17 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -40,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -50,7 +56,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     RequestJudgementByAdmissionForSpecCuiCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    JudgementService.class
+    JudgementService.class,
+    JudgmentByAdmissionOnlineMapper.class
 })
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -349,13 +356,199 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     class AboutToSubmitCallbackTest {
 
         @Test
-        void shouldSetUpBusinessProcessAndCaseState() {
-            CaseData caseData = CaseDataBuilder.builder().respondent1Represented(YES)
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsJudgmentOnlineLiveDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(YES)
                 .specRespondent1Represented(YES)
-                .applicant1Represented(YES).build();
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLROneVOne() {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(YES)
+                .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLiPOneVOneAndNotPaidImmediately() {
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIsLRvLiP1v1AndPaidImmediately() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndPaidImmediately() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .specRespondent1Represented(YES)
+                .respondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                                  .value(DynamicListElement.builder()
+                                                             .label("John Doe")
+                                                             .build())
+                                                  .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs2v1AndPaidImmediately() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .addApplicant2(YesOrNo.YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -383,6 +576,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .applicant1Represented(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

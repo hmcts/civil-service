@@ -543,6 +543,17 @@ public class DeadlinesCalculatorTest {
                 .isTheSame(expectedDeadline);
         }
 
+        @Test
+        void shouldReturnPlus5workingDaysAt4pm_whenResponseDateIsProvided() {
+            //Given
+            LocalDateTime providedDate = LocalDate.of(2024, 5, 21).atTime(23, 0);
+            LocalDateTime expectedDeadline = LocalDate.of(2024, 5, 29).atTime(16, 00);
+            //When
+            LocalDateTime paymentDate = calculator.getRespondentToImmediateSettlementAgreement(providedDate);
+            //Then
+            assertThat(paymentDate)
+                    .isTheSame(expectedDeadline);
+        }
     }
 
 }

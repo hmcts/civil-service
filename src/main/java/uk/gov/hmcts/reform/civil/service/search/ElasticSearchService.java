@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
@@ -14,6 +15,7 @@ import java.util.List;
 import static java.math.RoundingMode.UP;
 
 @RequiredArgsConstructor
+@Slf4j
 public abstract class ElasticSearchService {
 
     private final CoreCaseDataService coreCaseDataService;

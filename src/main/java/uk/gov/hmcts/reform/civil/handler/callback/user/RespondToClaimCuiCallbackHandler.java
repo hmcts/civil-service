@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -86,22 +87,24 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
+            builder, featureToggleService.isUpdateContactDetailsEnabled());
 
         if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
-            Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .flags(caseData.getRespondent1Copy().getFlags())
-                .partyID(caseData.getRespondent1Copy().getPartyID())
+            CaseData latestData = builder.build();
+            Party updatedRespondent1 = latestData.getRespondent1().toBuilder()
+                .flags(latestData.getRespondent1Copy().getFlags())
+                .partyID(latestData.getRespondent1Copy().getPartyID())
                 .build();
             builder.respondent1(updatedRespondent1)
                 .respondent1Copy(null);
         }
 
-        boolean responseLanguageIsBilingual = caseData.isRespondentResponseBilingual();
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!responseLanguageIsBilingual) {
+        if (!caseData.isRespondentResponseBilingual()) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
@@ -113,7 +116,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        CaseData updatedData = caseData.toBuilder()
+        return caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
@@ -124,6 +127,5 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 allocatedTrack
             ))
             .build();
-        return updatedData;
     }
 }

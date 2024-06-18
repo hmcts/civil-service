@@ -258,7 +258,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
 
-            updateApplicants(caseData, builder, statementOfTruth);
+            updateApplicants(caseData, builder, statementOfTruth, callbackParams);
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -303,13 +303,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
-            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)
+            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))
                 ? CaseState.JUDICIAL_REFERRAL
                 : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
             .build();
     }
 
-    private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth) {
+    private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth,
+                                  CallbackParams callbackParams) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
             Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
@@ -317,7 +318,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
             String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
-                CallbackParams.Params.BEARER_TOKEN.toString(), true
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), true
             );
             applicant1DQBuilder.applicant1DQRequestedCourt(
                 RequestedCourt.builder()
@@ -358,32 +359,35 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
+    static final String CLAIMANT = "Claimant";
+
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant2())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getApplicant1DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getApplicant2DQ())
             .map(Applicant2DQ::getApplicant2DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, CLAIMANT,
                                       updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
+        List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = caseData.getDuplicateClaimantDefendantResponseDocs();
         if (!claimantUploads.isEmpty()) {
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
@@ -393,9 +397,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
                     claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
-                claimantUploads.addAll(copy);
+                duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            updatedCaseData.duplicateClaimantDefendantResponseDocs(copy);
         }
     }
 
@@ -416,8 +421,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     break;
                 }
                 // FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
                 // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {

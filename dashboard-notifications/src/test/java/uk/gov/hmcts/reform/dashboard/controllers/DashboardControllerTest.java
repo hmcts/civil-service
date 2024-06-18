@@ -62,7 +62,7 @@ class DashboardControllerTest {
     private DashboardController dashboardController;
 
     @Test
-    public void shouldReturnTaskListForCaseReferenceAndRole() {
+    void shouldReturnTaskListForCaseReferenceAndRole() {
 
         //given
         List<TaskList> taskList = getTaskListList();
@@ -82,7 +82,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
+    void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
 
         //given
         when(taskListService.getTaskList(any(), any()))
@@ -102,7 +102,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
+    void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
 
         //given
         when(taskListService.getTaskList(any(), any()))
@@ -117,7 +117,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldReturnNotificationsForCaseReferenceAndRole() {
+    void shouldReturnNotificationsForCaseReferenceAndRole() {
 
         List<Notification> notifications = getNotificationList();
         //given
@@ -143,25 +143,25 @@ class DashboardControllerTest {
         final ResponseEntity responseEntity = dashboardController
             .recordScenario(CASE_ID, NOTIFICATION_DRAFT_CLAIM_START, AUTHORISATION, SCENARIO_REQUEST_PARAMS);
 
-        assertEquals(responseEntity.getStatusCode(), OK);
+        assertEquals(OK, responseEntity.getStatusCode());
 
         verify(dashboardScenariosService)
             .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
     }
 
     @Test
-    public void shouldReturnOkWhenNotificationDeleted() {
+    void shouldReturnOkWhenNotificationDeleted() {
 
         //when
         final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
 
         //then
-        assertEquals(responseEntity.getStatusCode(), OK);
+        assertEquals(OK, responseEntity.getStatusCode());
         verify(dashboardNotificationService).deleteById(ID);
     }
 
     @Test
-    public void shouldReturn401WhenNotificationDeletedUnauthorised() {
+    void shouldReturn401WhenNotificationDeletedUnauthorised() {
 
         //given
         doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);

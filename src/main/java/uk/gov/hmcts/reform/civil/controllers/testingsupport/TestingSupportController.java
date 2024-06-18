@@ -13,9 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
@@ -58,6 +57,8 @@ public class TestingSupportController {
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
+    private static final String SUCCESS = "success";
+    private static final String FAILED = "failed";
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
@@ -108,27 +109,24 @@ public class TestingSupportController {
         }
     }
 
-    @RequestMapping(
+    @PostMapping(
         value = "/testing-support/flowstate",
-        method = RequestMethod.POST,
         produces = "application/json")
     public StateFlow getFlowStateInformationForCaseData(
         @RequestBody CaseData caseData) {
         return stateFlowEngine.evaluate(caseData);
     }
 
-    @RequestMapping(
+    @PostMapping(
         value = "/testing-support/eventHistory",
-        method = RequestMethod.POST,
         produces = "application/json")
     public EventHistory getEventHistoryInformationForCaseData(
         @RequestBody CaseData caseData) {
         return eventHistoryMapper.buildEvents(caseData);
     }
 
-    @RequestMapping(
+    @PostMapping(
         value = "/testing-support/rpaJson",
-        method = RequestMethod.POST,
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
@@ -138,24 +136,24 @@ public class TestingSupportController {
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")
     public ResponseEntity<String> getCaseDismissalScheduler() {
 
-        String responseMsg = "success";
+        String responseMsg = SUCCESS;
         ExternalTaskImpl externalTask = new ExternalTaskImpl();
         try {
             claimDismissedHandler.handleTask(externalTask);
         } catch (Exception e) {
-            responseMsg = "failed";
+            responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
 
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
-        String responseMsg = "success";
+        String responseMsg = SUCCESS;
         var event = new BundleCreationTriggerEvent(caseId);
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
-            responseMsg = "failed";
+            responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
@@ -170,12 +168,12 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-hearing-fee-paid")
     public ResponseEntity<String> getHearingFeePaidEvent(@PathVariable("caseId") Long caseId) {
 
-        String responseMsg = "success";
+        String responseMsg = SUCCESS;
         var event = new HearingFeePaidEvent(caseId);
         try {
             hearingFeePaidHandler.moveCaseToPrepareForHearing(event);
         } catch (Exception e) {
-            responseMsg = "failed";
+            responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
@@ -183,12 +181,12 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-hearing-fee-unpaid")
     public ResponseEntity<String> getHearingFeeUnpaidEvent(@PathVariable("caseId") Long caseId) {
 
-        String responseMsg = "success";
+        String responseMsg = SUCCESS;
         var event = new HearingFeeUnpaidEvent(caseId);
         try {
             hearingFeeUnpaidHandler.moveCaseToStruckOut(event);
         } catch (Exception e) {
-            responseMsg = "failed";
+            responseMsg = FAILED;
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }

@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,7 +34,7 @@ public class TaskListService {
         return taskListEntityList.stream()
             .sorted(Comparator.comparingInt(t -> t.getTaskItemTemplate().getTaskOrder()))
             .map(TaskList::from)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public TaskListEntity saveOrUpdate(TaskListEntity taskList) {

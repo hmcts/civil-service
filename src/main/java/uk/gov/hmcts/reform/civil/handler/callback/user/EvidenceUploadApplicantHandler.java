@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -29,10 +30,10 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
     public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService,
                                           CaseDetailsConverter caseDetailsConverter,
                                           CoreCaseDataService coreCaseDataService,
-                                          ObjectMapper objectMapper, Time time) {
+                                          ObjectMapper objectMapper, Time time, FeatureToggleService featureToggleService) {
         super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
                 objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
-              "validateValuesApplicant", "createShowCondition");
+              "validateValuesApplicant", "createShowCondition", featureToggleService);
     }
 
     @Override

@@ -48,6 +48,8 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             applicantName += " and " + caseData.getApplicant2().getPartyName();
         }
 
+        final String headingThreeText = "<h3 class=\"govuk-heading-m\">If ";
+
         StringBuilder sb = new StringBuilder();
         sb.append("<br>You believe you owe &#163;").append(admitOwed).append(
                 ". We've emailed ").append(applicantName)
@@ -68,7 +70,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
 
         sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
 
-            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(headingThreeText)
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
             sb.append(" accept your offer</h3>");
@@ -87,14 +89,15 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         } else {
             sb.append("'s");
         }
+        final String P_TAG = ".</p>";
         sb.append(" legal representative if you need details on how to pay.</p>")
 
             .append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
             .append(" can request a county court judgment against you for &#163;")
-            .append(admitOwed).append(".</p>")
+            .append(admitOwed).append(P_TAG)
 
-            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(headingThreeText)
             .append(applicantName)
             .append(" disagrees that you only owe &#163;")
             .append(admitOwed)
@@ -104,12 +107,12 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
               .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
               .append(
                         "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
-                    .append(totalClaimAmount).append(".</p>");
+                    .append(totalClaimAmount).append(P_TAG);
         } else {
             sb.append("<p>The court will review the case for the full amount of &#163;")
-              .append(totalClaimAmount).append(".</p>");
+              .append(totalClaimAmount).append(P_TAG);
         }
-        sb.append("<h3 class=\"govuk-heading-m\">If ")
+        sb.append(headingThreeText)
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))

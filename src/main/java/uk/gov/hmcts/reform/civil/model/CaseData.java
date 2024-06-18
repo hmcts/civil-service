@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -110,6 +111,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
@@ -137,6 +139,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
     private final String generalAppReasonsOfOrder;
+    private final YesOrNo generalAppAskForCosts;
     private final GAInformOtherParty generalAppInformOtherParty;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
@@ -193,6 +196,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
+    private HelpWithFees generalAppHelpWithFees;
     private final HelpWithFeesDetails claimIssuedHwfDetails;
     private final HelpWithFeesDetails hearingHwfDetails;
     private final FeeType hwfFeeType;
@@ -267,6 +271,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
+
+    @Builder.Default
+    @JsonProperty("duplicateClaimantDefResponseDocs")
+    private final List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
@@ -650,6 +661,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
     private CaseDocument decisionOnReconsiderationDocument;
+    private CaseDocument requestForReconsiderationDocument;
+    private CaseDocument requestForReconsiderationDocumentRes;
+    private LocalDateTime requestForReconsiderationDeadline;
+    private YesOrNo requestForReconsiderationDeadlineChecked;
+
+    //Settle And Discontinue
+    private YesOrNo markPaidForAllClaimants;
+    private DynamicList claimantWhoIsSettling;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -737,14 +756,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPaidFullAmount() {
-        RespondToClaim respondToClaim = null;
+        RespondToClaim localRespondToClaim = null;
         if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-            respondToClaim = getRespondToClaim();
+            localRespondToClaim = getRespondToClaim();
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
-            respondToClaim = getRespondToAdmittedClaim();
+            localRespondToClaim = getRespondToAdmittedClaim();
         }
 
-        return Optional.ofNullable(respondToClaim)
+        return Optional.ofNullable(localRespondToClaim)
             .map(RespondToClaim::getHowMuchWasPaid)
             .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
             .orElse(false);
@@ -990,7 +1009,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isPartAdmitClaimSpec()
                 && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
                 && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
+                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+                && getCcdState() == AWAITING_APPLICANT_INTENTION);
     }
 
     @JsonIgnore
@@ -1456,13 +1476,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPaidLessThanClaimAmount() {
-        RespondToClaim respondToClaim = null;
+        RespondToClaim localRespondToClaim = null;
         if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-            respondToClaim = getRespondToClaim();
+            localRespondToClaim = getRespondToClaim();
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
-            respondToClaim = getRespondToAdmittedClaim();
+            localRespondToClaim = getRespondToAdmittedClaim();
         }
-        return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
+        return Optional.ofNullable(localRespondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
+        return hasApplicant1CourtDecisionInFavourOfClaimant()
+                && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
     }
 }

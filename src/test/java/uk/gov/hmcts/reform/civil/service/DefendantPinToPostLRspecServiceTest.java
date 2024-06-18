@@ -19,30 +19,33 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
+
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.CMCPinVerifyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.exceptions.RetryablePinException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.CUIIdamClientService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
     DefendantPinToPostLRspecService.class,
@@ -51,8 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 })
 @EnableRetry
 class DefendantPinToPostLRspecServiceTest {
-
-    private static final String CASE_ID = "1";
 
     @Autowired
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
@@ -65,6 +66,9 @@ class DefendantPinToPostLRspecServiceTest {
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+
+    @MockBean
+    private ClaimStoreService claimStoreService;
 
     @MockBean
     private IdamApi idamApi;
@@ -99,17 +103,17 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
                 .expiryDate(LocalDate.now().plusDays(180))
                 .build();
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", pinInPostData);
-
-            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), pinInPostData);
-
-            verify(coreCaseDataService).triggerEvent(caseData.getCcdCaseReference(), UPDATE_CASE_DATA, data);
+            var updatedData = defendantPinToPostLRspecService.removePinInPostData(caseDetails);
+            assertThat(updatedData).isEqualTo(data);
         }
 
         @Test
@@ -128,7 +132,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
+                () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000")
+            );
         }
 
         @Test
@@ -146,7 +151,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
+                () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000")
+            );
         }
 
         @Test
@@ -161,7 +167,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12342"));
+                () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12342")
+            );
         }
 
         @Test
@@ -180,7 +187,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12341"));
+                () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12341")
+            );
         }
 
         @Test
@@ -198,9 +206,13 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             when(cmcPinVerifyConfiguration.getClientId()).thenReturn("cmc_citizen");
             when(idamApi.authenticatePinUser(eq("TEST1234"), eq("cmc_citizen"), anyString(), eq("620MC123")))
-                .thenReturn(Response.builder().request(request).status(HttpStatus.SC_MOVED_TEMPORARILY).headers(headers).build());
+                .thenReturn(Response.builder().request(request).status(HttpStatus.SC_MOVED_TEMPORARILY).headers(headers)
+                                .build());
 
-            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
+            Assertions.assertDoesNotThrow(() -> defendantPinToPostLRspecService.validateOcmcPin(
+                "TEST1234",
+                "620MC123"
+            ));
         }
 
         @Test
@@ -218,10 +230,19 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             when(cmcPinVerifyConfiguration.getClientId()).thenReturn("cmc_citizen");
             when(idamApi.authenticatePinUser(eq("DummyPin"), eq("cmc_citizen"), anyString(), eq("620MC123")))
-                .thenReturn(Response.builder().request(request).status(HttpStatus.SC_UNAUTHORIZED).headers(headers).build());
+                .thenReturn(Response.builder().request(request).status(HttpStatus.SC_UNAUTHORIZED).headers(headers)
+                                .build());
 
-            Assertions.assertThrows(RetryablePinException.class, () ->  defendantPinToPostLRspecService.validateOcmcPin("DummyPin", "620MC123"));
-            verify(idamApi, times(3)).authenticatePinUser(eq("DummyPin"), eq("cmc_citizen"), anyString(), eq("620MC123"));
+            Assertions.assertThrows(
+                PinNotMatchException.class,
+                () -> defendantPinToPostLRspecService.validateOcmcPin("DummyPin", "620MC123")
+            );
+            verify(idamApi).authenticatePinUser(
+                eq("DummyPin"),
+                eq("cmc_citizen"),
+                anyString(),
+                eq("620MC123")
+            );
         }
     }
 
@@ -230,16 +251,35 @@ class DefendantPinToPostLRspecServiceTest {
         LocalDate expiryDate = LocalDate.of(
             2022,
             1,
-            1);
+            1
+        );
         DefendantPinToPostLRspec initialPin = DefendantPinToPostLRspec.builder()
-                                               .accessCode("TEST1234")
-                                               .expiryDate(expiryDate)
-                                               .build();
+            .accessCode("TEST1234")
+            .expiryDate(expiryDate)
+            .build();
 
         DefendantPinToPostLRspec resetPin = defendantPinToPostLRspecService.resetPinExpiryDate(initialPin);
 
         assertThat(resetPin.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(180));
         assertThat(resetPin.getAccessCode()).isEqualTo(initialPin.getAccessCode());
+    }
+
+    @Test
+    void shouldReturnTrueIfDefenentIsLinked() {
+        when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(DefendantLinkStatus.builder().linked(true).build());
+
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
+
+        assertTrue(status);
+    }
+
+    @Test
+    void shouldReturnFalseIfDefenentIsNotLinked() {
+        when(claimStoreService.isOcmcDefendantLinked("620MC123")).thenReturn(DefendantLinkStatus.builder().linked(false).build());
+
+        boolean status = defendantPinToPostLRspecService.isOcmcDefendantLinked("620MC123");
+
+        assertFalse(status);
     }
 
     private LocalDate getDate180days() {

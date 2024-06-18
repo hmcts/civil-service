@@ -161,7 +161,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
+        void shouldRecordScenario_whenInvokedWhenCaseStateIsAwaitingApplicantIntentiondAndPartAdmit() {
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
@@ -174,7 +174,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(null)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build().toBuilder().ccdState(CaseState.CASE_SETTLED).build();
+                .build().toBuilder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
@@ -193,7 +193,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         void shouldCreateDashboardNotificationsForSignSettlementAgreement() {
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimantSettlementAgreement", "accepted");
+            scenarioParams.put("claimantSettlementAgreementEn", "accepted");
+            scenarioParams.put("claimantSettlementAgreementCy", "derbyn");
             scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -304,6 +305,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("claimantRepaymentPlanDecisionCy", "derbyn");
             scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

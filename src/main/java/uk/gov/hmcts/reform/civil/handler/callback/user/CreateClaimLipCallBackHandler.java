@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -106,7 +108,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (featureToggleService.isHmcEnabled()) {
             populateWithPartyIds(caseDataBuilder);
         }
-
+        if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
+            caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+        }
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -142,7 +141,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
@@ -263,11 +262,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = setWithNoticeByType(caseData);
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        final UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+        final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
+        if (caseData.getGeneralAppPBADetails() == null) {
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().build();
+            CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
+            caseData = newCaseData;
+        }
         if (caseData.getGeneralAppPBADetails().getFee() == null) {
             Fee feeForGA = feesService.getFeeForGA(caseData);
             GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeForGA).build();
@@ -313,6 +317,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
      * @param callbackParams This parameter is required as this is passed as reference for execute method in CallBack
      * @return empty submitted callback response
      */
+    @Override
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
     }

@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
@@ -37,7 +39,6 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -76,6 +77,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
     private final FeatureToggleService toggleService;
+    private final DefaultJudgmentOnlineMapper djOnlineMapper;
     BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
@@ -112,7 +114,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED_HEADER);
+        } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both"))) {
@@ -124,7 +128,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()) {
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
+        } else if (caseData.isLRvLipOneVOne()) {
             return format(JUDGMENT_REQUESTED_LIP_CASE);
         } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
@@ -180,7 +189,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -402,8 +411,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getRepaymentDate().isBefore(eligibleDate.plusDays(1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }
@@ -417,27 +426,21 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String nextState;
 
-        if (featureToggleService.isJudgmentOnlineLive() && isNonDivergent(caseData)) {
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
-
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            caseDataBuilder.activeJudgment(djOnlineMapper.addUpdateActiveJudgment(caseData));
+            caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
-    }
-
-    private boolean isNonDivergent(CaseData caseData) {
-        return  MultiPartyScenario.isOneVOne(caseData)
-            || MultiPartyScenario.isTwoVOne(caseData)
-            || (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-            && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
     }
 }
 
