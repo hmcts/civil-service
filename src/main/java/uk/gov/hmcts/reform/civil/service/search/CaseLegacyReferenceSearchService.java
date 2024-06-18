@@ -25,7 +25,7 @@ public class CaseLegacyReferenceSearchService {
         Query query = new Query(boolQuery().must(
             matchQuery("data.legacyCaseReference", legacyReference)), List.of(), 0);
         SearchResult searchResult = coreCaseDataService.searchCases(query);
-        if (searchResult == null || searchResult.getCases().isEmpty()) {
+        if (searchResult == null || searchResult.getCases().size() < 1) {
             log.error("no case found for {}", legacyReference);
             throw new SearchServiceCaseNotFoundException();
         }
