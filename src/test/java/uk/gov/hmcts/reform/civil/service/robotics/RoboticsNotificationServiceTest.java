@@ -586,11 +586,11 @@ class RoboticsNotificationServiceTest {
 
     @Test
     @SneakyThrows
-    void shouldSendNotificationEmailWithLIPVLRSubjectLine() {
+    void shouldSendNotificationEmailWithLipVLrSubjectLine() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-            caseData = caseData.toBuilder()
+        caseData = caseData.toBuilder()
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .caseAccessCategory(SPEC_CLAIM)
