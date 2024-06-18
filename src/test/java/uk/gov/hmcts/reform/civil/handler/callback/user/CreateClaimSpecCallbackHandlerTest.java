@@ -87,7 +87,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -521,7 +520,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             List<String> actualPbas = dynamicList.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(actualPbas).containsOnly("12345", "98765");
             assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
