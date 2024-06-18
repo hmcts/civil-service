@@ -109,7 +109,7 @@ class JudgmentOnlineUtilsTest {
     }
 
     @Test
-    void testShouldAddress() {
+    void testShouldReturnAddress() {
 
         ContactInformation contact =  ContactInformation.builder().addressLine1("Test").country(
             "Test").build();
