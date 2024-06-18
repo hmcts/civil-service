@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.config.CarmDateConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -16,12 +18,14 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 
 @Service
+@Slf4j
 public class MediationCasesSearchService extends ElasticSearchService {
 
-    private static final LocalDate CARM_DATE = LocalDate.of(2024, 8, 1);
+    private final CarmDateConfiguration carmDateConfiguration;
 
-    public MediationCasesSearchService(CoreCaseDataService coreCaseDataService) {
+    public MediationCasesSearchService(CoreCaseDataService coreCaseDataService, CarmDateConfiguration carmDateConfiguration) {
         super(coreCaseDataService);
+        this.carmDateConfiguration = carmDateConfiguration;
     }
 
     private QueryBuilder beState(CaseState caseState) {
@@ -30,12 +34,13 @@ public class MediationCasesSearchService extends ElasticSearchService {
     }
 
     private QueryBuilder submittedDate(boolean carmEnabled) {
+        log.info(carmDateConfiguration.getCarmDate() + "");
         if (carmEnabled) {
             return boolQuery()
-                .must(rangeQuery("data.submittedDate").gte(CARM_DATE));
+                .must(rangeQuery("data.submittedDate").gte(carmDateConfiguration.getCarmDate()));
         } else {
             return boolQuery()
-                .must(rangeQuery("data.submittedDate").lt(CARM_DATE));
+                .must(rangeQuery("data.submittedDate").lt(carmDateConfiguration.getCarmDate()));
         }
     }
 

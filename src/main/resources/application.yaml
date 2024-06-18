@@ -498,12 +498,16 @@ feign:
       document-management-metadata-download-api:
         loggerLevel: full
 
+carmDate: ${CARM_DATE:}
+
 ---
 
 spring:
   config:
     activate:
       on-profile: local
+
+carmDate: ${CARM_DATE:2022-08-01}
 
   datasource:
     driverClassName: org.postgresql.Driver
