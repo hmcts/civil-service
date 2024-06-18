@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -26,13 +24,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getAddress;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
@@ -190,40 +188,21 @@ public class JudgmentByDeterminationDocGenerator {
         if (caseData.isApplicantLiP()) {
             return getPartyDetails(caseData.getApplicant1());
         } else if (caseData.getApplicant1OrganisationPolicy() != null) {
-            return getOrgDetails(caseData.getApplicant1OrganisationPolicy());
+            return getOrgDetails(caseData.getApplicant1OrganisationPolicy(), organisationService);
         } else {
             return null;
         }
-    }
-
-    private Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
-    }
-
-    private Party getOrgDetails(OrganisationPolicy organisationPolicy) {
-
-        return Optional.ofNullable(organisationPolicy)
-            .map(OrganisationPolicy::getOrganisation)
-            .map(Organisation::getOrganisationID)
-            .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map(o -> Party.builder()
-                .name(o.getName())
-                .primaryAddress(getAddress(o.getContactInformation().get(0)))
-                .build())).orElse(null);
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
         if (partyType.equals(RESPONDENT1) && caseData.isRespondent1LiP()) {
             return getPartyDetails(caseData.getRespondent1());
         } else if (partyType.equals(RESPONDENT1) && caseData.getRespondent1OrganisationPolicy() != null) {
-            return getOrgDetails(caseData.getRespondent1OrganisationPolicy());
+            return getOrgDetails(caseData.getRespondent1OrganisationPolicy(), organisationService);
         } else if (!partyType.equals(RESPONDENT1) && caseData.isRespondent2LiP()) {
             return getPartyDetails(caseData.getRespondent2());
         } else if (!partyType.equals(RESPONDENT1) && caseData.getRespondent2OrganisationPolicy() != null) {
-            return getOrgDetails(caseData.getRespondent2OrganisationPolicy());
+            return getOrgDetails(caseData.getRespondent2OrganisationPolicy(), organisationService);
         } else {
             return null;
         }

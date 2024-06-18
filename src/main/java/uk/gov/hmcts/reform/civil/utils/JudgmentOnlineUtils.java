@@ -93,4 +93,23 @@ public class JudgmentOnlineUtils {
             .postTown(address.getTownCity())
             .build();
     }
+
+    public static Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
+        return Party.builder()
+            .name(party.getPartyName())
+            .primaryAddress(party.getPrimaryAddress())
+            .build();
+    }
+
+    public static Party getOrgDetails(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
+        return Optional.ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(organisationService::findOrganisationById)
+            .flatMap(value -> value.map(o -> Party.builder()
+                .name(o.getName())
+                .primaryAddress(getAddress(o.getContactInformation().get(0)))
+                .build())).orElse(null);
+    }
+
 }
