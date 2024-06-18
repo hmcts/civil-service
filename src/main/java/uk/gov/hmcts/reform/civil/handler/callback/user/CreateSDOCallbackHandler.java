@@ -1571,8 +1571,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (featureToggleService.isEarlyAdoptersEnabled()) {
             // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
             if (!sdoSubmittedPreCPForLiPCase(caseData)
-                // If both SDO court AND case managment location is a EA approved court.
-                // check epimm from judge selected court in SDO journey
                 && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
                 && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
