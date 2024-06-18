@@ -25,7 +25,7 @@ public class NotifyDefendantJudgmentByAdmissionNotificationHandler extends Callb
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_JUDGMENT_BY_ADMISSION_DEFENDANT);
-    public static final String TASK_ID = "NotifyDefendantJudgmentByAdmission";
+    public static final String TASK_ID = "NotifyJudgmentByAdmissionDefendant";
     private static final String REFERENCE_TEMPLATE =
         "defendant-judgment-by-admission-%s";
 
