@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_JUDGMENT_BY_ADMISSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_JUDGMENT_BY_ADMISSION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantName
 public class NotifyClaimantJudgmentByAdmissionNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_JUDGMENT_BY_ADMISSION);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_JUDGMENT_BY_ADMISSION_CLAIMANT);
     public static final String TASK_ID = "NotifyClaimantJudgmentByAdmission";
     private static final String REFERENCE_TEMPLATE =
         "claimant-judgment-by-admission-%s";

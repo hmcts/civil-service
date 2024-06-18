@@ -79,7 +79,7 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_CLAIMANT_JUDGMENT_BY_ADMISSION.name())
+                             .eventId(CaseEvent.NOTIFY_JUDGMENT_BY_ADMISSION_CLAIMANT.name())
                              .build())
                 .build();
 
