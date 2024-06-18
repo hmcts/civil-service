@@ -20,7 +20,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new MediationCasesSearchService(coreCaseDataService,carmDateConfiguration);
+        searchService = new MediationCasesSearchService(coreCaseDataService, carmDateConfiguration);
     }
 
     @Override
