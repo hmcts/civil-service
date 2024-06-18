@@ -195,6 +195,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
+    private HelpWithFees generalAppHelpWithFees;
     private final HelpWithFeesDetails claimIssuedHwfDetails;
     private final HelpWithFeesDetails hearingHwfDetails;
     private final FeeType hwfFeeType;
@@ -754,14 +755,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPaidFullAmount() {
-        RespondToClaim respondToClaim = null;
+        RespondToClaim localRespondToClaim = null;
         if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-            respondToClaim = getRespondToClaim();
+            localRespondToClaim = getRespondToClaim();
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
-            respondToClaim = getRespondToAdmittedClaim();
+            localRespondToClaim = getRespondToAdmittedClaim();
         }
 
-        return Optional.ofNullable(respondToClaim)
+        return Optional.ofNullable(localRespondToClaim)
             .map(RespondToClaim::getHowMuchWasPaid)
             .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
             .orElse(false);
@@ -1473,13 +1474,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPaidLessThanClaimAmount() {
-        RespondToClaim respondToClaim = null;
+        RespondToClaim localRespondToClaim = null;
         if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-            respondToClaim = getRespondToClaim();
+            localRespondToClaim = getRespondToClaim();
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
-            respondToClaim = getRespondToAdmittedClaim();
+            localRespondToClaim = getRespondToAdmittedClaim();
         }
-        return Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid)
+        return Optional.ofNullable(localRespondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
     }
 
