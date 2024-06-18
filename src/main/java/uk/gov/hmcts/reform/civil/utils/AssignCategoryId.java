@@ -4,8 +4,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;

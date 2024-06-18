@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.model.documents.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

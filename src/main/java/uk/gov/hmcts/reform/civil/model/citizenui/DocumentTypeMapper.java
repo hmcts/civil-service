@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 
 public final class DocumentTypeMapper {
 

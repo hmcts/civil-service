@@ -30,8 +30,8 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -624,7 +624,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
         if (respondent1ClaimResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
                 Element<CaseDocument> documentElement =
                         buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
@@ -639,7 +639,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
             if (respondent1DQDraftDirections != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1DQDraftDirections,
@@ -655,7 +655,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         ResponseDocument respondent2ClaimResponseDocument = caseData.getRespondent2ClaimResponseDocument();
         if (respondent2ClaimResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2ClaimResponseDocument.getFile();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent2ClaimDocument = respondent2ClaimResponseDocument.getFile();
             if (respondent2ClaimDocument != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2ClaimDocument, "Defendant 2",
@@ -669,7 +669,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
         if (respondent2DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
             if (respondent2DQDraftDirections != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2DQDraftDirections,

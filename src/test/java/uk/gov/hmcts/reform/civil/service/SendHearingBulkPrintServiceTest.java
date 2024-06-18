@@ -8,9 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -24,8 +24,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {

@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -1661,7 +1661,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
         if (respondent1SpecDefenceResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1ClaimDocument, "Defendant",
@@ -1677,7 +1677,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
             if (respondent1DQDraftDirections != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1DQDraftDirections,
@@ -1693,7 +1693,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                uk.gov.hmcts.reform.civil.model.documents.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
                     Element<CaseDocument> documentElement = buildElemCaseDocument(
                             respondent2ClaimDocument, DEF2,
@@ -1710,7 +1710,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                uk.gov.hmcts.reform.civil.model.documents.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
                     Element<CaseDocument> documentElement = buildElemCaseDocument(
                             respondent2ClaimDocument, DEF2,
@@ -1732,7 +1732,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
         if (respondent2DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
+            uk.gov.hmcts.reform.civil.model.documents.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
             if (respondent2DQDraftDirections != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2DQDraftDirections,

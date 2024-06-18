@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;

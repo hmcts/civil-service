@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.model.documents.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.model.documents.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 

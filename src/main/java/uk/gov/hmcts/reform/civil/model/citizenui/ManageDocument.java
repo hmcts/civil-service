@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDateTime;
 

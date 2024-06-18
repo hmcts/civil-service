@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
