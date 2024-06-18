@@ -76,7 +76,7 @@ class DefendantResponseDeadlinePassedNotificationHandlerTest extends BaseCallbac
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_RESPONSE_DEADLINE_DEFENDANT.name()).build()

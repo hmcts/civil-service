@@ -73,7 +73,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
         @BeforeEach
         void before() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest

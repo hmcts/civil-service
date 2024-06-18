@@ -65,7 +65,7 @@ public class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseC
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

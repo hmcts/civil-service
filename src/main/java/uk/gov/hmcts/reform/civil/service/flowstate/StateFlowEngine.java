@@ -211,7 +211,7 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
@@ -226,7 +226,7 @@ public class StateFlowEngine {
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
@@ -237,7 +237,7 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
@@ -251,7 +251,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
@@ -264,7 +264,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
@@ -277,7 +277,7 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isLipVLipEnabled(),
                         CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                         BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))

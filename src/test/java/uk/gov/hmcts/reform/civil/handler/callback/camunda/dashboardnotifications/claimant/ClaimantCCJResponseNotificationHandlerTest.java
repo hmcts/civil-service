@@ -54,7 +54,7 @@ public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHand
             scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()

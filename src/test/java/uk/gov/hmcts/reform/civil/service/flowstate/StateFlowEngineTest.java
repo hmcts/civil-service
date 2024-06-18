@@ -542,7 +542,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -577,7 +577,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -917,7 +917,7 @@ class StateFlowEngineTest {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

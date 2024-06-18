@@ -88,7 +88,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
@@ -410,7 +410,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
@@ -445,7 +445,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -478,7 +478,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -511,7 +511,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
