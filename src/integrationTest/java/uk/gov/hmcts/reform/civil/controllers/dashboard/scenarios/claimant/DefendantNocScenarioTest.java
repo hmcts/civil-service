@@ -36,8 +36,11 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
 
         String caseId = "323491";
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP().build();
-
+            .atStateClaimIssued1v1LiP().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .build();
 
         handler.handle(callbackParams(caseData));
 
