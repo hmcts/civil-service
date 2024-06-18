@@ -120,6 +120,13 @@ withPipeline(type, product, component) {
 
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
+
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
   afterAlways('smoketest:preview') {
@@ -127,16 +134,6 @@ withPipeline(type, product, component) {
     if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
       error "The 'pr-values: enableHelm' label is active on the PR. The build will be interrupted to avoid wasting build time needlessly."
     }
-  }
-
-  before('smoketest:preview') {
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
   afterAlways('functionalTest:preview') {
