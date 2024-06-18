@@ -676,7 +676,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Contact information changed")
-            .confirmationBody("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab.")
+            .confirmationBody("### What happens next\nAny changes made to contact details have been updated.")
             .build();
     }
 
