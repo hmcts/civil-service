@@ -428,6 +428,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     public boolean isNocForDefendant() {
         return isPaperResponse()
-            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name());
+            && (caseData.getBusinessProcess() != null
+            && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(caseData.getBusinessProcess().getCamundaEvent()));
     }
 }
