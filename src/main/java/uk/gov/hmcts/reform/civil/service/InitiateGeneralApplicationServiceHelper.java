@@ -143,7 +143,7 @@ public class InitiateGeneralApplicationServiceHelper {
         }
     }
 
-    private Boolean setSingleGaApplicant(List<CaseAssignedUserRole> applicantSolicitor,
+    private Boolean setSingleGaApplicant(List<CaseAssignmentUserRole> applicantSolicitor,
                                       GeneralApplication.GeneralApplicationBuilder applicationBuilder,
                                       GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder applicantBuilder,
                                       String applicant1OrgCaseRole,
