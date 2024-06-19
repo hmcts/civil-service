@@ -37,7 +37,6 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     private final ObjectMapper objectMapper;
     protected final WorkingDayIndicator workingDayIndicator;
 
-
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);

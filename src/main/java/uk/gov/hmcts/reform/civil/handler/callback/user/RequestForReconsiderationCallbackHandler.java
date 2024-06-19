@@ -37,7 +37,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
@@ -148,7 +149,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
                 updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
-                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
                 updatedData.orderRequestedForReviewClaimant(YES);
             }
         } else if (isRespondentSolicitorOne(roles)) {
@@ -162,7 +163,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
                 updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
-                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
                 updatedData.orderRequestedForReviewDefendant(YES);
             }
         } else if (isRespondentSolicitorTwo(roles)) {
@@ -172,11 +173,17 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
+            if (caseData.isRespondent1LiP()) {
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
+            }
             updatedData.orderRequestedForReviewClaimant(YES);
-            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
+            if (caseData.isApplicantLiP()) {
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
+            }
             updatedData.orderRequestedForReviewDefendant(YES);
-            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI));
+            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

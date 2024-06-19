@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT;
 
@@ -45,6 +44,6 @@ public class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationH
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() && (nonNull(caseData.getOrderRequestedForReviewDefendant()));
+        return caseData.isApplicant1NotRepresented();
     }
 }

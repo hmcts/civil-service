@@ -46,8 +46,7 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
             && SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData));
     }
 
-
-    protected LocalDateTime getDateWithoutBankHolidays () {
+    protected LocalDateTime getDateWithoutBankHolidays() {
         LocalDate date = LocalDate.now().plusDays(7);
         while (workingDayIndicator.isPublicHoliday(date)) {
             date = date.plusDays(1);
