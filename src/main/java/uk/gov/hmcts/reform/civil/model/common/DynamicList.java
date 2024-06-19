@@ -33,7 +33,7 @@ public class DynamicList {
     public static DynamicList fromList(List<String> list) {
         List<DynamicListElement> items = list.stream()
             .map(DynamicListElement::dynamicElement)
-            .collect(toList());
+            .toList();
 
         return DynamicList.builder().listItems(items).value(DynamicListElement.EMPTY).build();
     }

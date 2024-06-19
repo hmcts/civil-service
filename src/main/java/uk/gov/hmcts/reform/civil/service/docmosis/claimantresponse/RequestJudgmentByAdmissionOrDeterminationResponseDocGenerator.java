@@ -49,6 +49,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         );
     }
 
+    @Override
     public JudgmentByAdmissionOrDetermination getTemplateData(CaseData caseData, CaseEvent caseEvent) {
         return judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, caseEvent);
     }
@@ -75,10 +76,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
     private DocmosisTemplates getTemplateName(CaseEvent caseEvent) {
         if (caseEvent.name().equals(CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT.name())) {
             return DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT;
-        } else if (caseEvent.name().equals(CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT.name())) {
-            return DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
         } else {
-            return null;
+            return DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
         }
     }
 

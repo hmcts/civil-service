@@ -39,40 +39,40 @@ class CamundaRuntimeClientTest {
 
         when(authTokenGenerator.generate()).thenReturn(authToken);
         when(camundaApi.getProcessVariables(processInstanceId, authToken)).thenReturn(mapper.convertValue(Map.of(
-                "caseId", Map.of(
-                        "type", "Long",
-                        "value", "1713874015833902",
-                        "valueInfo", Map.of()),
-                "hearingId", Map.of(
-                        "type", "String",
-                        "value", "2000005721",
-                        "valueInfo", Map.of()),
-                "flowState", Map.of(
-                        "type", "String",
-                        "value", "MAIN.FULL_DEFENCE_PROCEED",
-                        "valueInfo", Map.of()),
-                "flowFlags", Map.of(
-                        "type", "Object",
-                        "value", Map.of(
-                                "BULK_CLAIM_ENABLED", true,
-                                "SDO_ENABLED", true
-                        ),
-                        "valueInfo", Map.of(
-                                "objectTypeName", "java.util.HashMap<java.lang.Object,java.lang.Object>",
-                                "serializationDataFormat", "application/json"
-                        ))
+            "caseId", Map.of(
+                "type", "Long",
+                "value", "1713874015833902",
+                "valueInfo", Map.of()),
+            "hearingId", Map.of(
+                "type", "String",
+                "value", "2000005721",
+                "valueInfo", Map.of()),
+            "flowState", Map.of(
+                "type", "String",
+                "value", "MAIN.FULL_DEFENCE_PROCEED",
+                "valueInfo", Map.of()),
+            "flowFlags", Map.of(
+                "type", "Object",
+                "value", Map.of(
+                    "BULK_CLAIM_ENABLED", true,
+                    "SDO_ENABLED", true
+                ),
+                "valueInfo", Map.of(
+                    "objectTypeName", "java.util.HashMap<java.lang.Object,java.lang.Object>",
+                    "serializationDataFormat", "application/json"
+                ))
         ), new TypeReference<>() {}));
 
         Map actual = camundaClient.getProcessVariables(processInstanceId);
 
         Map expected = Map.of(
-                "caseId", "1713874015833902",
-                "hearingId", "2000005721",
-                "flowState", "MAIN.FULL_DEFENCE_PROCEED",
-                "flowFlags", Map.of(
-                        "BULK_CLAIM_ENABLED", true,
-                        "SDO_ENABLED", true
-                ));
+            "caseId", "1713874015833902",
+            "hearingId", "2000005721",
+            "flowState", "MAIN.FULL_DEFENCE_PROCEED",
+            "flowFlags", Map.of(
+                "BULK_CLAIM_ENABLED", true,
+                "SDO_ENABLED", true
+            ));
 
         assertEquals(expected, actual);
     }
