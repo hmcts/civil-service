@@ -1552,7 +1552,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isNationalRolloutEnabled()) {
+            log.info("isNationalRolloutEnabled is {}", featureToggleService.isNationalRolloutEnabled());
             // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            log.info("sdoSubmittedPreCPForLiPCase is {}", !sdoSubmittedPreCPForLiPCase(caseData));
+            log.info("isPartOfNationalRollout is CML{}", featureToggleService
+                .isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()));
+            log.info("isPartOfNationalRollout is Hearing choice {}", featureToggleService
+                .isPartOfNationalRollout(getEpimmsId(caseData)));
             if (!sdoSubmittedPreCPForLiPCase(caseData)
                 && featureToggleService.isPartOfNationalRollout(getEpimmsId(caseData))
                 && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
@@ -1641,7 +1647,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
-        return !featureToggleService.isCaseProgressionEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
+        return !featureToggleService.isCaseProgressionEnabled()
+            && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
     }
 
     private DynamicList deleteLocationList(DynamicList list) {
