@@ -9,11 +9,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.fees.client.FeesClient;
-import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
-import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
-import uk.gov.hmcts.reform.fees.client.model.FlatAmountDto;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.FeeVersionDto;
+import uk.gov.hmcts.reform.civil.model.FlatAmountDto;
 
 import java.math.BigDecimal;
 
@@ -34,7 +33,7 @@ class FeesServiceTest {
     private static final BigDecimal MAX_RANGE = new BigDecimal("300");
 
     @Mock
-    private FeesClient feesClient;
+    private FeesClientService feesClient;
 
     @Mock
     private FeesConfiguration feesConfiguration;
