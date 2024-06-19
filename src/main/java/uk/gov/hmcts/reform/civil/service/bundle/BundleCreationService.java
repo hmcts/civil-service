@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.BundleApiClient;
+import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
@@ -24,7 +24,7 @@ public class BundleCreationService {
     private final CoreCaseDataService coreCaseDataService;
     private final BundleRequestMapper bundleRequestMapper;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
-    private final BundleApiClient bundleApiClient;
+    private final EvidenceManagementApiClient evidenceManagementApiClient;
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
 
@@ -50,6 +50,6 @@ public class BundleCreationService {
     private BundleCreateResponse createNewBundleRequest(String authorization, String serviceAuthorization,
                                               BundleCreateRequest bundleCreateRequest) {
 
-        return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
+        return evidenceManagementApiClient.createNewBundle(authorization, serviceAuthorization, bundleCreateRequest);
     }
 }
