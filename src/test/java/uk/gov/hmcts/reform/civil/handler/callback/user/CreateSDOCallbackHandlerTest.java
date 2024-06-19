@@ -40,28 +40,15 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -75,6 +62,11 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
@@ -87,11 +79,18 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -100,6 +99,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -226,7 +226,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    protected LocationRefDataService locationRefDataService;
+    protected LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
@@ -1888,7 +1888,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .findFirst();
             assertThat(shouldBeSelected).isPresent();
             assertThat(dynamicList.getValue()).isNotNull()
-                .extracting("label").isEqualTo(LocationRefDataService.getDisplayEntry(shouldBeSelected.get()));
+                .extracting("label").isEqualTo(LocationReferenceDataService.getDisplayEntry(shouldBeSelected.get()));
 
             assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
 
