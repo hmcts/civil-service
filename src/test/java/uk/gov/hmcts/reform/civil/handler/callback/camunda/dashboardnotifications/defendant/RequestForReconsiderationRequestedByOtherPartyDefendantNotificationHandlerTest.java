@@ -40,7 +40,7 @@ public class RequestForReconsiderationRequestedByOtherPartyDefendantNotification
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "DeleteNotificationRequestForReconsiderationDefendant";
+    public static final String TASK_ID = "CreateNotificationRequestForReconsiderationDefendant";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
