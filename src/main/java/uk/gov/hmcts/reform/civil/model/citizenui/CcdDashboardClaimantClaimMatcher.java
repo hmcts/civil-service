@@ -425,4 +425,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             && caseData.isClaimantBilingual();
     }
+
+    public boolean isNocForDefendant() {
+        return isPaperResponse()
+            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name());
+    }
 }
