@@ -9,8 +9,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ public class DocumentHearingLocationHelperTest {
     @InjectMocks
     private DocumentHearingLocationHelper hearingLocationHelper;
     @Mock
-    private LocationReferenceDataService locationRefDataService;
+    private LocationRefDataService locationRefDataService;
 
     @Test
     void whenFormDefined_thenReturnForm() {

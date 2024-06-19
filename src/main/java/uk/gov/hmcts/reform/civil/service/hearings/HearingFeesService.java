@@ -4,15 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
-import uk.gov.hmcts.reform.civil.model.FeesApiRequest;
+import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
 
 import static java.util.Objects.isNull;
 
@@ -22,68 +23,70 @@ import static java.util.Objects.isNull;
 public class HearingFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-    private final FeesApiClient feesApiClient;
+    private final RestTemplate restTemplate;
     private final HearingFeeConfiguration feesConfiguration;
 
+    private static final String CHANNEL = "channel";
+    private static final String EVENT = "event";
+    private static final String JURISDICTION1 = "jurisdiction1";
+    private static final String JURISDICTION2 = "jurisdiction2";
+    private static final String SERVICE = "service";
+    private static final String KEYWORD = "keyword";
+    private static final String AMOUNT = "amount_or_volume";
+
     public Fee getFeeForHearingSmallClaims(BigDecimal amount) {
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getSmallClaimHrgKey())
-            .amount(amount).build();
+        String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam(CHANNEL, feesConfiguration.getChannel())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
+            .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
+            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
+            .queryParam(SERVICE, feesConfiguration.getService())
+            .queryParam(KEYWORD, feesConfiguration.getSmallClaimHrgKey())
+            .queryParam(AMOUNT, amount);
 
         return getRespond(builder);
     }
 
     public Fee getFeeForHearingFastTrackClaims(BigDecimal amount) {
-
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getFastTrackHrgKey())
-            .amount(amount).build();
+        String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam(CHANNEL, feesConfiguration.getChannel())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
+            .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
+            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2Hearing())
+            .queryParam(SERVICE, feesConfiguration.getService())
+            .queryParam(KEYWORD, feesConfiguration.getFastTrackHrgKey())
+            .queryParam(AMOUNT, amount);
 
         return getRespond(builder);
     }
 
     public Fee getFeeForHearingMultiClaims(BigDecimal amount) {
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2Hearing())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getMultiClaimKey())
-            .amount(amount).build();
+        String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam(CHANNEL, feesConfiguration.getChannel())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
+            .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
+            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2Hearing())
+            .queryParam(SERVICE, feesConfiguration.getService())
+            .queryParam(KEYWORD, feesConfiguration.getMultiClaimKey())
+            .queryParam(AMOUNT, amount);
 
         return getRespond(builder);
     }
 
-    private Fee getRespond(FeesApiRequest feesApiRequest) {
+    private Fee getRespond(UriComponentsBuilder builder) {
         FeeLookupResponseDto feeLookupResponseDto;
-
+        URI uri = builder.build().toUri();
         try {
-            feeLookupResponseDto = feesApiClient.lookupFeeWithAmount(
-                feesApiRequest.getService(),
-                feesApiRequest.getJurisdiction(),
-                feesApiRequest.getJurisdiction2(),
-                feesApiRequest.getChannel(),
-                feesApiRequest.getEvent(),
-                feesApiRequest.getKeyword(),
-                feesApiRequest.getAmount()
-            );
+            feeLookupResponseDto = restTemplate.getForObject(uri, FeeLookupResponseDto.class);
         } catch (RestClientException e) {
-            log.error("Fee Service Lookup Failed for [{}]", feesApiRequest);
+            log.error("Fee Service Lookup Failed for [{}]", uri);
             throw e;
         }
         if (isNull(feeLookupResponseDto) || isNull(feeLookupResponseDto.getFeeAmount())) {
-            log.error("No Fees returned for [{}].", feesApiRequest);
+            log.error("No Fees returned for [{}].", uri);
             throw new InternalServerErrorException("No Fees returned by fee-service while creating hearing fee");
         }
         return buildFeeDto(feeLookupResponseDto);

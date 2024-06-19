@@ -14,22 +14,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -37,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -115,7 +116,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private RepresentativeService representativeService;
 
     @MockBean
-    private DocmosisApiClient docmosisApiClient;
+    private RestTemplate restTemplate;
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
@@ -180,8 +181,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .totalClaimAmount(BigDecimal.ONE)
             .issueDate(DATE)
             .build();
-        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
-            .thenReturn(bytes);
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
+            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 
@@ -206,8 +207,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .build();
 
         //when
-        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
-            .thenReturn(bytes);
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
+            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenThrow(DocumentUploadException.class);
 
@@ -234,8 +235,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         );
 
         //when
-        when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
-            .thenReturn(bytes);
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
+            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 

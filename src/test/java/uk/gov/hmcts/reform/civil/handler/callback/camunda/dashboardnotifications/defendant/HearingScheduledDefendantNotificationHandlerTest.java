@@ -12,11 +12,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class HearingScheduledDefendantNotificationHandlerTest extends BaseCallba
     private FeatureToggleService featureToggleService;
 
     @Mock
-    private LocationReferenceDataService locationRefDataService;
+    private LocationRefDataService locationRefDataService;
 
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledDefendant";
 

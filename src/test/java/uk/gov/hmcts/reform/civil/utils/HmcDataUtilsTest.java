@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
@@ -1168,7 +1168,7 @@ class HmcDataUtilsTest {
     class GetHearingLocation {
 
         @MockBean
-        private LocationReferenceDataService locationRefDataService;
+        private LocationRefDataService locationRefDataService;
 
         @Test
         void shouldReturnLocation_whenInvoked() {

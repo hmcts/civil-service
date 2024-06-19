@@ -4,22 +4,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.fees.client.FeesApi;
 
 public class FeesHealthIndicator implements HealthIndicator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FeesHealthIndicator.class);
 
-    private final FeesApiClient feesApiClient;
+    private final FeesApi feesApi;
 
-    public FeesHealthIndicator(final FeesApiClient feesApiClient) {
-        this.feesApiClient = feesApiClient;
+    public FeesHealthIndicator(final FeesApi feesApi) {
+        this.feesApi = feesApi;
     }
 
     @Override
     public Health health() {
         try {
-            InternalHealth internalHealth = this.feesApiClient.health();
+            InternalHealth internalHealth = this.feesApi.health();
             return new Health.Builder(internalHealth.getStatus()).build();
         } catch (Exception ex) {
             LOGGER.error("Error on fees client healthcheck", ex);

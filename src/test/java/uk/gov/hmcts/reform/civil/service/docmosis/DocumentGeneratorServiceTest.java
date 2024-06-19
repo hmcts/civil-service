@@ -1,17 +1,21 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
@@ -22,58 +26,60 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService.API_RENDER;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {DocumentGeneratorService.class, JacksonAutoConfiguration.class})
 class DocumentGeneratorServiceTest {
 
-    @Mock
-    private DocmosisApiClient docmosisApiClient;
-
-    @Captor
-    ArgumentCaptor<DocmosisRequest> argumentCaptor;
-
-    @InjectMocks
-    private DocumentGeneratorService documentGeneratorService;
+    @MockBean
+    private RestTemplate restTemplate;
 
     @Mock
+    private ResponseEntity<byte[]> tornadoResponse;
+
+    @MockBean
     private DocmosisConfiguration configuration;
 
-    @Spy
-    private ObjectMapper mapper = new ObjectMapper();
+    @Captor
+    ArgumentCaptor<HttpEntity<DocmosisRequest>> argumentCaptor;
+
+    @Autowired
+    private DocumentGeneratorService documentGeneratorService;
 
     @Test
-    void shouldInvokeTornado() {
+    void shouldInvokesTornado() {
         SealedClaimForm sealedClaimForm = SealedClaimForm.builder().issueDate(LocalDate.now()).build();
 
+        when(restTemplate.exchange(eq(configuration.getUrl() + API_RENDER),
+                                   eq(HttpMethod.POST), argumentCaptor.capture(), eq(byte[].class)
+        )).thenReturn(tornadoResponse);
+
         byte[] expectedResponse = {1, 2, 3};
-        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(expectedResponse);
+        when(tornadoResponse.getBody()).thenReturn(expectedResponse);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(sealedClaimForm, N1);
         assertThat(docmosisDocument.getBytes()).isEqualTo(expectedResponse);
 
-        assertThat(argumentCaptor.getValue().getTemplateName()).isEqualTo(N1.getTemplate());
-        assertThat(argumentCaptor.getValue().getOutputFormat()).isEqualTo("pdf");
+        assertThat(argumentCaptor.getValue().getBody().getTemplateName()).isEqualTo(N1.getTemplate());
+        assertThat(argumentCaptor.getValue().getBody().getOutputFormat()).isEqualTo("pdf");
     }
 
     @Test
     void shouldThrowWhenTornadoFails() {
-        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenThrow(new HttpClientErrorException(
-            HttpStatus.NOT_FOUND,
-            "not found"
-        ));
+        when(restTemplate.exchange(eq(configuration.getUrl() + API_RENDER),
+                                   eq(HttpMethod.POST), argumentCaptor.capture(), eq(byte[].class)
+        )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "not found"));
 
         Map<String, Object> placeholders = Map.of();
 
-        HttpClientErrorException httpClientErrorException =
-            assertThrows(
-                HttpClientErrorException.class,
-                () -> documentGeneratorService.generateDocmosisDocument(
-                    placeholders,
-                    N1
-                )
-            );
+        HttpClientErrorException httpClientErrorException = assertThrows(
+            HttpClientErrorException.class,
+            () -> documentGeneratorService.generateDocmosisDocument(placeholders, N1)
+        );
 
         assertThat(httpClientErrorException).hasMessageContaining("404 not found");
     }

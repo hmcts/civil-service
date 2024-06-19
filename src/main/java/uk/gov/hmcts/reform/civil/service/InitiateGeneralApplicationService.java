@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -70,7 +70,7 @@ public class InitiateGeneralApplicationService {
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final UserRoleCaching userRoleCaching;
-    private final LocationReferenceDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;

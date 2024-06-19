@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.config;
+package uk.gov.hmcts.reform.fees.client.config;
 
 import feign.codec.Encoder;
 import feign.form.FormEncoder;
@@ -13,17 +13,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.fees.client.FeesApi;
 import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 @Configuration
 @ConditionalOnProperty(prefix = "fees", name = "api.url")
 @EnableFeignClients(basePackages = "uk.gov.hmcts.reform.fees.client")
-public class FeesClientConfiguration {
+public class FeesClientAutoConfiguration {
 
     @Bean
-    public FeesHealthIndicator feesHealthIndicator(FeesApiClient feesApiClient) {
-        return new FeesHealthIndicator(feesApiClient);
+    public FeesHealthIndicator feesHealthIndicator(FeesApi feesApi) {
+        return new FeesHealthIndicator(feesApi);
     }
 
     @Autowired
