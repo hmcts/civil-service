@@ -835,9 +835,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .applicant1Represented(NO);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLipVLip()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             CaseData caseData = caseDataBuilder.build();
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
@@ -877,9 +877,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .applicant1Represented(NO);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLipVLip()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
