@@ -127,7 +127,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .ccdState(CaseState.CASE_SETTLED)
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)

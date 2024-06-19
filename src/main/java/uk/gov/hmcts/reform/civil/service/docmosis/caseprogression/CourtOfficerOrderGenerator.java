@@ -11,11 +11,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.CourtOfficerOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,7 +34,7 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
-    private final LocationReferenceDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
     private LocationRefData caseManagementLocationDetails;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -97,7 +97,7 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
                 ));
         }
 
-        return LocationReferenceDataService.getDisplayEntry(matchingLocations.get(0));
+        return LocationRefDataService.getDisplayEntry(matchingLocations.get(0));
     }
 
     private String getHearingLocationText(CaseData caseData, String authorisation) {

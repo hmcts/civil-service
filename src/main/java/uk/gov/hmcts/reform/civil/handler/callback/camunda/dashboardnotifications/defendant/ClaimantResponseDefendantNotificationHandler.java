@@ -88,8 +88,6 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             }
         } else if (isClaimantRejectRepaymentPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         }
         return null;
     }
@@ -97,6 +95,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     private String getCaseSettledScenarios(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && caseData.isClaimantIntentionSettlePartAdmit()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
+        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         }
         return null;
     }

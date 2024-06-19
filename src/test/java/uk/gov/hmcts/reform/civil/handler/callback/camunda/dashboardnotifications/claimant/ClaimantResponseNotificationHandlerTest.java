@@ -161,7 +161,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedWhenCaseStateIsAwaitingApplicantIntentiondAndPartAdmit() {
+        void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
@@ -174,7 +174,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(null)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build().toBuilder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+                .build().toBuilder().ccdState(CaseState.CASE_SETTLED).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();

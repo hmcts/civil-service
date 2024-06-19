@@ -40,7 +40,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.of(2024, 3, 19))
                                                .build())
-            .ccdCaseReference(Long.valueOf(caseId)).ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+            .ccdCaseReference(Long.valueOf(caseId)).ccdState(CaseState.CASE_SETTLED).build();
 
         // When
         handler.handle(callbackParams(caseData));

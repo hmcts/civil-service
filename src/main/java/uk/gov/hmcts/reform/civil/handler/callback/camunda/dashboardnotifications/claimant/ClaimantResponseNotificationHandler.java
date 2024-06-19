@@ -52,6 +52,9 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     @Override
     public String getScenario(CaseData caseData) {
         if (caseData.getCcdState() == CASE_SETTLED) {
+            if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+                return SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario();
+            }
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
@@ -70,9 +73,6 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
                 && caseData.getRespondent1().isCompanyOROrganisation()
                 && caseData.hasApplicantRejectedRepaymentPlan()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
-        }
-        if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
-            return SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario();
         }
         return null;
     }

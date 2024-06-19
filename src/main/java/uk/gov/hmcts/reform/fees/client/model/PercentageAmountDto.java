@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model;
+package uk.gov.hmcts.reform.fees.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

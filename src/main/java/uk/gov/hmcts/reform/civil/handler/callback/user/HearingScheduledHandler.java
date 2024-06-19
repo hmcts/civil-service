@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 
 import static java.lang.String.format;
@@ -57,7 +57,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n"
         + "# Your reference number\n" + "# %s";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
-    private final LocationReferenceDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final HearingFeesService hearingFeesService;

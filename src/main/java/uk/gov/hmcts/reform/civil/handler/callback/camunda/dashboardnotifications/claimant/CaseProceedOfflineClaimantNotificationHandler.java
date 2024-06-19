@@ -19,9 +19,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE);
-    private static final List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
-            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCaseProceedOffline";
 
     public CaseProceedOfflineClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -47,7 +44,8 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return (caseData.getPreviousCCDState() != null && caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
+        return ((CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getPreviousCCDState()
+                || CaseState.AWAITING_APPLICANT_INTENTION == caseData.getPreviousCCDState())
                 && caseData.isLipvLipOneVOne());
     }
 }

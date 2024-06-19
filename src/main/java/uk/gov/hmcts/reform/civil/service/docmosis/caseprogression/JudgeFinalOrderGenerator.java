@@ -18,12 +18,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -55,7 +55,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final IdamClient idamClient;
-    private final LocationReferenceDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
     private LocationRefData caseManagementLocationDetails;
 
@@ -179,7 +179,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .furtherHearingLength(getFurtherHearingLength(caseData))
             .datesToAvoid(getDatesToAvoid(caseData))
             .showFurtherHearingLocationAlt(isDefaultCourt(caseData))
-            .furtherHearingLocationDefault(LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails))
+            .furtherHearingLocationDefault(LocationRefDataService.getDisplayEntry(caseManagementLocationDetails))
             .furtherHearingLocationAlt(getFurtherHearingLocationAlt(caseData))
             .furtherHearingMethod(getFurtherHearingMethod(caseData))
             .hearingNotes(getHearingNotes(caseData))
@@ -645,7 +645,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 ));
         }
 
-        return LocationReferenceDataService.getDisplayEntry(matchingLocations.get(0));
+        return LocationRefDataService.getDisplayEntry(matchingLocations.get(0));
     }
 
     private String getHearingLocationText(CaseData caseData, String authorisation) {

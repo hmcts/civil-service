@@ -1324,8 +1324,7 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_PAY_IMMEDIATELY.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                CLAIMANT_RESPONSE_CUI,
-                LIP_CLAIM_SETTLED
+                CLAIMANT_RESPONSE_CUI
             )
         ),
         entry(

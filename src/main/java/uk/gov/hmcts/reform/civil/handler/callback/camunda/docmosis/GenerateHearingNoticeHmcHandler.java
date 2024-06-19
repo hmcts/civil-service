@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -50,7 +50,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final HearingsService hearingsService;
     private final HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
     private final ObjectMapper objectMapper;
-    private final LocationReferenceDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -129,14 +129,14 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     }
 
     private String getHearingLocation(String hearingId, HearingGetResponse hearing,
-                                      String bearerToken, LocationReferenceDataService locationRefDataService) {
+                                      String bearerToken, LocationRefDataService locationRefDataService) {
         LocationRefData hearingLocation = getLocationRefData(
             hearingId,
             HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
             bearerToken,
             locationRefDataService);
         if (hearingLocation != null) {
-            return LocationReferenceDataService.getDisplayEntry(hearingLocation);
+            return LocationRefDataService.getDisplayEntry(hearingLocation);
         }
         return null;
     }

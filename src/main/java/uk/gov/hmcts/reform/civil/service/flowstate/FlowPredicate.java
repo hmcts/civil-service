@@ -733,7 +733,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
-            && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
+            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
 
     public static final Predicate<CaseData> demageMultiClaim = caseData ->
         AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())

@@ -1,20 +1,20 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.fees.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.model.Fee2Dto;
-import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
+import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 
 @Service
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
-public class FeesClientService {
+public class FeesClient {
 
     public static final String EVENT_ISSUE = "issue";
     public static final String EVENT_HEARING = "hearing";
@@ -22,7 +22,7 @@ public class FeesClientService {
     public static final String HEARING_SMALL_CLAIMS = "HearingSmallClaims";
     public static final String MONEY_CLAIM = "MoneyClaim";
 
-    private final FeesApiClient feesApiClient;
+    private final FeesApi feesApi;
     private final String service;
     private final String jurisdiction1;
     private final String jurisdiction2;
@@ -30,15 +30,15 @@ public class FeesClientService {
     private final FeatureToggleService featureToggleService;
 
     @Autowired
-    public FeesClientService(
-        FeesApiClient feesApiClient,
+    public FeesClient(
+        FeesApi feesApi,
         FeatureToggleService featureToggleService,
         @Value("${fees.api.service:}") String service,
         @Value("${fees.api.jurisdiction1:}") String jurisdiction1,
         @Value("${fees.api.jurisdiction2:}") String jurisdiction2,
         @Value("${fees.api.jurisdiction-fast-track-claim:}") String jurisdictionFastTrackClaim
     ) {
-        this.feesApiClient = feesApiClient;
+        this.feesApi = feesApi;
         this.service = service;
         this.jurisdiction1 = jurisdiction1;
         this.jurisdiction2 = jurisdiction2;
@@ -61,7 +61,7 @@ public class FeesClientService {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return this.feesApiClient.lookupFeeWithAmount(
+            return this.feesApi.lookupFee(
                 service,
                 jurisdiction1,
                 jurisdiction2,
@@ -72,12 +72,12 @@ public class FeesClientService {
             );
 
         } else {
-            return this.feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
+            return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
     }
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {
-        return this.feesApiClient.findRangeGroup(service, jurisdiction1, jurisdiction2, channel, event);
+        return this.feesApi.findRangeGroup(service, jurisdiction1, jurisdiction2, channel, event);
     }
 
     /**
