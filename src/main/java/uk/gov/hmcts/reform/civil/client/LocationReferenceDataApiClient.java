@@ -8,9 +8,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @FeignClient(name = "location-ref-data-api", url = "${location.api.baseUrl}")
 public interface LocationReferenceDataApiClient {
 
