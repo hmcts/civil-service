@@ -21,10 +21,6 @@ import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 @EnableFeignClients(basePackages = "uk.gov.hmcts.reform.fees.client")
 public class FeesClientConfiguration {
 
-    @Bean
-    public FeesHealthIndicator feesHealthIndicator(FeesApiClient feesApiClient) {
-        return new FeesHealthIndicator(feesApiClient);
-    }
 
     @Autowired
     private ObjectFactory<HttpMessageConverters> messageConverters;
