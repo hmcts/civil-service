@@ -107,7 +107,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
-            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+            && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
 
     private static boolean isNotSuitableSDO(CaseData caseData) {
         return caseData.getReasonNotSuitableSDO() != null

@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ class DirectionsQuestionnaireGeneratorTest {
             .build();
 
     @MockBean
-    private DocumentManagementService documentManagementService;
+    private UnsecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;

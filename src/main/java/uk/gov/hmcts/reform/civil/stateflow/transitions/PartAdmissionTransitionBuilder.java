@@ -38,9 +38,9 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions() {
-        this.moveTo(IN_MEDIATION).onlyWhen(agreedToMediation)
+        this.moveTo(IN_MEDIATION).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff)))
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
+            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)))
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());

@@ -195,7 +195,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
     void shouldReturnTrue_whenClaimDismissedDeadlineIsNotNullAndResponseDeadlineIsBeforeNow() {
         CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDeadline(LocalDateTime.now().minusDays(1))  // setting a past date
-            .atStatePastApplicantResponseDeadline()  // this sets the applicant1ResponseDeadline to a past date
+            .atStateClaimDismissed()  // this sets the applicant1ResponseDeadline to a past date
             .build();
 
         assertTrue(claimDismissalOutOfTime.test(caseData));
