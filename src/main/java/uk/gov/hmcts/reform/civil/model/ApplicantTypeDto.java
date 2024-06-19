@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.fees.client.model;
+package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventTypeDto {
+public class ApplicantTypeDto {
 
     private OffsetDateTime creationTime;
     private OffsetDateTime lastUpdated;
