@@ -16,19 +16,18 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -44,10 +43,11 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -104,7 +104,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    LocationRefDataService.class,
+    LocationReferenceDataService.class,
     CourtLocationUtils.class,
     StateFlowEngine.class,
     AssignCategoryId.class
@@ -136,7 +136,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseUserService coreCaseUserService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private CourtLocationUtils courtLocationUtils;
@@ -2244,7 +2244,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2300,7 +2300,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2353,7 +2353,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         ))
@@ -2363,7 +2363,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2428,7 +2428,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         )
@@ -2536,7 +2536,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))

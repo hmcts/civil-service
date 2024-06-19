@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.jetbrains.annotations.Nullable;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -265,7 +265,7 @@ public class HmcDataUtils {
 
     @Nullable
     public static LocationRefData getLocationRefData(String hearingId, String venueId,
-                                                     String bearerToken, LocationRefDataService locationRefDataService) {
+                                                     String bearerToken, LocationReferenceDataService locationRefDataService) {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         if (!matchedLocations.isEmpty()) {
