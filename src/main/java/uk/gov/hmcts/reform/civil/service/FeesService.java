@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.fees.client.FeesClient;
-import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
-import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,7 +21,7 @@ public class FeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
 
-    private final FeesClient feesClient;
+    private final FeesClientService feesClient;
     private final FeesConfiguration feesConfiguration;
 
     public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
