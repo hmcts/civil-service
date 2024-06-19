@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -109,7 +110,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    LocationRefDataService.class,
+    LocationReferenceDataService.class,
     CourtLocationUtils.class,
     StateFlowEngine.class,
     SimpleStateFlowEngine.class,
@@ -144,7 +145,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseUserService coreCaseUserService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private CourtLocationUtils courtLocationUtils;
@@ -2252,7 +2253,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2308,7 +2309,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2361,7 +2362,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         ))
@@ -2371,7 +2372,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2436,7 +2437,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         )
@@ -2544,7 +2545,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))

@@ -737,7 +737,7 @@ public class FlowPredicate {
     //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
-            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+            && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
 
     //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> demageMultiClaim = caseData ->

@@ -15,12 +15,12 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                                IStateFlowEngine stateFlowEngine,
                                                RepresentativeService representativeService,
                                                FeatureToggleService featureToggleService,
-                                               LocationRefDataService locationRefDataService) {
+                                               LocationReferenceDataService locationRefDataService) {
         super(
             documentManagementService,
             documentGeneratorService,
