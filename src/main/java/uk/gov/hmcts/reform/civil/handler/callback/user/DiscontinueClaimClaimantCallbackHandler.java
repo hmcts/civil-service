@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -39,11 +40,12 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         final var caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
-        DiscontinueClaimHelper.checkState(caseData, errors);
-        if (errors.isEmpty()) {
+        //DiscontinueClaimHelper.checkState(caseData, errors);
+        if (MultiPartyScenario.isTwoVOne(caseData)) {
             List<String> claimantNames = new ArrayList<>();
             claimantNames.add(caseData.getApplicant1().getPartyName());
             claimantNames.add(caseData.getApplicant2().getPartyName());
+            claimantNames.add("Both");
             caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
         }
 
