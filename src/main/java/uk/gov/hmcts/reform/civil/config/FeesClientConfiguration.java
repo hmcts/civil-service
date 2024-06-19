@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
-import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 @Configuration
 @ConditionalOnProperty(prefix = "fees", name = "api.url")
