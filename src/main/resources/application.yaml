@@ -649,7 +649,7 @@ management:
 
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: ${FEES_API_URL:http://localhost:6666}
 
 genApp:
   lrd:
