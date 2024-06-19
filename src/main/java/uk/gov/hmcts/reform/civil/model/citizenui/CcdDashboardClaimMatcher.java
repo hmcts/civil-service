@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.List;
+import java.util.Objects;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
@@ -25,11 +27,24 @@ public abstract class CcdDashboardClaimMatcher {
     }
 
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired() && !isSettled();
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && caseData.isSettlementAgreementDeadlineExpired()
+            && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean isSettled() {
         return caseData.getCcdState() == CaseState.CASE_SETTLED;
+    }
+
+    public boolean isClaimProceedInCaseMan() {
+        List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
+                CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
+
+        return  Objects.nonNull(caseData.getTakenOfflineDate())
+                && Objects.nonNull(caseData.getPreviousCCDState())
+                && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
     }
 
     protected boolean isSDOMadeByLegalAdviser() {
