@@ -36,8 +36,8 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder()
-                        .companyName("Company one")
-                        .type(Party.Type.COMPANY).build())
+                             .companyName("Company one")
+                             .type(Party.Type.COMPANY).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
@@ -53,16 +53,17 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
                 jsonPath("$[0].titleEn").value("The court will review the details and issue a judgment"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have rejected the defendant's payment plan, the court will issue a County Court Judgment (CCJ)."
-                          +  " If you do not agree with the judgment, you can send in the defendant's financial details and ask for this to be redetermined. "
-                          +  "Your online account will not be updated - any further updates will be by post.</p><p class=\"govuk-body\">Email the details and your claim number"
-                          +  " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
+                        + " If you do not agree with the judgment, you can send in the defendant's financial details and ask for this to be redetermined. "
+                        + "Your online account will not be updated - any further updates will be by post.</p><p class=\"govuk-body\">Email the details and your claim number"
+                        + " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
                 jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi gwrthod cynllun talu’r diffynnydd a bydd y llys yn cyhoeddi Dyfarniad Llys Sirol (CCJ). " +
                         "Os nad ydych yn cytuno â’r dyfarniad, gallwch anfon manylion ariannol y diffynnydd i’r llys a gofyn am ailbenderfyniad. " +
                         "Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru - bydd unrhyw ddiweddariadau pellach yn cael eu hanfon drwy’r post." +
                         "</p><p class=\"govuk-body\">Anfonwch y manylion a rhif eich hawliad reference ar e-bost i {cmcCourtEmailId} neu postiwch yr wybodaeth i: </p>" +
-                        "<br>{cmcCourtAddress}"));
+                        "<br>{cmcCourtAddress}")
+            );
     }
 
     @Test
@@ -72,42 +73,45 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
-                .toBuilder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
-                .respondent1(Party.builder()
-                        .companyName("Org one")
-                        .type(Party.Type.ORGANISATION).build())
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                        .firstRepaymentDate(firstRepaymentDate)
-                        .paymentAmount(new BigDecimal(1000))
-                        .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                        .build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-                .build();
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .respondent1(Party.builder()
+                             .companyName("Org one")
+                             .type(Party.Type.ORGANISATION).build())
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .firstRepaymentDate(firstRepaymentDate)
+                                          .paymentAmount(new BigDecimal(1000))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .build();
 
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
-                .andExpect(status().isOk())
-                .andExpectAll(
-                        status().is(HttpStatus.OK.value()),
-                        jsonPath("$[0].titleEn").value("The court will review the details and issue a judgment"),
-                        jsonPath("$[0].descriptionEn").value(
-                                "<p class=\"govuk-body\">You have rejected the defendant's payment plan, the court will issue a County Court Judgment (CCJ)."
-                                        +  " If you do not agree with the judgment, you can send in the defendant's financial details and ask for this to be redetermined. "
-                                        +  "Your online account will not be updated - any further updates will be by post.</p><p class=\"govuk-body\">Email the details and your claim number"
-                                        +  " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
-                        jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
-                        jsonPath("$[0].descriptionCy").value(
-                                "<p class=\"govuk-body\">Rydych wedi gwrthod cynllun talu’r diffynnydd a bydd y llys yn cyhoeddi Dyfarniad Llys Sirol (CCJ)." +
-                                    " Os nad ydych yn cytuno â’r dyfarniad, gallwch anfon manylion ariannol y diffynnydd i’r llys a gofyn am ailbenderfyniad. " +
-                                    "Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru - bydd unrhyw ddiweddariadau pellach yn cael eu hanfon drwy’r post.</p><p class=\"govuk-body\">Anfonwch y " +
-                                    "manylion a rhif eich hawliad reference ar e-bost i {cmcCourtEmailId} neu postiwch yr wybodaeth i: </p>" +
-                                    "<br>{cmcCourtAddress}"));
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("The court will review the details and issue a judgment"),
+                jsonPath("$[0].descriptionEn").value(
+                    "<p class=\"govuk-body\">You have rejected the defendant's payment plan, the court will issue a County Court Judgment (CCJ)."
+                        + " If you do not agree with the judgment, you can send in the defendant's financial details and ask for this to be redetermined. "
+                        + "Your online account will not be updated - any further updates will be by post.</p>"
+                        + "<p class=\"govuk-body\">Email the details and your claim number"
+                        + " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
+                jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi gwrthod cynllun talu’r diffynnydd a bydd y llys yn cyhoeddi Dyfarniad Llys Sirol (CCJ)." +
+                        " Os nad ydych yn cytuno â’r dyfarniad, gallwch anfon manylion ariannol y diffynnydd i’r llys a gofyn am ailbenderfyniad. " +
+                        "Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru - bydd unrhyw ddiweddariadau pellach yn cael eu hanfon drwy’r post.</p>" +
+                        "<p class=\"govuk-body\">Anfonwch y " +
+                        "manylion a rhif eich hawliad reference ar e-bost i {cmcCourtEmailId} neu postiwch yr wybodaeth i: </p>" +
+                        "<br>{cmcCourtAddress}")
+            );
     }
 
 }
