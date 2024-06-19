@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
-* There is currently an issue with the getVariables with using the RunTimeService in org.camunda.community.
-* This class was created to handle retrieving camunda process variables directly.
-* */
+ * There is currently an issue with the getVariables with using the RunTimeService in org.camunda.community.
+ * This class was created to handle retrieving camunda process variables directly.
+ * */
 @Component
 @RequiredArgsConstructor
 public class CamundaRuntimeClient {

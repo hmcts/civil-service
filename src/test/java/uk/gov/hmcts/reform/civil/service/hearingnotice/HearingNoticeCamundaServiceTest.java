@@ -31,6 +31,7 @@ public class HearingNoticeCamundaServiceTest {
     private ObjectMapper mapper;
     @MockBean
     private RuntimeService runtimeService;
+
     @MockBean
     private CamundaRuntimeClient runtimeClient;
     @Autowired
