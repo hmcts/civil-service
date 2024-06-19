@@ -44,7 +44,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
-            && caseData.isBilingual()
+            && caseData.isClaimantBilingual()
             && (caseData.getIssueDate() != null || caseData.isHWFOutcomeReady());
     }
 
@@ -77,12 +77,18 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
+        if (isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
             && isPayImmediately();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
+        if (isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
             && caseData.isPayBySetDate()
             && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
@@ -90,6 +96,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
+        if (isClaimProceedInCaseMan()) {
+            return false;
+        }
         return hasResponseFullAdmit()
             && caseData.isPayByInstallment()
             && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
@@ -125,6 +134,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
+        if (isClaimProceedInCaseMan()) {
+            return false;
+        }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
             && caseData.getApplicant1ResponseDate() == null;
     }
@@ -192,6 +204,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
+        if (isClaimProceedInCaseMan()) {
+            return false;
+        }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
             && !caseData.getApplicant1ResponseDeadlinePassed()
             && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
@@ -359,8 +374,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     private boolean isIndividualORSoleTrader() {
-        return nonNull(caseData.getRespondent1())
-            ? caseData.getRespondent1().isIndividualORSoleTrader() : false;
+        return nonNull(caseData.getRespondent1()) && caseData.getRespondent1().isIndividualORSoleTrader();
     }
 
     @Override
@@ -409,6 +423,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isRespondentResponseFullDefence()
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
-            && caseData.isBilingual();
+            && caseData.isClaimantBilingual();
     }
 }

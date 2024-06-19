@@ -190,7 +190,7 @@ public class FlowPredicate {
         caseData.getClaimNotificationDeadline() != null;
 
     public static final Predicate<CaseData> claimIssueBilingual = caseData ->
-        caseData.isBilingual();
+        caseData.isClaimantBilingual();
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -733,7 +733,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
-            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+            && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
 
     public static final Predicate<CaseData> demageMultiClaim = caseData ->
         AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())

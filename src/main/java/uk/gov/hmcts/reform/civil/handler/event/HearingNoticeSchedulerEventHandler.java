@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 @RequiredArgsConstructor
 public class HearingNoticeSchedulerEventHandler {
 
-    private static int MAX_RETRIES = 3;
-    private static String HEARING_NOTICE_MESSAGE = "NOTIFY_HEARING_PARTIES";
+    private static int maxRetries = 3;
+    private static String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
@@ -36,7 +36,7 @@ public class HearingNoticeSchedulerEventHandler {
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
-        for (int i = 0; i < MAX_RETRIES; i++) {
+        for (int i = 0; i < maxRetries; i++) {
             String hearingId = event.getHearingId();
             try {
                 processHearing(hearingId);
@@ -73,7 +73,7 @@ public class HearingNoticeSchedulerEventHandler {
 
     private void triggerHearingNoticeEvent(HearingNoticeMessageVars messageVars) {
         runtimeService
-            .createMessageCorrelation(HEARING_NOTICE_MESSAGE)
+            .createMessageCorrelation(hearingNoticeMessage)
             .setVariables(messageVars.toMap(mapper))
             .correlateStartMessage();
     }

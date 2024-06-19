@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
@@ -76,7 +76,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
     private InitiateGeneralApplicationServiceHelper helper;
 
     @MockBean
-    private CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private CaseAssignmentApi caseAssignmentApi;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -101,111 +101,111 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @BeforeEach
     void setup() {
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseAssignmentApplicantUserRoles()).build());
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(List.of(
-                                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+        when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(List.of(
+                                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build())).build());
     }
 
-    public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
+    public List<CaseAssignmentUserRole> getCaseAssignmentApplicantUserRoles() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("3")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("3")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("4")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("4")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("5")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("5")
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersWithEmptyRole() {
+    public List<CaseAssignmentUserRole> getCaseUsersWithEmptyRole() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsers() {
+    public List<CaseAssignmentUserRole> getCaseUsers() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForDefendant1ToBeApplicant() {
+    public List<CaseAssignmentUserRole> getCaseUsersForDefendant1ToBeApplicant() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("1")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("1")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForDefendant2ToBeApplicant() {
+    public List<CaseAssignmentUserRole> getCaseUsersForDefendant2ToBeApplicant() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("1")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("1")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(RESPONDENTSOLICITORTWO.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForLrVLipAppLr() {
+    public List<CaseAssignmentUserRole> getCaseUsersForLrVLipAppLr() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
                         .caseRole(DEFENDANT.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForLrVLipAppLip() {
+    public List<CaseAssignmentUserRole> getCaseUsersForLrVLipAppLip() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(DEFENDANT.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForLipVLrAppLip() {
+    public List<CaseAssignmentUserRole> getCaseUsersForLipVLrAppLip() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(CLAIMANT.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForLipVLip() {
+    public List<CaseAssignmentUserRole> getCaseUsersForLipVLip() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(CL_LIP_USER_ID)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(CL_LIP_USER_ID)
                         .caseRole(CLAIMANT.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(DEF_LIP_USER_ID)
                         .caseRole(DEFENDANT.getFormattedName()).build()
         );
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForLipVLrAppLr() {
+    public List<CaseAssignmentUserRole> getCaseUsersForLipVLrAppLr() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(CLAIMANT.getFormattedName()).build()
         );
     }
@@ -239,9 +239,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldReturnsFourRespondentsWithEmptyDetails() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersWithEmptyRole()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersWithEmptyRole()).build());
 
         assertThrows(IllegalArgumentException.class, () -> helper
                 .setRespondentDetailsIfPresent(
@@ -307,9 +307,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldSetApplicantSolicitorOrgIDTo200() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -346,9 +346,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldSetApplicantSolicitorOrgIDTo100() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -387,9 +387,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldSetApplicantSolicitorOrgIDTo101() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -425,13 +425,13 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getGeneralAppApplnSolicitor().getOrganisationIdentifier()).isEqualTo("101");
     }
 
-    public List<CaseAssignedUserRole> getCaseUsersForApplicantCheck() {
+    public List<CaseAssignmentUserRole> getCaseUsersForApplicantCheck() {
         return List.of(
-                CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
                         .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignedUserRole.builder().caseDataId("1").userId("3")
+                CaseAssignmentUserRole.builder().caseDataId("1").userId("3")
                         .caseRole(RESPONDENTSOLICITORTWO.getFormattedName()).build()
         );
     }
@@ -439,9 +439,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldNotExceptionClaimantDetialsSetToAppln() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsers()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsers()).build());
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -488,9 +488,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldNotExceptionDefendent1DetialsSetToAppln() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -540,9 +540,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
     @Test
     void shouldNotExceptionDefendent2DetialsSetToAppln() {
 
-        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignedUserRolesResource.builder()
-                        .caseAssignedUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
         CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
@@ -626,9 +626,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .type(Party.Type.INDIVIDUAL)
                             .individualFirstName("party").build())
                     .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build());
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLrVLipAppLr()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
@@ -676,9 +676,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .partyEmail("party@gmail.com")
                             .individualFirstName("party").build())
                     .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build());
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLrVLipAppLip()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
@@ -715,9 +715,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .individualFirstName("party").build())
                     .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .applicant1Represented(NO);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLipVLrAppLip()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
@@ -755,9 +755,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .defendantUserDetails(IdamUserDetails.builder().id("2").email(RESPONDENT_EMAIL_ID_CONSTANT).build())
                     .applicant1Represented(NO);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLipVLrAppLr()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),
@@ -795,9 +795,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
                     .applicant1Represented(NO);
-            when(caseAccessDataStoreApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                    .thenReturn(CaseAssignedUserRolesResource.builder()
-                            .caseAssignedUserRoles(getCaseUsersForLipVLip()).build());
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                    .thenReturn(CaseAssignmentUserRolesResource.builder()
+                            .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
                             GeneralApplication.builder().build(),

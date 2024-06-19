@@ -82,7 +82,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
         return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            && caseData.isBilingual();
+            && caseData.isClaimantBilingual();
     }
 
     private String getEmailTemplate(CaseData caseData) {
