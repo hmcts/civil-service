@@ -77,7 +77,7 @@ public class DashboardNotificationsParamsMapperTest {
             .documentName("document test name")
             .documentSize(0L)
             .documentType(documentType)
-            .createdDatetime(LocalDateTime.of(2024, Month.APRIL, 04, 14, 14))
+            .createdDatetime(LocalDateTime.of(2024, Month.APRIL, 4, 14, 14))
             .documentLink(Document.builder()
                               .documentUrl("fake-url")
                               .documentFileName("file-name.pdf")

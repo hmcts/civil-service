@@ -252,8 +252,9 @@ public class DashboardNotificationsParamsMapper {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
 
-        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
-            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
+        if ((CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
+            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent))
+            && nonNull(caseData.getRequestForReconsiderationDeadline())) {
             params.put("requestForReconsiderationDeadlineEn",
                        DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
             params.put("requestForReconsiderationDeadlineCy",
@@ -268,7 +269,6 @@ public class DashboardNotificationsParamsMapper {
             case WEEKLY -> "weekly";
             case EVERY_TWO_WEEKS -> "biweekly";
             case MONTHLY -> "monthly";
-            default -> "";
         };
     }
 
