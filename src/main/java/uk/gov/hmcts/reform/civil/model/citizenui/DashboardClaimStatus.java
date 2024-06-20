@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    HEARING_FEE_UNPAID(
+        Claim::isCaseStruckOut
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),

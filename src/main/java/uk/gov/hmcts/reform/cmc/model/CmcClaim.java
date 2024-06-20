@@ -541,4 +541,7 @@ public class CmcClaim implements Claim {
             .map(Offer::getPaymentIntention)
             .isPresent();
     }
+
+    @Override
+    public boolean isCaseStruckOut() { return false; }
 }

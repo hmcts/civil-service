@@ -45,4 +45,8 @@ public abstract class CcdDashboardClaimMatcher {
                 && Objects.nonNull(caseData.getPreviousCCDState())
                 && (caseMovedInCaseManStates.contains(caseData.getPreviousCCDState()));
     }
+
+    public boolean isCaseStruckOut() {
+        return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
+    }
 }
