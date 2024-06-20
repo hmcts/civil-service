@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 public class DecisionOnRequestForReconsiderationClaimantHandler extends CaseProgressionDashboardCallbackHandler {
+
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_DECISION_RECONSIDERATION_CLAIMANT1);
     public static final String TASK_ID = "GenerateDashboardNotificationDecisionReconsiderationClaimant";
 
