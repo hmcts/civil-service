@@ -70,7 +70,7 @@ public class DocumentHearingLocationHelper {
         return locationRefData;
     }
 
-    public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationRefDataService locationRefDataService, String authorisation) {
+    public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationReferenceDataService locationRefDataService, String authorisation) {
         LocationRefData caseManagementLocationDetails = null;
         if (checkIfCcmccOrCnbc(caseData) && caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             caseManagementLocationDetails = locationRefDataService.getCnbcLocation(authorisation);
