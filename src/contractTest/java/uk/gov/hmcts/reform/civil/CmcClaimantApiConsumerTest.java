@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil;
 
-
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;

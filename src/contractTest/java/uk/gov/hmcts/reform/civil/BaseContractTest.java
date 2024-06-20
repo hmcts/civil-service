@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -22,11 +23,6 @@ public class BaseContractTest {
     protected static final String AUTHORIZATION_TOKEN = "Bearer some-access-token";
     protected static final String SERVICE_AUTH_TOKEN = "someServiceAuthToken";
 
-    protected ObjectMapper objectMapper = JsonMapper
-        .builder()
-        .addModule(new JavaTimeModule())
-        .addModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .build();
+    @Autowired
+    protected ObjectMapper objectMapper;
 }

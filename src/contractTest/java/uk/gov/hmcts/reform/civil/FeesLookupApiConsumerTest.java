@@ -26,12 +26,12 @@ import static uk.gov.hmcts.reform.civil.service.FeesClientService.MONEY_CLAIM;
 
 @PactTestFor(providerName = "feeRegister_lookUp")
 @MockServerConfig(hostInterface = "localhost", port = "6666")
-public class FeesConsumerTest extends BaseContractTest {
+public class FeesLookupApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/fees-register/fees/lookup";
     public static final String CHANNEL = "default";
     public static final String HEARING_EVENT = "hearing";
-    public static final String HEARING_SERVICE = "civil money claims";
+    public static final String CMC_SERVICE = "civil money claims";
     public static final String SMALL_CLAIMS_KEYWORD = "HearingSmallClaims";
     public static final String FAST_TRACK_KEYWORD = "FastTrackHrg";
     public static final String MULTI_TRACK_KEYWORD = "MultiTrackHrg";
@@ -47,10 +47,21 @@ public class FeesConsumerTest extends BaseContractTest {
     private FeesApiClient feesApiClient;
 
     @Pact(consumer = "civil-service")
+    public RequestResponsePact getFeeForMoneyClaimWithoutKeyword(PactDslWithProvider builder) throws JSONException {
+        return buildLookupFeeRequestWithoutKeywordResponsePact(builder, JURISDICTION_CC, "1000",
+                                                               new BigDecimal(80.00), "FEE0033",
+                                                               "Money Claims Fees exists for Civil",
+                                                               "a request for money claims fees without keyword",
+                                                               EVENT_ISSUE
+        );
+    }
+
+    @Pact(consumer = "civil-service")
     public RequestResponsePact getFeeForMoneyClaim(PactDslWithProvider builder) throws JSONException {
-        return buildGenAppFeeRequestResponsePact(builder, "a request for Money Claims with notice",
-                                                 MONEY_CLAIM, EVENT_ISSUE, HEARING_SERVICE,
-                                                 new BigDecimal(300.00), "FEE0031"
+        return buildLookupFeeRequestWithAmountResponsePact(builder, JURISDICTION_CIVIL, MONEY_CLAIM, "1000",
+                                                           new BigDecimal(80.00), "FEE0023",
+                                                           "Money Claims Fees exists for Civil",
+                                                           "a request for money claims fees", EVENT_ISSUE
         );
     }
 
@@ -78,7 +89,6 @@ public class FeesConsumerTest extends BaseContractTest {
         );
     }
 
-
     @Pact(consumer = "civil-service")
     public RequestResponsePact getFeeForHearingSmallClaims(PactDslWithProvider builder) throws JSONException {
         return buildHearingFeeRequestResponsePact(builder, JURISDICTION_CC, SMALL_CLAIMS_KEYWORD,
@@ -104,12 +114,49 @@ public class FeesConsumerTest extends BaseContractTest {
         );
     }
 
+
+    @Test
+    @PactTestFor(pactMethod = "getFeeForMoneyClaimWithoutKeyword")
+    public void verifyFeeForMoneyClaimWithoutKeyword() {
+        FeeLookupResponseDto fee = feesApiClient.lookupFeeWithoutKeyword(
+            CMC_SERVICE,
+            JURISDICTION_CIVIL,
+            JURISDICTION_CC,
+            CHANNEL,
+            EVENT_ISSUE,
+            new BigDecimal(1000)
+        );
+        assertThat(fee.getCode(), is(equalTo("FEE0033")));
+        assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(80.00))));
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "getFeeForMoneyClaim")
+    public void verifyFeeForMoneyClaim() {
+        FeeLookupResponseDto fee = feesApiClient.lookupFeeWithAmount(
+            CMC_SERVICE,
+            JURISDICTION_CIVIL,
+            JURISDICTION_CIVIL,
+            CHANNEL,
+            EVENT_ISSUE,
+            MONEY_CLAIM,
+            new BigDecimal(1000)
+        );
+        assertThat(fee.getCode(), is(equalTo("FEE0023")));
+        assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(80.00))));
+    }
+
     @Test
     @PactTestFor(pactMethod = "getFeeForGAWithNotice")
     public void verifyFeeForGAWithNotice() {
 
-        FeeLookupResponseDto fee = feesApiClient.lookupFee(SERVICE_GENERAL, JURISDICTION_CIVIL, JURISDICTION_CIVIL, CHANNEL,
-                                                           GENERAL_APP_EVENT, WITH_NOTICE_KEYWORD
+        FeeLookupResponseDto fee = feesApiClient.lookupFee(
+            SERVICE_GENERAL,
+            JURISDICTION_CIVIL,
+            JURISDICTION_CIVIL,
+            CHANNEL,
+            GENERAL_APP_EVENT,
+            WITH_NOTICE_KEYWORD
         );
         assertThat(fee.getCode(), is(equalTo("FEE0011")));
         assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(10.00))));
@@ -118,8 +165,13 @@ public class FeesConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "getFeeForConsentWithOrWithout")
     public void verifyFeeForConsentWithOrWithout() {
-        FeeLookupResponseDto fee = feesApiClient.lookupFee(SERVICE_GENERAL, JURISDICTION_CIVIL, JURISDICTION_CIVIL, CHANNEL,
-                                                           GENERAL_APP_EVENT, CONSENT_WITHWITHOUT_NOTICE_KEYWORD
+        FeeLookupResponseDto fee = feesApiClient.lookupFee(
+            SERVICE_GENERAL,
+            JURISDICTION_CIVIL,
+            JURISDICTION_CIVIL,
+            CHANNEL,
+            GENERAL_APP_EVENT,
+            CONSENT_WITHWITHOUT_NOTICE_KEYWORD
         );
         assertThat(fee.getCode(), is(equalTo("FEE0012")));
         assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(20.00))));
@@ -147,7 +199,7 @@ public class FeesConsumerTest extends BaseContractTest {
 
         FeeLookupResponseDto fee =
             feesApiClient.lookupFeeWithAmount(
-                HEARING_SERVICE,
+                CMC_SERVICE,
                 JURISDICTION_CIVIL,
                 JURISDICTION_CC,
                 CHANNEL,
@@ -165,7 +217,7 @@ public class FeesConsumerTest extends BaseContractTest {
 
         FeeLookupResponseDto fee =
             feesApiClient.lookupFeeWithAmount(
-                HEARING_SERVICE,
+                CMC_SERVICE,
                 JURISDICTION_CIVIL,
                 JURISDICTION_CIVIL,
                 CHANNEL,
@@ -184,7 +236,7 @@ public class FeesConsumerTest extends BaseContractTest {
 
         FeeLookupResponseDto fee =
             feesApiClient.lookupFeeWithAmount(
-                HEARING_SERVICE,
+                CMC_SERVICE,
                 JURISDICTION_CIVIL,
                 JURISDICTION_CC,
                 CHANNEL,
@@ -217,6 +269,55 @@ public class FeesConsumerTest extends BaseContractTest {
             .toPact();
     }
 
+    private RequestResponsePact buildLookupFeeRequestWithoutKeywordResponsePact(PactDslWithProvider builder,
+                                                                                String jurisdiction2,
+                                                                                String amount,
+                                                                                BigDecimal feeAmount,
+                                                                                String feeCode,
+                                                                                String given,
+                                                                                String uponReceiving,
+                                                                                String event) {
+        return builder
+            .given(given)
+            .uponReceiving(uponReceiving)
+            .path(ENDPOINT)
+            .method(HttpMethod.GET.toString())
+            .matchQuery("channel", CHANNEL, CHANNEL)
+            .matchQuery("event", event, event)
+            .matchQuery("jurisdiction1", JURISDICTION_CIVIL, JURISDICTION_CIVIL)
+            .matchQuery("jurisdiction2", jurisdiction2, jurisdiction2)
+            .matchQuery("service", CMC_SERVICE, CMC_SERVICE)
+            .matchQuery("amount_or_volume", amount, amount)
+            .willRespondWith()
+            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .body(buildFeesResponseBody(feeCode, feeAmount))
+            .status(HttpStatus.SC_OK)
+            .toPact();
+    }
+
+    private RequestResponsePact buildLookupFeeRequestWithAmountResponsePact(PactDslWithProvider builder, String jurisdiction2,
+                                                                            String keyword, String amount, BigDecimal feeAmount,
+                                                                            String feeCode, String given, String uponReceiving,
+                                                                            String event) {
+        return builder
+            .given(given)
+            .uponReceiving(uponReceiving)
+            .path(ENDPOINT)
+            .method(HttpMethod.GET.toString())
+            .matchQuery("channel", CHANNEL, CHANNEL)
+            .matchQuery("event", event, event)
+            .matchQuery("jurisdiction1", JURISDICTION_CIVIL, JURISDICTION_CIVIL)
+            .matchQuery("jurisdiction2", jurisdiction2, jurisdiction2)
+            .matchQuery("service", CMC_SERVICE, CMC_SERVICE)
+            .matchQuery("keyword", keyword, keyword)
+            .matchQuery("amount_or_volume", amount, amount)
+            .willRespondWith()
+            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .body(buildFeesResponseBody(feeCode, feeAmount))
+            .status(HttpStatus.SC_OK)
+            .toPact();
+    }
+
     private RequestResponsePact buildHearingFeeRequestResponsePact(PactDslWithProvider builder, String jurisdiction2,
                                                                    String keyword, String amount, BigDecimal feeAmount,
                                                                    String feeCode, String given, String uponReceiving) {
@@ -229,7 +330,7 @@ public class FeesConsumerTest extends BaseContractTest {
             .matchQuery("event", HEARING_EVENT, HEARING_EVENT)
             .matchQuery("jurisdiction1", JURISDICTION_CIVIL, JURISDICTION_CIVIL)
             .matchQuery("jurisdiction2", jurisdiction2, jurisdiction2)
-            .matchQuery("service", HEARING_SERVICE, HEARING_SERVICE)
+            .matchQuery("service", CMC_SERVICE, CMC_SERVICE)
             .matchQuery("keyword", keyword, keyword)
             .matchQuery("amount_or_volume", amount, amount)
             .willRespondWith()
