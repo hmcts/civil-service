@@ -8,30 +8,24 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @FeignClient(name = "location-ref-data-api", url = "${location.api.baseUrl}")
 public interface LocationReferenceDataApiClient {
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByName(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
         @RequestParam("court_venue_name") final String courtVenueName
     );
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByEpimmsId(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
         @RequestParam("epimms_id") final String epimmsId
     );
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByEpimmsIdAndType(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
@@ -39,8 +33,7 @@ public interface LocationReferenceDataApiClient {
         @RequestParam("court_type_id") final String courtTypeId
     );
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByLocationCode(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
@@ -50,8 +43,7 @@ public interface LocationReferenceDataApiClient {
         @RequestParam("court_status") final String courtStatus
     );
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getHearingVenue(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
@@ -60,8 +52,7 @@ public interface LocationReferenceDataApiClient {
         @RequestParam("location_type") final String locationType
     );
 
-    @GetMapping(value = "/refdata/location/court-venues",
-        headers = CONTENT_TYPE + "=" + APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenue(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
