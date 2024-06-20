@@ -81,7 +81,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
         void shouldNotifyApplicant_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicant2RespondToDefenceAndProceed_2v1()
                 .applicant1Represented(NO)
-            .build();
+                .build();
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
