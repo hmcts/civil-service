@@ -86,7 +86,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getChannel()).thenReturn("default");
         when(feesConfiguration.getHearingEvent()).thenReturn("hearing");
         when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
+        when(feesConfiguration.getJurisdiction2Hearing()).thenReturn("civil");
         when(feesConfiguration.getFastTrackHrgKey()).thenReturn("FastTrackHrgKey");
         // Given
         given(feesApiClient.lookupFeeWithAmount(
