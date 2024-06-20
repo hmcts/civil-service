@@ -167,7 +167,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT_RECIPIENT("Scenario.AAA6.CP.ReviewOrderRequestedbyRecipient.Claimant"),
     SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT_RECIPIENT("Scenario.AAA6.CP.ReviewOrderRequestedbyRecipient.Defendant"),
     SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
-    SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant");
+    SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant"),
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Delete.Claimant"),
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Delete.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.Claimant");
 
     private final String scenario;
 
