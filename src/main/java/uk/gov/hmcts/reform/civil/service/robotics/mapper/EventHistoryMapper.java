@@ -94,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -242,6 +243,9 @@ public class EventHistoryMapper {
                         break;
                     case IN_MEDIATION:
                         buildClaimInMediation(builder, caseData);
+                        break;
+                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC:
+                        buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:
                         break;
@@ -2383,6 +2387,19 @@ public class EventHistoryMapper {
                     false
                 ));
         }
+    }
+
+    private void buildTakenOfflineDueToDefendantNoc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getTakenOfflineDate())
+                .eventDetailsText("RPA Reason : Notice of Change filed.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason : Notice of Change filed.")
+                                  .build())
+                .build());
     }
 
     private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
