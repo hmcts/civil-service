@@ -248,4 +248,23 @@ class FeatureToggleServiceTest {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
+        var cuiReKey = "cuiReleaseTwoEnabled";
+        var dashboardKey = "is-dashboard-enabled-for-case";
+        givenToggle(cuiReKey, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+
+        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
 }

@@ -135,6 +135,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
+            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 }
