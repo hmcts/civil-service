@@ -2499,8 +2499,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " Digital Portal with the particulars of claim");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").doesNotHaveToString("date1");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
-                .isEqualTo("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                               + "and uploaded to the Digital Portal by 4pm on");
+                .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
+                               "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
@@ -2508,7 +2508,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
-                .isEqualTo("and uploaded to the Digital Portal by");
+                .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
                 .isEqualTo(nextWorkingDayDate.toString());
 
