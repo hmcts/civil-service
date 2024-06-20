@@ -93,8 +93,6 @@ public class HearingFormGeneratorTest {
     FeatureToggleService featureToggleService;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private CourtLocationUtils courtLocationUtils;
     @Autowired
     private HearingFormGenerator generator;
     @MockBean

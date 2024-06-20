@@ -27,7 +27,7 @@ public class DocumentHearingLocationHelperTest {
 
     @Autowired
     private DocumentHearingLocationHelper hearingLocationHelper;
-    @Mock
+    @MockBean
     private LocationReferenceDataService locationRefDataService;
 
     @Test
