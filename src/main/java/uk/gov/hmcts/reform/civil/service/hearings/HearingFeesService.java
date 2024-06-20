@@ -44,7 +44,7 @@ public class HearingFeesService {
             .channel(feesConfiguration.getChannel())
             .event(feesConfiguration.getHearingEvent())
             .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2())
+            .jurisdiction2(feesConfiguration.getJurisdiction2Hearing())
             .service(feesConfiguration.getService())
             .keyword(feesConfiguration.getFastTrackHrgKey())
             .amount(amount).build();
