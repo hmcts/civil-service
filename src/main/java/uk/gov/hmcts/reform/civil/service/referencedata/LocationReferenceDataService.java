@@ -151,7 +151,7 @@ public class LocationReferenceDataService {
             List<LocationRefData> responseEntity =
                 locationReferenceDataApiClient.getHearingVenue(
                     authTokenGenerator.generate(),
-                    authToken, "Y", "Y", "Court"
+                    authToken, "Y", "10", "Court"
                 );
             return responseEntity;
         } catch (Exception e) {
@@ -227,5 +227,4 @@ public class LocationReferenceDataService {
         return filteredLocations.get(0);
 
     }
-
 }
