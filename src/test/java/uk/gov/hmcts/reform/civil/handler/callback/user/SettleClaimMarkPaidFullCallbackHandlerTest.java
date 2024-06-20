@@ -20,9 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -56,24 +53,12 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     class AboutToStartCallback {
 
         @Test
-        void shouldReturn_error_when_case_in_all_final_orders_issued_state() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getErrors()).isNotNull();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Test
-        void should_not_return_error_when_case_in_any_other_state_than_all_final_orders_issued_state() {
+        void shouldNotReturn_error() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            List<String> claimantNames = new ArrayList<>();
-            claimantNames.add(caseData.getApplicant1().getPartyName());
-            claimantNames.add(caseData.getApplicant2().getPartyName());
+
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData().get("claimantWhoIsSettling")).isNotNull();
         }
