@@ -2508,7 +2508,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
-                .isEqualTo("and uploaded to the Digital Portal by");
+                .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
                 .isEqualTo(nextWorkingDayDate.toString());
 
