@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -639,5 +640,27 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION);
+    }
+
+    @Test
+    void given_responseAdmitPayImmediately_whenGetStatus_thenReturnResponeByPost() {
+        CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now())
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).previousCCDState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                updatedClaim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+    }
+
+    @Test
+    void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnResponeByPost() {
+        CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        DashboardClaimStatus status =
+                ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(updatedClaim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
 }

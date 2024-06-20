@@ -25,7 +25,7 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
-        List<Element<Party>> defendants = new ArrayList<Element<Party>>();
+        List<Element<Party>> defendants = new ArrayList<>();
         defendants.add(element(caseData.getRespondent1()));
         if (caseData.isMultiPartyDefendant()) {
             defendants.add(element(caseData.getRespondent2()));

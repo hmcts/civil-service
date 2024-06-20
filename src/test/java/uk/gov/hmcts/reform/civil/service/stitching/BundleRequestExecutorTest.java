@@ -7,13 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -26,14 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class BundleRequestExecutorTest {
 
     @Mock
-    RestTemplate restTemplate;
+    EvidenceManagementApiClient evidenceManagementApiClient;
     @Mock
     AuthTokenGenerator serviceAuthTokenGenerator;
     @Mock
@@ -43,8 +41,12 @@ class BundleRequestExecutorTest {
 
     @BeforeEach
     void setup() {
-        bundleRequestExecutor = new BundleRequestExecutor(restTemplate, serviceAuthTokenGenerator, caseDetailsConverter,
-                                                          new ObjectMapper());
+        bundleRequestExecutor = new BundleRequestExecutor(
+            evidenceManagementApiClient,
+            serviceAuthTokenGenerator,
+            caseDetailsConverter,
+            new ObjectMapper()
+        );
     }
 
     @Test
@@ -55,7 +57,7 @@ class BundleRequestExecutorTest {
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
         ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.OK);
         given(caseDetailsConverter.toCaseData(responseCaseDetails)).willReturn(expectedCaseData);
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willReturn(responseEntity);
 
         // When
@@ -74,10 +76,11 @@ class BundleRequestExecutorTest {
             + "[\"Stitching failed: prl-ccd-definitions-pr-662-cdam executing GET "
             + "http://prl-ccd-definitions-pr-662-cdam/cases/documents/5ce8143a-9a0a-45f2-9735-6b6f9236e4d3/binary\"],"
             + "\"warnings\":[],\"documentTaskId\":0}";
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willThrow(new RestClientResponseException("random exception", 500, "Internal server error",
                                                        HttpHeaders.EMPTY, errorData.getBytes(),
-                                                       Charset.defaultCharset()));
+                                                       Charset.defaultCharset()
+            ));
         BundleRequest request = BundleRequest.builder().build();
 
         RetryableStitchingException exception = assertThrows(
@@ -93,9 +96,11 @@ class BundleRequestExecutorTest {
         // Given
         String endpoint = "some url";
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
-        ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails,
-                                                                          HttpStatus.NOT_ACCEPTABLE);
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+        ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(
+            responseCaseDetails,
+            HttpStatus.NOT_ACCEPTABLE
+        );
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willReturn(responseEntity);
 
         // When
