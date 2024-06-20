@@ -503,7 +503,7 @@ public class FlowPredicate {
         getPredicateForClaimantIntentionNotProceed(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getTakenOfflineDate() != null && caseData.getChangeOfRepresentation() == null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getDrawDirectionsOrderRequired() != null
