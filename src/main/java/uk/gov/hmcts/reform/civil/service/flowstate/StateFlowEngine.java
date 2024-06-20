@@ -213,7 +213,7 @@ public class StateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
-                  })
+                })
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
                             .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
@@ -227,7 +227,7 @@ public class StateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
-                    })
+                })
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedOneUnrepresentedDefendantOnly)
@@ -274,7 +274,7 @@ public class StateFlowEngine {
                     flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
                     flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
                     flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
-                    })
+                })
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
