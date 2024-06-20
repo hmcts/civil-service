@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -220,7 +221,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isNull();
+        assertNull(response.getErrors());
     }
 
     public Boolean checkGAExitsWithBusinessProcessReady(Element<GeneralApplication> generalApplication) {
