@@ -3,10 +3,10 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.ReconDecisionMade.Claimant',
-        '{"Notice.AAA6.CP.ReviewOrderRequested.Recipient", "Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient"}',
+        '{"Notice.AAA6.CP.ReviewOrderRequested.Recipient.Claimant", "Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Claimant"}',
         '{"Notice.AAA6.CP.ReconDecisionMade.Claimant": []}'),
        ('Scenario.AAA6.CP.ReconDecisionMade.Defendant',
-        '{"Notice.AAA6.CP.ReviewOrderRequested.Recipient", "Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient"}',
+        '{"Notice.AAA6.CP.ReviewOrderRequested.Recipient.Defendant", "Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant"}',
         '{"Notice.AAA6.CP.ReconDecisionMade.Defendant": []}');
 
 /**
