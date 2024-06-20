@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.CourtOfficerOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -75,7 +75,7 @@ public class CourtOfficerOrderGenerator implements TemplateDataGenerator<CourtOf
         return courtOfficerOrderBuilder.build();
     }
 
-    private String getHearingLocationText(CaseData caseData, String authorisation) {
+    private String getHearingLocationText(CaseData caseData) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
             : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
     }

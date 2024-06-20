@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -616,7 +616,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-    private String getHearingLocationText(CaseData caseData, String authorisation) {
+    private String getHearingLocationText(CaseData caseData) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
             : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
     }
