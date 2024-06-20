@@ -107,11 +107,11 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             jsonPath("$[0].titleEn").value(
                 "You requested a County Court Judgment against Mr. Sole Trader"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>.<br>When we've processed the request, we'll post a copy of the judgment to you.</p>"),
+                "<p class=\"govuk-body\">You rejected the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>. When we've processed the request, we'll post a copy of the judgment to you.</p>"),
             jsonPath("$[0].titleCy").value(
                 "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader"),
             jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Rydych wedi gwrthod y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>." +
-                                                     "<br>Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
+                                                     " Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>")
         );
     }
 }
