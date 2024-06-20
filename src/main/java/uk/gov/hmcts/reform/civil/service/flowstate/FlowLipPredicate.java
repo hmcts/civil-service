@@ -39,4 +39,6 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> isDefendantNotPaidFullDefenceClaim =
         CaseData::isFullDefenceNotPaid;
 
+    public static final Predicate<CaseData> nocSubmittedForLiPDefendant = CaseData::nocApplyForLiPDefendant;
+
 }

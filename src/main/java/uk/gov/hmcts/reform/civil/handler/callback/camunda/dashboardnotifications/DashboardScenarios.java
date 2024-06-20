@@ -161,7 +161,10 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT("Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Claimant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
-    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE("Scenario.AAA6.CP.SDOMadebyLA.Delete");
+    SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE("Scenario.AAA6.CP.SDOMadebyLA.Delete"),
+    SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
+    SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.Claimant");
 
     private final String scenario;
 
