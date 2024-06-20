@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import uk.gov.hmcts.reform.fees.client.health.InternalHealth;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
@@ -13,9 +12,6 @@ import java.math.BigDecimal;
 public interface FeesApiClient {
 
     String baseUrl = "/fees-register/fees";
-
-    @GetMapping("/health")
-    InternalHealth health();
 
     @GetMapping(baseUrl + "/lookup"
         + "?service={service}"
