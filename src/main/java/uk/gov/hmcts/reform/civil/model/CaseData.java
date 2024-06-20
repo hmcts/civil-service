@@ -1491,4 +1491,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return hasApplicant1CourtDecisionInFavourOfClaimant()
                 && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
     }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPDefendant() {
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+    }
 }
