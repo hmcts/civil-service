@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
@@ -189,6 +190,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -305,63 +307,64 @@ public class StateFlowEngine {
                             FlowFlag.LIP_CASE.name(), false,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
                         )))
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant)))
                     .set(flags -> flags.putAll(
                         Map.of(
                             FlowFlag.LIP_CASE.name(), true,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )))
+                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
                 .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-            // Unrepresented
-            // 1. Both def1 and def2 unrepresented
-            // 2. Def1 unrepresented, Def2 registered
-            // 3. Def1 registered, Def 2 unrepresented
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
-                        .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                        .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
-                        .and(not(specClaim))
-                        .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                                                   .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                                                   .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-                                .and(specClaim)))
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-            })
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-            })
-            // Unregistered
-            // 1. Both def1 and def2 unregistered
-            // 2. Def1 unregistered, Def2 registered
-            // 3. Def1 registered, Def 2 unregistered
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
-                ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                    .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                            .and(bothDefSameLegalRep.negate())
-                    )
-            )
-            // Unrepresented and Unregistered
-            // 1. Def1 unrepresented, Def2 unregistered
-            // 2. Def1 unregistered, Def 2 unrepresented
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
-                (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
-                            .and(respondent2NotRepresented)))
+                // Unrepresented
+                // 1. Both def1 and def2 unrepresented
+                // 2. Def1 unrepresented, Def2 registered
+                // 3. Def1 registered, Def 2 unrepresented
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+                .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
+                            .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                            .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
+                            .and(not(specClaim))
+                            .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
+                                                       .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                                                       .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
+                                    .and(specClaim)))
+                .set(flags -> {
+                    if (featureToggleService.isPinInPostEnabled()) {
+                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                    }
+                })
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
+                .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
+                .set(flags -> {
+                    if (featureToggleService.isPinInPostEnabled()) {
+                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                    }
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                })
+                // Unregistered
+                // 1. Both def1 and def2 unregistered
+                // 2. Def1 unregistered, Def2 registered
+                // 3. Def1 registered, Def 2 unregistered
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
+                    ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                        .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                                .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                        .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                                .and(bothDefSameLegalRep.negate())
+                        )
+                )
+                // Unrepresented and Unregistered
+                // 1. Def1 unrepresented, Def2 unregistered
+                // 2. Def1 unregistered, Def 2 unrepresented
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
+                    (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                        .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
+                                .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -523,43 +526,43 @@ public class StateFlowEngine {
                                                        .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-            })
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                    flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                })
+                    .transitionTo(FULL_DEFENCE_PROCEED)
+                .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                            .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+                    flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                        .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
-                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
-                        .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
-            })
-            .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
-            .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
-            .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(applicantOutOfTime)
+                .onlyIf(fullDefenceProceed.and(isCarmApplicableLipCase.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                             .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                    flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                })
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
+                            .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                    flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+                })
+                .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantSettleTheClaim.and(not(agreedToMediation)))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                    flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
+                })
+                .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
+                .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
+                        .onlyIf(applicantOutOfTime)
             .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
@@ -593,10 +596,10 @@ public class StateFlowEngine {
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(not(takenOfflineByStaff)))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)))
-            .set((c, flags) -> {
-                flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-            })
+                .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.SDO_ENABLED.name(), JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                })
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)
@@ -674,6 +677,7 @@ public class StateFlowEngine {
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
+            .state(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC)
             .build();
     }
 
