@@ -10,8 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +27,8 @@ public class DocumentHearingLocationHelperTest {
 
     @Autowired
     private DocumentHearingLocationHelper hearingLocationHelper;
-    @MockBean
-    private LocationRefDataService locationRefDataService;
+    @Mock
+    private LocationReferenceDataService locationRefDataService;
 
     @Test
     void whenFormDefined_thenReturnForm() {

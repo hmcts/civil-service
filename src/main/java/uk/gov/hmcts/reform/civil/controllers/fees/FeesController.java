@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
-import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 
 import java.math.BigDecimal;
 import java.util.List;

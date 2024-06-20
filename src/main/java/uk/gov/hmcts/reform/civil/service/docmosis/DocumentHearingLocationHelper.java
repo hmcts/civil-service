@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +22,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @Slf4j
 public class DocumentHearingLocationHelper {
 
-    private final LocationRefDataService locationRefDataService;
     @Value("${court-location.unspecified-claim.epimms-id}")
     public String ccmccEpimmId;
     @Value("${court-location.specified-claim.epimms-id}")
     public String cnbcEpimmId;
+    private final LocationReferenceDataService locationRefDataService;
 
     public LocationRefData getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
         if (StringUtils.isNotBlank(valueFromForm)) {
@@ -55,14 +55,14 @@ public class DocumentHearingLocationHelper {
                     return null;
                 } else if (sameLocation.size() == 1) {
                     log.info("Claim " + caseData.getLegacyCaseReference()
-                                 + " found one matching location: " + LocationRefDataService.getDisplayEntry(
+                                 + " found one matching location: " + LocationReferenceDataService.getDisplayEntry(
                         sameLocation.get(0)));
                     return sameLocation.get(0);
                 } else {
                     log.info("Claim " + caseData.getLegacyCaseReference() +
                                  "found " + sameLocation.size() + " locations with same epimmsId and region "
                                  + baseLocation + "/" + caseData.getCaseManagementLocation().getRegion()
-                                 + ": " + sameLocation.stream().map(LocationRefDataService::getDisplayEntry)
+                                 + ": " + sameLocation.stream().map(LocationReferenceDataService::getDisplayEntry)
                         .collect(Collectors.joining(", ")));
                     return sameLocation.get(0);
                 }
