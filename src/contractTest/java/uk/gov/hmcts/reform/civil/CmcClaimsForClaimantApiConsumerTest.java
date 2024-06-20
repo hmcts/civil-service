@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.cmc.model.ClaimState.OPEN;
 
 @PactTestFor(providerName = "cmc_claimant")
 @MockServerConfig(hostInterface = "localhost", port = "8765")
-public class CmcClaimantApiConsumerTest extends BaseContractTest {
+public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/claims/claimant/";
     private static final String SUBMITTER_ID_SUFFIX = "${submitterId}";
@@ -119,7 +119,7 @@ public class CmcClaimantApiConsumerTest extends BaseContractTest {
                 .booleanType("moreTimeRequested")
                 .stringType("submitterEmail", "submitterEmail")
                 .object("response", response1 -> response1
-                    .stringType("responseType", "responseType")
+                    .stringType("responseType", "FULL_DEFENCE")
                     .object("paymentIntention", paymentIntention ->
                         paymentIntention
                             .stringType("paymentOption", "IMMEDIATELY")
@@ -128,7 +128,7 @@ public class CmcClaimantApiConsumerTest extends BaseContractTest {
                         paymentDeclaration
                             .date("paidDate", "yyyy-MM-dd")
                             .numberType("paidAmount", 10.0))
-                    .stringType("responseMethod", "responseMethod"))
+                    .stringType("responseMethod", "OFFLINE"))
                 .date("moneyReceivedOn", "yyyy-MM-dd")
                 .date("countyCourtJudgmentRequestedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .date("createdAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -146,15 +146,15 @@ public class CmcClaimantApiConsumerTest extends BaseContractTest {
                             courtDetermination
                                 .object("courtDecision", courtDecision ->
                                     courtDecision
-                                        .stringType("paymentOption", "paymentOption")
+                                        .stringType("paymentOption", "IMMEDIATELY")
                                         .date("paymentDate", "yyyy-MM-dd"))
                                 .object("courtPaymentIntention", courtDecision ->
                                     courtDecision
-                                        .stringType("paymentOption", "paymentOption")
+                                        .stringType("paymentOption", "IMMEDIATELY")
                                         .date("paymentDate", "yyyy-MM-dd"))
                                 .stringType("rejectionReason", "rejectionReason")
                                 .numberType("disposableIncome", 30.0))
-                        .stringType("formaliseOption", "Settlement"))
+                        .stringType("formaliseOption", "SETTLEMENT"))
                 .stringType("state", "OPEN")
                 .stringType("proceedOfflineReason", "OTHER")
                 .object("settlement", settlement ->
@@ -169,7 +169,7 @@ public class CmcClaimantApiConsumerTest extends BaseContractTest {
                                         .date("completionDate", "yyyy-MM-dd")
                                         .object("paymentIntention", paymentIntention ->
                                             paymentIntention
-                                                .stringType("paymentOption", "paymentOption")
+                                                .stringType("paymentOption", "IMMEDIATELY")
                                                 .date("paymentDate", "yyyy-MM-dd")))))
             )).build();
     }

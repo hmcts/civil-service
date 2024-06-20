@@ -34,7 +34,6 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
     @Autowired
     private EvidenceManagementApiClient evidenceManagementApiClient;
 
-
     @Pact(consumer = "civil-service")
     public RequestResponsePact postStitchBundleServiceRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
@@ -61,7 +60,7 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
     private RequestResponsePact buildStitchBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
             .given("There are documents to be bundled")
-            .uponReceiving("a new bundle request")
+            .uponReceiving("a stitch bundle request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)

@@ -114,7 +114,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-
     @Test
     @PactTestFor(pactMethod = "getFeeForMoneyClaimWithoutKeyword")
     public void verifyFeeForMoneyClaimWithoutKeyword() {
