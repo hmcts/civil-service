@@ -926,7 +926,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)))
             .input3("The answers to the questions shall be answered by the Expert by")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)))
-            .input4("and uploaded to the Digital Portal by")
+            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
             .build();
 
