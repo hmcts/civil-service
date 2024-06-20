@@ -19,10 +19,10 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -49,7 +49,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(COURT_OFFICER_ORDER);
 
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final WorkingDayIndicator workingDayIndicator;
     private final DocumentHearingLocationHelper locationHelper;
