@@ -54,9 +54,8 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -106,9 +105,7 @@ public class HearingValuesServiceTest {
     @Mock
     private OrganisationService organisationService;
     @Mock
-    private CaseFlagsInitialiser caseFlagsInitialiser;
-    @Mock
-    private FeatureToggleService featureToggleService;
+    private EarlyAdoptersService earlyAdoptersService;
     @Autowired
     private ObjectMapper mapper;
 
@@ -125,8 +122,7 @@ public class HearingValuesServiceTest {
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+        when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
     }
 
     @Test
@@ -522,7 +518,7 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
                 hearingValuesService.getValues(caseId, "8AB87C89", "auth");
             });
@@ -550,7 +546,7 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
         }
 
@@ -578,7 +574,7 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
                 hearingValuesService.getValues(caseId, "8AB87C89", "auth");
             });
@@ -607,7 +603,7 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+            when(earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
         }
     }
