@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
@@ -81,7 +81,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final ObjectMapper objectMapper;
     private final Time time;
     private final FeatureToggleService featureToggleService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
@@ -384,29 +384,31 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
+    static final String CLAIMANT = "Claimant";
+
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant2())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, "Claimant",
+                buildElemCaseDocument(claimDocument, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getApplicant1DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, CLAIMANT,
                                       updatedCaseData.build().getApplicant1ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getApplicant2DQ())
             .map(Applicant2DQ::getApplicant2DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, "Claimant",
+                buildElemCaseDocument(document, CLAIMANT,
                                       updatedCaseData.build().getApplicant2ResponseDate(),
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
@@ -444,8 +446,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     break;
                 }
                 // FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
                 // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {

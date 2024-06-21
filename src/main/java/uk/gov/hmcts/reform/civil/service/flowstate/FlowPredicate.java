@@ -503,7 +503,7 @@ public class FlowPredicate {
         getPredicateForClaimantIntentionNotProceed(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getTakenOfflineDate() != null && caseData.getChangeOfRepresentation() == null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getDrawDirectionsOrderRequired() != null
@@ -733,7 +733,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
-            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+            && caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now());
 
     public static final Predicate<CaseData> demageMultiClaim = caseData ->
         AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
