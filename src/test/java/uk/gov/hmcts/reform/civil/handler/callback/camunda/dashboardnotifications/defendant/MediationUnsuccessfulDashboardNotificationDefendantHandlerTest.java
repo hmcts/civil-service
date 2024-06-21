@@ -74,7 +74,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotifications() {
+        void createDashboardNotifications() {
             params.put("ccdCaseReference", "123");
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -101,7 +101,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
@@ -135,7 +135,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 

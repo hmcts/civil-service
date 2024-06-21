@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
     CreateSDORespondent2LRNotificationSender.class,
     CreateSDORespondent2LiPNotificationSender.class
 })
-public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
+class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;

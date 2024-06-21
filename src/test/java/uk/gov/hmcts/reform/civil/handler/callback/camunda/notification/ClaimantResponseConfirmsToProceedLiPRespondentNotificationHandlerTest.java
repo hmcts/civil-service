@@ -85,7 +85,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService).sendMail(
                 RESPONDENT_EMAIL_ID,
                 RESPONDENT_EMAIL_TEMPLATE,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
         }
@@ -103,7 +103,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 RESPONDENT_EMAIL_ID,
                 RESPONDENT_EMAIL_TEMPLATE,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
         }
@@ -154,19 +154,19 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
-                getNotificationDataMapCarm(caseData),
+                getNotificationDataMapCarm(),
                 REFERENCE_NUMBER
             );
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONDENT_NAME, DEFENDANT
             );
         }
 
-        private Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapCarm() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name"

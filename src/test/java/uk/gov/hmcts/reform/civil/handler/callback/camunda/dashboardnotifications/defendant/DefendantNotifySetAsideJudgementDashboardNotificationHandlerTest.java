@@ -95,7 +95,7 @@ public class DefendantNotifySetAsideJudgementDashboardNotificationHandlerTest ex
     }
 
     @Test
-    public void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiP() {
+    void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiP() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);

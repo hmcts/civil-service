@@ -144,7 +144,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
         }
 
         @Test
-        public void configureDashboardNotificationsForClaimantResponseCCJ() {
+        void configureDashboardNotificationsForClaimantResponseCCJ() {
 
             HashMap<String, Object> params = new HashMap<>();
 
