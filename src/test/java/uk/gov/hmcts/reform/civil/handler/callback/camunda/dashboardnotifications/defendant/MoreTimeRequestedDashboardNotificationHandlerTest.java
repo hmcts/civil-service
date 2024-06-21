@@ -61,7 +61,7 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void createDashboardNotifications() {
 
         params.put("ccdCaseReference", "123");
 

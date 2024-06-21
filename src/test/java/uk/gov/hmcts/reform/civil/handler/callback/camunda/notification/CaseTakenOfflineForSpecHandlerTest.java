@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Ca
 @SpringBootTest(classes = {
     CaseTakenOfflineForSpecApplicantNotificationHandler.class
 })
-public class CaseTakenOfflineForSpecHandlerTest {
+class CaseTakenOfflineForSpecHandlerTest {
 
     @Autowired
     private CaseTakenOfflineForSpecApplicantNotificationHandler handler;

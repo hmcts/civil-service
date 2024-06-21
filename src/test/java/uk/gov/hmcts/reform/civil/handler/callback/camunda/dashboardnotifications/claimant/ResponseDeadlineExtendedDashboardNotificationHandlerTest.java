@@ -58,7 +58,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTime() {
+    void configureDashboardNotificationsForDefendantRequestMoreTime() {
 
         HashMap<String, Object> params = new HashMap<>();
 

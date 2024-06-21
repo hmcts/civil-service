@@ -71,12 +71,12 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "failed-payment-applicant-notification-000DC001"
             );
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
@@ -95,7 +95,7 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "failed-payment-applicant-notification-000DC001"
             );
         }
