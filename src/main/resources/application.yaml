@@ -654,7 +654,7 @@ cmc-claim-store:
 
 fees:
   api:
-    url: http://localhost:6661
+    url: http://localhost:6665
 
 genApp:
   lrd:
