@@ -89,7 +89,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponse() {
+    void configureDashboardNotificationsForClaimantResponse() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -118,7 +118,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponseForPartAdmitImmediately() {
+    void configureDashboardNotificationsForClaimantResponseForPartAdmitImmediately() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -149,7 +149,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantNoMediationFullDefenceClaimantProceed() {
+    void configureDashboardNotificationsForDefendantNoMediationFullDefenceClaimantProceed() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -179,7 +179,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
+    void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -215,7 +215,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
+    void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -248,7 +248,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantPartAdmitHearing() {
+    void configureDashboardNotificationsForDefendantPartAdmitHearing() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -278,7 +278,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceClaimantProceed() {
+    void configureDashboardNotificationsForDefendantFullDefenceClaimantProceed() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -307,7 +307,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
+    void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -341,7 +341,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
+    void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -375,7 +375,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantPartAdmitNotPaidAmount() {
+    void configureDashboardNotificationsForDefendantPartAdmitNotPaidAmount() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -404,7 +404,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceNotPaidAmount() {
+    void configureDashboardNotificationsForDefendantFullDefenceNotPaidAmount() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -435,7 +435,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceClaimantRejectMediation() {
+    void configureDashboardNotificationsForDefendantFullDefenceClaimantRejectMediation() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -468,7 +468,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantMediation() {
+    void configureDashboardNotificationsForDefendantMediation() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
