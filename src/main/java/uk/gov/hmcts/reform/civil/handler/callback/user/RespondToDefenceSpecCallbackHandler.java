@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -48,6 +47,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
@@ -113,13 +113,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final UnavailableDateValidator unavailableDateValidator;
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private static final String datePattern = "dd MMMM yyyy";
+    private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
@@ -526,7 +526,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -705,18 +705,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondToAdmittedClaim() != null
             && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
             return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return deadlineCalculatorService.calculateExtendedDeadline(
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         return null;
     }
@@ -767,8 +767,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             errors.add("Enter a valid amount for equal instalments");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
             1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));

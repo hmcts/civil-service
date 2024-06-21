@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -22,6 +24,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HearingFeeUnpaidClaimantNotificationHandler handler;
+
+    @BeforeEach
+    public void before() {
+        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+    }
 
     @Test
     void should_create_hearing_fee_unpaid_scenario() throws Exception {
@@ -50,12 +58,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -95,12 +103,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -138,12 +146,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
