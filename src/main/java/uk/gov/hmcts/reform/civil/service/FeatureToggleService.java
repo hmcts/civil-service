@@ -137,6 +137,7 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+    }
 
     public boolean isNationalRolloutEnabled() {
         return featureToggleApi.isFeatureEnabled("enable-national-rollout");
