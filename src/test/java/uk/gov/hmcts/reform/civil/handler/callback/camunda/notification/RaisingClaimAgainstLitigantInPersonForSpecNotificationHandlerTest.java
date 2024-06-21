@@ -13,13 +13,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
-public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
+class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
 
     @InjectMocks
     private RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler handler;
 
     @Test
-    public void addProperties() {
+    void addProperties() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .build();
