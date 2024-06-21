@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.citizen.events;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,8 @@ public class CaseEventService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
+    @Value("${caseFlags.logging.enabled:false}")
+    private boolean caseFlagsLoggingEnabled;
 
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
         return coreCaseDataApi.startEventForCitizen(
@@ -62,13 +63,13 @@ public class CaseEventService {
             params.getCaseId(),
             params.getEvent()
         );
-        if (featureToggleService.isSpecificEnvLogsEnabled()) {
+        if (caseFlagsLoggingEnabled) {
             CaseData caseData = caseDetailsConverter.toCaseData(eventResponse.getCaseDetails().getData());
             Flags respondentFlags = caseData.getRespondent1().getFlags();
             log.info("caseid: {}, respondent flags before civil commons call: {}", params.getCaseId(), respondentFlags);
         }
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
-        if (featureToggleService.isSpecificEnvLogsEnabled()) {
+        if (caseFlagsLoggingEnabled) {
             var payload = new HashMap((Map) caseDataContent.getData());
             var respondent1 = new HashMap((Map) payload.get("respondent1"));
             log.info(
