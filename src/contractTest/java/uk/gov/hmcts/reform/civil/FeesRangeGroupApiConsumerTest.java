@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.FeesLookupApiConsumerTest.JURISDICTION_C
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 
 @PactTestFor(providerName = "feeRegister_rangeGroup")
-@MockServerConfig(hostInterface = "localhost", port = "6666")
+@MockServerConfig(hostInterface = "localhost", port = "6661")
 public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/fees-register/fees";

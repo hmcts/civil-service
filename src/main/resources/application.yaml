@@ -648,15 +648,23 @@ management:
   endpoints:
     enabled-by-default: false
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 fees:
   api:
-    url: ${FEES_API_URL:http://localhost:6666}
+    url: http://localhost:6661
 
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
   jrd:
     url: http://fake-rd-judicial-api
+
+bundle:
+  api:
+    url: http://localhost:8084
 
 payments:
   api:
@@ -684,7 +692,7 @@ document_management:
 
 docmosis:
   tornado:
-    url: http://localhost:6666
+    url: http://localhost:6663
     key: fake-key
 
 notifications:

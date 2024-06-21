@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "docmosis_render")
-@MockServerConfig(hostInterface = "localhost", port = "6666")
+@MockServerConfig(hostInterface = "localhost", port = "6663")
 public class DocmosisApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/rs/render";
