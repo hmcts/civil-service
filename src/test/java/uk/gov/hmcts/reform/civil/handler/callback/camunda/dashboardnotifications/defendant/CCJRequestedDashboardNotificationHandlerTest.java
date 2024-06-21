@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -69,7 +67,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotificationsCcjRequested() {
+    void createDashboardNotificationsCcjRequested() {
 
         params.put("ccdCaseReference", "123");
 
@@ -94,7 +92,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotificationsForBrokenSettlementAgreement() {
+    void createDashboardNotificationsForBrokenSettlementAgreement() {
 
         params.put("ccdCaseReference", "12376868");
 
@@ -126,7 +124,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotificationsCcjRequestedDefendantRejectedSettlementAgreement() {
+    void createDashboardNotificationsCcjRequestedDefendantRejectedSettlementAgreement() {
 
         params.put("ccdCaseReference", "123");
 
@@ -155,7 +153,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotificationsCcjRequestedDefendantNotRespondedToSettlementAgreement() {
+    void createDashboardNotificationsCcjRequestedDefendantNotRespondedToSettlementAgreement() {
 
         params.put("ccdCaseReference", "123");
 
