@@ -31,7 +31,7 @@ VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
         '<p class="govuk-body"><b>Gofynnwyd am adolygiad</b></p>' ||
         '<p class="govuk-body">Mae''r partïon eraill wedi gofyn am adolygiad o orchymyn. Gallwch <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">weld eu cais a/neu eu sylwadau</a>.</p>' ||
         '<p class="govuk-body">Bydd barnwr yn adolygu''r cais a''r sylwadau a chysylltir â chi os bydd y barnwr yn gwneud gorchymyn newydd. Parhewch i wneud yr hyn y mae''r gorchymyn presennol yn ei ofyn oni bai eich bod yn cael gwybod bod barnwr wedi gwneud gorchymyn newydd.</p>',
-        'DEFENDANT'),
+        'CLAIMANT'),
  ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Claimant',
   'Comment made on your request',
   'Sylwadau wedi’u gwnaed ar eich cais',
@@ -43,4 +43,5 @@ VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
   '<p class="govuk-body"><b>Gofynnwyd am adolygiad</b></p>' ||
   '<p class="govuk-body">Mae''r partïon eraill wedi gofyn am adolygiad o orchymyn. Gallwch <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">weld eu cais a/neu eu sylwadau</a>.</p>' ||
   '<p class="govuk-body">Bydd barnwr yn adolygu''r cais a''r sylwadau a chysylltir â chi os bydd y barnwr yn gwneud gorchymyn newydd. Parhewch i wneud yr hyn y mae''r gorchymyn presennol yn ei ofyn oni bai eich bod yn cael gwybod bod barnwr wedi gwneud gorchymyn newydd.</p>',
-  'CLAIMANT');
+  'DEFENDANT');
+
