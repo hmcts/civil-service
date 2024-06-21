@@ -66,6 +66,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (featureToggleService.isSpecificEnvLogsEnabled()) {
+            log.info(
+                "case id: {}, defendant response cui before about to start: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
+        }
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
@@ -75,6 +83,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        if (featureToggleService.isSpecificEnvLogsEnabled()) {
+            log.info(
+                "case id: {}, defendant response cui before about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                callbackParams.getCaseData().getRespondent1().getFlags()
+            );
+        }
+
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
@@ -106,6 +122,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
         if (!caseData.isRespondentResponseBilingual()) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
+
+        if (featureToggleService.isSpecificEnvLogsEnabled()) {
+            log.info(
+                "case id: {}, defendant response cui after about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
         }
 
         return responseBuilder.build();
