@@ -65,8 +65,10 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),
                 jsonPath("$[14].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[14].currentStatusEn").value("Not available yet"),
-                jsonPath("$[15].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[15].currentStatusEn").value("Not available yet")
+                jsonPath("$[15].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[15].currentStatusEn").value("Not available yet"),
+                jsonPath("$[16].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[16].currentStatusEn").value("Not available yet")
 
             );
 
