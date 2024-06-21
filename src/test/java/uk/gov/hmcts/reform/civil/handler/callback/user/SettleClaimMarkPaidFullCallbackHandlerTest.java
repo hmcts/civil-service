@@ -70,6 +70,19 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData().get("claimantWhoIsSettling")).isNotNull();
         }
+
+        @Test
+        void should_return_error_if_present() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            assertThat(response.getErrors()).isNotNull();
+        }
     }
 
     @Nested
