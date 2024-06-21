@@ -65,7 +65,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    public void createDashboardNotifications_smallClaims() {
+    void createDashboardNotifications_smallClaims() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -93,7 +93,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    public void createDashboardNotifications_fastTrack() {
+    void createDashboardNotifications_fastTrack() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
