@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.TrialArrangementsNotifyOtherPartyNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBaseIntegrationTest {
+public class TrialArrangementsNotifyOtherPartyScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
     @Autowired
     private TrialArrangementsNotifyOtherPartyNotificationHandler handler;
@@ -42,10 +42,10 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
                 jsonPath("$[0].titleCy").value("Mae'r parti arall wedi cadarnhau eu trefniadau treial"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You can <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">view the arrangements that they've confirmed.</a></p>"),
+                        "<p class=\"govuk-body\">You can <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">view the arrangements that they've confirmed</a>.</p>"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">weld y trefniadau y maent wedi'u cadarnhau.</a></p>")
+                        "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">weld y trefniadau y maent wedi'u cadarnhau</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
