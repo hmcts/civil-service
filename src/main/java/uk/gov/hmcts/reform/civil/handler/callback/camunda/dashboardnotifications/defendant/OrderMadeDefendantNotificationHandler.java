@@ -20,16 +20,9 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static java.util.Objects.isNull;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
@@ -39,7 +32,8 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                                                          CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+                                                          CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
+                                                          UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
 
     public OrderMadeDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -107,7 +101,12 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         if (isSDODrawnPreCPRelease()) {
             return SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
+
+        if (isFinalOrderIssued(callbackParams)){
+            return SCENARIO_AAA6_UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
+        }
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
+
     }
 
     private boolean hasUploadDocuments(CaseData caseData) {
@@ -126,6 +125,10 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
     }
 
+    private boolean isFinalOrderIssued(CallbackParams callbackParams) {
+            return UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS
+                .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
+    }
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
