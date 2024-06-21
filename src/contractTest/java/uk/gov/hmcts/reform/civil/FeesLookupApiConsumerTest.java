@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.MONEY_CLAIM;
 
 @PactTestFor(providerName = "feeRegister_lookUp")
-@MockServerConfig(hostInterface = "localhost", port = "6665")
+@MockServerConfig(hostInterface = "localhost", port = "6661")
 public class FeesLookupApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/fees-register/fees/lookup";
