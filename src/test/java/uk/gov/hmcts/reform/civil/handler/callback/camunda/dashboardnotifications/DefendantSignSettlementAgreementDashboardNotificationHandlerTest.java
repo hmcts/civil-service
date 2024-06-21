@@ -63,7 +63,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
     }
 
     @Test
-    public void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
+    void configureDashboardNotificationsDefendantRejectedSettlementAgreement() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -94,7 +94,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
     }
 
     @Test
-    public void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
+    void configureDashboardNotificationsDefendantAcceptedSettlementAgreement() {
 
         HashMap<String, Object> params = new HashMap<>();
 

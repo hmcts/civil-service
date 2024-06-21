@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -161,7 +161,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
+        void shouldRecordScenario_whenInvokedWhenCaseStateIsAwaitingApplicantIntentiondAndPartAdmit() {
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
@@ -174,7 +174,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(null)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build().toBuilder().ccdState(CaseState.CASE_SETTLED).build();
+                .build().toBuilder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();

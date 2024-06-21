@@ -3,13 +3,11 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -22,8 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentGeneratorService {
 
-    public static final String API_RENDER = "/rs/render";
-    private final RestTemplate restTemplate;
+    private final DocmosisApiClient docmosisApiClient;
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;
 
@@ -43,14 +40,10 @@ public class DocumentGeneratorService {
             .accessKey(configuration.getAccessKey())
             .build();
 
-        HttpEntity<DocmosisRequest> request = new HttpEntity<>(requestBody, headers);
-
         byte[] response;
 
         try {
-            response = restTemplate.exchange(configuration.getUrl() + API_RENDER,
-                                             HttpMethod.POST, request, byte[].class
-            ).getBody();
+            response = docmosisApiClient.createDocument(requestBody);
         } catch (HttpClientErrorException ex) {
             log.error("Docmosis document generation failed for " + ex.getMessage());
             throw ex;

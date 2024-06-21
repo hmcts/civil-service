@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_HEARING_NOTI
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
+class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -66,7 +66,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
     @MockBean
     private HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     private static Long CASE_ID = 1L;
     private static String HEARING_ID = "1234";
@@ -85,7 +85,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         .build();
 
     @Test
-    public void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData() {
+    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData() {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
@@ -146,14 +146,14 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         );
 
         CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
         assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
         assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
         assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 1, 1));
     }
 
     @Test
-    public void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData_BstHearingDate() {
+    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData_BstHearingDate() {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
@@ -220,7 +220,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         );
 
         CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
         assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
         assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
         assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 7, 1));

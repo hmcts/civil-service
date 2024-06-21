@@ -72,7 +72,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
+    void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);

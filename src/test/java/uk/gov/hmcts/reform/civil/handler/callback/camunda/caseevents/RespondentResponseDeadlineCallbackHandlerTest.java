@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
     DeadlinesCalculator.class,
     JacksonAutoConfiguration.class
 })
-public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackHandlerTest {
+class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RespondentResponseDeadlineCallbackHandler handler;
