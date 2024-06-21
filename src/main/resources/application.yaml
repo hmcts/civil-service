@@ -352,6 +352,7 @@ notifications:
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
