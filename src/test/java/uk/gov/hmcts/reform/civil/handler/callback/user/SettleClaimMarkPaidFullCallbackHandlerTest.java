@@ -37,7 +37,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
 
     @Autowired
     private ObjectMapper objectMapper;
-    public static final String PROCEED_HERITAGE_SYSTEM_NEXT_STEPS = """
+    public static final String REQUEST_BEING_REVIEWED_NEXT_STEPS = """
             ### Next step
 
              The case will now proceed offline and your online account will not be updated for this claim. Any updates will be sent by post.""";
@@ -47,7 +47,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
              Any hearing listed will be vacated.\s
 
              The defendants will be notified.""";
-    public static final String PROCEED_HERITAGE_SYSTEM_HEADER = "### Request is being reviewed";
+    public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
     public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
 
     @Test
@@ -143,7 +143,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void whenSubmitted_show_proceed_heritage_system_header_if_only_1_claimant_paid_full() {
+        void whenSubmitted_show_request_being_reviewed_header_if_only_1_claimant_paid_full() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(YesOrNo.NO);
@@ -158,8 +158,8 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             //Then
-            Assertions.assertTrue(response.getConfirmationHeader().contains(PROCEED_HERITAGE_SYSTEM_HEADER));
-            Assertions.assertTrue(response.getConfirmationBody().contains(PROCEED_HERITAGE_SYSTEM_NEXT_STEPS));
+            Assertions.assertTrue(response.getConfirmationHeader().contains(REQUEST_BEING_REVIEWED_HEADER));
+            Assertions.assertTrue(response.getConfirmationBody().contains(REQUEST_BEING_REVIEWED_NEXT_STEPS));
         }
     }
 }

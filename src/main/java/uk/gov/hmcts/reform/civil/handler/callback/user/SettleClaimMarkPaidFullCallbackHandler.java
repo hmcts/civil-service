@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM_MARK_PAID_FULL);
-    public static final String PROCEED_HERITAGE_SYSTEM_NEXT_STEPS = """
+    public static final String REQUEST_BEING_REVIEWED_NEXT_STEPS = """
             ### Next step
 
              The case will now proceed offline and your online account will not be updated for this claim. Any updates will be sent by post.""";
@@ -43,7 +43,7 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
              Any hearing listed will be vacated.\s
 
              The defendants will be notified.""";
-    public static final String PROCEED_HERITAGE_SYSTEM_HEADER = "### Request is being reviewed";
+    public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
     public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
     private final ObjectMapper objectMapper;
 
@@ -105,14 +105,14 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private static String getBody(CaseData caseData) {
         if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            return format(PROCEED_HERITAGE_SYSTEM_NEXT_STEPS);
+            return format(REQUEST_BEING_REVIEWED_NEXT_STEPS);
         }
         return format(CLOSED_NEXT_STEPS);
     }
 
     private static String getHeader(CaseData caseData) {
         if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            return format(PROCEED_HERITAGE_SYSTEM_HEADER);
+            return format(REQUEST_BEING_REVIEWED_HEADER);
         }
         return format(CLOSED_HEADER);
     }
