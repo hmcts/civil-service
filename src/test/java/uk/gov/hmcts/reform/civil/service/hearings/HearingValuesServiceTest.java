@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -104,6 +105,8 @@ public class HearingValuesServiceTest {
     private CategoryService categoryService;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private CaseFlagsInitialiser caseFlagsInitialiser;
     @Mock
     private EarlyAdoptersService earlyAdoptersService;
     @Autowired
