@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -101,7 +100,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         @ParameterizedTest
         @MethodSource("defendantTypeAndScenarioArguments")
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -142,7 +141,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
 
         @ParameterizedTest
         @MethodSource("defendantTypeAndScenarioArguments")
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -182,7 +181,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediatelyClaimant() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediatelyClaimant() {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -217,7 +216,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullDefencePaidPartialClaimant() {
+        void configureDashboardNotificationsForDefendantResponseForFullDefencePaidPartialClaimant() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -253,7 +252,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartialClaimant() {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitPaidPartialClaimant() {
             //given
             HashMap<String, Object> params = new HashMap<>();
             String caseId = "12345674";
@@ -288,7 +287,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallmentsClaimant() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallmentsClaimant() {
             //given
             HashMap<String, Object> params = new HashMap<>();
             String caseId = "12345675";
@@ -322,7 +321,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseFullDefenseFastTackForClaimant() {
+        void configureDashboardNotificationsForDefendantResponseFullDefenseFastTackForClaimant() {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -356,7 +355,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
+        void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -427,7 +426,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantResponseForFullAdmitFullPaidClaimant() {
+    void configureDashboardNotificationsForDefendantResponseForFullAdmitFullPaidClaimant() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -467,7 +466,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantResponseFullDefenceDisputeAllClaimantCarm() {
+    void configureDashboardNotificationsForDefendantResponseFullDefenceDisputeAllClaimantCarm() {
 
         HashMap<String, Object> params = new HashMap<>();
 
