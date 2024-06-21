@@ -66,7 +66,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     }
 
     @Test
-    public void createDashboardNotificationsWhenCarmIsEnabled() {
+    void createDashboardNotificationsWhenCarmIsEnabled() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
@@ -96,7 +96,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     }
 
     @Test
-    public void createDashboardNotificationsWhenCarmIsDisabled() {
+    void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
 
