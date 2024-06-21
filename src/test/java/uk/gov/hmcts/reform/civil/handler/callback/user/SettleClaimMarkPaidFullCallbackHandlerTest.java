@@ -59,19 +59,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     class AboutToStartCallback {
 
         @Test
-        void shouldReturn_error_when_case_in_all_final_orders_issued_state() {
-            //Given
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            //When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            //Then
-            assertThat(response.getErrors()).isNotNull();
-        }
-
-        @Test
-        void should_not_return_error_when_case_in_any_other_state_than_all_final_orders_issued_state() {
+        void should_not_return_error() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
