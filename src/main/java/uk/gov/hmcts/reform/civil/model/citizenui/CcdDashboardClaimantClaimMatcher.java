@@ -325,7 +325,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
+        return featureToggleService.isLipVLipEnabled()
             && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
