@@ -70,10 +70,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("dashboard-service");
     }
 
-    public boolean isSpecificEnvLogsEnabled() {
-        return featureToggleApi.isFeatureEnabled("specific-env-logs");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
