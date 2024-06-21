@@ -58,6 +58,10 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+docmosis:
+  tornado:
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:6666}
+
 hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}
@@ -82,6 +86,8 @@ send-letter:
 
 fees:
   api:
+    url: ${FEES_API_URL:http://localhost:6666}
+    endpoint: /fees-register/fees/lookup
     service: civil money claims
     jurisdiction1: civil
     jurisdiction2: county court
@@ -89,6 +95,15 @@ fees:
     channel: default
     event: issue
     hearingEvent: hearing
+    jurisdiction2Hearing: civil
+    keywords:
+      fastTrackHrg: FastTrackHrg
+      multiTrackHrg: MultiTrackHrg
+      smallClaimHrg: HearingSmallClaims
+
+location:
+  api:
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
 
 genApp:
   fee:
@@ -417,6 +432,7 @@ notifications:
   notifyDJNonDivergentSpecClaimantTemplate: "7c4be349-fe65-4e65-abed-802a81ba60d1"
   notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
   hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
+  notifySettleClaimMarkedPaidInFullDefendantTemplate: "6cbcd10e-c9ed-493e-a8f0-64ce85f236c9"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

@@ -35,9 +35,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDOApplicantsNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -166,8 +167,9 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
         @NotNull
         private Map<String, String> getNotificationDataMapLip() {
             return Map.of(
+                PARTY_NAME, "Mr. John Rambo",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIMANT_NAME, "Mr. John Rambo"
+                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
             );
         }
 
