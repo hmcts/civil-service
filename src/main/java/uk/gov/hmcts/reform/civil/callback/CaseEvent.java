@@ -466,7 +466,6 @@ public enum CaseEvent {
     GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT(CAMUNDA),
     CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC(CAMUNDA);
 
-
     private final UserType userType;
 
     CaseEvent(UserType userType) {
