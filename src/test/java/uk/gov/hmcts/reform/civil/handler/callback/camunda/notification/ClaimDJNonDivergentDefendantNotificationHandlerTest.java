@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
     JacksonAutoConfiguration.class
 })
 @Ignore
-public class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String TEMPLATE_ID = "template-id";
     private static final String TASK_ID_RESPONDENT1 = "NotifyDJNonDivergentDefendant1";
