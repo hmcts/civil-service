@@ -45,6 +45,11 @@ public class UserRoleInitialisationService {
     public void assignHearingRoles(String userAuth) {
         log.info("Attempting to assign hearing roles");
         String userId = userService.getUserInfo(userAuth).getUid();
+
+        //REMOVE!! Testing purposes only.
+        log.info("USER_ID: " + userId);
+        log.info("AUTH_TOKEN: " + userAuth);
+
         roleAssignmentService.assignUserRoles(
             userId,
             userAuth,
