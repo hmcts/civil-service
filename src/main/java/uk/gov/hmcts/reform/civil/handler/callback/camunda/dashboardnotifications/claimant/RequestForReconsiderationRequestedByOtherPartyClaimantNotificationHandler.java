@@ -18,7 +18,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT;
 
 /**
- * Defendant requested a reconsideration of the SDO, Claimant needs to be notified
+ * CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT is triggered when defendant has requested reconsideration
+ * of the SDO; the claimant has to be notified
  */
 @Service
 public class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
