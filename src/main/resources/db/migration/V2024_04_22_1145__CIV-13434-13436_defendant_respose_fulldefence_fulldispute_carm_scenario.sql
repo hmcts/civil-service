@@ -8,7 +8,7 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant',
         "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant",
         "Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Defendant",
-        "Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Defendant"}',
+        "Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant"}',
         '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant":["applicant1PartyName"]}');
 
 /**
