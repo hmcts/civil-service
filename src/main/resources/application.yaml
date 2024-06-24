@@ -103,7 +103,7 @@ fees:
 
 location:
   api:
-    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6669}
 
 genApp:
   fee:
@@ -693,7 +693,7 @@ document_management:
 
 docmosis:
   tornado:
-    url: http://localhost:6663
+    url: http://localhost:6660
     key: fake-key
 
 notifications:

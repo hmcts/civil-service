@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 
@@ -25,7 +26,8 @@ import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.MONEY_CLAIM;
 
 @PactTestFor(providerName = "feeRegister_lookUp")
-@MockServerConfig(hostInterface = "localhost", port = "6661")
+@MockServerConfig(hostInterface = "localhost", port = "6662")
+@TestPropertySource(properties = "fees.api.url=http://localhost:6662")
 public class FeesLookupApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/fees-register/fees/lookup";

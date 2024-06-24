@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
@@ -26,7 +27,8 @@ import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.reform.cmc.model.ClaimState.OPEN;
 
 @PactTestFor(providerName = "cmc_claimant")
-@MockServerConfig(hostInterface = "localhost", port = "8765")
+@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6669")
+@MockServerConfig(hostInterface = "localhost", port = "6669")
 public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/claims/claimant/";

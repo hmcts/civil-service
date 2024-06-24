@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.CaseDetails;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
@@ -26,7 +27,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "em_stitchBundle")
-@MockServerConfig(hostInterface = "localhost", port = "8084")
+@MockServerConfig(hostInterface = "localhost", port = "6664")
+@TestPropertySource(properties = "bundle.api.url=http://localhost:6664")
 public class StitchBundleApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/api/stitch-ccd-bundles";

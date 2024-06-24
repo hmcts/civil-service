@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 
 @PactTestFor(providerName = "feeRegister_rangeGroup")
 @MockServerConfig(hostInterface = "localhost", port = "6661")
+@TestPropertySource(properties = "fees.api.url=http://localhost:6661")
 public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/fees-register/fees";

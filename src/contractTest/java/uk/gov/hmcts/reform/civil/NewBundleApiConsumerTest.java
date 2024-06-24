@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -36,7 +37,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "em_newBundle")
-@MockServerConfig(hostInterface = "localhost", port = "8084")
+@MockServerConfig(hostInterface = "localhost", port = "6663")
+@TestPropertySource(properties = "bundle.api.url=http://localhost:6663")
 public class NewBundleApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/api/new-bundle";
