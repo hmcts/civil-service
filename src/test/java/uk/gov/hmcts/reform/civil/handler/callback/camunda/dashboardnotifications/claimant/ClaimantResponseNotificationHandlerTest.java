@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -73,7 +73,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
         @BeforeEach
         void before() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
