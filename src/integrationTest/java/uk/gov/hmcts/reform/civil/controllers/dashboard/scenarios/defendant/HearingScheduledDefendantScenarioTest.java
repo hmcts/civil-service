@@ -31,7 +31,7 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();

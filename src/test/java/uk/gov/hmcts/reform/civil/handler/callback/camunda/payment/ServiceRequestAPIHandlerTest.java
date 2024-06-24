@@ -211,7 +211,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakeHearingPaymentServiceRequest_whenInvoked() throws Exception {
+        void shouldMakeHearingPaymentServiceRequest_whenInvoked() {
             //Given
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
@@ -238,9 +238,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
             //GIVEN
-            CallbackParams params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //THEN
-            assertThat(handler.camundaActivityId(params)).isEqualTo("ServiceRequestAPI");
+            assertThat(handler.camundaActivityId(localParams)).isEqualTo("ServiceRequestAPI");
         }
 
         @Test
@@ -351,7 +351,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             verifyNoInteractions(hearingFeesService);
             verifyNoInteractions(paymentsService);
         }
@@ -363,7 +362,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             verifyNoInteractions(hearingFeesService);
             verifyNoInteractions(paymentsService);
         }
@@ -375,7 +373,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             verifyNoInteractions(hearingFeesService);
             verifyNoInteractions(paymentsService);
         }
