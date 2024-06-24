@@ -325,7 +325,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
+        return featureToggleService.isLipVLipEnabled()
             && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
@@ -424,5 +424,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             && caseData.isClaimantBilingual();
+    }
+
+    public boolean isNocForDefendant() {
+        return isPaperResponse()
+            && (caseData.getBusinessProcess() != null
+            && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(caseData.getBusinessProcess().getCamundaEvent()));
     }
 }
