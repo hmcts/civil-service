@@ -67,7 +67,7 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     public void before() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
     }
 
     @AfterEach

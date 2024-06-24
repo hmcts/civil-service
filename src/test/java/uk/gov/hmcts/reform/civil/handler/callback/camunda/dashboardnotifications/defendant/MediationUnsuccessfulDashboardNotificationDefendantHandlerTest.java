@@ -74,11 +74,11 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotifications() {
+        void createDashboardNotifications() {
             params.put("ccdCaseReference", "123");
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             CaseData caseData = CaseData.builder()
@@ -101,9 +101,9 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             params.put("ccdCaseReference", "123");
             MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
@@ -135,9 +135,9 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             params.put("ccdCaseReference", "123");
             MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
