@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
     AgreedExtensionDateApplicantForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
+class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AgreedExtensionDateApplicantForSpecNotificationHandler handler;

@@ -257,12 +257,12 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     void shouldGenerateClaimForm_WhenSpecResponseTimelineDocAndRespondent1SpecDefenceResponseDocumentIsNull() {
         // Given: Case data with docs to stitch and no existing systemGeneratedCaseDocuments,
         // stitching is enabled,isPinInPostEnabled is false and callback version V1
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specRespondent1Represented(YES)
             .systemGeneratedCaseDocuments(new ArrayList<>()).build();
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, localCaseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
 
         // When: handler is called
@@ -284,11 +284,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -306,11 +306,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -327,12 +327,12 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .respondent2DocumentGeneration("userRespondent2")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -349,12 +349,12 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(SEALED_FORM);
 
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .respondent2DocumentGeneration("userRespondent2")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
