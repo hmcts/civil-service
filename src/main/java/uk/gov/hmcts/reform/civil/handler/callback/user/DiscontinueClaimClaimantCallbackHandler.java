@@ -34,11 +34,11 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateData,
-            callbackKey(MID, "showClaimantConsent"), this::checkIfConsentPageRequired
+            callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant
         );
     }
 
-    private CallbackResponse checkIfConsentPageRequired(CallbackParams callbackParams) {
+    private CallbackResponse updateSelectedClaimant(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
@@ -61,6 +61,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             claimantNames.add(caseData.getApplicant1().getPartyName());
             claimantNames.add(caseData.getApplicant2().getPartyName());
             claimantNames.add(BOTH);
+
             caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
         }
 
