@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -127,6 +128,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Slf4j
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -1096,6 +1098,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
+        log.info("getApplicantOrganisationId() = " + getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy())));
         return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
     }
 
@@ -1111,6 +1114,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     private String getOrganisationId(Optional<OrganisationPolicy> policy) {
+        log.info("getOrganisation = " + policy.map(OrganisationPolicy::getOrganisation));
+        log.info("getOrganisationID = " + policy.map(OrganisationPolicy::getOrganisation).map(Organisation::getOrganisationID));
         return policy
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)

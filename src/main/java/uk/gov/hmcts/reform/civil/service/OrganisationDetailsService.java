@@ -37,7 +37,7 @@ public class OrganisationDetailsService {
         String respondentLegalOrganizationName = null;
         if (organisation.isPresent()) {
             respondentLegalOrganizationName = organisation.get().getName();
-            log.info(respondentLegalOrganizationName + " org name");
+            log.info("Legal Org Name = " + respondentLegalOrganizationName);
         }
         return respondentLegalOrganizationName;
     }
