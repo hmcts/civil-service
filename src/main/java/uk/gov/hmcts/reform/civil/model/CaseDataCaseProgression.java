@@ -214,11 +214,11 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     /**
-     * Claimant has requested a reconsideration of the SDO
+     * Claimant has requested a reconsideration of the SDO.
      */
     private YesOrNo orderRequestedForReviewClaimant;
     /**
-     * Defendant has requested a reconsideration of the SDO
+     * Defendant has requested a reconsideration of the SDO.
      */
     private YesOrNo orderRequestedForReviewDefendant;
 

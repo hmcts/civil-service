@@ -15,11 +15,10 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT_RECIPIENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT;
 
 /**
  * CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT is triggered when defendant has requested reconsideration
- * of the SDO; the claimant has to be notified
+ * of the SDO; the claimant has to be notified.
  */
 @Service
 public class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler extends CaseProgressionDashboardCallbackHandler {

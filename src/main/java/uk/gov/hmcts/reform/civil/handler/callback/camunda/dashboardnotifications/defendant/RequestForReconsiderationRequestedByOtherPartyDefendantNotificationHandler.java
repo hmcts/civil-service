@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 /**
  * CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_DEFENDANT is triggered when applicant has requested reconsideration
- * of the SDO; the defendant has to be notified
+ * of the SDO; the defendant has to be notified.
  */
 @Service
 public class RequestForReconsiderationRequestedByOtherPartyDefendantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
