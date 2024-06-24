@@ -464,6 +464,9 @@ court-location:
     region-id: "4"
     epimms-id: "192280"
 
+assign-roles-on-startup:
+  enabled: ${ASSIGN_ROLES_ON_STARTUP:true}
+
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
   offline-mode: false
