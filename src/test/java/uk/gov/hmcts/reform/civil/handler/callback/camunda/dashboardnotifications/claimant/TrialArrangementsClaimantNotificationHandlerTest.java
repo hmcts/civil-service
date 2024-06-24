@@ -64,7 +64,7 @@ public class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForTrialArrangements() {
+    void configureDashboardNotificationsForTrialArrangements() {
 
         HashMap<String, Object> params = new HashMap<>();
 

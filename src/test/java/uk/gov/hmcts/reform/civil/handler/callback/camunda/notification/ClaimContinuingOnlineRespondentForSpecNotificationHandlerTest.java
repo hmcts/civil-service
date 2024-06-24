@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
     ClaimContinuingOnlineRespondentForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class,
 })
-public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -96,7 +96,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claim-continuing-online-notification-000DC001"
             );
         }
@@ -124,7 +124,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claim-continuing-online-notification-000DC001"
             );
         }
@@ -164,7 +164,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
             handler.handle(params);
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicatior",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,

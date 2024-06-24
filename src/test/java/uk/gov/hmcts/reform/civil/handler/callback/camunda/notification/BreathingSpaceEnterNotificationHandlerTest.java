@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(SpringExtension.class)
-public class BreathingSpaceEnterNotificationHandlerTest {
+class BreathingSpaceEnterNotificationHandlerTest {
 
     @InjectMocks
     private BreathingSpaceEnterNotificationHandler handler;
@@ -40,7 +40,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     private OrganisationService organisationService;
 
     @Test
-    public void notifyRespondent1_enter() {
+    void notifyRespondent1_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -88,7 +88,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2_enter() {
+    void notifyRespondent2_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -136,7 +136,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2SameSolicitor_enter() {
+    void notifyRespondent2SameSolicitor_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -186,7 +186,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2DiffSolicitor_enter() {
+    void notifyRespondent2DiffSolicitor_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -236,7 +236,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyApplicant1_enter() {
+    void notifyApplicant1_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate())
