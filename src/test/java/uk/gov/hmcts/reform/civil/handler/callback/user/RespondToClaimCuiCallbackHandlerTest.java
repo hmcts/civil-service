@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -84,6 +85,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -304,6 +306,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyFlagsAndIdFromRespondentCopy() {
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", true);
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
 
