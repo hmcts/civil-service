@@ -15,14 +15,21 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -133,5 +140,39 @@ public class CaseEventServiceTest {
                                                                    Map.of()
                                                                )
         );
+    }
+
+    @Test
+    void shouldSubmitEventForExistingClaimSuccessfully_whenCaseFlagsLoggingIsEnabled() {
+        ReflectionTestUtils.setField(caseEventService, "caseFlagsLoggingEnabled", true);
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+            .respondent1(Party.builder()
+                             .flags(Flags.builder()
+                                        .partyName("Mr test")
+                                        .roleOnCase("Defendant 1")
+                                        .details(List.of()).build())
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse eventResponse = StartEventResponse
+            .builder()
+            .eventId(EVENT_ID)
+            .token(EVENT_TOKEN)
+            .caseDetails(caseDetails)
+            .build();
+        given(coreCaseDataApi.startEventForCitizen(any(), any(), any(), any(), any(), any(), any()))
+            .willReturn(eventResponse);
+        given(caseDetailsConverter.toCaseData(anyMap())).willReturn(caseData);
+
+        CaseDetails response = caseEventService.submitEvent(EventSubmissionParams
+                                                                   .builder()
+                                                                   .updates(Maps.newHashMap())
+                                                                   .event(CaseEvent.DEFENDANT_RESPONSE_SPEC)
+                                                                   .caseId(CASE_ID)
+                                                                   .userId(USER_ID)
+                                                                   .authorisation(AUTHORISATION)
+                                                                   .build());
+        assertThat(response).isEqualTo(CASE_DETAILS);
     }
 }
