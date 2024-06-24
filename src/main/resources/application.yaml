@@ -103,7 +103,7 @@ fees:
 
 location:
   api:
-    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6669}
 
 genApp:
   fee:
@@ -649,15 +649,23 @@ management:
   endpoints:
     enabled-by-default: false
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: http://localhost:6661
 
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
   jrd:
     url: http://fake-rd-judicial-api
+
+bundle:
+  api:
+    url: http://localhost:8084
 
 payments:
   api:
@@ -674,7 +682,7 @@ idam:
 
 core_case_data:
   api:
-    url: http://fake-ccd-data-store-api
+    url: http://localhost:4452
 
 reference:
   database:
@@ -685,7 +693,7 @@ document_management:
 
 docmosis:
   tornado:
-    url: http://fake-docmosis-api
+    url: http://localhost:6660
     key: fake-key
 
 notifications:

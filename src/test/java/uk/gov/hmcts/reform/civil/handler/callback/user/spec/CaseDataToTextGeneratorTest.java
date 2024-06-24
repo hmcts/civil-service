@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
  * at most one implementation handling the case.</p>
  */
 @ExtendWith(SpringExtension.class)
-public class CaseDataToTextGeneratorTest {
+class CaseDataToTextGeneratorTest {
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(
@@ -57,7 +57,7 @@ public class CaseDataToTextGeneratorTest {
      */
     @SuppressWarnings({"SuspiciousMethodCalls", "rawtypes", "unchecked"})
     @Test
-    public void allGeneratorsMustBeChecked() {
+    void allGeneratorsMustBeChecked() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
             CaseDataToTextGeneratorTestConfig.class);
         Collection<CaseDataToTextGenerator> allGenerators = context.getBeansOfType(CaseDataToTextGenerator.class)

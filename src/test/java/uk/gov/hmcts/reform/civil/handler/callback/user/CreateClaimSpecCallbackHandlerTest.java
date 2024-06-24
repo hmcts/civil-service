@@ -1766,10 +1766,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
-
-            Organisation organisation = Organisation.builder()
-                .paymentAccount(List.of("12345", "98765"))
-                .build();
         }
 
         @Test
@@ -1779,16 +1775,16 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .code("FeeCode")
                 .calculatedAmountInPence(BigDecimal.valueOf(19990))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
-            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             // Then
             assertThat(response.getData()).extracting("claimFee").extracting("calculatedAmountInPence", "code")
                 .containsExactly(String.valueOf(feeData.getCalculatedAmountInPence()), feeData.getCode());
@@ -1797,15 +1793,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddSdtRequestId_whenInvokedAndBulkClaim() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             // Then
             assertThat(response.getData()).extracting("sdtRequestId").asString().contains("sdtRequestIdFromSdt");
         }
@@ -1813,11 +1809,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotAddSdtRequestId_whenInvokedAndNotBulkClaim() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             // Then
             assertThat(response.getData()).doesNotHaveToString("sdtRequestId");
         }
@@ -1825,15 +1821,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignFirstPbaNumber_whenInvokedAndBulkClaim() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
             // Then
             System.out.println(response.getData().get("applicantSolicitor1PbaAccounts"));
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
@@ -1879,12 +1875,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             // Given
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_SERVICE_REQUEST_CLAIM.name()).build())
                 .build();
 
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
             assertThat(response.getData())
@@ -1914,15 +1910,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCaseName1v2_whenCaseIs1v2() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
+            CallbackParams localParams = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
-            assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo'");
+            assertThat(response.getData())
+                .containsEntry("caseNameHmctsInternal", "'John Rambo' v 'Sole Trader', 'John Rambo'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1930,15 +1926,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCaseName2v1_whenCaseIs2v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+            CallbackParams localParams = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
-            assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo', 'Jason Rambo' v 'Sole Trader'");
+            assertThat(response.getData())
+                .containsEntry("caseNameHmctsInternal", "'John Rambo', 'Jason Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1946,11 +1942,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCaseName1v1_whenCaseIs1v1() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            CallbackParams localParams = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -2082,7 +2078,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldAddIdamEmailToIdamDetails_whenIdamEmailIsCorrect() {
                 // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                     .applicantSolicitor1CheckEmail(CorrectEmail.builder()
                                                        .email(EMAIL)
                                                        .correct(YES)
@@ -2092,7 +2088,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                params = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2115,7 +2111,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 given(idamClient.getUserDetails(any()))
                     .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                     .applicantSolicitor1CheckEmail(CorrectEmail.builder()
                                                        .email(EMAIL)
                                                        .correct(NO)
@@ -2125,10 +2121,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams localParams = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
                 // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
                 assertThat(response.getData())
@@ -2197,17 +2193,17 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .isFlightDelayClaim(YES)
                     .flightDelay(FlightDelayDetails.builder()
                                      .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
                                                         .build()).build()).build()).build();
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
                 // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
                 assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
@@ -2216,19 +2212,19 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
                 // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .flightDelay(FlightDelayDetails.builder()
                                      .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("OTHER").label("OTHER")
                                                         .build()).build()).build()).build();
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(getSampleCourLocationsRefObject());
 
                 // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
                 assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString("flightCourtLocation");

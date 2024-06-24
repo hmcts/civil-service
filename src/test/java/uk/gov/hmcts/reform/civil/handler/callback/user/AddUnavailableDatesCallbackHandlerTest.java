@@ -138,8 +138,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
-                    2);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems()).hasSize(2);
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
@@ -157,8 +156,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
-                    2);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems()).hasSize(2);
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
@@ -176,8 +174,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
-                    3);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems()).hasSize(3);
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
@@ -197,8 +194,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
-                    2);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems()).hasSize(2);
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimants");
                 assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
