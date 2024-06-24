@@ -87,13 +87,13 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         AboutToStartOrSubmitCallbackResponse
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper));
+            AboutToStartOrSubmitCallbackResponse.builder();
 
         if (YES.equals(caseData.getMarkPaidForAllClaimants())) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
             aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CLOSED.name());
         }
-        return aboutToStartOrSubmitCallbackResponseBuilder.build();
+        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

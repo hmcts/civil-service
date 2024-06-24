@@ -37,7 +37,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     private SettleClaimMarkPaidFullCallbackHandler handler;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     public static final String REQUEST_BEING_REVIEWED_NEXT_STEPS = """
             ### Next step
 
@@ -97,7 +97,8 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(handler.handledEvents()).contains(SETTLE_CLAIM_MARKED_PAID_IN_FULL);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
             assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
         }
 
@@ -110,12 +111,13 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(handler.handledEvents()).contains(SETTLE_CLAIM_MARKED_PAID_IN_FULL);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
             assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
         }
 
         @Test
-        void should_return_empty_callback_if_only_1_claimant_paid_full() {
+        void should_return_empty_state_if_only_1_claimant_paid_full() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(YesOrNo.NO);
