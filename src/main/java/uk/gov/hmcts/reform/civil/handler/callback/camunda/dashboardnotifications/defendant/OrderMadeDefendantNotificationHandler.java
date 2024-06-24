@@ -34,7 +34,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
-                                                          UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS);
+                                                          UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
 
     public OrderMadeDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -104,7 +104,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         }
 
         if (isFinalOrderIssued(callbackParams)){
-            return SCENARIO_AAA6_UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
+            return SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
 

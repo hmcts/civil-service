@@ -165,7 +165,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Defendant"),
     SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT("Scenario.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant"),
     SCENARIO_AAA6_DECISION_OUTCOME("Scenario.AAA6.DecisionOutcome"),
-    SCENARIO_AAA6_UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.TaskList.UploadDocuments.FinalOrders");
+    SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders"),
+    SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders");
 
     private final String scenario;
 

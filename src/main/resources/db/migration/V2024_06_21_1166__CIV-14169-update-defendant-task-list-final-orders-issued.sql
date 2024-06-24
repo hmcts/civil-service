@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.Update.TaskList.UploadDocuments.FinalOrders', '{}', '{}');
+VALUES ('Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders', '{}', '{}');
 
 /**
  * Add task list items claimant
@@ -11,7 +11,4 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
                                     scenario_name, task_status_sequence, role, task_order)
 VALUES ('<a>Upload hearing documents</a>', 'Hearing',
         '<a>Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
-        'Hearing.Document.Upload', 'Scenario.AAA6.Update.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'DEFENDANT', 10),
-       ('<a>Upload hearing documents</a>', 'Hearing',
-        '<a>Llwytho dogfennau''r gwrandawiad</a>', 'Gwrandawiad',
-        'Hearing.Document.Upload', 'Scenario.AAA6.Update.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'CLAIMANT', 10);
+        'Hearing.Document.Upload', 'Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders', '{2, 2}', 'DEFENDANT', 10);
