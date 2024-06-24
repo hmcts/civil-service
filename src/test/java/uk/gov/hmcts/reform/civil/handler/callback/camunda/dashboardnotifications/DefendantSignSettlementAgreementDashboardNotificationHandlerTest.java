@@ -68,7 +68,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -99,7 +99,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandlerTest ex
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
