@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
+class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -85,7 +85,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         .build();
 
     @Test
-    public void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData() {
+    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData() {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
@@ -146,14 +146,14 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         );
 
         CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
         assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
         assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
         assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 1, 1));
     }
 
     @Test
-    public void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData_BstHearingDate() {
+    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData_BstHearingDate() {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .ccdState(CASE_PROGRESSION)
@@ -220,7 +220,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         );
 
         CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
         assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
         assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
         assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 7, 1));

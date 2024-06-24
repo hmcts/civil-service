@@ -416,4 +416,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
         return false;
     }
+
+    @Override
+    public boolean isNocForDefendant() {
+        return false;
+    }
 }

@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    DEFENDANT_APPLY_NOC(
+        Claim::isNocForDefendant
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),

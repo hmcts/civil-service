@@ -131,7 +131,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void testFeignExceptionGatewayTimeoutException() {
+    void testFeignExceptionGatewayTimeoutException() {
         testTemplate(
             "gateway time out message",
             str -> new FeignException.GatewayTimeout(
@@ -146,7 +146,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void testClientAbortException() {
+    void testClientAbortException() {
         testTemplate(
             "ClosedChannelException",
             str -> new FeignException.InternalServerError(
@@ -161,7 +161,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleNotificationClientException() {
+    void testHandleNotificationClientException() {
         testTemplate(
             "expected exception from notification api",
             NotificationClientException::new,
@@ -199,7 +199,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void shouldReturnExpectationFailed_whenJsonSchemaValidationExceptionThrown() {
+    void shouldReturnExpectationFailed_whenJsonSchemaValidationExceptionThrown() {
         testTemplate(
             "expected exception from json schema rpa",
             str -> new JsonSchemaValidationException("expected exception from json schema rpa", new Throwable()),

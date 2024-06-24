@@ -123,4 +123,6 @@ public interface Claim {
     boolean isClaimSubmittedNotPaidOrFailedNotHwF();
 
     boolean isClaimSubmittedWaitingTranslatedDocuments();
+
+    boolean isNocForDefendant();
 }
