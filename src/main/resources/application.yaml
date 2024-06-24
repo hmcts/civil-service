@@ -103,7 +103,7 @@ fees:
 
 location:
   api:
-    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6669}
 
 genApp:
   fee:
@@ -352,6 +352,7 @@ notifications:
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
@@ -651,15 +652,23 @@ management:
   endpoints:
     enabled-by-default: false
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: http://localhost:6661
 
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
   jrd:
     url: http://fake-rd-judicial-api
+
+bundle:
+  api:
+    url: http://localhost:8084
 
 payments:
   api:
@@ -676,7 +685,7 @@ idam:
 
 core_case_data:
   api:
-    url: http://fake-ccd-data-store-api
+    url: http://localhost:4452
 
 reference:
   database:
@@ -687,7 +696,7 @@ document_management:
 
 docmosis:
   tornado:
-    url: http://fake-docmosis-api
+    url: http://localhost:6660
     key: fake-key
 
 notifications:
