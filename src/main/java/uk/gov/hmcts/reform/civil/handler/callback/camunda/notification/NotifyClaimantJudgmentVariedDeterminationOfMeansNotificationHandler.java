@@ -63,7 +63,7 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
         if (nonNull(recipient)) {
             notificationService.sendMail(
                 recipient,
-                caseData.isApplicantLiP() ? getLIPTemplate() : getTemplate(),
+                caseData.isApplicantLiP() ? getLIPTemplate(caseData) : getTemplate(),
                 caseData.isApplicantLiP() ? addLIPProperties(caseData) : addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -93,8 +93,12 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
         return notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
-    private String getLIPTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+    private String getLIPTemplate(CaseData caseData) {
+        if (caseData.isClaimantBilingual()) {
+            return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+        } else {
+            return notificationsProperties.getNotifyLipUpdateTemplate();
+        }
     }
 
     private String getReferenceTemplate(CaseData caseData) {
