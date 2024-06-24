@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 
 @SpringBootTest(classes = {
@@ -96,6 +97,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
+            assertThat(handler.handledEvents()).contains(SETTLE_CLAIM_MARKED_PAID_IN_FULL);
             assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
         }
 
@@ -108,6 +110,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
+            assertThat(handler.handledEvents()).contains(SETTLE_CLAIM_MARKED_PAID_IN_FULL);
             assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
         }
 

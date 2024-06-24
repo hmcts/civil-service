@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.SettleClaimHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -24,6 +25,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -83,15 +85,15 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        AboutToStartOrSubmitCallbackResponse
+            .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper));
 
-        if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            return emptyCallbackResponse(callbackParams);
-        } else {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .state(CaseState.CLOSED.name())
-                .build();
+        if (YES.equals(caseData.getMarkPaidForAllClaimants())) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CLOSED.name());
         }
+        return aboutToStartOrSubmitCallbackResponseBuilder.build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
