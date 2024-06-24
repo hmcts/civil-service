@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 public class DecisionOutcomeCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
+    protected final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MOVE_TO_DECISION_OUTCOME);
 
     @Override
@@ -35,13 +37,18 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_DASHBOARD_NOTIFICATION_DECISION_OUTCOME));
-
+        if(featureToggleService.isCaseProgressionEnabled()) {
+            CaseData caseData = callbackParams.getCaseData().toBuilder()
+                .build();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            caseDataBuilder.businessProcess(BusinessProcess.ready(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME))
+                .businessProcess(BusinessProcess.ready(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME));
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
+            .state(DECISION_OUTCOME.name())
             .build();
     }
 
