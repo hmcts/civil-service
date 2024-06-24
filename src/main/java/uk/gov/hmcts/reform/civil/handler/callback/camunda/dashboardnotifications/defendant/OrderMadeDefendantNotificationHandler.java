@@ -21,6 +21,7 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
@@ -126,8 +127,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     }
 
     private boolean isFinalOrderIssued(CallbackParams callbackParams) {
-            return UPDATE_DASHBOARD_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS
-                .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
+            return All_FINAL_ORDERS_ISSUED.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
