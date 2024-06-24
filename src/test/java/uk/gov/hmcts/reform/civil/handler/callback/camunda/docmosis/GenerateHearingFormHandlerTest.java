@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
+class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -54,7 +54,7 @@ public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     private HearingFormGenerator hearingFormGenerator;
 
     @Test
-    public void shouldGenerateForm_when1v1() {
+    void shouldGenerateForm_when1v1() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")
@@ -85,11 +85,11 @@ public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         verify(hearingFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
     }
 
     @Test
-    public void shouldGenerate2Forms_whenListHave1PreviousForm() {
+    void shouldGenerate2Forms_whenListHave1PreviousForm() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")
@@ -123,6 +123,6 @@ public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         verify(hearingFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(2);
+        assertThat(updatedData.getHearingDocuments()).hasSize(2);
     }
 }

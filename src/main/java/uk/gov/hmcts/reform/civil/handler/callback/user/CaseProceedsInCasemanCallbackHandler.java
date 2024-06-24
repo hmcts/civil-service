@@ -78,7 +78,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isDashboardServiceEnabled()) {
+        if (featureToggleService.isLipVLipEnabled()) {
             return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
                     ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
                     : null;

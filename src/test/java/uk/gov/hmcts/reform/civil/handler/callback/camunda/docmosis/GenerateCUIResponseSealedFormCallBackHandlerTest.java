@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     JacksonAutoConfiguration.class,
     AssignCategoryId.class
 })
-public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandlerTest {
+class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
