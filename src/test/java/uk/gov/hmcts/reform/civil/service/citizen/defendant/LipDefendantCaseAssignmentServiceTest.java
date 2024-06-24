@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -118,6 +122,8 @@ class LipDefendantCaseAssignmentServiceTest {
             .email(EMAIL)
             .build();
         data.put("defendantUserDetails", defendantUserDetails);
+        ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
+        when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
         EventSubmissionParams params = EventSubmissionParams.builder()
             .caseId(CASE_ID)
             .userId(USER_ID)
@@ -125,9 +131,6 @@ class LipDefendantCaseAssignmentServiceTest {
             .event(ASSIGN_LIP_DEFENDANT)
             .updates(data)
             .build();
-
-        ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
-        when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,
