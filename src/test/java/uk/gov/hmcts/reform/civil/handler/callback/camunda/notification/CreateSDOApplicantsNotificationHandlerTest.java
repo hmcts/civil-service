@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
     JacksonAutoConfiguration.class
 })
 
-public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;

@@ -80,11 +80,11 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsDisabledMediationUnsuccessful() {
+        void createDashboardNotificationsWhenCarmIsDisabledMediationUnsuccessful() {
             scenarioParams.put("ccdCaseReference", "123455L");
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
@@ -110,7 +110,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             scenarioParams.put("ccdCaseReference", "123");
@@ -143,7 +143,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         }
 
         @Test
-        public void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonClaimantNonAttendance() {
+        void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonClaimantNonAttendance() {
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             scenarioParams.put("ccdCaseReference", "123");
