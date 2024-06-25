@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.userroleassignment;
+package uk.gov.hmcts.reform.civil.service.roleassignment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @ConditionalOnProperty(value = "assign-roles-on-startup.enabled", havingValue = "true")
-public class UserRoleInitialisationService {
+public class RoleAssignmentInitialisationService {
 
     private static final String HEARINGS_SYSTEM_USER_REFERENCE = "civil-hearings-system-user";
     private static final String SYSTEM_USER_PROCESS = "civil-system-user";
@@ -42,14 +42,9 @@ public class UserRoleInitialisationService {
         }
     }
 
-    public void assignHearingRoles(String userAuth) {
+    private void assignHearingRoles(String userAuth) {
         log.info("Attempting to assign hearing roles");
         String userId = userService.getUserInfo(userAuth).getUid();
-
-        //REMOVE!! Testing purposes only.
-        log.info("USER_ID: " + userId);
-        log.info("AUTH_TOKEN: " + userAuth);
-
         roleAssignmentService.assignUserRoles(
             userId,
             userAuth,
