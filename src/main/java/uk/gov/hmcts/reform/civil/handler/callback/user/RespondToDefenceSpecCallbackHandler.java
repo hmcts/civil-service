@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -128,6 +129,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -514,6 +516,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         builder.businessProcess(businessProcess);
+
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

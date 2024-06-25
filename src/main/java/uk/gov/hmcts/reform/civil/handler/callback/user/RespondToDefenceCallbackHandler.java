@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -88,6 +89,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final ToggleConfiguration toggleConfiguration;
     private final AssignCategoryId assignCategoryId;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -290,6 +292,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
                                                                        featureToggleService.isUpdateContactDetailsEnabled());
