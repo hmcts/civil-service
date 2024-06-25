@@ -15,10 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventEmitterServiceTest {
@@ -38,6 +35,9 @@ class EventEmitterServiceTest {
     @Mock
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
+    private static final String TEST_EVENT = "TEST_EVENT";
+    private static final long CASE_ID = 1L;
+
     @BeforeEach
     void setup() {
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
@@ -45,81 +45,73 @@ class EventEmitterServiceTest {
         when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
     }
 
-    private CaseData buildCaseDataWithBusinessProcess(String event, long caseReference) {
-        return CaseData.builder()
-            .businessProcess(BusinessProcess.builder().camundaEvent(event).build())
-            .ccdCaseReference(caseReference)
-            .build();
-    }
-
-    private void verifyCommonInteractions(String event, long caseReference, boolean tenantId, int timesCalled) throws RemoteProcessEngineException {
-        verify(runtimeService, times(timesCalled)).createMessageCorrelation(event);
-        verify(messageCorrelationBuilder, times(timesCalled)).setVariable("caseId", caseReference);
-        verify(messageCorrelationBuilder, times(timesCalled)).correlateStartMessage();
-        if (tenantId) {
-            verify(messageCorrelationBuilder, times(timesCalled)).tenantId("civil");
-        } else {
-            verify(messageCorrelationBuilder, times(timesCalled)).withoutTenantId();
-        }
-    }
-
     @Test
-    void shouldSendMessageAndTriggerEvent_whenInvoked_withTenantId() throws RemoteProcessEngineException {
-        CaseData caseData = buildCaseDataWithBusinessProcess("TEST_EVENT", 1L);
-
+    void shouldSendMessageAndTriggerEvent_whenInvoked_withTenantId() {
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
-
-        verifyCommonInteractions("TEST_EVENT", 1L, true, 1);
-        verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, caseData.getBusinessProcess()));
+        verify(runtimeService).createMessageCorrelation(TEST_EVENT);
+        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
+        verify(messageCorrelationBuilder).tenantId("civil");
+        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
     @Test
-    void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() throws RemoteProcessEngineException {
+    void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage())
             .thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
 
-        CaseData caseData = buildCaseDataWithBusinessProcess("TEST_EVENT", 1L);
-
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
-        verifyCommonInteractions("TEST_EVENT", 1L, false, 2);
-        verify(applicationEventPublisher, times(2)).publishEvent(new DispatchBusinessProcessEvent(1L, caseData.getBusinessProcess()));
+        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
+        verify(messageCorrelationBuilder, times(2)).setVariable("caseId", CASE_ID);
+        verify(messageCorrelationBuilder).withoutTenantId();
+        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(applicationEventPublisher, times(2)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
     @Test
-    void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withTenantId() throws RemoteProcessEngineException {
-        CaseData caseData = buildCaseDataWithBusinessProcess("TEST_EVENT", 1L);
-
+    void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withTenantId() {
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
-
-        verifyCommonInteractions("TEST_EVENT", 1L, true, 1);
+        verify(runtimeService).createMessageCorrelation(TEST_EVENT);
+        verify(messageCorrelationBuilder).correlateStartMessage();
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
-    void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withoutTenantId() throws RemoteProcessEngineException {
+    void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withoutTenantId() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
 
-        CaseData caseData = buildCaseDataWithBusinessProcess("TEST_EVENT", 1L);
-
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
 
-        verifyCommonInteractions("TEST_EVENT", 1L, false, 2);
+        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
+        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
-    void shouldHandleException_whenInvoked() throws RemoteProcessEngineException {
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+    void shouldHandleException_whenInvoked() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
 
-        CaseData caseData = buildCaseDataWithBusinessProcess("TEST_EVENT", 1L);
-
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
-        verifyCommonInteractions("TEST_EVENT", 1L, false, 2);
+        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
+        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+    }
+
+    private CaseData createCaseData(String event, long caseId) {
+        BusinessProcess businessProcess = BusinessProcess.builder().camundaEvent(event).build();
+        return CaseData.builder()
+            .businessProcess(businessProcess)
+            .ccdCaseReference(caseId)
+            .build();
     }
 }
