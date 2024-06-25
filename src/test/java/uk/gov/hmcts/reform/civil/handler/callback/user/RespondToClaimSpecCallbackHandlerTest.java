@@ -9,11 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -21,6 +25,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -46,6 +51,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -83,6 +89,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -120,8 +127,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF2;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -129,46 +139,64 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    RespondToClaimSpecCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
+    JacksonAutoConfiguration.class,
+    ValidationAutoConfiguration.class,
+    DateOfBirthValidator.class,
+    UnavailableDateValidator.class,
+    CaseDetailsConverter.class,
+    LocationReferenceDataService.class,
+    CourtLocationUtils.class,
+    StateFlowEngine.class,
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
+})
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
+    @Autowired
     private RespondToClaimSpecCallbackHandler handler;
-
-    @Mock
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
     private Time time;
-    @Mock
+    @MockBean
     private PaymentDateValidator validator;
-    @Mock
+    @MockBean
     private UnavailableDateValidator dateValidator;
-    @Mock
+    @Autowired
     private ExitSurveyContentService exitSurveyContentService;
-    @Mock
+    @MockBean
     private FeatureToggleService toggleService;
-    @Mock
+    @MockBean
     private PostcodeValidator postcodeValidator;
-    @Mock
+    @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-    @Mock
+    @Autowired
     private UserService userService;
-    @Mock
+    @MockBean
     private CoreCaseUserService coreCaseUserService;
     @Mock
     private StateFlow mockedStateFlow;
-    @Mock
+    @MockBean
     private StateFlowEngine stateFlowEngine;
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
-    @Mock
+    @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @Mock
+    @Autowired
     private AssignCategoryId assignCategoryId;
-    @Mock
+    @MockBean
     private CourtLocationUtils courtLocationUtils;
-    @Mock
+    @MockBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @Mock
+    @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
         + "cannot attend hearing within next 3 months.";
@@ -1396,6 +1424,53 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldAssignCategoryId_frc_whenInvoked() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class),
+            any(AllocatedTrack.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent2DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //Then
+        assertThat(response.getData())
+            .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF1.getValue());
+
+        assertThat(response.getData())
+            .extracting("respondent2DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF2.getValue());
+    }
+
+    @Test
     void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
         // Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1998,7 +2073,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.FULL_DEFENCE,
+                    FULL_DEFENCE,
                     FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -2864,5 +2939,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
     }
 }
