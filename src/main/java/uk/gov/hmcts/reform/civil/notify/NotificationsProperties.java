@@ -603,4 +603,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifySettleClaimMarkedPaidInFullDefendantTemplate;
+
+    @NotEmpty
+    private String orderBeingTranslatedTemplateWelsh;
 }

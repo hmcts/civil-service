@@ -433,6 +433,7 @@ notifications:
   notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
   hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
   notifySettleClaimMarkedPaidInFullDefendantTemplate: "6cbcd10e-c9ed-493e-a8f0-64ce85f236c9"
+  orderBeingTranslatedTemplateWelsh: "8349f32b-7635-41ce-a887-02e65d85df00"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
