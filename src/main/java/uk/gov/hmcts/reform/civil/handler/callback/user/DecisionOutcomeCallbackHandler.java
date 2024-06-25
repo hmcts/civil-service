@@ -41,8 +41,7 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
             CaseData caseData = callbackParams.getCaseData().toBuilder()
                 .build();
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.businessProcess(BusinessProcess.ready(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME))
-                .businessProcess(BusinessProcess.ready(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME));
+            caseDataBuilder.businessProcess(BusinessProcess.ready(DASHBOARD_DECISION_OUTCOME));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
