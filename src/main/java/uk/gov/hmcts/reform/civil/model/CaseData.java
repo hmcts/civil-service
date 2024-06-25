@@ -1144,6 +1144,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return Optional.empty();
     }
+
     @JsonIgnore
     public boolean isCcjRequestJudgmentByAdmission() {
         return getCcjPaymentDetails() != null
