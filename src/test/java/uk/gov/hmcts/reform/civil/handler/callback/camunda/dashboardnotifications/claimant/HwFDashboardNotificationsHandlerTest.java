@@ -73,7 +73,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest

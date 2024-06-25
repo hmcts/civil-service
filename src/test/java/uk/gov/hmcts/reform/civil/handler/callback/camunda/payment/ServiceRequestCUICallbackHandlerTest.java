@@ -107,8 +107,6 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
                     ).build())
                 .build();
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
-            //WHEN
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
             verifyNoInteractions(paymentsService);
         }
@@ -122,10 +120,10 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
             //GIVEN
-            CallbackParams params =  params = callbackParamsOf(caseData,
+            CallbackParams localParams = callbackParamsOf(caseData,
                                                                CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             //THEN
-            assertThat(handler.camundaActivityId(params)).isEqualTo("CreateServiceRequestCUI");
+            assertThat(handler.camundaActivityId(localParams)).isEqualTo("CreateServiceRequestCUI");
         }
 
         @Test

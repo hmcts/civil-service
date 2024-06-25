@@ -61,7 +61,7 @@ public class FeesClientService {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return this.feesApiClient.lookupFeeWithAmount(
+            return feesApiClient.lookupFeeWithAmount(
                 service,
                 jurisdiction1,
                 jurisdiction2,
@@ -72,12 +72,12 @@ public class FeesClientService {
             );
 
         } else {
-            return this.feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
+            return feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
     }
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {
-        return this.feesApiClient.findRangeGroup(service, jurisdiction1, jurisdiction2, channel, event);
+        return feesApiClient.findRangeGroup(service, jurisdiction1, jurisdiction2, channel, event);
     }
 
     /**

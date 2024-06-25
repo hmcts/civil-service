@@ -88,7 +88,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void createDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -116,7 +116,7 @@ public class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbac
     }
 
     @Test
-    public void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
+    void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
