@@ -34,22 +34,17 @@ values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View m
   '<a>Ychwanegu trefniadau''r treial</a>',
   'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 10),
 
-('<a>Pay the hearing fee</a>',
-  'Hearing',
-  '<a>Talu ffi''r gwrandawiad</a>',
-  'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 11),
-
 ('<a>View the bundle</a>',
   'Hearing',
   '<a>Gweld y bwndel</a>',
-  'Gwrandawiad', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 12),
+  'Gwrandawiad', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 11),
 
 ('<a>View the judgment</a>',
   'Judgment from the court',
   '<a>Gweld y Dyfarniad</a>',
-  'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 13),
+  'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 12),
 
 ('<a>View applications</a>',
   'Applications',
   '<a>Gweld y cais i gyd</a>',
-  'Ceisiadau', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 14);
+  'Ceisiadau', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Defendant', '{2, 2}', 'DEFENDANT', 13);
