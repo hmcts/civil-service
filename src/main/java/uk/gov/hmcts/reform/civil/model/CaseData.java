@@ -1136,7 +1136,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<Element<CaseDocument>> getDecisionOnReconsiderationDocument() {
+    public Optional<Element<CaseDocument>> getDecisionOnReconsiderationDocumentFromList() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
                 .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()

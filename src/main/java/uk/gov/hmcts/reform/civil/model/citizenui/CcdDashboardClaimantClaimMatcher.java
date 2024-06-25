@@ -357,7 +357,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isDecisionForReconsiderationMade() {
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.getDecisionOnReconsiderationDocument().isPresent();
+            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
     }
 
     @Override
