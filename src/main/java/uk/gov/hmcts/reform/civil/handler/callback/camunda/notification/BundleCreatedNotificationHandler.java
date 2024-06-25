@@ -67,13 +67,33 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         if (nonNull(emailAddress)) {
             notificationService.sendMail(
                 emailAddress,
-                isLip(caseData, taskId) ? notificationsProperties.getNotifyLipUpdateTemplate() :
-                    notificationsProperties.getBundleCreationTemplate(),
+                getTemplate(caseData, taskId),
                 isLip(caseData, taskId) ? addPropertiesDefendantLip(caseData) : addProperties(caseData),
                 String.format(template, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplate(CaseData caseData, String taskId) {
+        boolean isLipWelsh = false;
+        boolean isLip = false;
+        if (taskId.equals(TASK_ID_APPLICANT)) {
+            isLip = isApplicant1Lip(caseData);
+            isLipWelsh = isLip && caseData.isClaimantBilingual();
+        } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
+            isLip = isRespondent1Lip(caseData);
+            isLipWelsh = isLip && caseData.isRespondentResponseBilingual();
+        }
+        if (isLip) {
+            if (isLipWelsh) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            return notificationsProperties.getBundleCreationTemplate();
+        }
     }
 
     private String getReferenceTemplateString(String taskId) {
