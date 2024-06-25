@@ -65,9 +65,9 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    public void createDashboardNotifications_smallClaims() {
+    void createDashboardNotifications_smallClaims() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
@@ -93,9 +93,9 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    public void createDashboardNotifications_fastTrack() {
+    void createDashboardNotifications_fastTrack() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
@@ -129,8 +129,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
     @Test
     public void doNotCreateDashboardNotifications_LegalRep() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
-
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
         CaseData caseData = CaseData.builder()

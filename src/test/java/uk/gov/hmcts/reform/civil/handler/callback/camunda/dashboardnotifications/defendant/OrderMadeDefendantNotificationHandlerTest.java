@@ -97,7 +97,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

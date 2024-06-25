@@ -110,7 +110,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getApplicantSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertThat(updatedCaseData.getApplicantSolicitor1ServiceAddressRequired())
                 .isEqualTo(NO);
 
@@ -148,9 +148,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
@@ -183,9 +183,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, true, false, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
@@ -220,9 +220,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
@@ -263,9 +263,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
@@ -303,9 +303,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R");
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
@@ -341,9 +341,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, true, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R2");
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
@@ -376,9 +376,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
@@ -413,9 +413,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, true, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
@@ -448,9 +448,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
@@ -484,9 +484,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
-                .isEqualTo(null);
+                .isNull();
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
@@ -556,7 +556,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
 
@@ -588,9 +588,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent1Represented()).isEqualTo(YES);
-            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isNull();
             assertSolicitorReferences(false, true, false, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
@@ -622,8 +622,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
@@ -660,8 +660,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
@@ -693,8 +693,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
@@ -726,8 +726,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
@@ -759,8 +759,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(null);
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(null);
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isNull();
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNull();
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);

@@ -27,7 +27,7 @@ public class HearingFeeHwfNumberUpdatedScenarioTest extends DashboardBaseIntegra
 
     @BeforeEach
     public void before() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
     }
 
