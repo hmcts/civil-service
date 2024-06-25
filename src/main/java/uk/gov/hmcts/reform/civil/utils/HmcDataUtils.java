@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
@@ -46,7 +45,7 @@ public class HmcDataUtils {
             .map(day -> HearingDay.builder()
                 .hearingStartDateTime(convertFromUTC(day.getHearingStartDateTime()))
                 .hearingEndDateTime(convertFromUTC(day.getHearingEndDateTime()))
-                .build()).collect(Collectors.toList());
+                .build()).toList();
     }
 
     private static List<HearingDaySchedule> getScheduledDays(HearingGetResponse hearing) {
@@ -146,7 +145,7 @@ public class HmcDataUtils {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
             .sorted(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .map(day -> formatDay(day))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -186,7 +185,7 @@ public class HmcDataUtils {
 
         var totalDurationInHours = Math.floor((double)totalDurationInMinutes / MINUTES_PER_HOUR);
 
-        int days = (int)Math.floor((double)totalDurationInHours / HOURS_PER_DAY);
+        int days = (int)Math.floor(totalDurationInHours / HOURS_PER_DAY);
         int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
         int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
 
@@ -201,7 +200,7 @@ public class HmcDataUtils {
      */
     private static String concatWithAnd(List<String> strings) {
         return strings.stream()
-            .filter((string) -> string != null & !string.equals(""))
+            .filter(string -> string != null && !string.equals(""))
             .reduce((acc, displayText) -> String.format("%s and %s", acc, displayText))
             .orElse("");
     }
@@ -245,7 +244,7 @@ public class HmcDataUtils {
     }
 
     private static boolean hasHearings(HearingsResponse hearings) {
-        return hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0;
+        return hearings.getCaseHearings() != null && !hearings.getCaseHearings().isEmpty();
     }
 
     private static boolean includesVideoHearing(HearingDaySchedule hearingDay) {
@@ -261,7 +260,7 @@ public class HmcDataUtils {
     public static boolean includesVideoHearing(HearingsResponse hearings) {
         return hasHearings(hearings)
             && hearings.getCaseHearings().stream()
-            .filter(hearing -> includesVideoHearing(hearing)).count() > 0;
+            .filter(HmcDataUtils::includesVideoHearing).count() > 0;
     }
 
     @Nullable
@@ -269,7 +268,7 @@ public class HmcDataUtils {
                                                      String bearerToken, LocationReferenceDataService locationRefDataService) {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
-        if (matchedLocations.size() > 0) {
+        if (!matchedLocations.isEmpty()) {
             return matchedLocations.get(0);
         } else {
             throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId);

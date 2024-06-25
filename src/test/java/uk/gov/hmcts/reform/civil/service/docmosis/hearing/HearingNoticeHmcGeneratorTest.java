@@ -102,7 +102,7 @@ class HearingNoticeHmcGeneratorTest {
         when(locationRefDataService
                  .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
-                                                                                             .venueName("VenueName")
+                                                                                             .externalShortName("VenueName")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
                                                                                              .postcode("Postcode")

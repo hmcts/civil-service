@@ -192,6 +192,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -837,6 +838,32 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate(Document document) {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(document)
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate() {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(
+                                                       DocumentBuilder.builder()
+                                                           .documentName("frc-doc1").build())
+                                                   .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQ() {
         respondent1DQ = Respondent1DQ.builder()
             .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -1097,6 +1124,20 @@ public class CaseDataBuilder {
                                                     .band(BAND_1)
                                                     .complexityBandingAgreed(YES)
                                                     .reasons("Good reason")
+                                                    .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQWithFixedRecoverableCostsIntermediate() {
+        respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .frcSupportingDocument(
+                                                        DocumentBuilder.builder()
+                                                            .documentName("frc-doc1").build())
                                                     .build()).build();
         return this;
     }
@@ -1400,6 +1441,20 @@ public class CaseDataBuilder {
                                                    .band(BAND_1)
                                                    .complexityBandingAgreed(YES)
                                                    .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithFixedRecoverableCostsIntermediate() {
+        applicant1DQ = applicant1DQ.toBuilder()
+            .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .frcSupportingDocument(
+                                                       DocumentBuilder.builder()
+                                                           .documentName("frc-doc1").build())
                                                    .build()).build();
         return this;
     }
@@ -4546,6 +4601,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setMultiTrackClaim() {
         allocatedTrack = MULTI_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setIntermediateTrackClaim() {
+        allocatedTrack = INTERMEDIATE_CLAIM;
         return this;
     }
 
