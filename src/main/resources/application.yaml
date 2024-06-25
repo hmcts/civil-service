@@ -434,6 +434,9 @@ notifications:
   hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
   notifySettleClaimMarkedPaidInFullDefendantTemplate: "6cbcd10e-c9ed-493e-a8f0-64ce85f236c9"
 
+  notifyClaimantLRJudgmentByAdmissionTemplate: "af5a407a-d295-48ae-9bd0-8ac029c0a697"
+  notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
