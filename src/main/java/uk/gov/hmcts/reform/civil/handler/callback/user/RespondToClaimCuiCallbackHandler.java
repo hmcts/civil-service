@@ -86,6 +86,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentExperts(builder);
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
@@ -121,7 +122,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null).name())
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
                 responseDate,
                 allocatedTrack
