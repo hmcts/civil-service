@@ -95,13 +95,28 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         if (emailAddress != null && !emailAddress.isEmpty()) {
             notificationService.sendMail(
                 emailAddress,
-                isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
+                getTemplate(caseData, isLiP, isApplicant),
                 isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplate(CaseData caseData, boolean isLiP, boolean isApplicant) {
+        String emailTemplate;
+        if (isLiP) {
+            if ((isApplicant && caseData.isClaimantBilingual())
+                || caseData.isRespondentResponseBilingual()) {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            emailTemplate = notificationsProperties.getOtherPartyTrialReady();
+        }
+        return emailTemplate;
     }
 
     private String getEmail(boolean isApplicant, boolean isRespondent2, boolean isLiP, CaseData caseData) {
@@ -130,9 +145,12 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            PARTY_NAME,
+            isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT,
+            getAllPartyNames(caseData)
         );
     }
 
@@ -140,6 +158,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+        );
     }
 }

@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -22,30 +21,23 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {
+    SettleClaimCallbackHandler.class,
+    ObjectMapper.class
+})
 class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
+    @Autowired
     private SettleClaimCallbackHandler handler;
 
-    @Mock
+    @MockBean
     private ObjectMapper objectMapper;
 
     @Nested
     class AboutToStartCallback {
 
         @Test
-        void shouldReturn_error_when_case_in_all_final_orders_issued_state() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0)).isEqualTo("This action is not currently allowed at this stage");
-        }
-
-        @Test
-        void shouldReturn_error_when_case_in_any_other_state_than_all_final_orders_issued_state() {
+        void shouldNotReturn_error() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

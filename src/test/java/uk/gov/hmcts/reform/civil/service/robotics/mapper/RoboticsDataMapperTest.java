@@ -17,23 +17,23 @@ import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
@@ -91,7 +91,7 @@ class RoboticsDataMapperTest {
     @MockBean
     private Time time;
     @MockBean
-    LocationRefDataService locationRefDataService;
+    LocationReferenceDataService locationRefDataService;
     @MockBean
     LocationRefDataUtil locationRefDataUtil;
     private static final String BEARER_TOKEN = "Bearer Token";

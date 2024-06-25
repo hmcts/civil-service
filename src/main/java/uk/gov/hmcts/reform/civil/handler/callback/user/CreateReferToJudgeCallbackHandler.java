@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -41,7 +41,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REFER_TO_JUDGE);
     public static final String CONFIRMATION_HEADER = "# Your order has been referred to Judge%n## Claim number: %s";
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final LocationHelper locationHelper;
 
     private final ObjectMapper objectMapper;
