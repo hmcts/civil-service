@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+
 @Component
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
@@ -62,6 +65,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
             }
         }
+
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+
+            if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE)) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
+            }
+        }
+
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
     }
 }
