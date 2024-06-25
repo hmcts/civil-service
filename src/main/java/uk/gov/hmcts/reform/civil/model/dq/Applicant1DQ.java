@@ -200,4 +200,9 @@ public class Applicant1DQ implements DQ {
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return applicant1DQLanguageLRspec;
     }
+
+    @Override
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return null;
+    }
 }
