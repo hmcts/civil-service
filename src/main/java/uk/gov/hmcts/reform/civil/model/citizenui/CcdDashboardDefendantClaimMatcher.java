@@ -307,7 +307,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
+        return featureToggleService.isLipVLipEnabled()
             && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
@@ -396,6 +396,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
+
+    @Override
+    public boolean isNocForDefendant() {
         return false;
     }
 }

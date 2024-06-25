@@ -39,7 +39,7 @@ public class DefendantResponseDeadlineCheckCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

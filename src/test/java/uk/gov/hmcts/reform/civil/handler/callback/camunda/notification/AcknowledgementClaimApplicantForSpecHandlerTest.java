@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Ac
 @SpringBootTest(classes = {
     AcknowledgeClaimApplicantForSpecNotificationHandler.class
 })
-public class AcknowledgementClaimApplicantForSpecHandlerTest {
+class AcknowledgementClaimApplicantForSpecHandlerTest {
 
     @Autowired
     private AcknowledgeClaimApplicantForSpecNotificationHandler handler;
