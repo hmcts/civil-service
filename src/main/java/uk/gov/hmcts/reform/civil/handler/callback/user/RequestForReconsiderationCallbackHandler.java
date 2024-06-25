@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -105,7 +108,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData.CaseDataBuilder<?, ?>  getPartyDetails(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?> getPartyDetails(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> roles = getUserRole(callbackParams);
@@ -147,7 +150,12 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
-                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
+                    caseData,
+                    callbackParams.getParams().get(
+                        BEARER_TOKEN).toString(),
+                    true
+                ));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
                 updatedData.orderRequestedForReviewClaimant(YES);
             }
@@ -161,7 +169,12 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
-                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
+                    caseData,
+                    callbackParams.getParams().get(
+                        BEARER_TOKEN).toString(),
+                    false
+                ));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
                 updatedData.orderRequestedForReviewDefendant(YES);
             }
@@ -172,14 +185,47 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
+            ReasonForReconsideration reasonForReconsideration = Optional
+                .ofNullable(caseData.getReasonForReconsiderationApplicant())
+                .orElseGet(ReasonForReconsideration::new);
+            reasonForReconsideration.setRequestor(getPartyAsRequestor("Applicant - ",
+                                                                      caseData.getApplicant1(),
+                                                                      caseData.getApplicant2()
+                                                                      ));
+            updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
+            Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRequestForReviewCommentsClaimant)
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(reasonForReconsideration::setReasonForReconsiderationTxt);
             if (caseData.isRespondent1LiP()) {
-                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
+                    caseData,
+                    callbackParams.getParams().get(
+                        BEARER_TOKEN).toString(),
+                    true
+                ));
             }
             updatedData.orderRequestedForReviewClaimant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
+            ReasonForReconsideration reasonForReconsideration = Optional
+                .ofNullable(caseData.getReasonForReconsiderationRespondent1())
+                .orElseGet(ReasonForReconsideration::new);
+            reasonForReconsideration.setRequestor(getPartyAsRequestor("Defendant - ",
+                                                                      caseData.getRespondent1(), null));
+            updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
+            Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRequestForReviewCommentsDefendant)
+                .filter(StringUtils::isNotBlank)
+                .ifPresent(reasonForReconsideration::setReasonForReconsiderationTxt);
+
             if (caseData.isApplicantLiP()) {
-                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
+                    caseData,
+                    callbackParams.getParams().get(
+                        BEARER_TOKEN).toString(),
+                    false
+                ));
             }
             updatedData.orderRequestedForReviewDefendant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
@@ -187,6 +233,15 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getPartyAsRequestor(String prefix, Party party1, Party party2) {
+        StringBuilder partyName = new StringBuilder();
+        partyName.append(prefix);
+        partyName.append(party1.getPartyName());
+        Optional.ofNullable(party2)
+                .map(p -> partyName.append(" and ").append(p.getPartyName()));
+        return partyName.toString();
     }
 
     private List<String> getUserRole(CallbackParams callbackParams) {
