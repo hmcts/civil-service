@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -107,7 +108,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     LocationReferenceDataService.class,
     CourtLocationUtils.class,
     StateFlowEngine.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -128,6 +130,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AssignCategoryId assignCategoryId;
+
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -1831,6 +1836,37 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("category_id=defendant1DefenseDirectionsQuestionnaire")
                 .contains("category_id=defendant2DefenseDirectionsQuestionnaire")
                 .contains("category_id=DQRespondent")
+                .contains("category_id=DQRespondentTwo");
+        }
+
+        @Test
+        void shouldAssignCategoryId_frc_whenInvoked() {
+            //Given
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .setIntermediateTrackClaim()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1DQWithFixedRecoverableCostsIntermediate()
+                .respondent2DQWithFixedRecoverableCostsIntermediate()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+                .asString()
+                .contains("category_id=DQRespondent");
+
+            assertThat(response.getData())
+                .extracting("respondent2DQFixedRecoverableCostsIntermediate")
+                .asString()
                 .contains("category_id=DQRespondentTwo");
         }
 
