@@ -61,11 +61,11 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void createDashboardNotifications() {
 
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
