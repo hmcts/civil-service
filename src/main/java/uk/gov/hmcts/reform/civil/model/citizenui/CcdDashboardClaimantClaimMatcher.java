@@ -320,16 +320,44 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated();
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
-            && caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isSDOOrderInReview()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.getDecisionOnReconsiderationDocument().isPresent();
     }
 
     @Override

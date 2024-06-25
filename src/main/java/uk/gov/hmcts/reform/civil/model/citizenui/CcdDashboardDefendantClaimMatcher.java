@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -136,7 +137,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             return false;
         }
 
-        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+        return nonNull(caseData.getTakenOfflineDate()) && nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
@@ -237,27 +238,27 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isMediationSuccessful() {
         return !hasSdoBeenDrawn()
-            && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
+            && nonNull(caseData.getMediation())
+            && nonNull(caseData.getMediation().getMediationSuccessful())
+            && nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
         return !hasSdoBeenDrawn()
-            && Objects.nonNull(caseData.getMediation())
-            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+            && nonNull(caseData.getMediation())
+            && ((nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
-            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+            || (nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
             && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
     public boolean isMediationPending() {
-        return Objects.nonNull(caseData.getCcdState())
+        return nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
-            && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
+            && nonNull(caseData.getMediation())
+            && nonNull(caseData.getMediation().getMediationSuccessful())
             && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
@@ -271,7 +272,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasClaimEnded() {
-        return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
+        return (nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
             && caseData.isRespondentResponseFullDefence())
             || caseData.getApplicant1ResponseDeadlinePassed();
@@ -302,16 +303,44 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated();
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
-            && caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+            && !isSDOOrderInReview()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.getDecisionOnReconsiderationDocument().isPresent();
     }
 
     @Override
