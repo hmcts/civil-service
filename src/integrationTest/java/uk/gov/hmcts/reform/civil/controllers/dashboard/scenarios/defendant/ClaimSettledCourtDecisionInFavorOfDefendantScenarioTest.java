@@ -62,7 +62,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
                                " class=\"govuk-body\">You can <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" "
                                + "class=\"govuk-link\">view the repayment plan</a> or <a "
                                + "href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener "
-                               + "noreferrer\" class=\"govuk-link\">view your response</a></p>"),
+                               + "noreferrer\" class=\"govuk-link\">view your response</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Cytundeb setlo"),
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">Mae Mr. John Rambo wedi gwrthod eich cynnig ac wedi gofyn i chi lofnodi cytundeb setlo.</p>" +

@@ -102,7 +102,7 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You need to respond before 4pm on 6 May 2024."
                                + " There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
-                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
+                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a></p>")
             );
     }
 
@@ -179,8 +179,9 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("You haven't responded to the claim"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You need to respond before 4pm on 6 May 2024."
-                               + " There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
-                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
+                               + " There are {daysLeftToRespond} days remaining.</p><p class=\"govuk-body\">" +
+                               "<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" " +
+                               "class=\"govuk-link\">Respond to the claim</a></p>")
             );
     }
 }

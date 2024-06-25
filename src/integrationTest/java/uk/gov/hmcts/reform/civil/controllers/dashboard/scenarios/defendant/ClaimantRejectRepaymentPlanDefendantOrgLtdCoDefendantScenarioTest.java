@@ -58,7 +58,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                     "<p class=\"govuk-body\">Company one has rejected your payment plan, the court will issue a County Court Judgment (CCJ)."
                           +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. "
                           +  "Your online account will not be updated - any further updates will be by post. Email the details and your claim number"
-                          +  " reference to {cmcCourtEmailId} or send by post to: </p><p class=\"govuk-body\">{cmcCourtAddress}</p>"),
+                          +  " reference to {cmcCourtEmailId} or send by post to: </p><br><p class=\"govuk-body\">{cmcCourtAddress}</p>"),
                 jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                 jsonPath("$[0].descriptionCy").value(
                         "<p class=\"govuk-body\">Mae Company one wedi gwrthod eich cynllun talu, a bydd y llys yn " +
@@ -109,7 +109,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                                 "<p class=\"govuk-body\">Applicant Org has rejected your payment plan, the court will issue a County Court Judgment (CCJ)."
                                         +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. "
                                         +  "Your online account will not be updated - any further updates will be by post. Email the details and your claim number"
-                                        +  " reference to {cmcCourtEmailId} or send by post to: </p><p class=\"govuk-body\">{cmcCourtAddress}</p>"),
+                                        +  " reference to {cmcCourtEmailId} or send by post to: </p><br><p class=\"govuk-body\">{cmcCourtAddress}</p>"),
                         jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                         jsonPath("$[0].descriptionCy").value(
                                 "<p class=\"govuk-body\">Mae Applicant Org wedi gwrthod eich cynllun talu, a bydd y llys yn cyhoeddi Dyfarniad " +
