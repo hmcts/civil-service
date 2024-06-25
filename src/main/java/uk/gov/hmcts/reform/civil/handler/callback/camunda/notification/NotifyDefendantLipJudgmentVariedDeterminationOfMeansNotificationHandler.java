@@ -58,7 +58,7 @@ public class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHan
         if (nonNull(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                getTemplate(),
+                getTemplate(caseData),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -76,8 +76,12 @@ public class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHan
         );
     }
 
-    private String getTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+    private String getTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+        } else {
+            return notificationsProperties.getNotifyLipUpdateTemplate();
+        }
     }
 
     private String getReferenceTemplate(CaseData caseData) {

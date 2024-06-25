@@ -66,10 +66,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
-    public boolean isDashboardServiceEnabled() {
-        return featureToggleApi.isFeatureEnabled("dashboard-service");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -129,5 +125,30 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabled("minti")
             && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+    }
+
+    public boolean isDashboardEnabledForCase(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
+            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+    }
+
+    public boolean isNationalRolloutEnabled() {
+        return featureToggleApi.isFeatureEnabled("enable-national-rollout");
+    }
+
+    public boolean isPartOfNationalRollout(String locationEpimms) {
+        return locationEpimms != null && featureToggleApi
+            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
+    }
+
+    public boolean isGenAppsAllowedPreSdo() {
+        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
 }

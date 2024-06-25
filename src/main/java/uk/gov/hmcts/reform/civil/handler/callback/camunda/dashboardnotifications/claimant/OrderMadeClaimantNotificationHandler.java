@@ -64,7 +64,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)
-            && featureToggleService.isDashboardServiceEnabled()) {
+            && featureToggleService.isLipVLipEnabled()) {
             caseDataBuilder.requestForReconsiderationDeadline(LocalDate.now().plusDays(7).atTime(16, 0));
         }
 
