@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
@@ -47,7 +46,7 @@ public class StateFlow {
     @SuppressWarnings("unchecked")
     public List<State> getStateHistory() {
         List<String> historyList = stateMachine.getExtendedState().get(EXTENDED_STATE_HISTORY_KEY, ArrayList.class);
-        return historyList.stream().map(State::from).collect(Collectors.toList());
+        return historyList.stream().map(State::from).toList();
     }
 
     @SuppressWarnings("unchecked")

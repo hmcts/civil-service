@@ -51,8 +51,10 @@ public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler 
         return CASE_REFERRED_TO_JUDGE;
     }
 
+    private static final String GET_BODY_STRING = "<br />";
+
     private String getBody() {
-        return "<br />";
+        return GET_BODY_STRING;
     }
 
     private CallbackResponse saveReferToJudgeDefenceReceivedInTimeDetails(CallbackParams callbackParams) {
