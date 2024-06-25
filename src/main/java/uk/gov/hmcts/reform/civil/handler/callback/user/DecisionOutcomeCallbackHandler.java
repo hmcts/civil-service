@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 
@@ -32,8 +33,8 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::changeState
-        );
+            callbackKey(ABOUT_TO_SUBMIT), this::changeState,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
@@ -41,7 +42,7 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
             CaseData caseData = callbackParams.getCaseData().toBuilder()
                 .build();
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DASHBOARD_DECISION_OUTCOME));
+            caseDataBuilder.businessProcess(BusinessProcess.ready(MOVE_TO_DECISION_OUTCOME));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
