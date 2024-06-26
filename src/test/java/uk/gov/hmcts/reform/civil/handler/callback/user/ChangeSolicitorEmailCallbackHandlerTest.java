@@ -126,8 +126,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddressRequired"))
-                    .isEqualTo("Yes");
+            Assertions.assertThat(response.getData()).containsEntry("respondentSolicitor1ServiceAddressRequired", "Yes");
             Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
                 .extracting("AddressLine1")
                     .isEqualTo("mail line 1");

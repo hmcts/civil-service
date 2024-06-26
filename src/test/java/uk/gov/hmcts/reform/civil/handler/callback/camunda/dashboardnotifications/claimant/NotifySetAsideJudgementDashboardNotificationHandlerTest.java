@@ -66,7 +66,7 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiPAndSetAsideError() {
+    void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiPAndSetAsideError() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -95,7 +95,7 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
     }
 
     @Test
-    public void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiP() {
+    void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiP() {
         params.put("ccdCaseReference", "123");
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);

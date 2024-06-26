@@ -41,7 +41,7 @@ public class DocumentHearingLocationHelper {
             }
         }
 
-        LocationRefData locationRefData = Optional.ofNullable(caseData.getCaseManagementLocation())
+        return Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(CaseLocationCivil::getBaseLocation)
             .map(baseLocation -> {
                 List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
@@ -50,7 +50,7 @@ public class DocumentHearingLocationHelper {
                 ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()
-                )).collect(Collectors.toList());
+                )).toList();
                 if (sameLocation.isEmpty()) {
                     return null;
                 } else if (sameLocation.size() == 1) {
@@ -67,7 +67,6 @@ public class DocumentHearingLocationHelper {
                     return sameLocation.get(0);
                 }
             }).orElse(null);
-        return locationRefData;
     }
 
     public LocationRefData getCaseManagementLocationDetailsNro(CaseData caseData, LocationReferenceDataService locationRefDataService, String authorisation) {

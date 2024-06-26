@@ -69,7 +69,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     @Test
     public void createDashboardNotificationsWhenCarmIsEnabled() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         params.put("ccdCaseReference", "123");
 
@@ -99,7 +99,7 @@ public class DefendantMediationSuccessfulDashboardNotificationHandlerTest extend
 
     @Test
     public void createDashboardNotificationsWhenCarmIsDisabled() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         params.put("ccdCaseReference", "567");
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);

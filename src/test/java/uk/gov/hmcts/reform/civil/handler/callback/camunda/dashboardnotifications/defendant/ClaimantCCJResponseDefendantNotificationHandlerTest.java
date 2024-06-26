@@ -80,7 +80,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
@@ -144,7 +144,7 @@ public class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCal
         }
 
         @Test
-        public void configureDashboardNotificationsForClaimantResponseCCJ() {
+        void configureDashboardNotificationsForClaimantResponseCCJ() {
 
             HashMap<String, Object> params = new HashMap<>();
 
