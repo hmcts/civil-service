@@ -103,7 +103,7 @@ fees:
 
 location:
   api:
-    baseUrl: ${GENAPP_LRD_URL:http://localhost:6666}
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6669}
 
 genApp:
   fee:
@@ -352,6 +352,7 @@ notifications:
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
 
@@ -418,8 +419,8 @@ notifications:
   notifyOneVTwoClaimantSuccessfulMediation: "18b7f7f0-a1f6-4c9f-9b1f-09a4f1450f4d"
   notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
-  notifyLrDefendantSuccessfulMediationForLipVLrClaim: "d8022f51-600a-4e69-8e6b-dee584516ad3"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
+  notifyLrDefendantSuccessfulMediationForLipVLrClaim: "d8022f51-600a-4e69-8e6b-dee584516ad3"
 
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
   notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
@@ -432,6 +433,9 @@ notifications:
   notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
   hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
   notifySettleClaimMarkedPaidInFullDefendantTemplate: "6cbcd10e-c9ed-493e-a8f0-64ce85f236c9"
+
+  notifyClaimantLRJudgmentByAdmissionTemplate: "af5a407a-d295-48ae-9bd0-8ac029c0a697"
+  notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -648,15 +652,23 @@ management:
   endpoints:
     enabled-by-default: false
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: http://localhost:6661
 
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
   jrd:
     url: http://fake-rd-judicial-api
+
+bundle:
+  api:
+    url: http://localhost:8084
 
 payments:
   api:
@@ -673,7 +685,7 @@ idam:
 
 core_case_data:
   api:
-    url: http://fake-ccd-data-store-api
+    url: http://localhost:4452
 
 reference:
   database:
@@ -684,7 +696,7 @@ document_management:
 
 docmosis:
   tornado:
-    url: http://fake-docmosis-api
+    url: http://localhost:6660
     key: fake-key
 
 notifications:
@@ -716,3 +728,7 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
+
+caseFlags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}

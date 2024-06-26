@@ -11,9 +11,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -61,6 +64,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         void setup() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-bilingual");
         }
 
         @Test
@@ -134,9 +139,62 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldNotifyRespondent1Lip_whenInvokedBilingual() {
+            //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                             .build())
+                                 .build())
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to respondent1
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id-lip-bilingual",
+                getRespondentNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
             //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .respondent2Represented(YesOrNo.NO)
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Alex")
+                                 .individualLastName("Richards")
+                                 .partyName("Mr. Alex Richards")
+                                 .partyEmail("respondentLip2@gmail.com")
+                                 .build()).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to respondent2
+            verify(notificationService).sendMail(
+                "respondentLip2@gmail.com",
+                "template-id-lip",
+                getRespondent2NotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent2Lip_whenInvokedBilingual() {
+            //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
                 .respondent2(Party.builder()

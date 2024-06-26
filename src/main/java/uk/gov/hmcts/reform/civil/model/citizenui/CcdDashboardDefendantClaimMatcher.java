@@ -311,6 +311,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
         return featureToggleService.isCaseProgressionEnabled()
+            && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -338,7 +339,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isDecisionForReconsiderationMade() {
-        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return caseData.getHearingDate() == null
             && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
     }
 
@@ -424,6 +425,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
+
+    @Override
+    public boolean isNocForDefendant() {
         return false;
     }
 }
