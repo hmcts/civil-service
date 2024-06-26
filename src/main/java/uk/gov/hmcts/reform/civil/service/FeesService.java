@@ -13,7 +13,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +90,7 @@ public class FeesService {
         return Arrays.stream(feeRanges)
             .sorted(Comparator.comparing(Fee2Dto::getMinRange, Comparator.nullsFirst(Comparator.naturalOrder())))
             .filter(e -> e.getMinRange() != null)
-            .collect(Collectors.toList());
+            .toList();
     }
 
 }

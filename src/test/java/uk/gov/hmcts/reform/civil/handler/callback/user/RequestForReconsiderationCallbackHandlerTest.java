@@ -523,6 +523,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .caseDataLip(CaseDataLiP.builder()
                                  .requestForReviewCommentsClaimant("Comments from claimant")
                                  .build())
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -547,6 +548,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .caseDataLip(CaseDataLiP.builder()
                                  .requestForReviewCommentsDefendant("Comments from defendant")
                                  .build())
+                .applicant1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
