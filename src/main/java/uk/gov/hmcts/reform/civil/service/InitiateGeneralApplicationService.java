@@ -99,7 +99,7 @@ public class InitiateGeneralApplicationService {
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(dataBuilder, caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -121,8 +121,7 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
-                                                CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
