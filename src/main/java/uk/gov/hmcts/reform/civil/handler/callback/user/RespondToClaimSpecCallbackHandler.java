@@ -1392,7 +1392,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
-        final AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
@@ -1451,7 +1450,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
             }
 
             // 1v1, 2v1
@@ -1468,7 +1467,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedData
                 .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
+                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
@@ -1872,8 +1871,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         );
     }
 
-    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
-        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate, allocatedTrack);
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

@@ -104,7 +104,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -803,7 +802,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -850,7 +849,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -879,7 +878,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -918,7 +917,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -946,7 +945,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -979,7 +978,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -1137,7 +1136,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDate(dateTime).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
             .thenReturn(LocalDateTime.now());
 
         // When
@@ -2549,7 +2548,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2604,7 +2603,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2638,7 +2637,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2672,7 +2671,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2706,7 +2705,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2740,7 +2739,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().minusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2774,7 +2773,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().minusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2808,7 +2807,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().plusYears(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2897,7 +2896,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .date(LocalDate.of(2024, 5, 2))
                     .who("who 1")
-                    .build()).map(ElementUtils::element).collect(Collectors.toList());
+                    .build()).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
