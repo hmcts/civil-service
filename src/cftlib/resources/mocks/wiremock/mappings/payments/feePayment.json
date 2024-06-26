@@ -1,0 +1,41 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "POST",
+        "urlPattern": "/service-request/.*/card-payments"
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "external_reference": "DUMMY-EXT-REF",
+          "payment_reference": "DUMMY-PAYMENT-REF",
+          "status": "Initiated",
+          "date_created": "2020-02-20T20:20:20.222+0000",
+          "next_url": "{{jsonPath request.body '$.return-url'}}"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/payments/.*"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "external_reference": "DUMMY-EXT-REF",
+          "payment_reference": "DUMMY-PAYMENT-REF",
+          "status": "Success",
+          "date_created": "2020-02-20T20:20:20.222+0000"
+        }
+      }
+    }
+  ]
+}
