@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -197,16 +198,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
 import static uk.gov.hmcts.reform.civil.enums.ComplexityBand.BAND_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -4460,6 +4452,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyCheck() {
         atStateHearingFeeDuePaid();
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        return this;
+    }
+    public CaseDataBuilder atAllFinalOrdersIssuedCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = All_FINAL_ORDERS_ISSUED;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         hearingDuration = MINUTES_120;
         return this;
