@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
+import static uk.gov.hmcts.reform.civil.security.JwtGrantedAuthoritiesConverter.TOKEN_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JwtGrantedAuthoritiesConverterTest {
@@ -45,7 +47,7 @@ class JwtGrantedAuthoritiesConverterTest {
 
         @BeforeEach
         void setup() {
-            when(jwt.containsClaim(anyString())).thenReturn(false);
+            when(jwt.getClaimAsString(TOKEN_NAME)).thenReturn(null);
         }
 
         @Test
@@ -55,23 +57,19 @@ class JwtGrantedAuthoritiesConverterTest {
 
         @Test
         void shouldReturnEmptyAuthorities_whenClaimNotAvailable() {
-            when(jwt.containsClaim(anyString())).thenReturn(false);
             assertEmptyAuthorities();
         }
 
         @Test
         void shouldReturnEmptyAuthorities_whenClaimValueDoesNotMatch() {
-            when(jwt.containsClaim(anyString())).thenReturn(true);
-            when(jwt.getClaim(anyString())).thenReturn("Test");
+            when(jwt.getClaimAsString(TOKEN_NAME)).thenReturn("Test");
             assertEmptyAuthorities();
         }
 
         @Test
         void shouldReturnEmptyAuthorities_whenIdamReturnsNoUsers() {
             setupMockJwtWithValidToken();
-            UserInfo userInfo = mock(UserInfo.class);
-            when(userInfo.getRoles()).thenReturn(Collections.emptyList());
-            when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            setupUserInfo(Collections.emptyList());
             assertEmptyAuthorities();
         }
 
@@ -88,9 +86,7 @@ class JwtGrantedAuthoritiesConverterTest {
         @BeforeEach
         void setup() {
             setupMockJwtWithValidToken();
-            UserInfo userInfo = mock(UserInfo.class);
-            when(userInfo.getRoles()).thenReturn(List.of("caseworker-solicitor"));
-            when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            setupUserInfo(List.of("caseworker-solicitor"));
         }
 
         @Test
@@ -102,8 +98,13 @@ class JwtGrantedAuthoritiesConverterTest {
     }
 
     private void setupMockJwtWithValidToken() {
-        when(jwt.containsClaim(anyString())).thenReturn(true);
-        when(jwt.getClaim(anyString())).thenReturn("access_token");
+        when(jwt.getClaimAsString(TOKEN_NAME)).thenReturn(ACCESS_TOKEN);
         when(jwt.getTokenValue()).thenReturn("access_token");
+    }
+
+    private void setupUserInfo(List<String> roles) {
+        UserInfo userInfo = mock(UserInfo.class);
+        when(userInfo.getRoles()).thenReturn(roles);
+        when(userService.getUserInfo(anyString())).thenReturn(userInfo);
     }
 }
