@@ -49,7 +49,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
         HearingNoticeHmc templateData = getHearingNoticeTemplateData(caseData, hearing, authorisation, hearingLocation, hearingId);
-        DocmosisTemplates template = getTemplate(caseData);
+        DocmosisTemplates template = getTemplate();
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
         PDF pdf =  new PDF(
@@ -106,7 +106,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DocmosisTemplates getTemplate(CaseData caseData) {
+    private DocmosisTemplates getTemplate() {
         return HEARING_NOTICE_HMC;
     }
 }

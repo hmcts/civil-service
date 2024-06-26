@@ -217,7 +217,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime weekdayDate = LocalDate.of(2023, 3, 1).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
-                weekdayDate, SMALL_CLAIM);
+                weekdayDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -240,7 +240,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime weekendDate = LocalDate.of(2023, 3, 1).atTime(12, 0);
             LocalDateTime expectedDeadline = LocalDate.of(2023, 3, 29).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
-                weekendDate, SMALL_CLAIM);
+                weekendDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -263,7 +263,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(17, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
-                weekdayDate, SMALL_CLAIM);
+                weekdayDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -286,7 +286,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(16, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
-                weekdayDate, SMALL_CLAIM);
+                weekdayDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -295,10 +295,10 @@ public class DeadlinesCalculatorTest {
 
         @ParameterizedTest
         @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = "SMALL_CLAIM")
-        void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekdayAndTrackIsNotSmallClaim(AllocatedTrack track) {
+        void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekdayAndTrackIsNotSmallClaim() {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(weekdayDate, track);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(weekdayDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -310,7 +310,7 @@ public class DeadlinesCalculatorTest {
         void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekendAndTrackIsNotSmallClaim(AllocatedTrack track) {
             LocalDateTime weekendDate = LocalDate.of(2021, 2, 6).atTime(12, 0);
             LocalDateTime expectedDeadline = LocalDate.of(2021, 3, 8).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(weekendDate, track);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(weekendDate);
 
             assertThat(responseDeadline)
                 .isWeekday()

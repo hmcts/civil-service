@@ -34,9 +34,7 @@ public class CaseFlagsInitialiser {
 
         CaseData caseData = dataBuilder.build();
         switch (caseEvent) {
-            case CREATE_CLAIM:
-            case CREATE_CLAIM_SPEC:
-            case CREATE_LIP_CLAIM: {
+            case CREATE_CLAIM, CREATE_CLAIM_SPEC, CREATE_LIP_CLAIM: {
                 initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
                 break;
             }
@@ -48,9 +46,7 @@ public class CaseFlagsInitialiser {
                 addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
                 break;
             }
-            case CLAIMANT_RESPONSE:
-            case CLAIMANT_RESPONSE_SPEC:
-            case CLAIMANT_RESPONSE_CUI: {
+            case CLAIMANT_RESPONSE, CLAIMANT_RESPONSE_SPEC, CLAIMANT_RESPONSE_CUI: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
                 break;
             }
