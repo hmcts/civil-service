@@ -250,16 +250,6 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
-
-        if ((CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
-            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent))
-            && nonNull(caseData.getRequestForReconsiderationDeadline())) {
-            params.put("requestForReconsiderationDeadlineEn",
-                       DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
-            params.put("requestForReconsiderationDeadlineCy",
-                       DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
-        }
-
         return params;
     }
 
