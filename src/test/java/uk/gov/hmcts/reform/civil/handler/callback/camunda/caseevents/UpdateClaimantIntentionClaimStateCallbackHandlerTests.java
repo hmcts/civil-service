@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallbackHandlerTest {
+class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private UpdateClaimantIntentionClaimStateCallbackHandler handler;

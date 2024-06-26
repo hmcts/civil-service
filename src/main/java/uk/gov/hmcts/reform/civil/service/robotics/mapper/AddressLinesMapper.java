@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -142,6 +141,6 @@ public class AddressLinesMapper {
                                                   .splitToList(line));
         String lastToken = tokens.remove(tokens.size() - 1);
         return asList(String.join(",", tokens), lastToken.trim())
-            .stream().map(String::trim).collect(Collectors.toList());
+            .stream().map(String::trim).toList();
     }
 }

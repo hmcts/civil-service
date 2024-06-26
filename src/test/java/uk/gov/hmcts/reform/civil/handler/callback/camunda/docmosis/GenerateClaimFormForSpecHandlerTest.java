@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
+class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private GenerateClaimFormForSpecCallbackHandler handler;

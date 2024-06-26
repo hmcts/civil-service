@@ -16,19 +16,18 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -44,14 +43,16 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -63,7 +64,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -105,10 +105,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    LocationRefDataService.class,
+    LocationReferenceDataService.class,
     CourtLocationUtils.class,
     StateFlowEngine.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -130,6 +131,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private AssignCategoryId assignCategoryId;
 
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
+
     @MockBean
     private FeatureToggleService featureToggleService;
 
@@ -137,7 +141,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseUserService coreCaseUserService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private CourtLocationUtils courtLocationUtils;
@@ -356,7 +360,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
                 //Then
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
                 assertThat(respondent1DQRequestedCourt.getOtherPartyPreferredSite())
@@ -383,7 +387,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
                 //Then
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
             }
@@ -1836,6 +1840,37 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAssignCategoryId_frc_whenInvoked() {
+            //Given
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .setIntermediateTrackClaim()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1DQWithFixedRecoverableCostsIntermediate()
+                .respondent2DQWithFixedRecoverableCostsIntermediate()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+                .asString()
+                .contains("category_id=DQRespondent");
+
+            assertThat(response.getData())
+                .extracting("respondent2DQFixedRecoverableCostsIntermediate")
+                .asString()
+                .contains("category_id=DQRespondentTwo");
+        }
+
+        @Test
         void shouldRetainSolicitorReferences_WhenNoReferencesPresent() {
             //Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
@@ -2245,7 +2280,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2301,7 +2336,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2354,7 +2389,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         ))
@@ -2364,7 +2399,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))
@@ -2429,7 +2464,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .responseCourtLocations(
                                         DynamicList.fromList(
                                             Collections.singletonList(locationA),
-                                            LocationRefDataService::getDisplayEntry,
+                                            LocationReferenceDataService::getDisplayEntry,
                                             locationA,
                                             false
                                         )
@@ -2537,7 +2572,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(DynamicList.fromList(
                                         Collections.singletonList(locationA),
-                                        LocationRefDataService::getDisplayEntry,
+                                        LocationReferenceDataService::getDisplayEntry,
                                         locationA,
                                         false
                                     ))

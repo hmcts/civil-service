@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
     GenerateSettlementAgreementFormCallbackHandler.class,
     JacksonAutoConfiguration.class,
 })
-public class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHandlerTest {
+class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private GenerateSettlementAgreementFormCallbackHandler handler;
