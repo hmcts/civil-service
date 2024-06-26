@@ -47,10 +47,14 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     }
 
     protected LocalDateTime getDateWithoutBankHolidays() {
-        LocalDate date = LocalDate.now().plusDays(7);
-        while (workingDayIndicator.isPublicHoliday(date)) {
-            date = date.plusDays(1);
+        LocalDate date = LocalDate.now();
+        for (int i = 0; i < 7; i++) {
+            if (workingDayIndicator.isPublicHoliday(date)) {
+                date = date.plusDays(2);
+            } else {
+                date = date.plusDays(1);
+            }
         }
-        return date.atTime(16, 0);
+        return date.atTime(16, 0, 0);
     }
 }
