@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 
 @Service
@@ -38,7 +38,7 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
-        if(featureToggleService.isCaseProgressionEnabled()) {
+        if (featureToggleService.isCaseProgressionEnabled()) {
             CaseData caseData = callbackParams.getCaseData().toBuilder()
                 .build();
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

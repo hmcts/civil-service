@@ -113,7 +113,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         if (isSDODrawnPreCPRelease()) {
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
-        if (isFinalOrderIssued(callbackParams)){
+        if (isFinalOrderIssued(callbackParams)) {
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
@@ -138,9 +138,11 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
     }
+
     private boolean isFinalOrderIssued(CallbackParams callbackParams) {
         return All_FINAL_ORDERS_ISSUED.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
+
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));

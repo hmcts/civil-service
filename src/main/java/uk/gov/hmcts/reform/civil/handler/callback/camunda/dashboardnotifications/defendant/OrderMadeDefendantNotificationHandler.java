@@ -137,6 +137,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     private boolean isFinalOrderIssued(CallbackParams callbackParams) {
             return All_FINAL_ORDERS_ISSUED.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
+
     private boolean isSDOEvent(CallbackParams callbackParams) {
         return CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
