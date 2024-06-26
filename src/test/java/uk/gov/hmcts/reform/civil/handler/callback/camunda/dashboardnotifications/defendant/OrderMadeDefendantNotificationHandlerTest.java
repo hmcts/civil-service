@@ -80,9 +80,11 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
-                                                     CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                                                     CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
+        assertThat(handler.handledEvents()).contains(
+            CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
+            CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
+            CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
+        );
     }
 
     @Test
@@ -108,7 +110,8 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+                .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl(
+                    "url").build()).build())))
                 .respondent1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -197,7 +200,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack(FAST_CLAIM.name())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               ))
                                .build())
                 .build();
 
@@ -233,7 +239,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack(FAST_CLAIM.name())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               ))
                                .build())
                 .build();
 
@@ -267,7 +276,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack(FAST_CLAIM.name())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               ))
                                .build())
                 .build();
 
@@ -303,7 +315,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack(FAST_CLAIM.name())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               ))
                                .build())
                 .build();
 
@@ -337,7 +352,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .responseClaimTrack(FAST_CLAIM.name())
                 .totalClaimAmount(BigDecimal.valueOf(11111111))
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               ))
                                .build())
                 .build();
 
@@ -405,7 +423,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
-            var response =(AboutToStartOrSubmitCallbackResponse)  handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
