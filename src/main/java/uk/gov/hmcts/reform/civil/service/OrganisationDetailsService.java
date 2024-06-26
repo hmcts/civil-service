@@ -34,11 +34,10 @@ public class OrganisationDetailsService {
     }
 
     private String getLegalOrganisationName(Optional<Organisation> organisation) {
-        String respondentLegalOrganizationName = null;
+        String legalOrganisationName = null;
         if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
-            log.info("Legal Org Name = " + respondentLegalOrganizationName);
+            legalOrganisationName = organisation.get().getName();
         }
-        return respondentLegalOrganizationName;
+        return legalOrganisationName;
     }
 }
