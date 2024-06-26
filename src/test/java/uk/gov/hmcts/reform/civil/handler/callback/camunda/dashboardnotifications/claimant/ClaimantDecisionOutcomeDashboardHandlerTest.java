@@ -56,6 +56,7 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
                     .build()))
                 .isEqualTo(TASK_ID);
         }
+
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
@@ -80,6 +81,7 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()

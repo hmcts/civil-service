@@ -416,12 +416,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .respondent1Represented(YesOrNo.NO)
                 .build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
+            HashMap<String, Object> scenarioParams = new HashMap<>();
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 

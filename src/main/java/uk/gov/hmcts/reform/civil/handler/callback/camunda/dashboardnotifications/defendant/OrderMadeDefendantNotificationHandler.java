@@ -111,7 +111,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             return SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
 
-        if (isFinalOrderIssued(callbackParams)){
+        if (isFinalOrderIssued(callbackParams)) {
             return SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
         return SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
@@ -135,7 +135,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     }
 
     private boolean isFinalOrderIssued(CallbackParams callbackParams) {
-            return All_FINAL_ORDERS_ISSUED.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
+        return All_FINAL_ORDERS_ISSUED.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
 
     private boolean isSDOEvent(CallbackParams callbackParams) {

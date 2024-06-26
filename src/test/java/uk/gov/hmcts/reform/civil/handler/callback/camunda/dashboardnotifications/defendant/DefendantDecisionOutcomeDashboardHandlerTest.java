@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantDecisionOutcomeDashboardHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -57,6 +56,7 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
                     .build()))
                 .isEqualTo(TASK_ID);
         }
+
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
@@ -81,6 +81,7 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()

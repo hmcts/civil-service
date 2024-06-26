@@ -182,6 +182,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
         @Test
         void shouldRecordScenarioClaimantFinalOrder_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
@@ -297,7 +298,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
-
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
