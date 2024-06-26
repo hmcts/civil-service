@@ -65,7 +65,7 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
     }
 
     @Test
-    public void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
+    void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);

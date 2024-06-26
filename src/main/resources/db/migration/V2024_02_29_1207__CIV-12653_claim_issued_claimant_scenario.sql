@@ -32,4 +32,7 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
         'Yr ymateb', 'Response.Defendant.Info', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 4),
        ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
         '<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">Gweld gorchmynion a rhybuddion</a>',
-        'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 14);
+        'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 14),
+       ('<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+        'Applications', '<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.Response.Await', '{4, 4}', 'CLAIMANT', 16);

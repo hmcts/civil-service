@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -69,7 +70,6 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -84,9 +84,12 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -99,7 +102,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.time.LocalDateTime.now;
@@ -150,11 +152,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
     LocationHelper.class,
-    LocationRefDataService.class,
+    LocationReferenceDataService.class,
     JudgementService.class,
     PaymentDateService.class,
     ResponseOneVOneShowTagService.class,
-    JudgmentByAdmissionOnlineMapper.class
+    JudgmentByAdmissionOnlineMapper.class,
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -173,6 +177,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
+
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
 
@@ -189,7 +196,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
@@ -250,7 +260,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             List<String> courtlist = dynamicList.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
         }
@@ -1188,7 +1198,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -1480,6 +1490,27 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAssignCategoryId_frc_whenInvoked() {
+            // Given
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            var caseData = CaseDataBuilder.builder()
+                .setIntermediateTrackClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .multiPartyClaimTwoApplicants()
+                .applicant1DQWithFixedRecoverableCostsIntermediate()
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = getCaseData(response);
+            System.out.println(updatedData.getClaimantResponseDocuments());
+            //Then
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo("DQApplicant");
+        }
+
+        @Test
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithoutMediationAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(NO)
@@ -1682,6 +1713,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isNotEqualTo(IN_MEDIATION.toString());
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
         }
     }
 
@@ -2425,7 +2460,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2456,7 +2491,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2487,7 +2522,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2518,7 +2553,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2549,7 +2584,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().minusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2580,7 +2615,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().minusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)
@@ -2611,7 +2646,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().plusYears(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .addApplicant2(YES)

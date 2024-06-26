@@ -66,7 +66,7 @@ public class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallb
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTime() {
+    void configureDashboardNotificationsForDefendantRequestMoreTime() {
 
         HashMap<String, Object> params = new HashMap<>();
 

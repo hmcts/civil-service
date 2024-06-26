@@ -84,10 +84,24 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private String getTemplate(CaseData caseData) {
-        if ((isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT))
-            || (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1))
-            || (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2))) {
-            return notificationsProperties.getNotifyLipUpdateTemplate();
+        boolean isLip = false;
+        boolean isLipWelsh = false;
+        if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
+            isLip = true;
+            isLipWelsh = caseData.isClaimantBilingual();
+        } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
+            isLip = true;
+            isLipWelsh = caseData.isRespondentResponseBilingual();
+        } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
+            // TODO CIV-13814 not contemplated response 2 currently
+            isLip = true;
+        }
+        if (isLip) {
+            if (isLipWelsh) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
         } else {
             return notificationsProperties.getGenerateOrderNotificationTemplate();
         }
@@ -98,11 +112,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private boolean getIsSameRespondentSolicitor(CaseData caseData) {
-        boolean isSameRespondentSolicitor = false;
-        if (taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            isSameRespondentSolicitor = true;
-        }
-        return isSameRespondentSolicitor;
+        return taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES;
     }
 
     private String getReceipientEmail(CaseData caseData) {

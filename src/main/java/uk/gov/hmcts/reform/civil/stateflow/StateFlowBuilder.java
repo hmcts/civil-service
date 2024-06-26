@@ -230,7 +230,7 @@ public class StateFlowBuilder<S> {
                     if (transition.getFlags() != null) {
                         transitionConfigurer.action(
                             action -> transition.getFlags().accept(
-                                (Map<String, Boolean>)action.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class)
+                                action.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class)
                             )
                         );
                     }
@@ -239,7 +239,7 @@ public class StateFlowBuilder<S> {
                         transitionConfigurer.action(
                             action -> transition.getDynamicFlags().accept(
                                 action.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseData.class),
-                                (Map<String, Boolean>)action.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class)
+                                action.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class)
                             )
                         );
                     }

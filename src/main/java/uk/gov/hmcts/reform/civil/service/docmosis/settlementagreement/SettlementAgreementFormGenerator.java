@@ -33,6 +33,7 @@ public class SettlementAgreementFormGenerator implements TemplateDataGenerator<S
         return documentManagementService.uploadDocument(authorisation, pdf);
     }
 
+    @Override
     public SettlementAgreementForm getTemplateData(CaseData caseData) {
         return settlementAgreementFormMapper.buildFormData(caseData);
     }

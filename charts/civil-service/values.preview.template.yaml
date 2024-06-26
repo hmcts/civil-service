@@ -23,6 +23,7 @@ java:
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    CASE_FLAGS_LOGGING_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
