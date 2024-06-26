@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
@@ -189,6 +190,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -205,82 +207,74 @@ public class StateFlowEngine {
             .initial(initialState)
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
-                .set(flags -> flags.putAll(
-                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                    // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
-                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
                             .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
                             .or(claimSubmittedBothUnregisteredSolicitors))
-                .set(flags -> flags.putAll(
+                .set((c, flags) -> {
                     // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
-                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
-                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                    flags.put(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false);
+                    flags.put(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedOneUnrepresentedDefendantOnly)
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             // Unrepresented defendant 1
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedRespondent1Unrepresented
                             .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
                             .and(claimSubmittedRespondent2Unrepresented.negate()))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             // Unrepresented defendant 2
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedRespondent2Unrepresented
                             .and(claimSubmittedRespondent1Unrepresented.negate()))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false);
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             // Unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedRespondent1Unrepresented.and(
                     claimSubmittedRespondent2Unrepresented))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
-                        CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
-                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
-                    )))
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true);
+                    flags.put(GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled());
+                    flags.put(DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c));
+                    flags.put(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled());
+                    flags.put(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled());
+                })
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
@@ -305,12 +299,13 @@ public class StateFlowEngine {
                             FlowFlag.LIP_CASE.name(), false,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
                         )))
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant)))
                     .set(flags -> flags.putAll(
                         Map.of(
                             FlowFlag.LIP_CASE.name(), true,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )))
+                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -385,13 +380,13 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
                 .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
                 .transitionTo(CONTACT_DETAILS_CHANGE).onlyIf(contactDetailsChange)
-                    .set(flags -> {
-                        flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true);
-                    })
+                    .set(flags ->
+                        flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true)
+                    )
                 .transitionTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyIf(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)))
-                   .set(flags -> {
-                       flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
-                   })
+                   .set(flags ->
+                       flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true)
+                   )
                 .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
                                                        .and(not(pastClaimNotificationDeadline)))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
@@ -411,9 +406,9 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyIf(isRespondentResponseLangIsBilingual)
-                    .set(flags -> {
-                        flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
-                    })
+                    .set(flags ->
+                        flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true)
+                    )
             .state(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL)
                 .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(isTranslatedDocumentUploaded))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(isTranslatedDocumentUploaded))
@@ -579,13 +574,13 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                })
+                .set((c, flags) ->
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c))
+                )
                 .transitionTo(FULL_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                })
+                .set((c, flags) ->
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c))
+                )
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission.and(isPayImmediately))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
@@ -602,13 +597,13 @@ public class StateFlowEngine {
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
                 .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                })
+                .set((c, flags) ->
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c))
+                )
                 .transitionTo(PART_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
-                .set((c, flags) -> {
-                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
-                })
+                .set((c, flags) ->
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c))
+                )
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
@@ -674,6 +669,7 @@ public class StateFlowEngine {
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
+            .state(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC)
             .build();
     }
 

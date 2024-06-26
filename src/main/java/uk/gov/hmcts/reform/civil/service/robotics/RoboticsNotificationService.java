@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.List.of;
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
@@ -194,6 +194,11 @@ public class RoboticsNotificationService {
                                     caseData.getLegacyCaseReference(),
                                     caseData.getCcdState(), triggerEvent
             );
+        } else if (caseData.isLipvLROneVOne()) {
+            subject = String.format(
+                "LIP v LR Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
         } else {
             subject = String.format(
                 "LR v LR Case Data for %s",
@@ -207,10 +212,9 @@ public class RoboticsNotificationService {
         if (isSpecClaim) {
             return roboticsEmailConfiguration.getSpecRecipient();
         }
-        String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
-        return recipient;
+        return isMultiParty ? roboticsEmailConfiguration
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {

@@ -50,7 +50,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     DJRespondentReceivedNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-public class DJRespondentReceivedNotificationHandlerTest {
+class DJRespondentReceivedNotificationHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -141,7 +141,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "test-template-requested-id",
-                getNotificationDataMap1v2fail(caseData),
+                getNotificationDataMap1v2fail(),
                 "default-judgment-respondent-requested-notification-000DC001"
             );
         }
@@ -213,7 +213,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
             );
         }
 
-        private Map<String, String> getNotificationDataMap1v2fail(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap1v2fail() {
             return Map.of(
                 DEFENDANT_EMAIL, "Test Org Name",
                 CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
