@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -516,9 +517,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantRequest() {
+        void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantLiPRequest() {
             //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .requestForReviewCommentsClaimant("Comments from claimant")
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
@@ -530,12 +535,19 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).extracting("orderRequestedForReviewClaimant")
                 .isEqualTo("Yes");
+            assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
+                .extracting("reasonForReconsiderationTxt")
+                .isEqualTo("Comments from claimant");
         }
 
         @Test
-        void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantRequest() {
+        void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantLiPRequest() {
             //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .requestForReviewCommentsDefendant("Comments from defendant")
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
@@ -546,6 +558,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //Then: setAsideDate should be set correctly
             assertThat(response.getData()).extracting("orderRequestedForReviewDefendant")
                 .isEqualTo("Yes");
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("reasonForReconsiderationTxt")
+                .isEqualTo("Comments from defendant");
         }
     }
 
