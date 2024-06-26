@@ -419,8 +419,8 @@ notifications:
   notifyOneVTwoClaimantSuccessfulMediation: "18b7f7f0-a1f6-4c9f-9b1f-09a4f1450f4d"
   notifyLrClaimantSuccessfulMediation:  "a1125671-1e41-4c17-96aa-c57d6a2a5755"
   notifyTwoVOneDefendantSuccessfulMediation: "4bb53294-3e93-4147-82f5-597f0c05b57d"
-  notifyLrDefendantSuccessfulMediationForLipVLrClaim: "d8022f51-600a-4e69-8e6b-dee584516ad3"
   notifyLrDefendantSuccessfulMediation: "873aac33-1a57-4b36-9b48-11748037def5"
+  notifyLrDefendantSuccessfulMediationForLipVLrClaim: "d8022f51-600a-4e69-8e6b-dee584516ad3"
 
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
   notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
@@ -728,3 +728,7 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
+
+caseFlags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
