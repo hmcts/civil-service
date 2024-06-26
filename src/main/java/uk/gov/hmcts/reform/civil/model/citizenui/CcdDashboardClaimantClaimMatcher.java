@@ -327,8 +327,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-<<<<<<< feat/CIV-13717
-        return featureToggleService.isCaseProgressionEnabled()
+        return && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -356,15 +355,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isDecisionForReconsiderationMade() {
-        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return caseData.getHearingDate() == null
             && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
-=======
-        return featureToggleService.isLipVLipEnabled()
-            && caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
->>>>>>> master
     }
 
     @Override
