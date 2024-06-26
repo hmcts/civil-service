@@ -24,22 +24,40 @@ public class SendFinalOrderBulkPrintService {
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkFinalOrderDocumentAvailable(caseData)) {
             CaseDocument caseDocument = caseData.getFinalOrderDocumentCollection().get(0).getValue();
-            String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
-            String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-            byte[] letterContent;
-            try {
-                letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-            } catch (Exception e) {
-                log.error("Failed getting letter content for Final Order ");
-                throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
-            }
-            List<String> recipients = getRecipientsList(caseData, task);
-            bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                         caseData.getLegacyCaseReference(), FINAL_ORDER_PACK_LETTER_TYPE, recipients);
+            sendBulkPrint(authorisation, caseData, task, caseDocument);
         }
     }
 
+    public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
+        if (checkTranslatedFinalOrderDocumentAvailable(caseData)) {
+            CaseDocument caseDocument = caseData.getFinalOrderDocumentCollection().get(0).getValue(); //TODO: add translated document
+            sendBulkPrint(authorisation, caseData, task, caseDocument);
+        }
+    }
+
+    private void sendBulkPrint(String authorisation, CaseData caseData, String task, CaseDocument caseDocument) {
+        String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
+        String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+        byte[] letterContent;
+        try {
+            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+        } catch (Exception e) {
+            log.error("Failed getting letter content for Final Order ");
+            throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
+        }
+        List<String> recipients = getRecipientsList(caseData, task);
+        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                     caseData.getLegacyCaseReference(), FINAL_ORDER_PACK_LETTER_TYPE, recipients);
+    }
+
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
+        return nonNull(caseData.getSystemGeneratedCaseDocuments())
+            && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
+            && nonNull(caseData.getFinalOrderDocumentCollection())
+            && !caseData.getFinalOrderDocumentCollection().isEmpty();
+    }
+
+    private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData) {
         return nonNull(caseData.getSystemGeneratedCaseDocuments())
             && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
             && nonNull(caseData.getFinalOrderDocumentCollection())
