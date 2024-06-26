@@ -72,7 +72,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
                                ". Os na fyddwch wedi ymateb erbyn hynny, neu os byddwch yn gwrthod y cytundeb, gallant wneud cais am Ddyfarniad Llys Sifil (CCJ).</p>" +
                                "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" " +
                                "class=\"govuk-link\">weld y cynllun ad-dalu</a> neu <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +
-                               "rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a></p>")
+                               "rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a>.</p>")
             );
     }
 }
