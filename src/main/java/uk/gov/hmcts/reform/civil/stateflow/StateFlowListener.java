@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
@@ -60,6 +59,6 @@ public class StateFlowListener extends StateMachineListenerAdapter<String, Strin
     private List<String> toPermittedStates(Collection<Transition<String, String>> permittedTransitions) {
         return permittedTransitions.stream()
             .map(transition -> transition.getTarget().getId())
-            .collect(Collectors.toList());
+            .toList();
     }
 }
