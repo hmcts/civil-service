@@ -405,7 +405,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
-            var response =(AboutToStartOrSubmitCallbackResponse)  handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse)  handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
