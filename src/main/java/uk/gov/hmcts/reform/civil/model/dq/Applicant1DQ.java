@@ -40,6 +40,7 @@ public class Applicant1DQ implements DQ {
     private VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
     private FutureApplications applicant1DQFutureApplications;
     private WelshLanguageRequirements applicant1DQLanguageLRspec;
+    private DocumentsToBeConsidered applicant1DQDefendantDocumentsToBeConsidered;
 
     private RemoteHearing remoteHearing;
 
@@ -202,7 +203,8 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant1DQDefendantDocumentsToBeConsidered")
     public DocumentsToBeConsidered getDocumentsToBeConsidered() {
-        return null;
+        return applicant1DQDefendantDocumentsToBeConsidered;
     }
 }
