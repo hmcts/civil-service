@@ -245,7 +245,7 @@ public class MockTaskList {
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
                 .nextStatusEn(TaskStatus.INACTIVE.getName())
                 .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(11)
+                .taskOrder(12)
                 .build(),
             TaskList.builder()
                 .reference(reference)
@@ -258,7 +258,7 @@ public class MockTaskList {
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
                 .nextStatusEn(TaskStatus.INACTIVE.getName())
                 .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(12)
+                .taskOrder(13)
                 .build(),
             TaskList.builder()
                 .reference(reference)
@@ -271,7 +271,7 @@ public class MockTaskList {
                 .currentStatusCy(TaskStatus.INACTIVE.getWelshName())
                 .nextStatusEn(TaskStatus.INACTIVE.getName())
                 .nextStatusCy(TaskStatus.INACTIVE.getWelshName())
-                .taskOrder(13)
+                .taskOrder(14)
                 .build()
         );
     }
