@@ -429,7 +429,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
-        if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
+        if (isDefendant1RespondedFirst(caseData) && !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
             return CaseLocationCivil.builder()
