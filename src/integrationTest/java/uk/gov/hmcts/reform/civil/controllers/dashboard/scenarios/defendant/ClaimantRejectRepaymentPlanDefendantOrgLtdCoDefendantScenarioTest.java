@@ -58,7 +58,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                     "<p class=\"govuk-body\">Company one has rejected your payment plan, the court will issue a County Court Judgment (CCJ)."
                           +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. "
                           +  "Your online account will not be updated - any further updates will be by post. Email the details and your claim number"
-                          +  " reference to {cmcCourtEmailId} or send by post to: </p><br><p class=\"govuk-body\">{cmcCourtAddress}</p>"),
+                          +  " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
                 jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                 jsonPath("$[0].descriptionCy").value(
                         "<p class=\"govuk-body\">Mae Company one wedi gwrthod eich cynllun talu, a bydd y llys yn " +
@@ -66,7 +66,7 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                             "gallwch anfon eich manylion ariannol i’r llys a gofyn am ailbenderfyniad." +
                             " Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru - bydd unrhyw ddiweddariadau pellach yn cael eu hanfon drwy’r post." +
                             " Anfonwch y manylion a rhif eich hawliad reference ar e-bost i {cmcCourtEmailId} neu postiwch yr wybodaeth i: </p>" +
-                            "<p class=\"govuk-body\">{cmcCourtAddress}</p>"));
+                            "<br>{cmcCourtAddress}"));
     }
 
     @Test
