@@ -22,7 +22,7 @@ INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, titl
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
         'Comment made on your request',
-        'Sylwadau wedi’u gwnaed ar eich cais',
+        'Sylwadau wedi''u gwnaed ar eich cais',
         '<p class="govuk-body">The other parties have made a <u>comment on your request to review an order</u>.</p>' ||
         '<p class="govuk-body"><b>Review has been requested</b></p>' ||
         '<p class="govuk-body">A review of an order has been requested by the other parties. You can <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">view their request and/or comments</a>.</p>' ||
@@ -34,7 +34,7 @@ VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
         'DEFENDANT'),
  ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Claimant',
   'Comment made on your request',
-  'Sylwadau wedi’u gwnaed ar eich cais',
+  'Sylwadau wedi''u gwnaed ar eich cais',
   '<p class="govuk-body">The other parties have made a <u>comment on your request to review an order</u>.</p>' ||
   '<p class="govuk-body"><b>Review has been requested</b></p>' ||
   '<p class="govuk-body">A review of an order has been requested by the other parties. You can <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">view their request and/or comments</a>.</p>' ||
