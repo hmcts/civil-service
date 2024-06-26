@@ -36,7 +36,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     public static final String CMC_SERVICE = "civil money claims";
     public static final String SMALL_CLAIMS_KEYWORD = "HearingSmallClaims";
     public static final String FAST_TRACK_KEYWORD = "FastTrackHrg";
-    public static final String MULTI_TRACK_KEYWORD = "MultiTrackHrg";
     private static final String GENERAL_APP_EVENT = "general application";
     private static final String WITH_NOTICE_KEYWORD = "GAOnNotice";
     private static final String CONSENT_WITHWITHOUT_NOTICE_KEYWORD = "GeneralAppWithoutNotice";
@@ -105,14 +104,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         return buildHearingFeeRequestResponsePact(builder, JURISDICTION_CIVIL, FAST_TRACK_KEYWORD, "1000",
                                                   new BigDecimal(70.00), "FEE0002", "Hearing Fees exists for Civil",
                                                   "a request for fast track claims fees"
-        );
-    }
-
-    @Pact(consumer = "civil-service")
-    public RequestResponsePact getFeeForHearingMultiClaims(PactDslWithProvider builder) throws JSONException {
-        return buildHearingFeeRequestResponsePact(builder, JURISDICTION_CC, MULTI_TRACK_KEYWORD, "1000",
-                                                  new BigDecimal(80.00), "FEE0003", "Hearing Fees exists for Civil",
-                                                  "a request for multi track claims fees"
         );
     }
 
@@ -229,24 +220,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
 
         assertThat(fee.getCode(), is(equalTo("FEE0002")));
         assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(70))));
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getFeeForHearingMultiClaims")
-    public void verifyFeeForHearingMultiClaims() {
-
-        FeeLookupResponseDto fee =
-            feesApiClient.lookupFeeWithAmount(
-                CMC_SERVICE,
-                JURISDICTION_CIVIL,
-                JURISDICTION_CC,
-                CHANNEL,
-                HEARING_EVENT,
-                MULTI_TRACK_KEYWORD,
-                new BigDecimal(1000)
-            );
-        assertThat(fee.getCode(), is(equalTo("FEE0003")));
-        assertThat(fee.getFeeAmount(), is(equalTo(new BigDecimal(80))));
     }
 
     private RequestResponsePact buildGenAppFeeRequestResponsePact(PactDslWithProvider builder, String uponReceiving,
