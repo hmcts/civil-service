@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
+import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Comparator;
 
@@ -50,7 +51,7 @@ public class OrgPolicyUtils {
     public static PreviousOrganisation getLatestOrganisationChanges(OrganisationPolicy organisationPolicy) {
         if (organisationPolicy != null && organisationPolicy.getPreviousOrganisations() != null) {
             return organisationPolicy.getPreviousOrganisations().stream()
-                .map(orgCollectionObject -> orgCollectionObject.getValue())
+                .map(PreviousOrganisationCollectionItem::getValue)
                 .max(Comparator.comparing(PreviousOrganisation::getToTimestamp)).orElse(null);
         } else {
             return null;
