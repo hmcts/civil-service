@@ -89,8 +89,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
         //Then
-        assertThat(response.getData()).extracting("systemGeneratedCaseDocuments")
-            .asList()
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        assertThat(documentsList)
             .extracting("value")
             .extracting("documentName")
             .isNotNull();

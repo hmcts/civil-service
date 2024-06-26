@@ -299,10 +299,8 @@ public class MediationJsonService {
     }
 
     private List<MediationUnavailability> getDateRangeToAvoid(MediationAvailability mediationAvailability) {
-        if (mediationAvailability != null) {
-            if (YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
-                return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
-            }
+        if (mediationAvailability != null && YES.equals(mediationAvailability.getIsMediationUnavailablityExists())) {
+            return toMediationUnavailableDates(mediationAvailability.getUnavailableDatesForMediation());
         }
         return List.of(MediationUnavailability.builder().build());
     }

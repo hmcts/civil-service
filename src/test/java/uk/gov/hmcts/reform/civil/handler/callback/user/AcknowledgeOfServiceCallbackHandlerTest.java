@@ -236,8 +236,8 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackResponse response = handler.handle(params);
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
-                           .getData().get("respondent1ResponseDeadline").toString())
-                .isEqualTo(newDeadline);
+                           .getData().get("respondent1ResponseDeadline"))
+                .hasToString(newDeadline);
         }
 
         @Test
@@ -276,8 +276,8 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackResponse response = handler.handle(params);
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
-                           .getData().get("respondent1ResponseDeadline").toString())
-                .isEqualTo(newDeadline);
+                           .getData().get("respondent1ResponseDeadline"))
+                .hasToString(newDeadline);
         }
     }
 

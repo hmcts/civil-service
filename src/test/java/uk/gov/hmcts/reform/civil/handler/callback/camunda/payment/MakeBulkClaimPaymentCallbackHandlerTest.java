@@ -102,16 +102,6 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotMakeBulkClaimPbaPayment_whenInvokedAndIsNotBulkClaim() {
         when(paymentsService.createPbaPayment(any(), any()))
             .thenReturn(PBAServiceRequestResponse.builder().paymentReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-            .hearingDate(null)
-            .sdtRequestIdFromSdt(null)
-            .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
         verifyNoInteractions(paymentsService);
 
     }
@@ -200,9 +190,9 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnCorrectActivityIdAndCorrectEvent_whenInvoked() {
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams localParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("makeBulkClaimPayment");
+        assertThat(handler.camundaActivityId(localParams)).isEqualTo("makeBulkClaimPayment");
         assertThat(handler.handledEvents()).contains(MAKE_BULK_CLAIM_PAYMENT);
     }
 

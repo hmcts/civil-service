@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.time.LocalDate.now;
@@ -668,7 +667,7 @@ public class UnavailabilityDatesUtilsTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.of(2022, 5, 2))
                 .build()
-        ).map(ElementUtils::element).collect(Collectors.toList());
+        ).map(ElementUtils::element).toList();
 
         @Test
         public void shouldCopyDatesIntoListingTabFieldsForRespondent1() {
@@ -679,7 +678,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(DEFENDANT_RESPONSE_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimantFullDefence()
@@ -713,7 +712,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(DEFENDANT_RESPONSE_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimantFullDefence()
@@ -747,7 +746,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(CLAIMANT_INTENTION_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimantFullDefence()
@@ -781,7 +780,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(CLAIMANT_INTENTION_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimantFullDefence()
@@ -823,7 +822,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(DJ_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -893,7 +892,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(DEFENDANT_RESPONSE_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             List<UnavailableDate> expectedDatesApplicant = Stream.of(
                 UnavailableDate.builder()
@@ -902,7 +901,7 @@ public class UnavailabilityDatesUtilsTest {
                     .dateAdded(issueDate)
                     .eventAdded(CLAIMANT_INTENTION_EVENT)
                     .build()
-            ).collect(Collectors.toList());
+            ).toList();
 
             assertThat(unwrapElements(builder.build().getApplicant1().getUnavailableDates())).isEqualTo(expectedDatesApplicant);
             assertThat(unwrapElements(builder.build().getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDatesApplicant);
