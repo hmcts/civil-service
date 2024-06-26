@@ -95,7 +95,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -108,7 +108,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -148,7 +148,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
@@ -328,7 +328,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
@@ -398,7 +398,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
             ).build();
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -433,7 +433,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
             Optional.empty()));
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
@@ -473,7 +473,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
             Optional.empty()));
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()

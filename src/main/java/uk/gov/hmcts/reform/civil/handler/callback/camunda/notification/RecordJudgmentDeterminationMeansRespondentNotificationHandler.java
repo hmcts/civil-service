@@ -63,9 +63,16 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
     private CallbackResponse notifyRespondentSolicitorForRecordJudgmentDeterminationOfMeans(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isRespondentLip = caseData.isRespondent1NotRepresented();
-        String emailTemplateID = isRespondentLip
-            ? notificationsProperties.getNotifyLipUpdateTemplate()
-            : notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate();
+        String emailTemplateID;
+        if (isRespondentLip) {
+            if (caseData.isRespondentResponseBilingual()) {
+                emailTemplateID = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                emailTemplateID = notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            emailTemplateID = notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate();
+        }
 
         String recipient = isRespondentLip ? caseData.getRespondent1().getPartyEmail() :
             callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name())
