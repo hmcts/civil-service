@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -168,14 +169,12 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
     @Test
     void shouldThrowErrorWhenNoGAExits() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
+        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {});
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(((List)(response.getData().get("generalApplications"))).size()).isZero();
+        List<?> generalApplications = (List<?>) response.getData().get("generalApplications");
+        assertThat(generalApplications).isEmpty();
     }
 
     @Test
@@ -209,7 +208,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isEqualTo(null);
+        assertThat(response.getErrors()).isNull();
     }
 
     @Test
@@ -222,7 +221,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
         AboutToStartOrSubmitCallbackResponse response
             = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isEqualTo(null);
+        assertNull(response.getErrors());
     }
 
     public Boolean checkGAExitsWithBusinessProcessReady(Element<GeneralApplication> generalApplication) {

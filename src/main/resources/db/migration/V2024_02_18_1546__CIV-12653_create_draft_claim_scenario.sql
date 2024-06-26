@@ -49,6 +49,9 @@ values ('<a>View the claim</a>', 'The claim','<a>Gweld yr hawliad</a>',
         'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{1, 1}', 'CLAIMANT', 14),
 ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>Gweld y Dyfarniad</a>',
         'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{1, 1}', 'CLAIMANT', 15),
+('<a>Contact the court to request a change to my case</a>', 'Applications',
+        '<a>Contact the court to request a change to my case</a>',
+        'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{1, 1}', 'CLAIMANT', 16),
 ('<a>View applications</a>', 'Applications' ,'<a>Gweld y cais i gyd</a>',
-        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{1, 1}', 'CLAIMANT', 16);
+        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{1, 1}', 'CLAIMANT', 17);
 

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -34,9 +35,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDOApplicantsNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -44,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
     JacksonAutoConfiguration.class
 })
 
-public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -68,7 +70,8 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
             when(notificationsProperties.getSdoOrderedSpec()).thenReturn("template-id-spec");
             when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-EA");
             when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn("template-id-spec-EA");
-            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("template-id-lip-bilingual");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
@@ -110,6 +113,26 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
         }
 
         @Test
+        void shouldNotifyApplicantLip_whenInvokedBilingual() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicantLip@example.com",
+                "template-id-lip-bilingual",
+                getNotificationDataMapLip(),
+                "create-sdo-applicants-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyApplicantSolicitorStatement_whenInvoked() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
@@ -144,8 +167,9 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
         @NotNull
         private Map<String, String> getNotificationDataMapLip() {
             return Map.of(
+                PARTY_NAME, "Mr. John Rambo",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIMANT_NAME, "Mr. John Rambo"
+                CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
             );
         }
 

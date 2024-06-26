@@ -327,6 +327,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
+<<<<<<< feat/CIV-13717
         return featureToggleService.isCaseProgressionEnabled()
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
@@ -357,6 +358,13 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isDecisionForReconsiderationMade() {
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
+=======
+        return featureToggleService.isLipVLipEnabled()
+            && caseData.getHearingDate() == null
+            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+>>>>>>> master
     }
 
     @Override
@@ -451,5 +459,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             && caseData.isClaimantBilingual();
+    }
+
+    public boolean isNocForDefendant() {
+        return isPaperResponse()
+            && (caseData.getBusinessProcess() != null
+            && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(caseData.getBusinessProcess().getCamundaEvent()));
     }
 }
