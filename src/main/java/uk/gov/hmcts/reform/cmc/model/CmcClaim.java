@@ -413,6 +413,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return false;
+    }
+
+    @Override
     public boolean hasClaimEnded() {
         return (Objects.nonNull(response)
             && response.isFullDefence()
