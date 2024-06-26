@@ -44,7 +44,7 @@ VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant',
         "Notice.AAA6.ClaimIssue.HWF.PhonePayment", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.ClaimIssue.HWF.FullRemission",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant",
         "Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant",
-        "Notice.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"}',
+        "Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant"}',
         '{"Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant":["respondent1PartyName", "applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
 
 /**

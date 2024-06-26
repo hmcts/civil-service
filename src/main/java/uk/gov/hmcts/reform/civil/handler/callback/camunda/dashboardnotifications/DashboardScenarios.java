@@ -97,7 +97,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT("Scenario.AAA6.CP.Hearing.Scheduled.Claimant"),
     SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT("Scenario.AAA6.CP.Hearing.Scheduled.Defendant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
-    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_FAST_TRACK_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.FastTrack.Claimant"),
+    SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MULTI_INT_FAST_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Upload.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT("Scenario.AAA6.CP.HearingDocuments.Upload.Defendant"),
