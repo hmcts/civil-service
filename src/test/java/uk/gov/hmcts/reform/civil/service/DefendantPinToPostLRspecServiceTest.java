@@ -35,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,7 +123,7 @@ class DefendantPinToPostLRspecServiceTest {
         void shouldCheckPinIsValidForCMC_whenInvoked() {
             Response response = createResponseWithHeader(HttpStatus.SC_MOVED_TEMPORARILY, "Location");
 
-            when(cuiIdamClientService.authenticatePinUser(eq("TEST1234"), eq("620MC123"))).thenReturn(response);
+            when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
 
             Assertions.assertDoesNotThrow(() -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
@@ -133,7 +132,7 @@ class DefendantPinToPostLRspecServiceTest {
         void shouldCheckPinIsNotValidForCMC_whenInvoked() {
             Response response = createResponse(HttpStatus.SC_BAD_REQUEST);
 
-            when(cuiIdamClientService.authenticatePinUser(eq("TEST1234"), eq("620MC123"))).thenReturn(response);
+            when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }

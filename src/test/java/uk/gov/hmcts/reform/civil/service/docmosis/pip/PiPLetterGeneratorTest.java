@@ -38,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -141,8 +140,8 @@ class PiPLetterGeneratorTest {
 
         // Then
         verify(documentGeneratorService).generateDocmosisDocument(refEq(LETTER_TEMPLATE_DATA), refEq(PIN_IN_THE_POST_LETTER));
-        verify(civilDocumentStitchingService).bundle(eq(specClaimTimelineDocuments), eq(BEARER_TOKEN), eq("sealed_claim_form_000DC001.pdf"),
-                                                     eq("sealed_claim_form_000DC001.pdf"), eq(caseData));
+        verify(civilDocumentStitchingService).bundle(specClaimTimelineDocuments, BEARER_TOKEN, "sealed_claim_form_000DC001.pdf",
+                                                     "sealed_claim_form_000DC001.pdf", caseData);
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {

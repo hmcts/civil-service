@@ -130,7 +130,9 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldNotDownloadDocument_whenFinalOrderOrderDocumentIsNull() {
         // given
-        CaseData caseData = buildCaseData(null, SEALED_CLAIM, false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements((CaseDocument) null))
+            .build();
 
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -143,7 +145,9 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsIsNull() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(null).build();
+            .systemGeneratedCaseDocuments(null)
+            .respondent1(PartyBuilder.builder().individual().build()) // Adding a respondent to differentiate
+            .build();
 
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);

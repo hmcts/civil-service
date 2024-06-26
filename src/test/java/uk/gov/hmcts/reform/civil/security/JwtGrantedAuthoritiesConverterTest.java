@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.security;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -89,7 +89,7 @@ class JwtGrantedAuthoritiesConverterTest {
         void setup() {
             setupMockJwtWithValidToken();
             UserInfo userInfo = mock(UserInfo.class);
-            when(userInfo.getRoles()).thenReturn(ImmutableList.of("caseworker-solicitor"));
+            when(userInfo.getRoles()).thenReturn(List.of("caseworker-solicitor"));
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
         }
 

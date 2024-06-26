@@ -62,7 +62,7 @@ class SendHearingBulkPrintServiceTest {
         return caseDataBuilder.build();
     }
 
-    private void verifyPrintLetter(CaseData caseData, String taskId, Party party) {
+    private void verifyPrintLetter(CaseData caseData, Party party) {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
@@ -84,7 +84,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
-        verifyPrintLetter(caseData, TASK_ID_DEFENDANT, respondent1);
+        verifyPrintLetter(caseData, respondent1);
     }
 
     @Test
@@ -99,7 +99,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
-        verifyPrintLetter(caseData, TASK_ID_CLAIMANT, claimant);
+        verifyPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -130,7 +130,9 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldNotDownloadDocument_whenHearingOrderDocumentIsNull() {
         // given
-        CaseData caseData = buildCaseData(null, SEALED_CLAIM, false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument[] {null})) // Adding a null CaseDocument explicitly
+            .build();
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -143,7 +145,9 @@ class SendHearingBulkPrintServiceTest {
     void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsIsNull() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(null).build();
+            .systemGeneratedCaseDocuments(null)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
