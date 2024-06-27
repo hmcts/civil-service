@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.math.BigDecimal;
