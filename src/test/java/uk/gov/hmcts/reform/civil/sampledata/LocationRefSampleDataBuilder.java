@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
@@ -290,7 +289,7 @@ public class LocationRefSampleDataBuilder {
     protected List<String> locationsFromDynamicList(DynamicList dynamicList) {
         return dynamicList.getListItems().stream()
             .map(DynamicListElement::getLabel)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
