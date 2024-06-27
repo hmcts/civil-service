@@ -514,6 +514,41 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .isEqualTo("Defendant - FirstName LastName");
             assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes").isNull();
         }
+
+        @Test
+        void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantRequest() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("orderRequestedForReviewClaimant")
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantRequest() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .applicant1Represented(YesOrNo.NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("orderRequestedForReviewDefendant")
+                .isEqualTo("Yes");
+        }
     }
 
     @Nested
