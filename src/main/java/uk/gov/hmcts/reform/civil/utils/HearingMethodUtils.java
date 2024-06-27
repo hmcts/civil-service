@@ -23,7 +23,7 @@ public class HearingMethodUtils {
         DynamicList hearingMethodList;
         if (categorySearchResult != null) {
             List<Category> categories = categorySearchResult.getCategories().stream()
-                .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).collect(Collectors.toList());
+                .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).toList();
             hearingMethodList = DynamicList.fromList(categories, Category::getValueEn, null, false);
         } else {
             hearingMethodList = DynamicList.fromList(List.of());

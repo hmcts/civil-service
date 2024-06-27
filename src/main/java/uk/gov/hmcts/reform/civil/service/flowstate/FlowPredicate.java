@@ -209,8 +209,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
-    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
-        caseData.isClaimantBilingual();
+    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -513,7 +512,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceNotProceed = FlowPredicate::getPredicateForClaimantIntentionNotProceed;
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getTakenOfflineDate() != null && caseData.getChangeOfRepresentation() == null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getDrawDirectionsOrderRequired() != null
@@ -545,8 +544,7 @@ public class FlowPredicate {
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
 
     //TODO Remove after DTSCCI-244
-    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
-        FlowPredicate::getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = FlowPredicate::getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
 
     //TODO Remove after DTSCCI-244
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = FlowPredicate::getPredicateTakenOfflineByStaffAfterClaimIssue;

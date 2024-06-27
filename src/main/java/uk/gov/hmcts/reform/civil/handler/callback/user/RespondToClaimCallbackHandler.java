@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -114,6 +115,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -511,6 +513,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         if (toggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(updatedData);

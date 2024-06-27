@@ -403,6 +403,16 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isSDOOrderInReview() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return false;
+    }
+
+    @Override
     public boolean hasClaimEnded() {
         return (Objects.nonNull(response)
             && response.isFullDefence()
@@ -522,6 +532,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
+
+    @Override
+    public boolean isNocForDefendant() {
         return false;
     }
 

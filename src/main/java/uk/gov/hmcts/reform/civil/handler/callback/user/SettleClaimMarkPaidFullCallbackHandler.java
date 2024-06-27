@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.SettleClaimHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -24,6 +25,7 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -33,11 +35,17 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM_MARK_PAID_FULL);
-    public static final String PROCEED_HERITAGE_SYSTEM_NEXT_STEPS = "### Next step\n\n The case will now proceed offline " +
-        "and your online account will not be updated for this claim. Any updates will be sent by post.";
-    public static final String CLOSED_NEXT_STEPS = "### Next step\n\n Any hearing listed will be vacated. " +
-        "\n\n The defendants will be notified.";
-    public static final String PROCEED_HERITAGE_SYSTEM_HEADER = "### Request is being reviewed";
+    public static final String REQUEST_BEING_REVIEWED_NEXT_STEPS = """
+            ### Next step
+
+             The case will now proceed offline and your online account will not be updated for this claim. Any updates will be sent by post.""";
+    public static final String CLOSED_NEXT_STEPS = """
+            ### Next step
+
+             Any hearing listed will be vacated.\s
+
+             The defendants will be notified.""";
+    public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
     public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
     private final ObjectMapper objectMapper;
 
@@ -61,13 +69,11 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         SettleClaimHelper.checkState(caseData, errors);
-        if (errors.isEmpty()) {
-            if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
-                List<String> claimantNames = new ArrayList<>();
-                claimantNames.add(caseData.getApplicant1().getPartyName());
-                claimantNames.add(caseData.getApplicant2().getPartyName());
-                caseDataBuilder.claimantWhoIsSettling(DynamicList.fromList(claimantNames));
-            }
+        if (errors.isEmpty() && (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES))) {
+            List<String> claimantNames = new ArrayList<>();
+            claimantNames.add(caseData.getApplicant1().getPartyName());
+            claimantNames.add(caseData.getApplicant2().getPartyName());
+            caseDataBuilder.claimantWhoIsSettling(DynamicList.fromList(claimantNames));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -78,18 +84,16 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        String nextState;
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        AboutToStartOrSubmitCallbackResponse
+            .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder();
 
-        if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-        } else {
-            nextState = CaseState.CLOSED.name();
+        if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CLOSED.name());
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(nextState)
-            .build();
+        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -103,14 +107,14 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private static String getBody(CaseData caseData) {
         if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            return format(PROCEED_HERITAGE_SYSTEM_NEXT_STEPS);
+            return format(REQUEST_BEING_REVIEWED_NEXT_STEPS);
         }
         return format(CLOSED_NEXT_STEPS);
     }
 
     private static String getHeader(CaseData caseData) {
         if (NO.equals(caseData.getMarkPaidForAllClaimants())) {
-            return format(PROCEED_HERITAGE_SYSTEM_HEADER);
+            return format(REQUEST_BEING_REVIEWED_HEADER);
         }
         return format(CLOSED_HEADER);
     }

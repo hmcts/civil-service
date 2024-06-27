@@ -243,8 +243,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                               && fileName.equals(element.getValue().getDocumentName()));
     }
 
+    static final String DEFENDANT = "defendant";
+
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
-        String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
+        boolean isRespondent = isRespondentState(caseData);
+        String userPrefix = isRespondent ? DEFENDANT : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
@@ -295,6 +298,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return true;
     }
 
+    static final String SMALL_CLAIM = "SMALL_CLAIM";
+
     @NotNull
     protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
@@ -329,7 +334,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         boolean specAndSmallClaim = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
+            && SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             specAndSmallClaim = true;
         }
 
@@ -357,39 +362,40 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder;
     }
 
+    static final String organisationName = "Organisation name";
+
     protected List<Party> getApplicants(CaseData caseData) {
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();
         var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
         var litigationFriend = caseData.getRespondent1LitigationFriend();
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-                return List.of(Party.builder()
-                                   .name(applicant.getPartyName())
-                                   .emailAddress(caseData.getApplicant1().getPartyEmail())
-                                   .phoneNumber(caseData.getApplicant1().getPartyPhone())
-                                   .primaryAddress(applicant.getPrimaryAddress())
-                                   .representative(respondentRepresentative)
-                                   .litigationFriendName(
-                                       ofNullable(litigationFriend)
-                                           .map(LitigationFriend::getFullName)
-                                           .orElse(""))
-                                   .legalRepHeading(legalRepHeading)
-                                   .build(),
-                               Party.builder()
-                                   .name(applicant2.getPartyName())
-                                   .emailAddress(caseData.getApplicant2().getPartyEmail())
-                                   .phoneNumber(caseData.getApplicant2().getPartyPhone())
-                                   .primaryAddress(applicant2.getPrimaryAddress())
-                                   .representative(respondentRepresentative)
-                                   .litigationFriendName(
-                                       ofNullable(litigationFriend)
-                                           .map(LitigationFriend::getFullName)
-                                           .orElse(""))
-                                   .legalRepHeading(legalRepHeading)
-                                   .build());
-            }
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            return List.of(Party.builder()
+                               .name(applicant.getPartyName())
+                               .emailAddress(caseData.getApplicant1().getPartyEmail())
+                               .phoneNumber(caseData.getApplicant1().getPartyPhone())
+                               .primaryAddress(applicant.getPrimaryAddress())
+                               .representative(respondentRepresentative)
+                               .litigationFriendName(
+                                   ofNullable(litigationFriend)
+                                       .map(LitigationFriend::getFullName)
+                                       .orElse(""))
+                               .legalRepHeading(legalRepHeading)
+                               .build(),
+                           Party.builder()
+                               .name(applicant2.getPartyName())
+                               .emailAddress(caseData.getApplicant2().getPartyEmail())
+                               .phoneNumber(caseData.getApplicant2().getPartyPhone())
+                               .primaryAddress(applicant2.getPrimaryAddress())
+                               .representative(respondentRepresentative)
+                               .litigationFriendName(
+                                   ofNullable(litigationFriend)
+                                       .map(LitigationFriend::getFullName)
+                                       .orElse(""))
+                               .legalRepHeading(legalRepHeading)
+                               .build());
         }
         return List.of(Party.builder()
                            .name(applicant.getPartyName())
@@ -408,7 +414,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
         var applicant = caseData.getApplicant2();
         var litigationFriend = caseData.getApplicant2LitigationFriend();
         var applicant2PartyBuilder = Party.builder()
@@ -443,7 +449,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private Party getApplicant1DQParty(CaseData caseData) {
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
         var applicant = caseData.getApplicant1();
         var litigationFriend = caseData.getApplicant1LitigationFriend();
         var applicant1PartyBuilder = Party.builder()
@@ -521,9 +527,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private FurtherInformation getFurtherInformation(DQ dq, CaseData caseData) {
         Optional<FurtherInformation> dqFurtherInformation = ofNullable(dq.getFurtherInformation());
-        Optional<FutureApplications> r1dqFutureApplications = ofNullable(
-            dq instanceof Respondent1DQ ? (Respondent1DQ) dq : null
-        ).map(Respondent1DQ::getFutureApplications);
+        Respondent1DQ respondent1dq = null;
+        if (dq instanceof Respondent1DQ r1dq) {
+            respondent1dq = r1dq;
+        }
+        Optional<FutureApplications> r1dqFutureApplications = ofNullable(respondent1dq)
+            .map(Respondent1DQ::getFutureApplications);
 
         YesOrNo wantMore = Stream.of(
             r1dqFutureApplications
@@ -634,7 +643,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
@@ -669,7 +678,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+            .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
@@ -720,7 +729,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
 
         if (isClaimantResponse(caseData)) {
 
@@ -1101,18 +1110,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .build();
     }
 
-    private Witnesses getWitnessesSmallClaim(Integer witnessesIncludingDefendants) {
-        if (witnessesIncludingDefendants != null
-            && witnessesIncludingDefendants > 0) {
-            return Witnesses.builder().witnessesToAppear(YES)
-                .details(Collections.emptyList())
-                .build();
-        }
-        return Witnesses.builder().witnessesToAppear(NO)
-            .details(Collections.emptyList())
-            .build();
-    }
-
     private Hearing getHearing(DQ dq) {
         var hearing = dq.getHearing();
         if (hearing != null) {
@@ -1187,8 +1184,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private String createStatementOfTruthText(Boolean respondentState) {
-        String role = respondentState ? "defendant" : "claimant";
-        String statementOfTruth = role.equals("defendant")
+        String role = Boolean.TRUE.equals(respondentState) ? DEFENDANT : "claimant";
+        String statementOfTruth = role.equals(DEFENDANT)
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
         statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"

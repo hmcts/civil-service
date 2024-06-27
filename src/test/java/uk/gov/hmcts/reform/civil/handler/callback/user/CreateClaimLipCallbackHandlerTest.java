@@ -141,10 +141,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .partyEmail("claimant@email.com").build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
@@ -160,10 +160,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
@@ -176,10 +176,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetOrganisationPolicies_whenInvoked() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
@@ -191,10 +191,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetCaseManagementLocation() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("caseManagementLocation.region")
@@ -207,10 +207,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetFlightDelayType() {
             caseData.setIsFlightDelayClaim(YesOrNo.YES);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("claimType")

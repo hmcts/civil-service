@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -136,6 +137,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AssignCategoryId assignCategoryId;
+
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -363,7 +367,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
                 //Then
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
                 assertThat(respondent1DQRequestedCourt.getOtherPartyPreferredSite())
@@ -390,7 +394,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
+                    .toList();
                 //Then
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
             }

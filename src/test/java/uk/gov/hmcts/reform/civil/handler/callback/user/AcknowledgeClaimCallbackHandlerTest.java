@@ -116,8 +116,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
+            assertThat(response.getData())
+                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
+            assertThat(response.getData())
+                .containsEntry("respondent2Copy", response.getData().get("respondent2"));
         }
 
         @Test
@@ -165,7 +167,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+            assertThat(response.getData())
+                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
             assertThat(response.getData().get("respondent2Copy")).isNull();
         }
 

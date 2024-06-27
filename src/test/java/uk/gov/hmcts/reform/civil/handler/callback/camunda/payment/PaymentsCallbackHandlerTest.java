@@ -154,9 +154,9 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePayment");
+            assertThat(handler.camundaActivityId(localParams)).isEqualTo("CreateClaimMakePayment");
         }
     }
 

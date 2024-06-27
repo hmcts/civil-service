@@ -19,9 +19,10 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -45,6 +46,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
@@ -103,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -546,7 +549,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -581,7 +584,7 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -921,7 +924,7 @@ class StateFlowEngineTest {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -2281,7 +2284,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
                     IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), TAKEN_OFFLINE_AFTER_SDO.fullName()
                 );
 
@@ -2631,7 +2634,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
                     IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(),
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
@@ -4212,8 +4215,8 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                .applicant1ProceedWithClaim(YES)
-                .build());
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4251,13 +4254,13 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(NO)
-                        .build()
-                )
-                .build());
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .applicant1ClaimMediationSpecRequired(
+                                                                  SmallClaimMedicalLRspec.builder()
+                                                                      .hasAgreedFreeMediation(NO)
+                                                                      .build()
+                                                              )
+                                                              .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4287,7 +4290,7 @@ class StateFlowEngineTest {
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .responseClaimMediationSpecRequired(YES)
                 .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                    .hasAgreedFreeMediation(YES).build())
+                                                          .hasAgreedFreeMediation(YES).build())
                 .build();
 
             // When
@@ -4297,13 +4300,13 @@ class StateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(YES)
-                        .build()
-                )
-                .build());
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .applicant1ClaimMediationSpecRequired(
+                                                                  SmallClaimMedicalLRspec.builder()
+                                                                      .hasAgreedFreeMediation(YES)
+                                                                      .build()
+                                                              )
+                                                              .build());
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
@@ -4375,10 +4378,10 @@ class StateFlowEngineTest {
                 .responseClaimMediationSpecRequired(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .caseDataLiP(CaseDataLiP.builder()
-                    .applicant1ClaimMediationSpecRequiredLip(
-                        ClaimantMediationLip.builder()
-                            .hasAgreedFreeMediation(MediationDecision.Yes)
-                            .build()).build())
+                                 .applicant1ClaimMediationSpecRequiredLip(
+                                     ClaimantMediationLip.builder()
+                                         .hasAgreedFreeMediation(MediationDecision.Yes)
+                                         .build()).build())
                 .build();
 
             // When
@@ -4412,10 +4415,10 @@ class StateFlowEngineTest {
                 .responseClaimMediationSpecRequired(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .caseDataLiP(CaseDataLiP.builder()
-                    .applicant1ClaimMediationSpecRequiredLip(
-                        ClaimantMediationLip.builder()
-                            .hasAgreedFreeMediation(MediationDecision.No)
-                            .build()).build())
+                                 .applicant1ClaimMediationSpecRequiredLip(
+                                     ClaimantMediationLip.builder()
+                                         .hasAgreedFreeMediation(MediationDecision.No)
+                                         .build()).build())
                 .build();
 
             // When
@@ -4630,7 +4633,7 @@ class StateFlowEngineTest {
             .extracting(State::getName)
             .containsExactly(
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
                 IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
             );
 
@@ -4797,7 +4800,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .containsExactly(
                     SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), FULL_DEFENCE.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
                     IN_MEDIATION.fullName(), MEDIATION_UNSUCCESSFUL_PROCEED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
@@ -4870,20 +4873,20 @@ class StateFlowEngineTest {
         void shouldContinueOnline_1v1Spec_HwF_whenDefendantIsUnrepresented() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v1UnrepresentedDefendant()
-                .applicant1Represented(NO)
-                .respondent1Represented(NO)
-                .build().toBuilder()
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .hwfFeeType(CLAIMISSUED)
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFee(YesOrNo.YES)
-                        .helpWithFeesReferenceNumber("12345678912")
-                        .build()).build())
-                .caseAccessCategory(SPEC_CLAIM).build();
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .applicant1Represented(NO)
+                    .respondent1Represented(NO)
+                    .build().toBuilder()
+                    .takenOfflineDate(null)
+                    .paymentSuccessfulDate(null)
+                    .claimIssuedPaymentDetails(null)
+                    .hwfFeeType(CLAIMISSUED)
+                    .caseDataLiP(CaseDataLiP.builder().helpWithFees(
+                            HelpWithFees.builder()
+                                    .helpWithFee(YesOrNo.YES)
+                                    .helpWithFeesReferenceNumber("12345678912")
+                                    .build()).build())
+                    .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -4891,15 +4894,15 @@ class StateFlowEngineTest {
 
             // Then
             assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.PIP_ENABLED.name(), true),
-                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                entry(FlowFlag.LIP_CASE.name(), true),
-                entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
+                    entry(FlowFlag.PIP_ENABLED.name(), true),
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                    entry(FlowFlag.LIP_CASE.name(), true),
+                    entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
             );
         }
 
@@ -4915,13 +4918,13 @@ class StateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
                 .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
@@ -4952,13 +4955,13 @@ class StateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .caseDataLiP(CaseDataLiP.builder()
-                    .helpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("Test")
-                        .build())
-                    .build())
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForClaimIssue(YES)
-                    .build())
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
                 .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
@@ -5037,8 +5040,8 @@ class StateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -5058,30 +5061,30 @@ class StateFlowEngineTest {
         void shouldReturnProceedsInHeritageSystem_whenPartAdmitRepaymentAcceptedWithCCJ() {
             // Given
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .build();
+                    .ccjPaymentPaidSomeOption(YES)
+                    .build();
             DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+                    .accessCode("TEST")
+                    .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v1UnrepresentedDefendant()
-                .applicant1Represented(NO)
-                .build().toBuilder()
-                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
-                .takenOfflineDate(null)
-                .paymentSuccessfulDate(null)
-                .claimIssuedPaymentDetails(null)
-                .caseAccessCategory(SPEC_CLAIM)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .claimNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .build();
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .applicant1Represented(NO)
+                    .build().toBuilder()
+                    .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+                    .takenOfflineDate(null)
+                    .paymentSuccessfulDate(null)
+                    .claimIssuedPaymentDetails(null)
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .claimNotificationDeadline(LocalDateTime.now())
+                    .claimNotificationDate(LocalDateTime.now())
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .build();
 
             // When
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -5089,11 +5092,11 @@ class StateFlowEngineTest {
 
             // Then
             assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(PART_ADMIT_AGREE_REPAYMENT.fullName());
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(PART_ADMIT_AGREE_REPAYMENT.fullName());
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
+                    entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
             );
         }
     }
@@ -5117,8 +5120,8 @@ class StateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -5178,6 +5181,47 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getFlags()).contains(
                 entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
             );
+        }
+    }
+
+    @Nested
+    class TakenOfflineByDefendantNoc {
+        @Test
+        void shouldTakenOffline_whenNOCSubmittedForLipDefendant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .takenOfflineDate(LocalDateTime.now())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
+                                            .timestamp(LocalDateTime.now())
+                                            .organisationToAddID("HA160")
+                                            .build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC.fullName());
         }
     }
 }

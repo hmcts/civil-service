@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -138,7 +139,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("Yes"));
+            assertEquals("Yes", response.getData().get("isRespondent1"));
         }
 
         @Test
@@ -156,7 +157,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("No"));
+            assertEquals("No", response.getData().get("isRespondent1"));
         }
     }
 

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -320,16 +319,34 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && !isSDOOrderLegalAdviserCreated();
+            && !isSDOOrderLegalAdviserCreated()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty();
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
-        return featureToggleService.isDashboardServiceEnabled()
-            && caseData.getHearingDate() == null
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && !isSDOOrderInReview()
+            && !isSDOOrderInReviewOtherParty();
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewClaimant())
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES);
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return featureToggleService.isCaseProgressionEnabled()
+            && isSDOMadeByLegalAdviser()
+            && nonNull(caseData.getOrderRequestedForReviewDefendant())
+            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+            && !isSDOOrderInReview();
     }
 
     @Override
@@ -424,5 +441,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             && caseData.isClaimantBilingual();
+    }
+
+    public boolean isNocForDefendant() {
+        return isPaperResponse()
+            && (caseData.getBusinessProcess() != null
+            && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(caseData.getBusinessProcess().getCamundaEvent()));
     }
 }

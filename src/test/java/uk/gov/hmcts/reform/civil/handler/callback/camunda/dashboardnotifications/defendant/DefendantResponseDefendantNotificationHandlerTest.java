@@ -88,11 +88,11 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -127,7 +127,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitImmediately() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -162,7 +162,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitInstalmentCompanyOrganisation() {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitInstalmentCompanyOrganisation() {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -200,7 +200,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstalmentCompanyOrganisation() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitInstalmentCompanyOrganisation() {
 
             HashMap<String, Object> params = new HashMap<>();
 
@@ -238,7 +238,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitAlreadyPaid() {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitAlreadyPaid() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -268,7 +268,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitAlreadyPaid() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitAlreadyPaid() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -298,7 +298,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDate() {
+        void configureDashboardNotificationsForDefendantResponseForPartAdmitBySetDate() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -334,7 +334,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitBySetDate() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitBySetDate() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -370,7 +370,7 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallments() {
+        void configureDashboardNotificationsForDefendantResponseForFullAdmitInstallments() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
@@ -405,12 +405,12 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForDefenceNoMediation() {
+        void configureDashboardNotificationsForDefendantResponseForDefenceNoMediation() {
             //given
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
@@ -439,13 +439,13 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllWithMediation() {
+        void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllWithMediation() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -472,13 +472,13 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllFastTrack() {
+        void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllFastTrack() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -505,13 +505,13 @@ public class DefendantResponseDefendantNotificationHandlerTest extends BaseCallb
         }
 
         @Test
-        public void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllSmallTrackCarm() {
+        void configureDashboardNotificationsForDefendantResponseForFullDefenceDisputeAllSmallTrackCarm() {
             //given
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()

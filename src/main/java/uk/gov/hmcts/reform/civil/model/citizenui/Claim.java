@@ -90,6 +90,10 @@ public interface Claim {
 
     boolean isSDOOrderLegalAdviserCreated();
 
+    boolean isSDOOrderInReview();
+
+    boolean isSDOOrderInReviewOtherParty();
+
     boolean isClaimantDefaultJudgement();
 
     boolean isPartialAdmissionAccepted();
@@ -119,4 +123,6 @@ public interface Claim {
     boolean isClaimSubmittedNotPaidOrFailedNotHwF();
 
     boolean isClaimSubmittedWaitingTranslatedDocuments();
+
+    boolean isNocForDefendant();
 }
