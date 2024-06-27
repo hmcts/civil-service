@@ -54,6 +54,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+            translatedDocuments.forEach(document -> {
+                if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
+                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                }
+            });
+        }
         return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
     }
 
