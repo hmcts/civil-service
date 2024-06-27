@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateDirectionsQuestionnaireCallbackHandler.class,
+    DirectionsQuestionnairePreparer.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     AssignCategoryId.class

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -27,13 +28,13 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now").timeZone("UTC"))
                             .must(beState(AWAITING_APPLICANT_INTENTION)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                            .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now").timeZone("UTC"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                            .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now").timeZone("UTC"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
