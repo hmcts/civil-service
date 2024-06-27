@@ -30,7 +30,6 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
