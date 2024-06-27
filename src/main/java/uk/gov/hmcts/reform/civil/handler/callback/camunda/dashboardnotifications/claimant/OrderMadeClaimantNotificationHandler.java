@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
@@ -14,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsucc
 public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private final ObjectMapper objectMapper;
-
+    protected final WorkingDayIndicator workingDayIndicator;
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT,
@@ -48,9 +48,11 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     public OrderMadeClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                 DashboardNotificationsParamsMapper mapper,
-                                                FeatureToggleService featureToggleService, ObjectMapper objectMapper) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                FeatureToggleService featureToggleService, ObjectMapper objectMapper,
+                                                WorkingDayIndicator workingDayIndicator) {
+        super(dashboardApiClient, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
+        this.workingDayIndicator = workingDayIndicator;
     }
 
     @Override
@@ -68,14 +70,14 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)
             && featureToggleService.isLipVLipEnabled()) {
-            caseDataBuilder.requestForReconsiderationDeadline(LocalDate.now().plusDays(7).atTime(16, 0));
+            caseDataBuilder.requestForReconsiderationDeadline(getDateWithoutBankHolidays());
         }
+        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseDataBuilder.build(), caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData, callbackParams);
