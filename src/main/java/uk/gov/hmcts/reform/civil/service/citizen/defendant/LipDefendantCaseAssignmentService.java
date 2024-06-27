@@ -43,6 +43,8 @@ public class LipDefendantCaseAssignmentService {
                 .build();
         Map<String, Object> data = new HashMap<>();
         data.put("defendantUserDetails", defendantUserDetails);
+        log.info("caseFlagsLoggingEnabled: {}", caseFlagsLoggingEnabled);
+        log.info("CASE_FLAGS_LOGGING_ENABLED: {}", System.getenv("CASE_FLAGS_LOGGING_ENABLED"));
         if (caseFlagsLoggingEnabled) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
             log.info(
