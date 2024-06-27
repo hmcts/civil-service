@@ -213,6 +213,9 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
+    private YesOrNo orderRequestedForReviewClaimant;
+    private YesOrNo orderRequestedForReviewDefendant;
+
     @JsonIgnore
     public String getHearingLocationText() {
         return ofNullable(hearingLocation)
