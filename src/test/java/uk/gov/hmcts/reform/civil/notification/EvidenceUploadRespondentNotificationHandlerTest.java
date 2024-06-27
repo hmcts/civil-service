@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 @ExtendWith(MockitoExtension.class)
 class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-
     private static final String RESPONDENT1_SOLICITOR_EMAIL = "respondentsolicitor@example.com";
     private static final String RESPONDENT1_LIP_EMAIL = "respondent@example.com";
     private static final String RESPONDENT2_SOLICITOR_EMAIL = "respondentsolicitor2@example.com";
@@ -164,6 +163,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
                 .notificationText(notificationText)
                 .build();
         }
+
         private CaseData createCaseDataForLip(String notificationText) {
             return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .notificationText(notificationText)
