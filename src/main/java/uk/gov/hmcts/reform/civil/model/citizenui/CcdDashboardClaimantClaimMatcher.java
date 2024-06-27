@@ -321,15 +321,18 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty();
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderLegalAdviserCreated() {
         return featureToggleService.isCaseProgressionEnabled()
+            && caseData.getHearingDate() == null
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
-            && !isSDOOrderInReviewOtherParty();
+            && !isSDOOrderInReviewOtherParty()
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
@@ -337,7 +340,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return featureToggleService.isCaseProgressionEnabled()
             && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewClaimant())
-            && caseData.getOrderRequestedForReviewClaimant().equals(YES);
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+            && !isDecisionForReconsiderationMade();
     }
 
     @Override
@@ -346,7 +350,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewDefendant())
             && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isSDOOrderInReview();
+            && !isSDOOrderInReview()
+            && !isDecisionForReconsiderationMade();
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return caseData.getHearingDate() == null
+            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
     }
 
     @Override
