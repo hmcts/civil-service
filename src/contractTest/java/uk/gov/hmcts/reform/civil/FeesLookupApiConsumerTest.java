@@ -151,7 +151,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         );
     }
 
-
     @Pact(consumer = "civil-service")
     public RequestResponsePact getFeeForGAWithNotice(PactDslWithProvider builder) throws JSONException {
         return buildLookupFeePact(
@@ -295,7 +294,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         assertThat(fee.getCode(), is(equalTo("FEE0447")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(12000))));
     }
-
 
     private RequestResponsePact buildLookupFeeWithAmountPact(PactDslWithProvider builder,
                                                              String uponReceiving,
