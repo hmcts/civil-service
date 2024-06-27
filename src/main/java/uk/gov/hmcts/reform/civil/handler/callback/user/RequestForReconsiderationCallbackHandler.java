@@ -76,8 +76,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        if (!featureToggleService.isCaseProgressionEnabled()
-            && callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) > 0) {
+        if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) > 0) {
             errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND);
         } else {
             Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()

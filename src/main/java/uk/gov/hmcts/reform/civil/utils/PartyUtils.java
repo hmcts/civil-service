@@ -74,8 +74,7 @@ public class PartyUtils {
                 return ofNullable(party.getIndividualDateOfBirth());
             case SOLE_TRADER:
                 return ofNullable(party.getSoleTraderDateOfBirth());
-            case COMPANY:
-            case ORGANISATION:
+            case COMPANY, ORGANISATION:
             default:
                 return Optional.empty();
         }
@@ -179,9 +178,7 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
-            .ifPresent(ref -> {
-                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
-            });
+            .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference()));
 
         return stringBuilder.toString();
     }
@@ -192,16 +189,12 @@ public class PartyUtils {
 
         if (!isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .ifPresent(ref -> {
-                    stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-                });
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference()));
         }
 
         if (isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
-                .ifPresent(ref -> {
-                    stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference());
-                });
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference()));
         }
         return stringBuilder.toString();
     }
@@ -298,6 +291,8 @@ public class PartyUtils {
         return responseIntentions.toString();
     }
 
+    static final String DEFENDANT_STRING = "\nDefendant : ";
+
     public static String fetchDefendantName(CaseData caseData) {
         StringBuilder defendantNames = new StringBuilder();
         switch (getMultiPartyScenario(caseData)) {
@@ -305,23 +300,23 @@ public class PartyUtils {
                 if ((caseData.getRespondent1TimeExtensionDate() == null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     //case where respondent 2 extends first
-                    defendantNames.append("\nDefendant : ")
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent2().getPartyName());
                 } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     if (caseData.getRespondent2TimeExtensionDate()
                         .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                         //case where respondent 2 extends 2nd
-                        defendantNames.append("\nDefendant : ")
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent2().getPartyName());
                     } else {
                         //case where respondent 1 extends 2nd
-                        defendantNames.append("\nDefendant : ")
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent1().getPartyName());
                     }
                 } else {
                     //case where respondent 1 extends first
-                    defendantNames.append("\nDefendant : ")
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent1().getPartyName());
                 }
                 break;
@@ -333,7 +328,7 @@ public class PartyUtils {
                     .append(caseData.getRespondent2().getPartyName());
                 break;
             default:
-                defendantNames.append("\nDefendant : ")
+                defendantNames.append(DEFENDANT_STRING)
                     .append(caseData.getRespondent1().getPartyName());
                 break;
         }
@@ -374,7 +369,7 @@ public class PartyUtils {
         return partyFlagStructures != null ? partyFlagStructures.stream().map(
             party -> Element.<PartyFlagStructure>builder()
                 .id(party.getId()).value(appendWithNewPartyId(party.getValue())).build()
-        ).collect(Collectors.toList()) : null;
+        ).toList() : null;
     }
 
     public static ExpertDetails appendWithNewPartyIds(ExpertDetails expert) {
@@ -393,7 +388,7 @@ public class PartyUtils {
         return experts.toBuilder().details(
             wrapElements(unwrapElements(
                 experts.getDetails()).stream().map(
-                    expert ->  appendWithNewPartyIds(expert)).collect(Collectors.toList()))).build();
+                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
     }
 
     public static Witness appendWithNewPartyIds(Witness witness) {
@@ -408,7 +403,7 @@ public class PartyUtils {
         return witnesses.toBuilder().details(
             wrapElements(unwrapElements(
                 witnesses.getDetails()).stream().map(
-                    witness ->  appendWithNewPartyIds(witness)).collect(Collectors.toList()))).build();
+                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
     }
 
     public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {

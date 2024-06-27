@@ -107,6 +107,7 @@ public class DashboardNotificationsParamsMapperTest {
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .hearingLocationCourtName("County Court")
             .applicant1Represented(NO)
+            .requestForReconsiderationDeadline(LocalDateTime.of(2024, 4, 1, 10, 20))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -171,6 +172,10 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("hearingDueDateEn")
             .isEqualTo("1 April 2024");
         assertThat(result).extracting("hearingDueDateCy")
+            .isEqualTo("1 Ebrill 2024");
+        assertThat(result).extracting("requestForReconsiderationDeadlineEn")
+            .isEqualTo("1 April 2024");
+        assertThat(result).extracting("requestForReconsiderationDeadlineCy")
             .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");

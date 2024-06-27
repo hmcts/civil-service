@@ -31,7 +31,7 @@ public class DefendantResponseDeadlineCheckCallbackHandler extends CallbackHandl
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isDashboardServiceEnabled()
+        return featureToggleService.isLipVLipEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::setRespondentResponseDeadlineChecked)
             : Map.of(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
