@@ -29,9 +29,7 @@ public class DateUtils {
 
     public static String formatDateInWelsh(LocalDate date) {
         String month = MonthNamesWelsh.getWelshNameByValue(date.getMonth().getValue());
-        String welshDate = date.getDayOfMonth() + " " + month + " " + date.getYear();
-
-        return welshDate;
+        return date.getDayOfMonth() + " " + month + " " + date.getYear();
     }
 
     public static LocalDateTime convertFromUTC(LocalDateTime utcDate) {

@@ -71,10 +71,10 @@ class BundleCreatedNotificationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldReturnCorrectEvent_WhenInvoked() {
             //Given: Casedata at hearingScheduled state and callback param with about-to-start event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            //When: Handler is called
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            handler.handle(params);
 
             //Then: Event should start BUNDLE_CREATION_NOTIFICATION
             assertTrue(handler.handledEvents().contains(BUNDLE_CREATION_NOTIFICATION));

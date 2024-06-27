@@ -89,11 +89,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponse() {
+    void configureDashboardNotificationsForClaimantResponse() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -118,12 +118,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponseForPartAdmitImmediately() {
+    void configureDashboardNotificationsForClaimantResponseForPartAdmitImmediately() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -149,12 +149,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantNoMediationFullDefenceClaimantProceed() {
+    void configureDashboardNotificationsForDefendantNoMediationFullDefenceClaimantProceed() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -179,12 +179,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
+    void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -215,12 +215,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
+    void configureDashboardNotificationsForClaimantResponseClaimSettleCourtDecisionFavorOfDefendant() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -248,12 +248,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantPartAdmitHearing() {
+    void configureDashboardNotificationsForDefendantPartAdmitHearing() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(1234L)
@@ -278,12 +278,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceClaimantProceed() {
+    void configureDashboardNotificationsForDefendantFullDefenceClaimantProceed() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -307,12 +307,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
+    void configureDashboardNotifications_fullDefenceJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -341,12 +341,12 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
+    void configureDashboardNotifications_partAdmitJudicialReferralClaimantAcceptsPartialAmountPaid() {
 
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -375,11 +375,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantPartAdmitNotPaidAmount() {
+    void configureDashboardNotificationsForDefendantPartAdmitNotPaidAmount() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -404,11 +404,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceNotPaidAmount() {
+    void configureDashboardNotificationsForDefendantFullDefenceNotPaidAmount() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(4321L)
@@ -435,11 +435,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantFullDefenceClaimantRejectMediation() {
+    void configureDashboardNotificationsForDefendantFullDefenceClaimantRejectMediation() {
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -468,11 +468,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantMediation() {
+    void configureDashboardNotificationsForDefendantMediation() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -499,7 +499,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -531,7 +531,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         // Given
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -570,7 +570,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         // Given
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -615,7 +615,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

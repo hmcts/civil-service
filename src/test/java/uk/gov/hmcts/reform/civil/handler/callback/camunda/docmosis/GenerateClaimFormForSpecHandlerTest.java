@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
+class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     protected static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
     @Autowired

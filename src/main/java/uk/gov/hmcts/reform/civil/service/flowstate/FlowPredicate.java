@@ -189,8 +189,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
 
-    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
-        caseData.isClaimantBilingual();
+    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -207,16 +206,13 @@ public class FlowPredicate {
             && caseData.getDefendantSolicitorNotifyClaimDetailsOptions() != null
             && hasNotifiedClaimDetailsToBoth.negate().test(caseData);
 
-    public static final Predicate<CaseData> notificationAcknowledged = caseData ->
-        getPredicateForNotificationAcknowledged(caseData);
+    public static final Predicate<CaseData> notificationAcknowledged = FlowPredicate::getPredicateForNotificationAcknowledged;
 
-    public static final Predicate<CaseData> claimIssueHwF = caseData ->
-            caseData.isHelpWithFees();
+    public static final Predicate<CaseData> claimIssueHwF = CaseData::isHelpWithFees;
 
     private static boolean getPredicateForNotificationAcknowledged(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP:
                 return (caseData.getRespondent1AcknowledgeNotificationDate() != null
                     || caseData.getRespondent2AcknowledgeNotificationDate() != null);
             default:
@@ -224,8 +220,7 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> respondentTimeExtension = caseData ->
-        getPredicateForTimeExtension(caseData);
+    public static final Predicate<CaseData> respondentTimeExtension = FlowPredicate::getPredicateForTimeExtension;
 
     private static boolean getPredicateForTimeExtension(CaseData caseData) {
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
@@ -262,8 +257,7 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = caseData ->
-        isDivergentResponsesWithDQAndGoOffline(caseData);
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = FlowPredicate::isDivergentResponsesWithDQAndGoOffline;
 
     private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
@@ -292,8 +286,7 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> divergentRespondGoOffline = caseData ->
-        isDivergentResponsesGoOffline(caseData);
+    public static final Predicate<CaseData> divergentRespondGoOffline = FlowPredicate::isDivergentResponsesGoOffline;
 
     private static boolean isDivergentResponsesGoOffline(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
@@ -303,10 +296,10 @@ public class FlowPredicate {
                     caseData.getRespondent2ClaimResponseType()
                 )
                     //scenario: latest response is not full defence
-                    && (((!caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
+                    && ((!caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
                     || !caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
-                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())))
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()))
                     //scenario: neither responses are full defence
                     || (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                     && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)));
@@ -322,52 +315,44 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> allResponsesReceived = caseData ->
-        getPredicateForResponses(caseData);
+    public static final Predicate<CaseData> allResponsesReceived = FlowPredicate::getPredicateForResponses;
 
     private static boolean getPredicateForResponses(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null;
-            default:
-                return caseData.getRespondent1ResponseDate() != null;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2ResponseDate() != null;
         }
+        return caseData.getRespondent1ResponseDate() != null;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceived = caseData ->
-        getPredicateForAwaitingResponsesFullDefenceReceived(caseData);
+    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceived = FlowPredicate::getPredicateForAwaitingResponsesFullDefenceReceived;
 
     private static boolean getPredicateForAwaitingResponsesFullDefenceReceived(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseType() != null
-                    && caseData.getRespondent2ClaimResponseType() == null
-                    && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
-                    ||
-                    (caseData.getRespondent1ClaimResponseType() == null
-                        && caseData.getRespondent2ClaimResponseType() != null
-                        && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
-            default:
-                return false;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseType() != null
+                && caseData.getRespondent2ClaimResponseType() == null
+                && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
+                ||
+                (caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
+                    && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
         }
+        return false;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived = caseData ->
-        getPredicateForAwaitingResponsesNonFullDefenceReceived(caseData);
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived
+        = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceReceived;
 
     private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceived(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseType() != null
-                    && caseData.getRespondent2ClaimResponseType() == null
-                    && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
-                    ||
-                    (caseData.getRespondent1ClaimResponseType() == null
-                        && caseData.getRespondent2ClaimResponseType() != null
-                        && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
-            default:
-                return false;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseType() != null
+                && caseData.getRespondent2ClaimResponseType() == null
+                && !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
+                ||
+                (caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
+                    && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
         }
+        return false;
     }
 
     public static final Predicate<CaseData> fullAdmission = caseData ->
@@ -379,17 +364,13 @@ public class FlowPredicate {
     public static final Predicate<CaseData> counterClaim = caseData ->
         getPredicateForResponseType(caseData, COUNTER_CLAIM);
 
-    public static final Predicate<CaseData> fullDefenceProceed = caseData ->
-        getPredicateForClaimantIntentionProceed(caseData);
+    public static final Predicate<CaseData> fullDefenceProceed = FlowPredicate::getPredicateForClaimantIntentionProceed;
 
-    public static final Predicate<CaseData> lipFullDefenceProceed = caseData ->
-        getPredicateForLipClaimantIntentionProceed(caseData);
+    public static final Predicate<CaseData> lipFullDefenceProceed = FlowPredicate::getPredicateForLipClaimantIntentionProceed;
 
-    public static final Predicate<CaseData> fullAdmitPayImmediately = caseData ->
-        getPredicateForPayImmediately(caseData);
+    public static final Predicate<CaseData> fullAdmitPayImmediately = FlowPredicate::getPredicateForPayImmediately;
 
-    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
-        getPredicateIfLipCaseCarmApplicable(caseData);
+    public static final Predicate<CaseData> isCarmApplicableLipCase = FlowPredicate::getPredicateIfLipCaseCarmApplicable;
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
         caseData.getReasonNotSuitableSDO() != null
@@ -499,11 +480,10 @@ public class FlowPredicate {
         };
     }
 
-    public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
-        getPredicateForClaimantIntentionNotProceed(caseData);
+    public static final Predicate<CaseData> fullDefenceNotProceed = FlowPredicate::getPredicateForClaimantIntentionNotProceed;
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getTakenOfflineDate() != null && caseData.getChangeOfRepresentation() == null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getDrawDirectionsOrderRequired() != null
@@ -531,14 +511,11 @@ public class FlowPredicate {
             && caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
-        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = FlowPredicate::getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
-        getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = FlowPredicate::getPredicateTakenOfflineByStaffAfterClaimIssue;
 
-    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
-        getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = FlowPredicate::getPredicateTakenOfflineByStaffBeforeClaimIssue;
 
     public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
         boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
@@ -585,13 +562,11 @@ public class FlowPredicate {
             && caseData.getClaimDetailsNotificationDeadline() != null
             && caseData.getClaimDetailsNotificationDeadline().isAfter(LocalDateTime.now());
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimDetailsNotified = caseData ->
-        getPredicateTakenOfflineByStaffAfterClaimDetailsNotified(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimDetailsNotified = FlowPredicate::getPredicateTakenOfflineByStaffAfterClaimDetailsNotified;
 
     public static final boolean getPredicateTakenOfflineByStaffAfterClaimDetailsNotified(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP:
                 return (caseData.getTakenOfflineByStaffDate() != null
                     && caseData.getRespondent1AcknowledgeNotificationDate() == null
                     && caseData.getRespondent1ResponseDate() == null
@@ -615,45 +590,38 @@ public class FlowPredicate {
             && caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getRespondent1ResponseDate() == null;
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension = caseData ->
-        getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension
+        = FlowPredicate::getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt;
 
     public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() != null);
-            default:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() != null);
-        }
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() != null);
+            default -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null);
+        };
     }
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = caseData ->
-        getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(caseData);
+    public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = FlowPredicate::getPredicateTakenOfflineByStaffAfterNotificationAcknowledged;
 
     public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1ResponseDate() == null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() == null
-                    && caseData.getRespondent2ResponseDate() == null);
-            default:
-                return (caseData.getTakenOfflineByStaffDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1ResponseDate() == null);
-        }
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getTakenOfflineByStaffDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
     }
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = FlowPredicate::getPredicateForCaseDismissedAfterDetailNotified;
@@ -690,40 +658,35 @@ public class FlowPredicate {
             && caseData.getRespondent2ClaimResponseIntentionType() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledged = caseData -> {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2TimeExtensionDate() == null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
-
-            default:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1TimeExtensionDate() == null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent1ResponseDate() == null;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getClaimDismissedDeadline().isBefore(java.time.LocalDateTime.now())
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null);
         }
+        return caseData.getClaimDismissedDeadline().isBefore(java.time.LocalDateTime.now())
+            && caseData.getRespondent1TimeExtensionDate() == null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent1ResponseDate() == null;
     };
 
     public static final Predicate<CaseData> caseDismissedAfterClaimAcknowledgedExtension = caseData -> {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
-                    && (caseData.getRespondent1TimeExtensionDate() != null
-                    || caseData.getRespondent2TimeExtensionDate() != null)
-                    && caseData.getReasonNotSuitableSDO() == null
-                    && caseData.getTakenOfflineByStaffDate() == null;
-            default:
-                return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-                    && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
-                    && caseData.getReasonNotSuitableSDO() == null
-                    && caseData.getTakenOfflineByStaffDate() == null;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getClaimDismissedDeadline().isBefore(java.time.LocalDateTime.now())
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && (caseData.getRespondent1TimeExtensionDate() != null
+                || caseData.getRespondent2TimeExtensionDate() != null)
+                && caseData.getReasonNotSuitableSDO() == null
+                && caseData.getTakenOfflineByStaffDate() == null;
         }
+        return caseData.getClaimDismissedDeadline().isBefore(java.time.LocalDateTime.now())
+            && caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getReasonNotSuitableSDO() == null
+            && caseData.getTakenOfflineByStaffDate() == null;
     };
 
     public static final Predicate<CaseData> applicantOutOfTime = caseData ->
@@ -809,8 +772,7 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec = caseData ->
-        isDivergentResponsesWithDQAndGoOfflineSpec(caseData);
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec = FlowPredicate::isDivergentResponsesWithDQAndGoOfflineSpec;
 
     private static boolean isDivergentResponsesWithDQAndGoOfflineSpec(CaseData caseData) {
 
@@ -818,10 +780,10 @@ public class FlowPredicate {
             return false;
         }
 
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_ONE_LEGAL_REP ->
                 //scenario: only one of them have submitted full defence response
-                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     && NO.equals(caseData.getRespondentResponseIsSame())
@@ -829,9 +791,9 @@ public class FlowPredicate {
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     || RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_TWO_LEGAL_REP ->
                 //scenario: latest response is full defence
-                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent1ResponseDate() != null
                     && caseData.getRespondent2ResponseDate() != null
@@ -839,18 +801,16 @@ public class FlowPredicate {
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     // for the time being, 1v2ds not full defence goes offline
                     || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE);
-            case TWO_V_ONE:
-                return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+            case TWO_V_ONE ->
+                (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
                     || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
                     && !(RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
                     && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
-            default:
-                return false;
-        }
+            default -> false;
+        };
     }
 
-    public static final Predicate<CaseData> divergentRespondGoOfflineSpec = caseData ->
-        isDivergentResponsesGoOfflineSpec(caseData);
+    public static final Predicate<CaseData> divergentRespondGoOfflineSpec = FlowPredicate::isDivergentResponsesGoOfflineSpec;
 
     private static boolean isDivergentResponsesGoOfflineSpec(CaseData caseData) {
 
@@ -872,58 +832,48 @@ public class FlowPredicate {
                     && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
             case TWO_V_ONE:
-                if ((!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                return (!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
                     && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
                     && (caseData.getClaimant1ClaimResponseTypeForSpec() != null
                     && caseData.getClaimant2ClaimResponseTypeForSpec() != null)
                     && !caseData.getClaimant1ClaimResponseTypeForSpec()
-                    .equals(caseData.getClaimant2ClaimResponseTypeForSpec())) {
-                    return true;
-                }
-                return false;
+                    .equals(caseData.getClaimant2ClaimResponseTypeForSpec());
             default:
                 return false;
         }
     }
 
-    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = caseData ->
-        getPredicateForAwaitingResponsesFullDefenceReceivedSpec(caseData);
+    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = FlowPredicate::getPredicateForAwaitingResponsesFullDefenceReceivedSpec;
 
     private static boolean getPredicateForAwaitingResponsesFullDefenceReceivedSpec(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                && RespondentResponseTypeSpec.FULL_DEFENCE
+                .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+                ||
+                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-                    ||
-                    (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                        && RespondentResponseTypeSpec.FULL_DEFENCE
-                        .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-            default:
-                return false;
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
         }
+        return false;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = caseData ->
-        getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(caseData);
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec;
 
     private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-                    && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData
-                                                                           .getRespondent1ClaimResponseTypeForSpec()))
-                    ||
-                    (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                        && !RespondentResponseTypeSpec.FULL_DEFENCE
-                        .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
-            default:
-                return false;
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+                ||
+                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
         }
+        return false;
     }
 
     public static final Predicate<CaseData> specClaim = caseData ->
@@ -933,33 +883,22 @@ public class FlowPredicate {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                case ONE_V_TWO_TWO_LEGAL_REP:
-                case ONE_V_ONE:
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
                     predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
-                    break;
-                case TWO_V_ONE:
-                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
-                    break;
-                default:
-                    break;
+                case TWO_V_ONE -> predicate = YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                default -> {
+                }
             }
         } else {
             switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-                    break;
-                case ONE_V_ONE:
-                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
-                    break;
-                case TWO_V_ONE:
-                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                        || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-                    break;
-                default:
-                    break;
+                case ONE_V_ONE -> predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                case TWO_V_ONE -> predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                default -> {
+                }
             }
         }
         return predicate;
@@ -975,11 +914,10 @@ public class FlowPredicate {
 
     private static boolean getPredicateForPayImmediately(CaseData caseData) {
         boolean predicate = false;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
-                predicate = null != caseData.getWhenToBePaidText()
-                    &&  null == caseData.getApplicant1ProceedWithClaim();
-            }
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && getMultiPartyScenario(caseData) == ONE_V_ONE) {
+            predicate = null != caseData.getWhenToBePaidText()
+                &&  null == caseData.getApplicant1ProceedWithClaim();
         }
         return predicate;
     }
@@ -988,9 +926,7 @@ public class FlowPredicate {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                case ONE_V_TWO_TWO_LEGAL_REP:
-                case ONE_V_ONE:
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE:
                     predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
                     break;
                 case TWO_V_ONE:
@@ -1001,8 +937,7 @@ public class FlowPredicate {
             }
         } else {
             switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
                     predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                     break;
@@ -1021,15 +956,13 @@ public class FlowPredicate {
         return predicate;
     }
 
-    public static final Predicate<CaseData> oneVsOneCase = caseData ->
-        getPredicateFor1v1Case(caseData);
+    public static final Predicate<CaseData> oneVsOneCase = FlowPredicate::getPredicateFor1v1Case;
 
     private static boolean getPredicateFor1v1Case(CaseData caseData) {
         return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
     }
 
-    public static final Predicate<CaseData> multipartyCase = caseData ->
-        getPredicateForMultipartyCase(caseData);
+    public static final Predicate<CaseData> multipartyCase = FlowPredicate::getPredicateForMultipartyCase;
 
     private static boolean getPredicateForMultipartyCase(CaseData caseData) {
         return isMultiPartyScenario(caseData);
