@@ -4466,6 +4466,7 @@ public class CaseDataBuilder {
         hearingDuration = MINUTES_120;
         return this;
     }
+
     public CaseDataBuilder atCaseProgressionCheck() {
         atStateHearingFeeDuePaid();
         ccdState = CASE_PROGRESSION;
@@ -4473,6 +4474,7 @@ public class CaseDataBuilder {
         hearingDuration = MINUTES_120;
         return this;
     }
+
     public CaseDataBuilder atAllFinalOrdersIssuedCheck() {
         atStateHearingFeeDuePaid();
         ccdState = All_FINAL_ORDERS_ISSUED;
