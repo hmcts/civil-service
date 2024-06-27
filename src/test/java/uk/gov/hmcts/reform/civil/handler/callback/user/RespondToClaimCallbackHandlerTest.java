@@ -115,7 +115,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
