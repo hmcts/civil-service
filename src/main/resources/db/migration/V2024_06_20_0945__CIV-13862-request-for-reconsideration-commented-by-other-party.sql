@@ -26,7 +26,7 @@ VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
         '<p class="govuk-body">The other parties have made a <u>comment on your request to review an order</u>.</p>' ||
         '<p class="govuk-body"><b>Review has been requested</b></p>' ||
         '<p class="govuk-body">A review of an order has been requested by the other parties. You can <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">view their request and/or comments</a>.</p>' ||
-        '<p class="govuk-body">A judge will review the request and comments and you will be contacted if the judge makes a new order.Continue doing what the current order asks of you unless you''re informed a judge has made a new order.</p>',
+        '<p class="govuk-body">A judge will review the request and comments and you will be contacted if the judge makes a new order. Continue doing what the current order asks of you unless you''re informed a judge has made a new order.</p>',
         '<p class="govuk-body">Mae''r partïon eraill wedi gwneud <u>sylw ar eich cais i adolygu gorchymyn</u>.</p>' ||
         '<p class="govuk-body"><b>Gofynnwyd am adolygiad</b></p>' ||
         '<p class="govuk-body">Mae''r partïon eraill wedi gofyn am adolygiad o orchymyn. Gallwch <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">weld eu cais a/neu eu sylwadau</a>.</p>' ||
@@ -38,7 +38,7 @@ VALUES ('Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant',
   '<p class="govuk-body">The other parties have made a <u>comment on your request to review an order</u>.</p>' ||
   '<p class="govuk-body"><b>Review has been requested</b></p>' ||
   '<p class="govuk-body">A review of an order has been requested by the other parties. You can <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">view their request and/or comments</a>.</p>' ||
-  '<p class="govuk-body">A judge will review the request and comments and you will be contacted if the judge makes a new order.Continue doing what the current order asks of you unless you’re informed a judge has made a new order.</p>',
+  '<p class="govuk-body">A judge will review the request and comments and you will be contacted if the judge makes a new order. Continue doing what the current order asks of you unless you''re informed a judge has made a new order.</p>',
   '<p class="govuk-body">Mae''r partïon eraill wedi gwneud <u>sylw ar eich cais i adolygu gorchymyn</u>.</p>' ||
   '<p class="govuk-body"><b>Gofynnwyd am adolygiad</b></p>' ||
   '<p class="govuk-body">Mae''r partïon eraill wedi gofyn am adolygiad o orchymyn. Gallwch <a href="{VIEW_REQUEST_FOR_RECONSIDERATION_DOCUMENT}" rel="noopener noreferrer" target="_blank" class="govuk-link">weld eu cais a/neu eu sylwadau</a>.</p>' ||
