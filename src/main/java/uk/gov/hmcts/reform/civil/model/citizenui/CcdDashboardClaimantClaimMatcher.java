@@ -329,7 +329,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue();
+            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(10000).intValue()
+            && featureToggleService.isCaseProgressionEnabled();
     }
 
     @Override
