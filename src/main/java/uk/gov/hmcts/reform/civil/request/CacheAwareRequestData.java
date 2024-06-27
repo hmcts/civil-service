@@ -79,18 +79,24 @@ public class CacheAwareRequestData implements RequestData {
             .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("unchecked")
     private String extractCaseIdFromBody(HttpServletRequest httpServletRequest) {
+
         var mapper = new ObjectMapper();
         String requestBody;
-        //httpServletRequest.getRequestedSessionId();
+
         if (!httpServletRequest.getMethod().equals(HttpMethod.POST.name())) {
             Map<String, String> pathMappings =
-                (Map) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+                (Map<String, String>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             return Optional.ofNullable(pathMappings.get(CCD_CASE_IDENTIFIER_KEY)).orElse(StringUtils.EMPTY);
         }
+
         try {
             requestBody = IOUtils.toString(httpServletRequest.getReader());
-
+            SimpleCallbackRequest callbackRequest = mapper.readValue(requestBody, SimpleCallbackRequest.class);
+            return Optional.ofNullable(callbackRequest.getCaseDetails().getId())
+                .map(Object::toString)
+                .orElse(StringUtils.EMPTY);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.request;
 import java.util.Optional;
 
 public class RequestDataCache {
+
     private static final ThreadLocal<SimpleRequestData> REQUEST_DATA_THREAD_LOCAL = new ThreadLocal<>();
 
     private RequestDataCache() {

@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
-import uk.gov.hmcts.reform.civil.request.RequestData;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.net.UnknownHostException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
