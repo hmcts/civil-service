@@ -6,8 +6,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.applicant2Present;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.areRespondentLegalOrgsEqual;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getAddress;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrganisationByPolicy;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.respondent2Present;
 
@@ -103,5 +106,15 @@ class JudgmentOnlineUtilsTest {
         assertThat(applicant2Present(caseData)).isFalse();
         assertThat(respondent2Present(caseData)).isFalse();
         assertThat(areRespondentLegalOrgsEqual(caseData)).isFalse();
+    }
+
+    @Test
+    void testShouldReturnAddress() {
+
+        ContactInformation contact =  ContactInformation.builder().addressLine1("Test").country(
+            "Test").build();
+        Address address = Address.builder().addressLine1("Test").country("Test").build();
+        assertThat(getAddress(contact).getAddressLine1()).isEqualTo(address.getAddressLine1());
+        assertThat(getAddress(contact).getCountry()).isEqualTo(address.getCountry());
     }
 }
