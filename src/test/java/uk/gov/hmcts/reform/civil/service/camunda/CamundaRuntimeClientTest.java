@@ -2,42 +2,44 @@ package uk.gov.hmcts.reform.civil.service.camunda;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CamundaRuntimeClient.class
-})
+@ExtendWith(MockitoExtension.class)
 class CamundaRuntimeClientTest {
 
-    @MockBean
-    private CamundaRuntimeApi camundaApi;
-
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
-    @Autowired
+    @InjectMocks
     private CamundaRuntimeClient camundaClient;
 
-    @Autowired
-    ObjectMapper mapper;
+    @Mock
+    private CamundaRuntimeApi camundaApi;
+
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+    private String authToken;
+    private String processInstanceId;
+
+    @BeforeEach
+    void setUp() {
+        authToken = "auth-token";
+        processInstanceId = "process-instance-id";
+        when(authTokenGenerator.generate()).thenReturn(authToken);
+    }
 
     @Test
     void shouldReturnExpectedParsedResponse() {
-        String authToken = "auth-token";
-        String processInstanceId  = "process-instance-id";
-
-        when(authTokenGenerator.generate()).thenReturn(authToken);
         when(camundaApi.getProcessVariables(processInstanceId, authToken)).thenReturn(mapper.convertValue(Map.of(
             "caseId", Map.of(
                 "type", "Long",
@@ -63,9 +65,9 @@ class CamundaRuntimeClientTest {
                 ))
         ), new TypeReference<>() {}));
 
-        Map actual = camundaClient.getProcessVariables(processInstanceId);
+        Map<String, Object> actual = camundaClient.getProcessVariables(processInstanceId);
 
-        Map expected = Map.of(
+        Map<String, Object> expected = Map.of(
             "caseId", "1713874015833902",
             "hearingId", "2000005721",
             "flowState", "MAIN.FULL_DEFENCE_PROCEED",
