@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,15 +26,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
-
-    private ObjectMapper mapper;
 
     public DirectionsQuestionnaireLipGenerator(DocumentManagementService documentManagementService,
                                                DocumentGeneratorService documentGeneratorService,

@@ -216,7 +216,7 @@ public class HearingValuesServiceTest {
             .caseFlags(getCaseFlags(caseData))
             .build();
 
-        ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+        ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
@@ -257,7 +257,7 @@ public class HearingValuesServiceTest {
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
         assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+            hearingValuesService.getValues(caseId, "auth");
         });
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
@@ -295,7 +295,7 @@ public class HearingValuesServiceTest {
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
         assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+            hearingValuesService.getValues(caseId, "auth");
         });
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
@@ -341,7 +341,7 @@ public class HearingValuesServiceTest {
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
         assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+            hearingValuesService.getValues(caseId, "auth");
         });
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
@@ -431,7 +431,7 @@ public class HearingValuesServiceTest {
             .when(caseDataService).triggerEvent(any(), any(), any());
 
         assertThrows(FeignException.GatewayTimeout.class, () -> {
-            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+            hearingValuesService.getValues(caseId, "auth");
         });
     }
 
@@ -468,7 +468,7 @@ public class HearingValuesServiceTest {
 
         assertThrows(
             CaseNotFoundException.class,
-            () -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
+            () -> hearingValuesService.getValues(caseId, "auth"));
     }
 
     @Nested
@@ -524,7 +524,7 @@ public class HearingValuesServiceTest {
 
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
-                hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+                hearingValuesService.getValues(caseId, "auth");
             });
         }
 
@@ -551,7 +551,7 @@ public class HearingValuesServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
@@ -580,7 +580,7 @@ public class HearingValuesServiceTest {
 
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
-                hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+                hearingValuesService.getValues(caseId, "auth");
             });
         }
 
@@ -608,7 +608,7 @@ public class HearingValuesServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
     }
 

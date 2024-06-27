@@ -9,15 +9,15 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 public class ExitSurveyContentService {
 
     private final ExitSurveyConfiguration exitSurveyConfiguration;
-    private static final String feedbackLink = "%n%n<br/><br/>This is a new service - your <a href=\"%s\" target=\"_blank\">feedback</a> will help us to improve it.";
+    private static final String FEEDBACK_LINK_TEMPLATE = "%n%n<br/><br/>This is a new service - your <a href=\"%s\" target=\"_blank\">feedback</a> will help us to improve it.";
 
     public String applicantSurvey() {
-        return String.format(feedbackLink,
+        return String.format(FEEDBACK_LINK_TEMPLATE,
                              exitSurveyConfiguration.getApplicantLink());
     }
 
     public String respondentSurvey() {
-        return String.format(feedbackLink,
+        return String.format(FEEDBACK_LINK_TEMPLATE,
                               exitSurveyConfiguration.getRespondentLink());
     }
 }

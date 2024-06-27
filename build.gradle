@@ -1,3 +1,5 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
   id 'application'
   id 'checkstyle'
@@ -9,6 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1253'
   id "org.flywaydb.flyway" version "10.15.0"
 }
 
@@ -21,7 +24,6 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.32',
-  pact              : '3.5.24',
   springSecurity    : '5.8.12',
   camunda           : '7.20.0',
   jackson           : '2.17.1',
@@ -214,11 +216,11 @@ task integration(type: Test) {
 }
 
 task contract(type: Test) {
-  useJUnitPlatform()
-  description = "Runs pact contract tests"
-  group = "Delivery pipeline"
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+  group = 'Delivery pipeline'
+  description = 'Runs the consumer Pact tests'
+  setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
+  setClasspath(sourceSets.contractTest.runtimeClasspath)
+  systemProperty 'pact.rootDir', "pacts"
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -334,10 +336,11 @@ configurations.all {
     }
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.99'
+  implementation 'com.github.hmcts:civil-commons:1.1.0'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -389,7 +392,7 @@ dependencies {
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
@@ -451,14 +454,15 @@ dependencies {
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
 
   // dashboard specific changes
 
@@ -467,8 +471,6 @@ dependencies {
   testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
   // dashboard specific changes ends
 
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -495,16 +497,69 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runAndPublishConsumerPactTests(type: Test) {
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+task buildCCDXlsx(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://localhost:4000'
+  environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://localhost:9999'
+  environment 'CCD_DEF_AAC_URL', 'http://localhost:4502'
+  commandLine './bin/build-civil-xlsx-definitions.sh'
+}
+
+task runOtherServices(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'ADDITIONAL_COMPOSE_FILES', 'cftlib-additional-services.yml'
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+
+  commandLine './bin/add-services.sh'
+  doLast() {
+    importBpmnDiagrams
+  }
+}
+
+task importBpmnDiagrams(type: Exec) {
+  group 'ccd tasks'
+
+  dependsOn(runOtherServices)
+
+  environment 'CAMUNDA_BASE_URL', 'http://localhost:9404'
+  environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+
+  commandLine './bin/import-bpmn-diagram-cftlib.sh'
+}
+
+bootWithCCD {
+  group 'ccd tasks'
+
+  dependsOn(buildCCDXlsx)
+  dependsOn(runOtherServices)
+  dependsOn(importBpmnDiagrams)
+
+  //AAT or Local (IDAM and S2S Simulators)
+  authMode = AuthMode.AAT
+
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+
+  doFirst() {
+    project.file('./.aat-env').readLines().each() {
+      def index = it.indexOf("=")
+      def key = it.substring(0, index)
+      def value = it.substring(index + 1)
+      environment(key, value)
+    }
+  }
 
 }
 
-runAndPublishConsumerPactTests.dependsOn contract
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
+task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contract)
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
+}
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
@@ -512,13 +567,9 @@ project.ext {
 
 pact {
   publish {
-    pactDirectory = 'target/pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if (pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
-      excludes = ['civil_service-Idam_api']
-      pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
-    }
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
+    pactDirectory = 'pacts'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pactVersion
   }
 }

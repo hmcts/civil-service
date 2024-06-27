@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -65,6 +66,8 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
     private DashboardNotificationsParamsMapper mapper;
     @MockBean
     private FeatureToggleService toggleService;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
 
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
 
@@ -94,7 +97,7 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
