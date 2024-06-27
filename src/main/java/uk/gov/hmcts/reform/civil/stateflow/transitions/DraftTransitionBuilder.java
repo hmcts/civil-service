@@ -26,13 +26,13 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
     void setUpTransitions() {
         this.moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered))
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
                 Map.of(
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -40,25 +40,25 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
                 .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
                 .or(claimSubmittedBothUnregisteredSolicitors))
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
                 Map.of(
                     FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                     FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedOneUnrepresentedDefendantOnly)
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -67,12 +67,12 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .onlyWhen(claimSubmittedRespondent1Unrepresented
                 .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
                 .and(claimSubmittedRespondent2Unrepresented.negate()))
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -80,12 +80,12 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedRespondent2Unrepresented
                 .and(claimSubmittedRespondent1Unrepresented.negate()))
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )))
@@ -93,12 +93,12 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .moveTo(CLAIM_SUBMITTED)
             .onlyWhen(claimSubmittedRespondent1Unrepresented.and(
                 claimSubmittedRespondent2Unrepresented))
-            .set(flags -> flags.putAll(
+            .set((c, flags) -> flags.putAll(
                 Map.of(
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                     GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardServiceEnabled(),
+                    DASHBOARD_SERVICE_ENABLED.name(), featureToggleService.isDashboardEnabledForCase(c),
                     CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled(),
                     BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                 )));

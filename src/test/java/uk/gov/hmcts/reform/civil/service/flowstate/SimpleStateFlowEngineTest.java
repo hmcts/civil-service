@@ -547,7 +547,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(caseData)).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -582,7 +582,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(caseData)).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -922,7 +922,7 @@ class SimpleStateFlowEngineTest {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
-                when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isDashboardEnabledForCase(caseData)).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
