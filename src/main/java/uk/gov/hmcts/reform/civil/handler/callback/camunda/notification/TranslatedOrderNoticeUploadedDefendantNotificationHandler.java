@@ -72,7 +72,8 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
     }
 
     private String getEmail(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented() ? caseData.getRespondent1Email() : null;
+        return caseData.isRespondent1NotRepresented() && caseData.isRespondentResponseBilingual()
+            ? caseData.getRespondent1Email() : null;
     }
 }
 
