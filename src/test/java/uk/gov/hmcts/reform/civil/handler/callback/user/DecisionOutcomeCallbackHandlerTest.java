@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 
@@ -40,6 +41,19 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDetails).build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        assertThat(response.getErrors()).isNull();
+    }
+    
+    @Test
+    void shouldReturnNoError_WhenAboutToSubmitIsInvokedAndCasePRogressionEnabled() {
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDetails).build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
