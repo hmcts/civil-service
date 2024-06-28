@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant',
         '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant",
-         "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant"}',
+         "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA6.ClaimIssue.HWF.PhonePayment"}',
         '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant" : ["respondent1PartyName", "defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
 
 /**
