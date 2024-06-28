@@ -270,7 +270,7 @@ class FeatureToggleServiceTest {
         var caseFlagsKey = "ga-allowed-pre-sdo";
         givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(false);
+        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {
