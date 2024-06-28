@@ -47,7 +47,7 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response.getErrors()).isNull();
     }
-    
+
     @Test
     void shouldReturnNoError_WhenAboutToSubmitIsInvokedAndCasePRogressionEnabled() {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
