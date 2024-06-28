@@ -95,11 +95,9 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE:
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP:
                 return N1;
-            case TWO_V_ONE:
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
                 return N1_MULTIPARTY_SAME_SOL;
             default:
                 throw new IllegalArgumentException("Multiparty scenario doesn't exist");

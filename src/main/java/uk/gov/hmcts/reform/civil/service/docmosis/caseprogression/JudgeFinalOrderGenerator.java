@@ -634,7 +634,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
                         authorisation, caseData.getCaseManagementLocation().getBaseLocation())
                 .stream().filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .toList();
+            .toList();
 
         if (matchingLocations.size() != 1) {
             throw new LocationRefDataException(
