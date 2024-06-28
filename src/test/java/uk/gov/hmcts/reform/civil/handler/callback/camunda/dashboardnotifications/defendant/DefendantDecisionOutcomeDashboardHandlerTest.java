@@ -70,7 +70,7 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 
@@ -95,7 +95,7 @@ public class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHa
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 

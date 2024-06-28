@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_TASK
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_DECISION_OUTCOME;
 
 @Service
-public class DefendantDecisionOutcomeDashboardHandler extends DashboardCallbackHandler {
+public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME);
     public static final String TASK_ID = "GenerateDashboardDefendantDecisionOutcome";
@@ -27,8 +27,8 @@ public class DefendantDecisionOutcomeDashboardHandler extends DashboardCallbackH
     }
 
     @Override
-    public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented();
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class DefendantDecisionOutcomeDashboardHandler extends DashboardCallbackH
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
     }
 
     @Override
