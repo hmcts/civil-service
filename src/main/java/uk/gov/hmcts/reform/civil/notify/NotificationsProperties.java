@@ -611,5 +611,8 @@ public class NotificationsProperties {
     private String notifyDefendantLIPJudgmentByAdmissionTemplate;
 
     @NotEmpty
+    private String orderBeingTranslatedTemplateWelsh;
+
+    @NotEmpty
     private String notifyLiPOrderTranslatedTemplate;
 }
