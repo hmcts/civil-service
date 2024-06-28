@@ -27,6 +27,11 @@ public class ClaimantDecisionOutcomeDashboardHandler extends DashboardCallbackHa
     }
 
     @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicant1NotRepresented();
+    }
+
+    @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
