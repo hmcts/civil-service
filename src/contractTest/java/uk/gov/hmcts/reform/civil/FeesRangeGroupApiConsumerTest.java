@@ -15,8 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +37,9 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     public static final String ENDPOINT = "/fees-register/fees";
 
     @Autowired
-    private FeesApiClient feesApiClient;
+    private FeesClientService feesClientService;
+    @Autowired
+    private FeesConfiguration feesConfiguration;
 
     @Pact(consumer = "civil-service")
     public RequestResponsePact getRangeGroupFees(PactDslWithProvider builder) throws JSONException {
@@ -50,12 +53,7 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "getRangeGroupFees")
     public void verifyRangeGroupFees() {
-        Fee2Dto[] fee = feesApiClient.findRangeGroup(
-            CMC_SERVICE,
-            JURISDICTION_CIVIL,
-            JURISDICTION_CC,
-            CHANNEL,
-            EVENT_ISSUE
+        Fee2Dto[] fee = feesClientService.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent()
         );
         assertThat(fee[0].getCode(), is(equalTo("code")));
     }

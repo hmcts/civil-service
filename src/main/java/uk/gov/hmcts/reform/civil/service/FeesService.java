@@ -19,7 +19,6 @@ import java.util.List;
 public class FeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-
     private final FeesClientService feesClient;
     private final FeesConfiguration feesConfiguration;
 
