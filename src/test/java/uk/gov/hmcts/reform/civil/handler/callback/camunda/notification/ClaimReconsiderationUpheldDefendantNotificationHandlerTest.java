@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
@@ -131,6 +132,30 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap2(caseData));
             assertThat(reference.getAllValues().get(1)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
 
+        }
+
+        @Test
+        void shouldNotifyDefendant_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                .respondent1Represented(NO)
+                .build();
+
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "reconsideration-upheld-applicant-notification-000DC001"
+            );
         }
 
     }

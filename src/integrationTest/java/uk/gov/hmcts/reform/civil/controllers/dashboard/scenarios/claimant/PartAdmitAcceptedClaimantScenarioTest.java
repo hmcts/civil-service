@@ -55,7 +55,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
                     "<p class=\"govuk-body\">Mr. Sole Trader has said that they will pay you £500 immediately " +
                         "in full and final settlement of your claim and you have accepted this offer. " +
                         "Funds must be received in your account by 19 March 2024.</p> " +
-                        "<p class=\"govuk-body\">If you don´t receive the money by then, " +
+                        "<p class=\"govuk-body\">If you don't receive the money by then, " +
                         "you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy").value(
