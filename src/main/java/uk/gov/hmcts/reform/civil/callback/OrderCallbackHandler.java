@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;

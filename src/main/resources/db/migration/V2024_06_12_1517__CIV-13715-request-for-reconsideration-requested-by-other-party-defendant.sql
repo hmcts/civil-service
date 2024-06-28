@@ -1,5 +1,6 @@
 /**
  * Add scenario
+ * Notifies the Defendant that the Claimant has requested a reconsideration of the SDO
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.ReviewOrderRequestedbyOtherParty.Defendant',
