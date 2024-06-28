@@ -1521,10 +1521,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
-            String ccmcEpimmId = handler.ccmccEpimsId;
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmcEpimmId).region("ccmcRegion").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
