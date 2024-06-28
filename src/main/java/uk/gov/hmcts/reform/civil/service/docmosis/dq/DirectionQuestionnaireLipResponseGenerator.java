@@ -47,7 +47,12 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
         DQLipFormMapper mapper = MAPPER_FACTORY.getDQLipFormMapper(caseData);
         builder.lipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
             .applicant(Party.toLipParty(caseData.getApplicant1()))
-            .respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress());
+            .respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
+            .allocatedTrack(caseData.getResponseClaimTrack())
+            .fixedRecoverableCosts(mapper.getFixedRecoverableCostsIntermediate(caseData))
+            .disclosureOfElectronicDocuments(mapper.getDisclosureOfElectronicDocuments(caseData))
+            .disclosureOfNonElectronicDocuments(mapper.getDisclosureOfNonElectronicDocuments(caseData))
+            .documentsToBeConsidered(mapper.getDocumentsToBeConsidered(caseData));
         return mapper.addLipDQs(builder.build(), Optional.ofNullable(caseData.getCaseDataLiP()));
     }
 
