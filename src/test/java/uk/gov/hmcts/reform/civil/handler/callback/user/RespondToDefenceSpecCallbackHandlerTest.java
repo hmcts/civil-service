@@ -1127,7 +1127,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldUpdateCaseManagmentLocationIfAirlineNotOther() {
-                String cnbcEpimmId = handler.cnbcEpimsId;
                 given(featureToggleService.isSdoR2Enabled()).willReturn(true);
                 LocationRefData locationA = LocationRefData.builder()
                     .regionId("regionId1").epimmsId("111000").courtLocationCode("312").siteName("Site 1")
@@ -1143,7 +1142,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateApplicantRespondToDefenceAndProceed()
                     .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimmId).region("cnbc region").build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbc region").build())
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
@@ -1812,10 +1811,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOn() {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
-            String cnbcEpimmId = handler.cnbcEpimsId;
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimmId).region("cnbcRegion").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
