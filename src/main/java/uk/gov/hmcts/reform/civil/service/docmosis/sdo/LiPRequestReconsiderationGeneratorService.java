@@ -69,11 +69,23 @@ public class LiPRequestReconsiderationGeneratorService {
             .partyAddress(isApplicant
                               ? caseData.getApplicant1().getPrimaryAddress()
                               : caseData.getRespondent1().getPrimaryAddress())
-            .requestReason(isApplicant
-                               ? caseData.getReasonForReconsiderationApplicant().getReasonForReconsiderationTxt()
-                               : caseData.getReasonForReconsiderationRespondent1().getReasonForReconsiderationTxt());
+            .requestReason(getReasonForReconsiderationClaimant(caseData, isApplicant));
 
         return liPRequestForReconsiderationFormBuilder
             .build();
+    }
+
+    private String getReasonForReconsiderationClaimant(CaseData caseData, boolean isApplicant) {
+        if (isApplicant) {
+            if (nonNull(caseData.getReasonForReconsiderationApplicant())) {
+                return caseData.getReasonForReconsiderationApplicant().getReasonForReconsiderationTxt();
+            }
+            return caseData.getCaseDataLiP().getRequestForReviewCommentsClaimant();
+        } else {
+            if (nonNull(caseData.getReasonForReconsiderationRespondent1())) {
+                return caseData.getReasonForReconsiderationRespondent1().getReasonForReconsiderationTxt();
+            }
+            return caseData.getCaseDataLiP().getRequestForReviewCommentsDefendant();
+        }
     }
 }
