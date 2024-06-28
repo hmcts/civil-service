@@ -569,7 +569,7 @@ idam:
     url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
     totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
   client:
-    id: civil-service
+    id: civil
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
 
