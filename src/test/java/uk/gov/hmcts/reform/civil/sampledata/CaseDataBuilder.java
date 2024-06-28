@@ -4484,10 +4484,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateDecisionOutcome() {
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
-            .hearingDate(LocalDate.now())
-            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
-            .build();
+        atStateRespondentFullDefenceSpec();
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         return this;
     }
 
