@@ -58,7 +58,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
     private CallbackResponse notifyDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail()) && caseData.isRespondentResponseBilingual()) {
+        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
