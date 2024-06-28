@@ -376,8 +376,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
-    public void updateCaseManagementLocation(CallbackParams callbackParams,
-                                              CaseData.CaseDataBuilder builder) {
+    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
