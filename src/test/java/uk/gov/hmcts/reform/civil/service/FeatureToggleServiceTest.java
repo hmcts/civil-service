@@ -268,7 +268,7 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_isGenAppsAllowedPreSdo(Boolean toggleStat) {
         var caseFlagsKey = "ga-allowed-pre-sdo";
-        //givenToggle(caseFlagsKey, toggleStat);
+        givenToggle(caseFlagsKey, toggleStat);
 
         assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(false);
     }
