@@ -31,7 +31,7 @@ public class LipDefendantCaseAssignmentService {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    @Value("${caseFlags.logging.enabled}")
+    @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
 
     public void addLipDefendantToCaseDefendantUserDetails(String authorisation, String caseId,
