@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -755,6 +756,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(YES)
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -965,6 +967,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(NO)
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1027,6 +1030,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(NO)
                 .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1082,6 +1086,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
                 .applicant1ProceedWithClaim(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1136,6 +1141,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
                 .applicant1ProceedWithClaim(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
+
                 .build();
             /*
             CourtLocation.builder()
@@ -1195,6 +1202,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1254,6 +1262,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1313,6 +1322,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1372,6 +1382,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1504,6 +1515,61 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
             }
+        }
+
+        @Test
+        void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            // Given
+            String ccmcEpimmId = handler.ccmccEpimsId;
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmcEpimmId).region("ccmcRegion").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
+        }
+
+        @Test
+        void shouldNotUpdateLocation_WhenCmlIsNotCcmccAndToggleOn() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("3", "12345");
+        }
+
+        @Test
+        void shouldUpdateLocation_preferredLocationBehaviourWhenToggleOff() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
         }
     }
 
