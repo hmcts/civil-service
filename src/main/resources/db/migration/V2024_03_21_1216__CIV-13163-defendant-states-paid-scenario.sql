@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant', '{"Notice.AAA6.ClaimIssue.Response.Required", "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant"}', '{"Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant" : ["admissionPaidAmount", "claimSettledDateEn", "claimSettledDateCy"]}');
+VALUES ('Scenario.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant', '{"Notice.AAA6.ClaimIssue.Response.Required", "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant", "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant", "Notice.AAA6.ClaimIssue.HWF.PhonePayment"}', '{"Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant" : ["admissionPaidAmount", "claimSettledDateEn", "claimSettledDateCy"]}');
 
 /**
  * Add notification template
