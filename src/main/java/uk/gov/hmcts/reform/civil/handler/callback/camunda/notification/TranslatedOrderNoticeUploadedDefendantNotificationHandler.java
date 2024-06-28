@@ -29,13 +29,6 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
     public static final String TASK_ID = "NotifyDefendantOfUploadedOrderNotice";
 
     @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendant
-        );
-    }
-
-    @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
@@ -43,6 +36,13 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    @Override
+    protected Map<String, Callback> callbacks() {
+        return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantOfTranslation
+        );
     }
 
     @Override
@@ -54,7 +54,7 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
         );
     }
 
-    private CallbackResponse notifyDefendant(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendantOfTranslation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         String email = getEmail(caseData);

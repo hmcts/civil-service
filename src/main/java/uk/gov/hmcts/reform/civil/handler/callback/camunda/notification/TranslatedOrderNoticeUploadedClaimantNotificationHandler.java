@@ -29,21 +29,16 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_UPLOADED_DOCUMENT_ORDER_NOTICE);
+    private final FeatureToggleService featureToggleService;
+    final OrganisationService organisationService;
     private static final String REFERENCE_TEMPLATE = "translated-order-notice-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyClaimantOfUploadedOrderNotice";
-    private final FeatureToggleService featureToggleService;
-    final  OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimant
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantOfTranslation
         );
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
     }
 
     @Override
@@ -60,7 +55,12 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
         );
     }
 
-    private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
+
+    private CallbackResponse notifyClaimantOfTranslation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String email = getEmail(caseData);
         if (Objects.nonNull(email)) {
@@ -76,12 +76,5 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
 
     private String getEmail(CaseData caseData) {
         return caseData.isApplicant1NotRepresented() && caseData.isClaimantBilingual() ? caseData.getApplicant1Email() : null;
-    }
-
-    public String getApplicantLegalOrganizationName(CaseData caseData) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
