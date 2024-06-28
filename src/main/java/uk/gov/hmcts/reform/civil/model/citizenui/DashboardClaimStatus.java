@@ -30,6 +30,15 @@ public enum DashboardClaimStatus {
     SDO_ORDER_LEGAL_ADVISER_CREATED(
         Claim::isSDOOrderLegalAdviserCreated
     ),
+    SDO_ORDER_IN_REVIEW(
+        Claim::isSDOOrderInReview
+    ),
+    SDO_ORDER_IN_REVIEW_OTHER_PARTY(
+        Claim::isSDOOrderInReviewOtherParty
+    ),
+    DECISION_FOR_RECONSIDERATION_MADE(
+        Claim::isDecisionForReconsiderationMade
+    ),
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
