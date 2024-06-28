@@ -1812,6 +1812,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
                 .build();
@@ -1841,6 +1842,53 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("3", "12345");
+        }
+
+        @Test
+        void shouldUpdateLocation_WhenCmlIsCnbcToggleOnFlightDelayOtherSmall() {
+            // Given
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            given(featureToggleService.isSdoR2Enabled()).willReturn(true);
+            LocationRefData locationA = LocationRefData.builder()
+                .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                .courtAddress("Lane 1").postcode("123").build();
+            when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                .thenReturn(locationA);
+
+            DynamicList airlineList = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("OTHER").label("OTHER").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
+                .build();
+            CaseLocationCivil requestCourt = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .applicant1DQ(
+                    Applicant1DQ.builder().applicant1DQRequestedCourt(
+                        RequestedCourt.builder()
+                            .responseCourtLocations(DynamicList.builder().build())
+                            .build()).build())
+                .flightDelay(FlightDelayDetails.builder()
+                                 .airlineList(airlineList)
+                                 .flightCourtLocation(null)
+                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .build();
+
+            caseData.setIsFlightDelayClaim(YES);
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
         }
 
         @Test
