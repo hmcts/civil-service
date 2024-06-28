@@ -15,7 +15,6 @@ public class SettleClaimHelper {
     public static void checkState(CaseData caseData, List<String> errors) {
 
         if (caseData.isApplicantLiP()
-            || MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)
             || (caseData.getAddRespondent2() == YesOrNo.YES && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()))) {
             errors.add("This action is not available for this claim");
         }
