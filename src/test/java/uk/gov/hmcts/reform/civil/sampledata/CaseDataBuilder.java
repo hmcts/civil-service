@@ -4483,6 +4483,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateDecisionOutcome() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+            .hearingDate(LocalDate.now())
+            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyCheckLiP(boolean hasEmailAddress) {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
