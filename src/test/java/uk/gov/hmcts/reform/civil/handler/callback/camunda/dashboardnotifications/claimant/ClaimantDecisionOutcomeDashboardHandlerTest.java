@@ -60,7 +60,7 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -85,7 +85,7 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
             CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
