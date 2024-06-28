@@ -58,6 +58,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
+
     @Nested
     class AssignRolesIn1v1LipCase {
 

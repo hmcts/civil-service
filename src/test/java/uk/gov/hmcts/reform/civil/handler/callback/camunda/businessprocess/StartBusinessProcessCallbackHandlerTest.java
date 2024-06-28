@@ -35,7 +35,7 @@ class StartBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @org.junit.jupiter.api.BeforeAll
-    public static void setUpTest(){
+    public static void setUpTest() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
