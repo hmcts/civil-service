@@ -1048,13 +1048,12 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldHandleCourtLocationDataIfFastTrack() {
-                String cnbcEpimmId = handler.cnbcEpimsId;
                 LocationRefData locationA = LocationRefData.builder()
                     .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
                     .courtAddress("Lane 1").postcode("123").build();
                 when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                     .thenReturn(locationA);
-
+                String cnbcEpimmId = handler.cnbcEpimsId;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
