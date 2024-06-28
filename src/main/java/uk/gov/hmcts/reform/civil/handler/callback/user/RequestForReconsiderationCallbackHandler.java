@@ -54,6 +54,8 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
+    private static final String AND = " and ";
+    public static final String DEFENDANT = "Defendant - ";
     protected final ObjectMapper objectMapper;
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
@@ -145,7 +147,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             partyName.append("Applicant - ");
             partyName.append(caseData.getApplicant1().getPartyName());
             partyName.append(applicant2Present(caseData)
-                                 ? " and " + caseData.getApplicant2().getPartyName() : "");
+                                 ? AND + caseData.getApplicant2().getPartyName() : "");
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
@@ -155,10 +157,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 updatedData.orderRequestedForReviewClaimant(YES);
             }
         } else if (isRespondentSolicitorOne(roles)) {
-            partyName.append("Defendant - ");
+            partyName.append(DEFENDANT);
             partyName.append(caseData.getRespondent1().getPartyName());
             partyName.append(respondent2Present(caseData) && respondent2HasSameLegalRep(caseData)
-                                 ? " and " + caseData.getRespondent2().getPartyName() : "");
+                                 ? AND + caseData.getRespondent2().getPartyName() : "");
 
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
@@ -169,7 +171,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 updatedData.orderRequestedForReviewDefendant(YES);
             }
         } else if (isRespondentSolicitorTwo(roles)) {
-            partyName.append("Defendant - ");
+            partyName.append(DEFENDANT);
             partyName.append(respondent2Present(caseData) ? caseData.getRespondent2().getPartyName() : "");
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent2();
             reasonForReconsideration.setRequestor(partyName.toString());
@@ -201,7 +203,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             ReasonForReconsideration reasonForReconsideration = Optional
                 .ofNullable(caseData.getReasonForReconsiderationRespondent1())
                 .orElseGet(ReasonForReconsideration::new);
-            reasonForReconsideration.setRequestor(getPartyAsRequestor("Defendant - ",
+            reasonForReconsideration.setRequestor(getPartyAsRequestor(DEFENDANT,
                                                                       caseData.getRespondent1(), null));
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
             Optional.ofNullable(caseData.getCaseDataLiP())
@@ -230,7 +232,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         partyName.append(prefix);
         partyName.append(party1.getPartyName());
         Optional.ofNullable(party2)
-                .map(p -> partyName.append(" and ").append(p.getPartyName()));
+                .ifPresent(p -> partyName.append(AND).append(p.getPartyName()));
         return partyName.toString();
     }
 
