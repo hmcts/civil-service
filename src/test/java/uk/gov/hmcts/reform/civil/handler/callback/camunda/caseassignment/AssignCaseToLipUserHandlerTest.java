@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -32,28 +32,32 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToLipUserHandler.TASK_ID;
 
-@SpringBootTest(classes = {
-    AssignCaseToLipUserHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private AssignCaseToLipUserHandler assignCaseToLipUserHandler;
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
 
     private CallbackParams params;
     private CaseData caseData;
 
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @org.junit.jupiter.api.BeforeAll
+    public static void setUpTest(){
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
     @Nested
     class AssignRolesIn1v1LipCase {
 
@@ -95,6 +99,8 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
             });
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT1.name(), CallbackType.SUBMITTED);
+
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
             assignCaseToLipUserHandler.handle(params);
 
