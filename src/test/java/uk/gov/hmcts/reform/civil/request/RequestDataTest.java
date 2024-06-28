@@ -12,12 +12,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.HandlerMapping;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -100,6 +103,24 @@ class RequestDataTest {
             SimpleCallbackRequest request = new SimpleCallbackRequest(SimpleCaseDetails.builder()
                                                                           .id(1234567891023456L)
                                                                           .build());
+            String requestString = new ObjectMapper().writeValueAsString(request);
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                    IOUtils.toInputStream(requestString, StandardCharsets.UTF_8)
+                )
+            );
+            when(httpServletRequest.getReader()).thenReturn(reader);
+            when(httpServletRequest.getMethod()).thenReturn(HttpMethod.POST.name());
+
+            assertThat(requestData.caseId()).isEqualTo(CACHED_CASE_ID);
+        }
+
+        @Test
+        void shouldReturnCaseIdWhenHttpMethodIsPostAndFullCaseDetailsIsBody() throws IOException {
+            CallbackRequest request = CallbackRequest.builder().caseDetails(CaseDetails.builder()
+                                                                                .id(1234567891023456L)
+                                                                                .data(new HashMap<>())
+                                                                                .build()).build();
             String requestString = new ObjectMapper().writeValueAsString(request);
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(

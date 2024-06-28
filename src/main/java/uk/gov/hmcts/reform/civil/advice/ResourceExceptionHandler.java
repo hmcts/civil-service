@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.advice;
 
 import feign.FeignException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.request.RequestData;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -22,17 +24,24 @@ import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class ResourceExceptionHandler {
+
+    private final RequestData requestData;
 
     @ExceptionHandler(value = CallbackException.class)
     public ResponseEntity<Object> notFound(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Not found error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({ClientAbortException.class})
     public ResponseEntity<String> handleClientAbortException(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Request aborted error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(),
                                     new HttpHeaders(), HttpStatus.REQUEST_TIMEOUT
         );
@@ -44,12 +53,16 @@ public class ResourceExceptionHandler {
     })
     public ResponseEntity<Object> incorrectStateFlowOrIllegalArgument(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Illegal flow state / illegal arg error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
     @ExceptionHandler(value = HttpClientErrorException.BadRequest.class)
     public ResponseEntity<Object> badRequest(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Bad request error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -59,36 +72,48 @@ public class ResourceExceptionHandler {
     })
     public ResponseEntity<Object> unknownHostAndInvalidPayment(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Unknown host / invalid payment error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Unauthorized feign error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value =  FeignException.Forbidden.class)
     public ResponseEntity<Object> forbiddenFeign(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Forbidden feign error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value =  FeignException.NotFound.class)
     public ResponseEntity<Object> feignExceptionNotFound(FeignException exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Not found feign error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)
     public ResponseEntity<Object> noSuchMethodError(Throwable error) {
         log.debug(error.getMessage(), error);
+        String errorMessage = "No such method error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(error.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler({FeignException.GatewayTimeout.class, SocketTimeoutException.class})
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Feign gateway timeout error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(),
                                     new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT
         );
@@ -97,6 +122,8 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(NotificationClientException.class)
     public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "Notification client error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return ResponseEntity
             .status(FAILED_DEPENDENCY)
             .body(exception.getMessage());
@@ -107,6 +134,8 @@ public class ResourceExceptionHandler {
     })
     public ResponseEntity<Object> handleJsonSchemaValidationException(JsonSchemaValidationException exception) {
         log.debug(exception.getMessage(), exception);
+        String errorMessage = "JSON validation error with message %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), requestData.caseId(), requestData.userId()));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.EXPECTATION_FAILED);
     }
 }

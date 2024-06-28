@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 
 @Primary
+@Slf4j
 @Service
 public class CacheAwareRequestData implements RequestData {
 
@@ -82,23 +84,30 @@ public class CacheAwareRequestData implements RequestData {
     @SuppressWarnings("unchecked")
     private String extractCaseIdFromBody(HttpServletRequest httpServletRequest) {
 
-        var mapper = new ObjectMapper();
-        String requestBody;
-
         if (!httpServletRequest.getMethod().equals(HttpMethod.POST.name())) {
             Map<String, String> pathMappings =
                 (Map<String, String>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
+            if (pathMappings == null) {
+                return StringUtils.EMPTY;
+            }
+
             return Optional.ofNullable(pathMappings.get(CCD_CASE_IDENTIFIER_KEY)).orElse(StringUtils.EMPTY);
         }
 
         try {
-            requestBody = IOUtils.toString(httpServletRequest.getReader());
+
+            var mapper = new ObjectMapper();
+            String requestBody = IOUtils.toString(httpServletRequest.getReader());
             SimpleCallbackRequest callbackRequest = mapper.readValue(requestBody, SimpleCallbackRequest.class);
+
             return Optional.ofNullable(callbackRequest.getCaseDetails().getId())
                 .map(Object::toString)
                 .orElse(StringUtils.EMPTY);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            //we don't really want to error the whole request if this fails
+            log.error("Unable to extract caseId from request body during caching due to exception %s".formatted(e.getMessage()));
+            return StringUtils.EMPTY;
         }
     }
 }
