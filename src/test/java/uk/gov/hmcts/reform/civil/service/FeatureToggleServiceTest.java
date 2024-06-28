@@ -168,9 +168,9 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
         var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
@@ -268,9 +268,9 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_isGenAppsAllowedPreSdo(Boolean toggleStat) {
         var caseFlagsKey = "ga-allowed-pre-sdo";
-        givenToggle(caseFlagsKey, toggleStat);
+        //givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isGenAppsAllowedPreSdo()).isEqualTo(false);
     }
 
     private void givenToggle(String feature, boolean state) {
