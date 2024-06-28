@@ -29,7 +29,7 @@ java:
       resourceGroup: civil
       secrets:
         - name: civil-idam-client-secret
-          alias: idam.client.secret
+          alias: CIVIL_CLIENT_SECRET
         - name: microservicekey-civil-service
           alias: idam.s2s-auth.totp_secret
         - name: system-update-user-username

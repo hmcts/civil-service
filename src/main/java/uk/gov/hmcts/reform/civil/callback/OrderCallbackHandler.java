@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.callback;
 
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 
+@Slf4j
 public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHandler {
 
     protected final WorkingDayIndicator workingDayIndicator;
@@ -25,7 +28,7 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
 
     protected boolean isEligibleForReconsideration(CaseData caseData) {
         return caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(1000).intValue();
+            && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0);
     }
 
     protected boolean hasTrackChanged(CaseData caseData) {
@@ -48,13 +51,19 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
 
     protected LocalDateTime getDateWithoutBankHolidays() {
         LocalDate date = LocalDate.now();
-        for (int i = 0; i < 7; i++) {
-            if (workingDayIndicator.isPublicHoliday(date)) {
-                date = date.plusDays(2);
-            } else {
-                date = date.plusDays(1);
+        try {
+            for (int i = 0; i < 7; i++) {
+                if (workingDayIndicator.isPublicHoliday(date)) {
+                    date = date.plusDays(2);
+                } else {
+                    date = date.plusDays(1);
+                }
             }
+        } catch (Exception e) {
+            log.error("Error when retrieving public days");
+            date = LocalDate.now().plusDays(7);
         }
+
         return date.atTime(16, 0, 0);
     }
 }

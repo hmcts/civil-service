@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.math.BigDecimal;
@@ -51,6 +52,6 @@ public abstract class CcdDashboardClaimMatcher {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().intValue() <= BigDecimal.valueOf(1000).intValue();
+            && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0);
     }
 }

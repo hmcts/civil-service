@@ -150,12 +150,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
-                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(
-                        BEARER_TOKEN).toString(),
-                    true
-                ));
+                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), true));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
                 updatedData.orderRequestedForReviewClaimant(YES);
             }
@@ -169,12 +164,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
-                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(
-                        BEARER_TOKEN).toString(),
-                    false
-                ));
+                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString(), false));
                 updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
                 updatedData.orderRequestedForReviewDefendant(YES);
             }

@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.civil.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -31,23 +30,20 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_P
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 
-@SpringBootTest(classes = {
-    UpdatePaymentStatusService.class,
-    JacksonAutoConfiguration.class
-
-})
+@ExtendWith(MockitoExtension.class)
 class UpdatePaymentStatusServiceTest {
 
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
+    @InjectMocks
+    UpdatePaymentStatusService updatePaymentStatusService;
+
+    @Mock
     CaseDetailsConverter caseDetailsConverter;
+
     @Mock
     ObjectMapper objectMapper;
-    @MockBean
+
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @Autowired
-    UpdatePaymentStatusService updatePaymentStatusService;
 
     public static final String BUSINESS_PROCESS = "JUDICIAL_REFERRAL";
     private static final Long CASE_ID = 1594901956117591L;
