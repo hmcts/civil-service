@@ -3888,6 +3888,7 @@ public class CaseDataBuilder {
             .build();
         respondent1DQ();
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(3);
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("11111").region("2").build();
         return this;
     }
 
@@ -4420,7 +4421,7 @@ public class CaseDataBuilder {
         applicant1DQ();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(2);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         switch (mpScenario) {
             case ONE_V_TWO_ONE_LEGAL_REP: {
                 respondent2SameLegalRepresentative = YES;
@@ -4550,6 +4551,7 @@ public class CaseDataBuilder {
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         return this;
     }
 
@@ -5341,6 +5343,7 @@ public class CaseDataBuilder {
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         return this;
     }
 

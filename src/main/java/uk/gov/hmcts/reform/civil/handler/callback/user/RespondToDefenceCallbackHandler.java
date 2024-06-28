@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -90,6 +91,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final AssignCategoryId assignCategoryId;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -255,7 +257,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.build().getCaseManagementLocation()
         );
 
-        updateCaseManagementLocation(callbackParams, builder);
+        // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (notTransferredOnline(caseData)) {
+                updateCaseManagementLocation(callbackParams, builder);
+            }
+        } else {
+            updateCaseManagementLocation(callbackParams, builder);
+        }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
@@ -367,7 +376,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
-    private void updateCaseManagementLocation(CallbackParams callbackParams,
+    public void updateCaseManagementLocation(CallbackParams callbackParams,
                                               CaseData.CaseDataBuilder builder) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
@@ -382,8 +391,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
     }
 
@@ -477,5 +485,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .confirmationHeader(format(title, claimNumber))
             .confirmationBody(body + exitSurveyContentService.applicantSurvey())
             .build();
+    }
+
+    public boolean notTransferredOnline(CaseData caseData) {
+        return caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
     }
 }
