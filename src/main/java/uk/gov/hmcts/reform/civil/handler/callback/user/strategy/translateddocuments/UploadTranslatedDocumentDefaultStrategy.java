@@ -33,18 +33,21 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
         CaseDataLiP caseDataLip = callbackParams.getCaseData().getCaseDataLiP();
 
+        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
+
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
         }
-        CaseData caseData = callbackParams.getCaseData();
+
         CaseData updatedCaseData = caseData.toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
             .caseDataLiP(caseDataLip)
-            .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(caseData))).build();
+            .businessProcess(BusinessProcess.ready(businessProcessEvent)).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))

@@ -75,7 +75,7 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
     }
 
     private String getEmail(CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() ? caseData.getApplicant1Email() : null;
+        return caseData.isApplicant1NotRepresented() && caseData.isClaimantBilingual() ? caseData.getApplicant1Email() : null;
     }
 
     public String getApplicantLegalOrganizationName(CaseData caseData) {
