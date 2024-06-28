@@ -27,6 +27,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class DashboardScenariosService {
 
+    /**
+     * use this in templates to delete to delete all current notifications before creating new ones
+     */
+    private static final String DELETE_ALL_CURRENT_NOTIFICATIONS = "*";
     private final ScenarioRepository scenarioRepository;
     private final NotificationTemplateRepository notificationTemplateRepository;
     private final DashboardNotificationService dashboardNotificationService;
@@ -51,6 +55,10 @@ public class DashboardScenariosService {
 
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
+
+            if (Arrays.asList(scenario.getNotificationsToDelete()).contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
+                deleteAllNotifications(scenarioReference);
+            }
 
             //create notifications based on notification template for given scenario Ref.
             createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
@@ -156,6 +164,10 @@ public class DashboardScenariosService {
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
         Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
 
+            if (DELETE_ALL_CURRENT_NOTIFICATIONS.equals(templateName)) {
+                return;
+            }
+
             Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                 .findByName(templateName);
 
@@ -168,5 +180,15 @@ public class DashboardScenariosService {
                 log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
             });
         });
+    }
+
+    private void deleteAllNotifications(String uniqueCaseIdentifier) {
+        Iterable<NotificationTemplateEntity> allNotificationTemplate = notificationTemplateRepository.findAll();
+        for (NotificationTemplateEntity nte : allNotificationTemplate) {
+            int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+                nte.getName(), uniqueCaseIdentifier, nte.getRole()
+            );
+            log.info("{} notifications removed for the template = {}", noOfRowsRemoved, nte.getName());
+        }
     }
 }
