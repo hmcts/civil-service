@@ -779,6 +779,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YES);
+
+                if (featureToggleService.isHmcEnabled()) {
+                    caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                        caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
+                }
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(NO);
