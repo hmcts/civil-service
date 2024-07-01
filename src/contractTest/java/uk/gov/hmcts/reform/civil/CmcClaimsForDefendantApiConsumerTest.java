@@ -132,12 +132,10 @@ public class CmcClaimsForDefendantApiConsumerTest extends BaseContractTest {
                 .date("countyCourtJudgmentRequestedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .date("createdAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .date("reDeterminationRequestedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                .date("admissionPayImmediatelyPastPaymentDate", "yyyy-MM-dd")
                 .date("intentionToProceedDeadline", "yyyy-MM-dd")
                 .date("claimantRespondedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .object("claimantResponse", claimantResponse ->
                     claimantResponse
-                        .stringType("type", "ACCEPTATION")
                         .numberType("amountPaid", 50.0)
                         .stringType("paymentReceived", "paymentReceived")
                         .stringType("settleForAmount", "settleForAmount")
