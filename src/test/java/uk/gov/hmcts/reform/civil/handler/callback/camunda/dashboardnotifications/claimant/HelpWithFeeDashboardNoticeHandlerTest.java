@@ -63,7 +63,7 @@ public class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTe
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void createDashboardNotifications() {
 
         params.put("ccdCaseReference", "1239988");
 

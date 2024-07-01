@@ -34,8 +34,10 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
@@ -50,6 +52,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -126,6 +129,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -426,6 +430,26 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
+        // Copy Clm1 DQ FRC to Clm2 DQ
+        if (getMultiPartyScenario(caseData) == TWO_V_ONE
+            && caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
+            if (caseData.getApplicant2DQ() == null
+                || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
+                FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
+
+                builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
+                    FixedRecoverableCosts.builder()
+                            .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
+                            .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
+                            .band(app1Frc.getBand())
+                            .reasons(app1Frc.getReasons())
+                            .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
+                            .build())
+                    .build());
+            }
+        }
+
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
                                                                        featureToggleService.isUpdateContactDetailsEnabled());
 
@@ -492,6 +516,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         builder.businessProcess(businessProcess);
+
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

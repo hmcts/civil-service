@@ -23,8 +23,8 @@ import static uk.gov.hmcts.reform.civil.utils.AddressUtils.formatAddress;
 @AllArgsConstructor
 public class PartyDetailsChangedUtil {
 
-    private static String NAME_LABEL = "Name";
-    private static String ADDRESS_LABEL = "Address";
+    private static String nameLabel = "Name";
+    private static String addressLabel = "Address";
 
     private LitigationFriend updateLitigationFriendAddress(LitigationFriend litigationFriend, Party party) {
         if (litigationFriend != null && litigationFriend.getHasSameAddressAsLitigant() != null
@@ -124,7 +124,7 @@ public class PartyDetailsChangedUtil {
 
         if (!current.getPartyName(true).equals(updated.getPartyName(true))) {
             changes.add(PartyDetailsChange.builder()
-                            .fieldName(NAME_LABEL)
+                            .fieldName(nameLabel)
                             .previousValue(current.getPartyName(true))
                             .updatedValue(updated.getPartyName(true))
                             .build());
@@ -132,7 +132,7 @@ public class PartyDetailsChangedUtil {
 
         if (!formatAddress(current.getPrimaryAddress()).equals(formatAddress(updated.getPrimaryAddress()))) {
             changes.add(PartyDetailsChange.builder()
-                            .fieldName(ADDRESS_LABEL)
+                            .fieldName(addressLabel)
                             .previousValue(formatAddress(current.getPrimaryAddress()))
                             .updatedValue(formatAddress(updated.getPrimaryAddress()))
                             .build());
@@ -157,7 +157,7 @@ public class PartyDetailsChangedUtil {
 
         if (!current.getFirstName().equals(updated.getFirstName()) || !current.getLastName().equals(updated.getLastName())) {
             changes.add(PartyDetailsChange.builder()
-                            .fieldName(NAME_LABEL)
+                            .fieldName(nameLabel)
                             .previousValue(String.format("%s %s", current.getFirstName(), current.getLastName()))
                             .updatedValue(String.format("%s %s", updated.getFirstName(), updated.getLastName()))
                             .build());
@@ -165,7 +165,7 @@ public class PartyDetailsChangedUtil {
 
         if (!formatAddress(current.getPrimaryAddress()).equals(formatAddress(updated.getPrimaryAddress()))) {
             changes.add(PartyDetailsChange.builder()
-                            .fieldName(ADDRESS_LABEL)
+                            .fieldName(addressLabel)
                             .previousValue(formatAddress(current.getPrimaryAddress()))
                             .updatedValue(formatAddress(updated.getPrimaryAddress()))
                             .build());

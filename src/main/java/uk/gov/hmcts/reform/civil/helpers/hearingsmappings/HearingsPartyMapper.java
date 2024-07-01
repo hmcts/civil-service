@@ -223,10 +223,12 @@ public class HearingsPartyMapper {
         }
 
         // applicant 1 solicitor
-        parties.add(getDetailsForSolicitorOrganisation(
-            caseData.getApplicant1OrganisationPolicy(),
-            organisationService
-        ));
+        if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null) {
+            parties.add(getDetailsForSolicitorOrganisation(
+                caseData.getApplicant1OrganisationPolicy(),
+                organisationService
+            ));
+        }
 
         if (caseData.getApplicant1DQ() != null) {
             // applicant 1 expert

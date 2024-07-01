@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimIssuedPaymentSuccessfulNotificationHandler.TASK_ID_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private NotificationService notificationService;

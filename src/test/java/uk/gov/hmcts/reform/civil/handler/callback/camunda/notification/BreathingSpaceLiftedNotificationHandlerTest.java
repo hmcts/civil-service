@@ -94,7 +94,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
-        public void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
+        void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
             when(organisationService.findOrganisationById(
                 anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
@@ -120,7 +120,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
-        public void assertThatCorrectActivityIdIsHandledByCallback() {
+        void assertThatCorrectActivityIdIsHandledByCallback() {
 
             assertThat(handler.camundaActivityId(
                 CallbackParamsBuilder.builder()

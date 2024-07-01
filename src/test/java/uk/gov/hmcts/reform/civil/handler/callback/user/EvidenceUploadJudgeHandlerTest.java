@@ -52,15 +52,14 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private CaseNoteService caseNoteService;
-
     @MockBean
     private Time time;
 
     public static final String REFERENCE_NUMBER = "000DC001";
+    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
 
     @Nested
     class AboutToStartCallback {
-
         @Test
         void aboutToStartCallback_placeholder() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -196,7 +195,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash", null);
+                                                 "hash", null, UPLOAD_TIMESTAMP);
             var documentAndNote = DocumentAndNote.builder().document(testDocument).build();
 
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
@@ -225,7 +224,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash", null);
+                                                 "hash", null, UPLOAD_TIMESTAMP);
             var documentAndNote = DocumentWithName.builder().document(testDocument).build();
 
             List<Element<DocumentWithName>> documentList = new ArrayList<>();
