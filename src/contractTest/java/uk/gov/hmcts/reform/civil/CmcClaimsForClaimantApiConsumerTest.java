@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil;
 
-import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import java.io.IOException;
 import java.util.List;
 
-import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
