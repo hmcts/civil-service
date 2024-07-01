@@ -75,8 +75,6 @@ public class CmcClaimsForDefendantApiConsumerTest extends BaseContractTest {
                 .stringType("defendantId", "defendantId")
                 .stringType("externalId", "externalId")
                 .stringType("referenceNumber", "referenceNumber")
-                .numberType("totalAmountTillToday", 10.0)
-
                 .object("claim", claimData ->
                     claimData
                         .object("amount", amount ->

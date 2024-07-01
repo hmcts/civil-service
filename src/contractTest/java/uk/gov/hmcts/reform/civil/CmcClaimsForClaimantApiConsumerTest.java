@@ -75,15 +75,13 @@ public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
                 .stringType("defendantId", "defendantId")
                 .stringType("externalId", "externalId")
                 .stringType("referenceNumber", "referenceNumber")
-                .numberType("totalAmountTillToday", 10.0)
-
                 .object("claim", claimData ->
                     claimData
                         .object("amount", amount ->
                             amount
                                 .minArrayLike("rows", 1, rows ->
                                     rows
-                                        .stringType("reason", "No reason")
+                                        .stringType("eason", "No reason")
                                         .numberType("amount", 20.0)))
                         .minArrayLike("claimants", 1, claimants ->
                             claimants
