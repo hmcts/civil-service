@@ -615,4 +615,5 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLiPOrderTranslatedTemplate;
+
 }
