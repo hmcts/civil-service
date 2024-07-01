@@ -255,8 +255,6 @@ class SendFinalOrderBulkPrintServiceTest {
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
             .build();
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
 
         // when
