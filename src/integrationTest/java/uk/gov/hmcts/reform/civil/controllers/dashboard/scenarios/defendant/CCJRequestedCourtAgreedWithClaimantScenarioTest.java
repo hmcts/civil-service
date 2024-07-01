@@ -81,7 +81,7 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                         + "class=\"govuk-link\">Contact " + claimantFirstName + " " + claimantLastName + "</a> if you "
                         +
                         "need their payment details.</p> <p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  "
-                        + "rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a>.</p>"
+                        + "rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>"
                 )
             );
     }
