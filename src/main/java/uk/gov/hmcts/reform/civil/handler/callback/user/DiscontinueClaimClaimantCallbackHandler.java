@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(DISCONTINUE_CLAIM_CLAIMANT);
     private static final String BOTH = "Both";
+    private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
+    private static final String ERROR_MESSAGE_UNABLE_TO_DISCONTINUE = "Unable to discontinue this claim";
 
     private final ObjectMapper objectMapper;
 
@@ -34,8 +38,29 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateData,
-            callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant
+            callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant,
+            callbackKey(MID, "checkPermissionGranted"), this::checkPermissionGrantedFields
         );
+    }
+
+    private CallbackResponse checkPermissionGrantedFields(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+
+        if (null != caseData.getPermissionGrantedComplex()
+            && validateIfFutureDate(caseData.getPermissionGrantedComplex().getPermissionGrantedDate())) {
+            errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
+        }
+
+        if(caseData.getIsPermissionGranted().equals(YesOrNo.NO)) {
+            errors.add(ERROR_MESSAGE_UNABLE_TO_DISCONTINUE);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse updateSelectedClaimant(CallbackParams callbackParams) {
@@ -68,6 +93,11 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    public static boolean validateIfFutureDate(LocalDate date) {
+        LocalDate today = LocalDate.now();
+        return date.isAfter(today);
     }
 
     @Override

@@ -673,6 +673,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String selectedClaimantForDiscontinuance;
     private YesOrNo courtPermissionNeeded;
     private YesOrNo courtPermissionNeededChecked;
+    private YesOrNo isPermissionGranted;
+    private PermissionGranted permissionGrantedComplex;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
