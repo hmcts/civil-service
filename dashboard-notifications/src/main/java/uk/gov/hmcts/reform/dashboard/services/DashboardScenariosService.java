@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 public class DashboardScenariosService {
 
     /**
-     * use this in templates to delete to delete all current notifications before creating new ones
+     * use this in templates to delete to delete all current notifications before creating new ones.
      */
     private static final String DELETE_ALL_CURRENT_NOTIFICATIONS = "*";
     private final ScenarioRepository scenarioRepository;
