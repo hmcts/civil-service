@@ -35,7 +35,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData caseData = callbackParams.getCaseData();
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
-        CaseDataLiP caseDataLip = caseData().getCaseDataLiP();
+        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
 
