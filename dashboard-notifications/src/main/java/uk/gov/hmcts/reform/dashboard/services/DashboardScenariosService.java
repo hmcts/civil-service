@@ -57,7 +57,7 @@ public class DashboardScenariosService {
         scenarioByName.ifPresent(scenario -> {
 
             if (Arrays.asList(scenario.getNotificationsToDelete()).contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
-                deleteAllNotifications(scenarioReference);
+                deleteAllNotifications(uniqueCaseIdentifier);
             }
 
             //create notifications based on notification template for given scenario Ref.
