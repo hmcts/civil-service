@@ -57,6 +57,7 @@ class CourtOfficerOrderGeneratorTest {
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("12").postcode("34")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+        .externalShortName("Court Name Short")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("123456").build();
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("123456").build();
