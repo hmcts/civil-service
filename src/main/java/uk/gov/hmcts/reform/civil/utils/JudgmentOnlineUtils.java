@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -65,7 +67,7 @@ public class JudgmentOnlineUtils {
     }
 
     public static List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
-                                     uk.gov.hmcts.reform.civil.model.Party applicant2) {
+                                           uk.gov.hmcts.reform.civil.model.Party applicant2) {
 
         List<Party> applicants = new ArrayList<>();
         applicants.add(Party.builder()
@@ -80,4 +82,34 @@ public class JudgmentOnlineUtils {
         }
         return applicants;
     }
+
+    public static Address getAddress(ContactInformation address) {
+        return Address.builder().addressLine1(address.getAddressLine1())
+            .addressLine2(address.getAddressLine1())
+            .addressLine3(address.getAddressLine1())
+            .country(address.getCountry())
+            .county(address.getCounty())
+            .postCode(address.getPostCode())
+            .postTown(address.getTownCity())
+            .build();
+    }
+
+    public static Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
+        return Party.builder()
+            .name(party.getPartyName())
+            .primaryAddress(party.getPrimaryAddress())
+            .build();
+    }
+
+    public static Party getOrgDetails(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
+        return Optional.ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(organisationService::findOrganisationById)
+            .flatMap(value -> value.map(o -> Party.builder()
+                .name(o.getName())
+                .primaryAddress(getAddress(o.getContactInformation().get(0)))
+                .build())).orElse(null);
+    }
+
 }

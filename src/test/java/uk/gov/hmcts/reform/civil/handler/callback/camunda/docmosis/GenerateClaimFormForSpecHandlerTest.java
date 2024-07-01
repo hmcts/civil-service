@@ -56,8 +56,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
+class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
+    protected static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
     @Autowired
     private GenerateClaimFormForSpecCallbackHandler handler;
 
@@ -190,12 +191,12 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
                 .specClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null, null))
+                                                             null, null, null))
 
                 .specClaimDetailsDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null, null))
+                                                             null, null, null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -230,7 +231,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         // Given
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -250,7 +251,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         // Given
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimTemplateDocumentFiles(testDocument)
@@ -270,7 +271,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         // Given
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)
@@ -293,7 +294,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         // Given
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
-                                             "hash", null);
+                                             "hash", null, UPLOAD_TIMESTAMP);
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .specClaimDetailsDocumentFiles(testDocument)

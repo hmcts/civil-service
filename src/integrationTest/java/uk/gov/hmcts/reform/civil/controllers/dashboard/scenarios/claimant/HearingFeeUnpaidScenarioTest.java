@@ -27,7 +27,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
     @BeforeEach
     public void before() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
     }
 

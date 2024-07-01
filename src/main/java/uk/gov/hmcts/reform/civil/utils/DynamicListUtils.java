@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DynamicListUtils {
 
@@ -18,7 +17,7 @@ public class DynamicListUtils {
             return dynamicList.getListItems()
                 .stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
         }
         return null;
     }

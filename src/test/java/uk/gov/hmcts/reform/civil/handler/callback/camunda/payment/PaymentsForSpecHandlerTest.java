@@ -59,10 +59,10 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePaymentForSpec");
+        assertThat(handler.camundaActivityId(localParams)).isEqualTo("CreateClaimMakePaymentForSpec");
     }
 
     @Nested
@@ -104,7 +104,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void testAboutToSubmit_handlerWith500Error() throws JsonProcessingException {
+        void testAboutToSubmit_handlerWith500Error() {
             when(paymentsService.createCreditAccountPayment(any(), anyString())).thenThrow((buildFeignExceptionWithInvalidResponse(500, "Internal server error")));
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
