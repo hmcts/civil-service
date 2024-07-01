@@ -59,7 +59,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID("orders");
                 }
             });
         }
