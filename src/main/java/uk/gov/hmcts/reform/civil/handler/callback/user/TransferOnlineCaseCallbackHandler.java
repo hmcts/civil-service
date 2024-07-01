@@ -119,7 +119,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isNationalRolloutEnabled()) {
-            if(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
