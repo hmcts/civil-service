@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -56,18 +58,14 @@ public class DashboardScenariosService {
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
 
-            if (Arrays.asList(scenario.getNotificationsToDelete()).contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
-                deleteAllNotifications(uniqueCaseIdentifier);
-            }
+            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
+            deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
 
             //create notifications based on notification template for given scenario Ref.
             createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
 
             //Create or update taskItem(s) based on task items template for given scenario ref.
             createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams);
-
-            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
-            deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
         });
     }
 
@@ -162,11 +160,8 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
-
-            if (DELETE_ALL_CURRENT_NOTIFICATIONS.equals(templateName)) {
-                return;
-            }
+        Stream<String> notificationsToDelete = getNotificationsToDelete(scenario);
+        notificationsToDelete.forEach(templateName -> {
 
             Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                 .findByName(templateName);
@@ -182,13 +177,15 @@ public class DashboardScenariosService {
         });
     }
 
-    private void deleteAllNotifications(String uniqueCaseIdentifier) {
-        Iterable<NotificationTemplateEntity> allNotificationTemplate = notificationTemplateRepository.findAll();
-        for (NotificationTemplateEntity nte : allNotificationTemplate) {
-            int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-                nte.getName(), uniqueCaseIdentifier, nte.getRole()
-            );
-            log.info("{} notifications removed for the template = {}", noOfRowsRemoved, nte.getName());
+    private Stream<String> getNotificationsToDelete(ScenarioEntity scenario) {
+        Stream<String> notificationsToDelete;
+        if (Arrays.asList(scenario.getNotificationsToDelete()).contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
+            notificationsToDelete = StreamSupport
+                .stream(notificationTemplateRepository.findAll().spliterator(), false)
+                .map(NotificationTemplateEntity::getName);
+        } else {
+            notificationsToDelete = Stream.of(scenario.getNotificationsToDelete());
         }
+        return notificationsToDelete;
     }
 }
