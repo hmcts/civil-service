@@ -81,7 +81,7 @@ public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
                             amount
                                 .minArrayLike("rows", 1, rows ->
                                     rows
-                                        .stringType("eason", "No reason")
+                                        .stringType("reason", "No reason")
                                         .numberType("amount", 20.0)))
                         .minArrayLike("claimants", 1, claimants ->
                             claimants
