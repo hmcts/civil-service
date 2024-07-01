@@ -54,8 +54,8 @@ public abstract class CcdDashboardClaimMatcher {
             && caseData.isSmallClaim()
             && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0);
     }
-  
+
     public boolean isCaseStruckOut() {
-      return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
+        return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
     }
 }
