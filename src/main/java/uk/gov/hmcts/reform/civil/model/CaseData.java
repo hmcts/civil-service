@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -671,9 +672,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DynamicList claimantWhoIsSettling;
     private DynamicList claimantWhoIsDiscontinuing;
     private String selectedClaimantForDiscontinuance;
-    private YesOrNo courtPermissionNeeded;
-    private YesOrNo courtPermissionNeededChecked;
-    private YesOrNo isPermissionGranted;
+    private SettleDiscontinueYesOrNoList courtPermissionNeeded;
+    //private YesOrNo courtPermissionNeededChecked;
+    private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
 
     @JsonUnwrapped

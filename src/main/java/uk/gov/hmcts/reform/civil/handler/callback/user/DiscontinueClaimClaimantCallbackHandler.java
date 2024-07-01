@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -20,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 
 @Service
@@ -36,11 +40,13 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateData,
-            callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant,
-            callbackKey(MID, "checkPermissionGranted"), this::checkPermissionGrantedFields
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::populateData)
+            .put(callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant)
+            .put(callbackKey(MID, "checkPermissionGranted"), this::checkPermissionGrantedFields)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .build();
     }
 
     private CallbackResponse checkPermissionGrantedFields(CallbackParams callbackParams) {
@@ -53,7 +59,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
 
-        if(caseData.getIsPermissionGranted().equals(YesOrNo.NO)) {
+        if(SettleDiscontinueYesOrNoList.NO.equals(caseData.getIsPermissionGranted())) {
             errors.add(ERROR_MESSAGE_UNABLE_TO_DISCONTINUE);
         }
 
