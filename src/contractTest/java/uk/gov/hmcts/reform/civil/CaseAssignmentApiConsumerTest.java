@@ -90,8 +90,8 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildRemoveUserRolesResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are user roles to be removed")
-            .uponReceiving("a user roles removal request")
+            .given("A User Role exists for a Case")
+            .uponReceiving("A Request to remove a User Role")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.DELETE.toString())
@@ -105,8 +105,8 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildGetUserRolesResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are user roles to be returned")
-            .uponReceiving("a user roles request")
+            .given("A User Role exists for a Case")
+            .uponReceiving("A Request to get user roles")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
