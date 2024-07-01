@@ -31,6 +31,8 @@ class DashboardScenariosServiceTest {
     public static final String SCENARIO_ISSUE_CLAIM_START = "scenario.issue.claim.start";
     public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
     private DashboardScenariosService dashboardScenariosService;
+    private NotificationTemplateEntity notification1;
+    private NotificationTemplateEntity notification2;
     @Mock
     private ScenarioRepository scenarioRepository;
     @Mock
@@ -52,39 +54,29 @@ class DashboardScenariosServiceTest {
             taskItemTemplateRepository
         );
 
-        when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
-            .thenReturn(Optional.of(ScenarioEntity.builder()
-                                        .id(1L)
-                                        .name(SCENARIO_ISSUE_CLAIM_START)
-                                        .notificationsToCreate(
-                                            Map.of(
-                                                NOTIFICATION_ISSUE_CLAIM_START,
-                                                new String[]{"url, status, helpText, animal, target"}
-                                            ))
-                                        .notificationsToDelete(new String[]{NOTIFICATION_DRAFT_CLAIM_START})
-                                        .build()));
+        notification1 = NotificationTemplateEntity.builder()
+            .name(NOTIFICATION_ISSUE_CLAIM_START)
+            .role("claimant")
+            .titleEn("The ${animal} jumped over the ${target}.")
+            .descriptionEn("The ${animal} jumped over the ${target}.")
+            .titleCy("The ${animal} jumped over the ${target}.")
+            .descriptionCy("The ${animal} jumped over the ${target}.")
+            .id(2L)
+            .build();
+        notification2 = NotificationTemplateEntity.builder()
+            .name(NOTIFICATION_DRAFT_CLAIM_START)
+            .role("claimant")
+            .titleEn("The ${animal} jumped over the ${target}.")
+            .descriptionEn("The ${animal} jumped over the ${target}.")
+            .titleCy("The ${animal} jumped over the ${target}.")
+            .descriptionCy("The ${animal} jumped over the ${target}.")
+            .id(1L)
+            .build();
 
         when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
-                                        .name(NOTIFICATION_ISSUE_CLAIM_START)
-                                        .role("claimant")
-                                        .titleEn("The ${animal} jumped over the ${target}.")
-                                        .descriptionEn("The ${animal} jumped over the ${target}.")
-                                        .titleCy("The ${animal} jumped over the ${target}.")
-                                        .descriptionCy("The ${animal} jumped over the ${target}.")
-                                        .id(2L)
-                                        .build()));
-
+            .thenReturn(Optional.of(notification1));
         when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
-                                        .name(NOTIFICATION_DRAFT_CLAIM_START)
-                                        .role("claimant")
-                                        .titleEn("The ${animal} jumped over the ${target}.")
-                                        .descriptionEn("The ${animal} jumped over the ${target}.")
-                                        .titleCy("The ${animal} jumped over the ${target}.")
-                                        .descriptionCy("The ${animal} jumped over the ${target}.")
-                                        .id(1L)
-                                        .build()));
+            .thenReturn(Optional.of(notification2));
 
         when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
@@ -98,14 +90,25 @@ class DashboardScenariosServiceTest {
                                     .taskNameEn("Pay hearing fee")
                                     .taskNameCy("Pay hearing fee")
                                     .build()));
-
-        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-            NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
-            .thenReturn(1);
     }
 
     @Test
     void shouldRecordScenario() {
+        when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(ScenarioEntity.builder()
+                                        .id(1L)
+                                        .name(SCENARIO_ISSUE_CLAIM_START)
+                                        .notificationsToCreate(
+                                            Map.of(
+                                                NOTIFICATION_ISSUE_CLAIM_START,
+                                                new String[]{"url, status, helpText, animal, target"}
+                                            ))
+                                        .notificationsToDelete(new String[]{NOTIFICATION_DRAFT_CLAIM_START})
+                                        .build()));
+        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
+            .thenReturn(1);
+
         dashboardScenariosService.recordScenarios(
             "Auth-token",
             SCENARIO_ISSUE_CLAIM_START,
@@ -132,6 +135,62 @@ class DashboardScenariosServiceTest {
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
         verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
             NOTIFICATION_DRAFT_CLAIM_START,
+            "ccd-case-id",
+            "claimant"
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioDeleteAll() {
+        when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(ScenarioEntity.builder()
+                                        .id(1L)
+                                        .name(SCENARIO_ISSUE_CLAIM_START)
+                                        .notificationsToCreate(
+                                            Map.of(
+                                                NOTIFICATION_ISSUE_CLAIM_START,
+                                                new String[]{"url, status, helpText, animal, target"}
+                                            ))
+                                        .notificationsToDelete(new String[]{"*"})
+                                        .build()));
+        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
+            .thenReturn(1);
+        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_ISSUE_CLAIM_START, "ccd-case-id", "claimant"))
+            .thenReturn(1);
+        when(notificationTemplateRepository.findAll()).thenReturn(List.of(notification1, notification2));
+
+        dashboardScenariosService.recordScenarios(
+            "Auth-token",
+            SCENARIO_ISSUE_CLAIM_START,
+            "ccd-case-id",
+            new ScenarioRequestParams(new HashMap<>(Map.of(
+                "url",
+                "http://testUrl",
+                "status",
+                "InProgress",
+                "helpText",
+                "Should be helpful!",
+                "animal",
+                "Tiger",
+                "target",
+                "Safari"
+            )))
+        );
+
+        verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
+        verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
+        verify(notificationTemplateRepository).findAll();
+        verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
+        verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
+        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_DRAFT_CLAIM_START,
+            "ccd-case-id",
+            "claimant"
+        );
+        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_ISSUE_CLAIM_START,
             "ccd-case-id",
             "claimant"
         );
