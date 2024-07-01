@@ -155,6 +155,6 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendFinalOrderBulkPrintService).sendTranslatedFinalOrderToLIP(any(), any(), eq(TASK_ID_CLAIMANT));
+        verify(sendFinalOrderBulkPrintService).sendTranslatedFinalOrderToLIP(any(), any(), eq(TASK_ID_DEFENDANT));
     }
 }
