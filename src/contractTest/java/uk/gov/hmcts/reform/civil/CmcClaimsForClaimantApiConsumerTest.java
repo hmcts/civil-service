@@ -54,7 +54,6 @@ public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildClaimsForClaimantPact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are claims for the claimant")
             .uponReceiving("a request for claims for a claimant")
             .pathFromProviderState(ENDPOINT + SUBMITTER_ID_SUFFIX, ENDPOINT + SUBMITTER_ID)
             .method(HttpMethod.GET.toString())

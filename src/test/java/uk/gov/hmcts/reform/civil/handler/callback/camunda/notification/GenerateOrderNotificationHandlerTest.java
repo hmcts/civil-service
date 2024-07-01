@@ -64,8 +64,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         void setup() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
-            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
-                .thenReturn("template-id-lip-bilingual");
+            when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh())
+                .thenReturn("template-id-lip-translate");
         }
 
         @Test
@@ -156,7 +156,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             //then: email should be sent to respondent1
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                "template-id-lip-bilingual",
+                "template-id-lip-translate",
                 getRespondentNotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );
@@ -233,6 +233,26 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id-lip",
+                getApplicantNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvokedBilingual() {
+            //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: handler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip-translate",
                 getApplicantNotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );
