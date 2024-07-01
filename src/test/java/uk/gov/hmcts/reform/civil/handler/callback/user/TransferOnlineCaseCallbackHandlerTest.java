@@ -210,6 +210,11 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateWhiteListing_whenCourtTransferredIsWhitelisted(Boolean isLocationWhiteListed) {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(isLocationWhiteListed);
+            given(courtLocationUtils.findPreferredLocationData(any(), any()))
+                .willReturn(LocationRefData.builder().siteName("")
+                                .epimmsId("222")
+                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
+                                .courtLocationCode("other code").build());
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .caseManagementLocation(CaseLocationCivil.builder()
                                             .region("2")
@@ -226,9 +231,14 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @CsvSource({"true", "false"})
-        void shouldPopulateWhiteListing_whenCourtTransferredIsWhitelisted2(Boolean isNationalRolloutEnabled) {
+        void shouldPopulateWhiteListing_whenNationalRolloutEnabled(Boolean isNationalRolloutEnabled) {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(isNationalRolloutEnabled);
             when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(isNationalRolloutEnabled);
+            given(courtLocationUtils.findPreferredLocationData(any(), any()))
+                .willReturn(LocationRefData.builder().siteName("")
+                                .epimmsId("222")
+                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
+                                .courtLocationCode("other code").build());
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .caseManagementLocation(CaseLocationCivil.builder()
                                             .region("2")
