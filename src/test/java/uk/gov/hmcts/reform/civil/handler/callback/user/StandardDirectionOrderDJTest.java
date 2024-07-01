@@ -52,8 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -717,11 +715,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesTrialHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
             assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
