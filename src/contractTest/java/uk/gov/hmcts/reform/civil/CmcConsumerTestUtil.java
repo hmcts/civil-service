@@ -6,6 +6,9 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 
 public class CmcConsumerTestUtil {
 
+    private CmcConsumerTestUtil() {
+    }
+
     static DslPart buildBundleCreateResponseDsl() {
         return newJsonArray(response -> response
             .object(cmcClaim -> cmcClaim
