@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.citizen.defendant;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,16 +22,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_LIP_DEFENDANT;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class LipDefendantCaseAssignmentService {
 
     private final IdamClient idamClient;
     private final CaseEventService caseEventService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseDetailsConverter caseDetailsConverter;
-
-    @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
+
+    public LipDefendantCaseAssignmentService(
+        IdamClient idamClient,
+        CaseEventService caseEventService,
+        DefendantPinToPostLRspecService defendantPinToPostLRspecService,
+        CaseDetailsConverter caseDetailsConverter,
+        @Value("${case-flags.logging.enabled:false}") boolean caseFlagsLoggingEnabled
+    ) {
+        this.idamClient = idamClient;
+        this.caseEventService = caseEventService;
+        this.defendantPinToPostLRspecService = defendantPinToPostLRspecService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.caseFlagsLoggingEnabled = caseFlagsLoggingEnabled;
+    }
 
     public void addLipDefendantToCaseDefendantUserDetails(String authorisation, String caseId,
                                                           Optional<CaseRole> caseRole,
