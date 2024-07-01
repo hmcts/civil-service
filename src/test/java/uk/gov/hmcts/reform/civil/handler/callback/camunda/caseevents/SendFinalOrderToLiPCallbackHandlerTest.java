@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -31,7 +33,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
@@ -77,6 +82,8 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SEND_FINAL_ORDER_TO_LIP_DEFENDANT);
         assertThat(handler.handledEvents()).contains(SEND_FINAL_ORDER_TO_LIP_CLAIMANT);
+        assertThat(handler.handledEvents()).contains(SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT);
+        assertThat(handler.handledEvents()).contains(SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT);
     }
 
     @Test
@@ -117,5 +124,37 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
         // then
         assertThat(response.getErrors()).isNull();
         verify(sendFinalOrderBulkPrintService).sendFinalOrderToLIP(any(), any(), eq(TASK_ID_CLAIMANT));
+    }
+
+    @Test
+    void shouldDownloadTranslatedDocumentAndPrintLetterSuccessfullyWhenIsClaimant() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().caseDataLip(
+            CaseDataLiP.builder().translatedDocuments(
+                wrapElements(TranslatedDocument.builder().documentType(ORDER_NOTICE).build())).build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT.name());
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(sendFinalOrderBulkPrintService).sendTranslatedFinalOrderToLIP(any(), any(), eq(TASK_ID_CLAIMANT));
+    }
+
+    @Test
+    void shouldDownloadTranslatedDocumentAndPrintLetterSuccessfullyWhenIsDefendant() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().caseDataLip(
+            CaseDataLiP.builder().translatedDocuments(
+                wrapElements(TranslatedDocument.builder().documentType(ORDER_NOTICE).build())).build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT.name());
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(sendFinalOrderBulkPrintService).sendTranslatedFinalOrderToLIP(any(), any(), eq(TASK_ID_CLAIMANT));
     }
 }

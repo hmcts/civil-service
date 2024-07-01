@@ -3,15 +3,19 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 
 @Service
 @RequiredArgsConstructor
@@ -19,35 +23,38 @@ public class SendFinalOrderBulkPrintService {
 
     private final BulkPrintService bulkPrintService;
     private final DocumentDownloadService documentDownloadService;
+    private final FeatureToggleService featureToggleService;
     private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
+    private static final String TRANSLATED_ORDER_PACK_LETTER_TYPE = "translated-order-document-pack";
 
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkFinalOrderDocumentAvailable(caseData)) {
-            CaseDocument caseDocument = caseData.getFinalOrderDocumentCollection().get(0).getValue();
-            sendBulkPrint(authorisation, caseData, task, caseDocument);
+            Document document = caseData.getFinalOrderDocumentCollection().get(0).getValue().getDocumentLink();
+            sendBulkPrint(authorisation, caseData, task, document, FINAL_ORDER_PACK_LETTER_TYPE);
         }
     }
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkTranslatedFinalOrderDocumentAvailable(caseData)) {
-            CaseDocument caseDocument = caseData.getFinalOrderDocumentCollection().get(0).getValue(); //TODO: add translated document
-            sendBulkPrint(authorisation, caseData, task, caseDocument);
+            Document document = caseData.getTranslatedDocuments().get(0).getValue().getFile();
+            sendBulkPrint(authorisation, caseData, task, document, TRANSLATED_ORDER_PACK_LETTER_TYPE);
         }
     }
 
-    private void sendBulkPrint(String authorisation, CaseData caseData, String task, CaseDocument caseDocument) {
-        String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
+    private void sendBulkPrint(String authorisation, CaseData caseData, String task, Document document,
+                               String letterType) {
+        String documentUrl = document.getDocumentUrl();
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
         byte[] letterContent;
         try {
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error("Failed getting letter content for Final Order ");
-            throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
+            throw new DocumentDownloadException(document.getDocumentFileName(), e);
         }
         List<String> recipients = getRecipientsList(caseData, task);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), FINAL_ORDER_PACK_LETTER_TYPE, recipients);
+                                     caseData.getLegacyCaseReference(), letterType, recipients);
     }
 
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
@@ -58,10 +65,12 @@ public class SendFinalOrderBulkPrintService {
     }
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData) {
-        return nonNull(caseData.getSystemGeneratedCaseDocuments())
-            && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
-            && nonNull(caseData.getFinalOrderDocumentCollection())
-            && !caseData.getFinalOrderDocumentCollection().isEmpty();
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+            return Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE);
+        }
+        return false;
     }
 
     private boolean isDefendantPrint(String task) {
