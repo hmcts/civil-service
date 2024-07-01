@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -55,8 +56,9 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     private CallbackResponse populateData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         final var caseDataBuilder = caseData.toBuilder();
-
-        if (MultiPartyScenario.isTwoVOne(caseData)) {
+        List<String> errors = new ArrayList<>();
+        DiscontinueClaimHelper.checkState(caseData, errors);
+        if (errors.isEmpty() && MultiPartyScenario.isTwoVOne(caseData)) {
             List<String> claimantNames = new ArrayList<>();
             claimantNames.add(caseData.getApplicant1().getPartyName());
             claimantNames.add(caseData.getApplicant2().getPartyName());
@@ -66,6 +68,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
