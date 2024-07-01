@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(TRANSFER_ONLINE_CASE);
@@ -119,7 +121,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isNationalRolloutEnabled()) {
-            if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("new location epimm is {}", newCourtLocation.getEpimmsId());
+            if (featureToggleService.isPartOfNationalRollout(newCourtLocation.getEpimmsId())) {
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             } else {
                 caseDataBuilder.eaCourtLocation(YesOrNo.NO);
