@@ -333,6 +333,32 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldPopulateReasonAndRequestorDetailsOfRespondent1Blank() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().build())
+                .respondent1(Party.builder()
+                                .individualFirstName("FirstName")
+                                .individualLastName("LastName")
+                                .type(Party.Type.INDIVIDUAL)
+                                .partyName("test").build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("reasonForReconsiderationTxt")
+                .isNotNull();
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("requestor")
+                .isEqualTo("Defendant - FirstName LastName");
+        }
+
+        @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent2() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -354,6 +380,33 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent2")
                 .extracting("reasonForReconsiderationTxt")
                 .isEqualTo("Reason");
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent2")
+                .extracting("requestor")
+                .isEqualTo("Defendant - FirstName LastName");
+        }
+
+        @Test
+        void shouldPopulateReasonAndRequestorDetailsOfRespondent2Blank() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationRespondent2(ReasonForReconsideration.builder().build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2(Party.builder()
+                                .individualFirstName("FirstName")
+                                .individualLastName("LastName")
+                                .type(Party.Type.INDIVIDUAL)
+                                .partyName("test").build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent2")
+                .extracting("reasonForReconsiderationTxt")
+                .isNotNull();
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent2")
                 .extracting("requestor")
                 .isEqualTo("Defendant - FirstName LastName");
@@ -387,6 +440,39 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
                 .extracting("reasonForReconsiderationTxt")
                 .isEqualTo("Reason");
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("requestor")
+                .isEqualTo("Defendant - FirstName LastName and FirstName2 LastName2");
+        }
+
+        @Test
+        void shouldPopulateReasonAndRequestorDetailsOfRespondentsWhen2V1SameDefSolBlank() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().build())
+                .respondent1(Party.builder()
+                                 .individualFirstName("FirstName")
+                                 .individualLastName("LastName")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("test").build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .respondent2(Party.builder()
+                                 .individualFirstName("FirstName2")
+                                 .individualLastName("LastName2")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("test").build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: setAsideDate should be set correctly
+            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
+                .extracting("reasonForReconsiderationTxt")
+                .isNotNull();
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
                 .extracting("requestor")
                 .isEqualTo("Defendant - FirstName LastName and FirstName2 LastName2");
