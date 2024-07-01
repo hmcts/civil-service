@@ -75,8 +75,7 @@ class DashboardScenariosServiceTest {
 
         when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
             .thenReturn(Optional.of(notification1));
-        when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
-            .thenReturn(Optional.of(notification2));
+
 
         when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
@@ -108,6 +107,8 @@ class DashboardScenariosServiceTest {
         when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
             NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
             .thenReturn(1);
+        when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
+            .thenReturn(Optional.of(notification2));
 
         dashboardScenariosService.recordScenarios(
             "Auth-token",
@@ -153,13 +154,8 @@ class DashboardScenariosServiceTest {
                                             ))
                                         .notificationsToDelete(new String[]{"*"})
                                         .build()));
-        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-            NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
+        when(dashboardNotificationService.deleteByReference("ccd-case-id"))
             .thenReturn(1);
-        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-            NOTIFICATION_ISSUE_CLAIM_START, "ccd-case-id", "claimant"))
-            .thenReturn(1);
-        when(notificationTemplateRepository.findAll()).thenReturn(List.of(notification1, notification2));
 
         dashboardScenariosService.recordScenarios(
             "Auth-token",
@@ -181,18 +177,10 @@ class DashboardScenariosServiceTest {
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findAll();
         verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
-        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
-            NOTIFICATION_DRAFT_CLAIM_START,
-            "ccd-case-id",
-            "claimant"
-        );
-        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
-            NOTIFICATION_ISSUE_CLAIM_START,
-            "ccd-case-id",
-            "claimant"
+        verify(dashboardNotificationService).deleteByReference(
+            "ccd-case-id"
         );
     }
 

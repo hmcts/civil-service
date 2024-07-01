@@ -105,4 +105,8 @@ public class DashboardNotificationService {
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
         return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
     }
+
+    public int deleteByReference(String reference) {
+        return dashboardNotificationsRepository.deleteByReference(reference);
+    }
 }

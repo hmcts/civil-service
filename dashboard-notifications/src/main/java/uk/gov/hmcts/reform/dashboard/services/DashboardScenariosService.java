@@ -80,7 +80,7 @@ public class DashboardScenariosService {
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
-            List<String> keys =  Arrays.asList(requestParamsKeys);
+            List<String> keys = Arrays.asList(requestParamsKeys);
             notificationTemplate.ifPresent(template -> {
                 Map<String, Object> templateParams = scenarioRequestParams.getParams().entrySet().stream()
                     .filter(e -> !keys.isEmpty() && keys.contains(e.getKey()))
@@ -160,32 +160,24 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        Stream<String> notificationsToDelete = getNotificationsToDelete(scenario);
-        notificationsToDelete.forEach(templateName -> {
-
-            Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
-                .findByName(templateName);
-
-            templateToRemove.ifPresent(template -> {
-                int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-                    template.getName(),
-                    uniqueCaseIdentifier,
-                    template.getRole()
-                );
-                log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
-            });
-        });
-    }
-
-    private Stream<String> getNotificationsToDelete(ScenarioEntity scenario) {
-        Stream<String> notificationsToDelete;
-        if (Arrays.asList(scenario.getNotificationsToDelete()).contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
-            notificationsToDelete = StreamSupport
-                .stream(notificationTemplateRepository.findAll().spliterator(), false)
-                .map(NotificationTemplateEntity::getName);
+        List<String> notificationsToDelete = Arrays.asList(scenario.getNotificationsToDelete());
+        if (notificationsToDelete.contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
+            dashboardNotificationService.deleteByReference(uniqueCaseIdentifier);
         } else {
-            notificationsToDelete = Stream.of(scenario.getNotificationsToDelete());
+            notificationsToDelete.forEach(templateName -> {
+
+                Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
+                    .findByName(templateName);
+
+                templateToRemove.ifPresent(template -> {
+                    int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+                        template.getName(),
+                        uniqueCaseIdentifier,
+                        template.getRole()
+                    );
+                    log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
+                });
+            });
         }
-        return notificationsToDelete;
     }
 }
