@@ -61,7 +61,6 @@ public class StitchBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildStitchBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are documents to be bundled")
             .uponReceiving("a stitch bundle request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
