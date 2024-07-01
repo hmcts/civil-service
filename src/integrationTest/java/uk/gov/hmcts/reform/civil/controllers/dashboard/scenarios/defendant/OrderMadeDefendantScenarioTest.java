@@ -61,14 +61,14 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("An order has been made"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The judge has made an order on your claim. "
+                    "<p class=\"govuk-body\">The judge has made an order on your claim.</p><p class=\"govuk-body\">"
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">View the order</a>.</p>"),
+                        + " class=\"govuk-link\">View the order</a></p>"),
                 jsonPath("$[0].titleCy").value("Mae gorchymyn wedi’i wneud"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad. "
+                    "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad.</p><p class=\"govuk-body\">"
                         + "<a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\""
-                        + " class=\"govuk-link\">Gweld y gorchymyn</a>.</p>")
+                        + " class=\"govuk-link\">Gweld y gorchymyn</a></p>")
             );
     }
 
