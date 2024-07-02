@@ -674,7 +674,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DynamicList discontinuingAgainstOneDefendant;
     private String selectedClaimantForDiscontinuance;
     private SettleDiscontinueYesOrNoList courtPermissionNeeded;
-    //private YesOrNo courtPermissionNeededChecked;
     private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
 
