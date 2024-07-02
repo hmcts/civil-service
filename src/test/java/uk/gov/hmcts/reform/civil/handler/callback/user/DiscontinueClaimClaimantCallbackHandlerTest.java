@@ -8,12 +8,16 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PermissionGranted;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -87,6 +91,69 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("selectedClaimantForDiscontinuance")).isNull();
+        }
+    }
+
+    @Nested
+    class MidEventCheckPermissionGrantedCallback {
+
+        private static final String PAGE_ID = "checkPermissionGranted";
+
+        @Test
+        void shouldHaveNoErrors_when2v1AndPermissionGrantedDataValid() {
+            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
+                .value(DynamicListElement.builder()
+                           .label("Both")
+                           .build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+            caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldHaveNoErrors_when2v1AndPermissionDateInFuture() {
+            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
+                .value(DynamicListElement.builder()
+                           .label("Both")
+                           .build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+            caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
+            caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
+            caseData.setPermissionGrantedComplex(PermissionGranted.builder()
+                                                     .permissionGrantedJudge("Test")
+                                                     .permissionGrantedDate(LocalDate.of(2070, 12,12))
+                                                     .build());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().size()).isEqualTo(1);
+        }
+
+        @Test
+        void shouldHaveNoErrors_when2v1AndPermissionNotGranted() {
+            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
+                .value(DynamicListElement.builder()
+                           .label("Both")
+                           .build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+            caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
+            caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.NO);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().size()).isEqualTo(1);
         }
     }
 }
