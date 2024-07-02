@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 

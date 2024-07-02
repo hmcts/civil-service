@@ -58,6 +58,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         final var caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
+
         DiscontinueClaimHelper.checkState(caseData, errors);
         if (errors.isEmpty() && MultiPartyScenario.isTwoVOne(caseData)) {
             List<String> claimantNames = new ArrayList<>();
@@ -68,7 +69,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
         }
 
-        if (is1v2LrVLrCase(caseData)) {
+        if (errors.isEmpty() && is1v2LrVLrCase(caseData)) {
             List<String> defendantNames = new ArrayList<>();
             defendantNames.add(caseData.getRespondent1().getPartyName());
             defendantNames.add(caseData.getRespondent2().getPartyName());
