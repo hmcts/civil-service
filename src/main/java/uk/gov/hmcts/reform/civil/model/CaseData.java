@@ -671,9 +671,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo markPaidForAllClaimants;
     private DynamicList claimantWhoIsSettling;
     private DynamicList claimantWhoIsDiscontinuing;
+    private DynamicList discontinuingAgainstOneDefendant;
     private String selectedClaimantForDiscontinuance;
     private YesOrNo courtPermissionNeeded;
     private YesOrNo courtPermissionNeededChecked;
+    private YesOrNo isDiscontinuingAgainstBothDefendants;
     private SettlementReason settleReason;
 
     @JsonUnwrapped
