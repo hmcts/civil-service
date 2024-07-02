@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -235,6 +236,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .hearingNoticeList(hearingNoticeList)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .listingOrRelisting(listingOrRelisting)
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -255,6 +257,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
@@ -327,6 +330,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .allocatedTrack(null)
             .responseClaimTrack("FAST_CLAIM")
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
@@ -355,6 +359,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .claimValue(null)
             .totalInterest(BigDecimal.TEN)
             .totalClaimAmount(new BigDecimal(1000))
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
@@ -381,6 +386,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .claimValue(null)
             .totalClaimAmount(new BigDecimal(123))
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
@@ -406,6 +412,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .totalClaimAmount(new BigDecimal(123000))
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
@@ -418,6 +425,99 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = CaseState.class,
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+    void shouldNotOverwriteCaseState_listingNonOther_whenAboutToSubmit(CaseState caseState) {
+
+        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        LocalDate hearingDueDate = LocalDate.of(2030, 01, 01);
+
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .totalClaimAmount(new BigDecimal(123000))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(caseState)
+            .hearingDueDate(hearingDueDate)
+            .hearingFee(fee)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getState()).isEqualTo(caseState.toString());
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = CaseState.class,
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+    void shouldNotOverwriteCaseState_reListing_whenAboutToSubmit(CaseState caseState) {
+
+        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        LocalDate hearingDueDate = LocalDate.of(2030, 01, 01);
+
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .totalClaimAmount(new BigDecimal(123000))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(caseState)
+            .hearingDueDate(hearingDueDate)
+            .hearingFee(fee)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getState()).isEqualTo(caseState.toString());
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = CaseState.class,
+        names = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME", "All_FINAL_ORDERS_ISSUED"})
+    void shouldNotOverwriteCaseState_listingOther_whenAboutToSubmit(CaseState caseState) {
+
+        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        LocalDate hearingDueDate = LocalDate.of(2030, 01, 01);
+
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.OTHER)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .totalClaimAmount(new BigDecimal(123000))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .ccdState(caseState)
+            .hearingDueDate(hearingDueDate)
+            .hearingFee(fee)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getState()).isEqualTo(caseState.toString());
     }
 
     @Test
