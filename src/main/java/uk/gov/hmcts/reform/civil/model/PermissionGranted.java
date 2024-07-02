@@ -12,6 +12,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PermissionGranted {
+
     private String permissionGrantedJudge;
     private LocalDate permissionGrantedDate;
+
 }
