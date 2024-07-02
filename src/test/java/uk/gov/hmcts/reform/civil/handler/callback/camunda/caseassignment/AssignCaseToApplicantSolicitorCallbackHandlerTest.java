@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -42,49 +42,45 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToApplicantSolicitorCallbackHandler.TASK_ID;
 
-@SpringBootTest(classes = {
-    AssignCaseToApplicantSolicitorCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private AssignCaseToApplicantSolicitorCallbackHandler assignCaseToApplicantSolicitorCallbackHandler;
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private PaymentsConfiguration paymentsConfiguration;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private static ObjectMapper objectMapper;
 
     private CallbackParams params;
     private CaseData caseData;
 
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
     @Nested
     class AssignHmctsServiceId {
 
-        @BeforeEach
-        void setup() {
-            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
-
-            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
-            });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
-        }
-
         @Test
         void shouldReturnSupplementaryDataOnSubmitted() {
+            caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
@@ -93,18 +89,15 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
     @Nested
     class AssignHmctsServiceIdSpec {
 
-        @BeforeEach
-        void setup() {
-            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
-            when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
-
-            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
-            });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
-        }
-
         @Test
         void shouldReturnSpecSupplementaryData() {
+            caseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+            when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
@@ -140,6 +133,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
@@ -147,6 +141,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator() {
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
@@ -155,9 +150,8 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
     @Nested
     class AssignRolesIn1v1CasesUnregisteredAndUnrespresented {
-
-        @BeforeEach
-        void setup() {
+        @Test
+        void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
             when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
@@ -176,10 +170,9 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
-        }
 
-        @Test
-        void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
@@ -218,6 +211,8 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
@@ -252,6 +247,8 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
@@ -282,6 +279,8 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
             });
 
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
+
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
 

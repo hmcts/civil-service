@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
@@ -25,26 +24,18 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER;
 
-@SpringBootTest(classes = {
-    JudgmentByAdmissionPiPLetterGenerator.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class JudgmentByAdmissionPiPLetterGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -84,36 +75,32 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
-    @MockBean
+    @Mock
     private UnsecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @Mock
     private IdamClient idamClient;
 
-    @Autowired
+    @InjectMocks
     private JudgmentByAdmissionPiPLetterGenerator generator;
 
-    @MockBean
+    @Mock
     private BulkPrintService bulkPrintService;
 
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
 
-    @MockBean
+    @Mock
     private PinInPostConfiguration pipInPostConfiguration;
 
-    @BeforeEach
-    void setUp() {
-        fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
+    private static final String forename = "Judge";
 
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                    .forename("Judge")
-                                                                    .surname("Dredd")
-                                                                    .roles(Collections.emptyList()).build());
-    }
+    private static final String surname = "Dredd";
+
+    private static final List<String> roles = List.of("role");
 
     @Test
     void shouldDefaultJudgmentSpecPiPLetterGenerator_whenValidDataIsProvided() {
