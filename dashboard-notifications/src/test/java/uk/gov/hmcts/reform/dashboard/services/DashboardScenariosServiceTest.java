@@ -76,7 +76,6 @@ class DashboardScenariosServiceTest {
         when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
             .thenReturn(Optional.of(notification1));
 
-
         when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
                                     .taskStatusSequence(new int[]{1, 2})
