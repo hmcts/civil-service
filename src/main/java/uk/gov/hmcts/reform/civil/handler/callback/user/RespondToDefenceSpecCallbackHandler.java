@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -137,6 +138,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability Date From must not be before today.";
     public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability Date To must not be more than one year in the future.";
     public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability Date must not be more than one year in the future.";
+    @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -343,24 +345,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.respondent2GeneratedResponseDocument(null);
         builder.respondent1ClaimResponseDocumentSpec(null);
 
-        //Update the caseManagement location to the flight location if
-        //Small claim & Flight Delay &Airline is not OTHER
-        if (isFlightDelaySmallClaimAndAirline(caseData)) {
-            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
-        } else if (!isFlightDelayAndSmallClaim(caseData)) {
-            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
-            locationHelper.getCaseManagementLocation(caseData)
-                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
-                    requestedCourt,
-                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString())
-                ));
+        // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (notTransferredOnline(caseData)) {
+                updateCaseManagementLocation(callbackParams, builder);
+            }
+        } else {
+            updateCaseManagementLocation(callbackParams, builder);
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
 
         if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
@@ -369,11 +364,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            //Update Case Management location with DQ location only if either of following is true
-            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
-            if (!isFlightDelayAndSmallClaim(caseData)
-                || isFlightDelaySmallClaimAndOther(caseData)) {
-                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+            // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+            if (featureToggleService.isNationalRolloutEnabled()) {
+                if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
+                    || isFlightDelaySmallClaimAndOther(caseData))) {
+                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+                }
+            } else {
+                //Update Case Management location with DQ location only if either of following is true
+                // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
+                if (!isFlightDelayAndSmallClaim(caseData)
+                    || isFlightDelaySmallClaimAndOther(caseData)) {
+                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+                }
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -545,8 +548,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
         ));
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
     }
 
@@ -852,5 +854,27 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER"));
+    }
+
+    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = callbackParams.getCaseData();
+        //Update the caseManagement location to the flight location if
+        //Small claim & Flight Delay &Airline is not OTHER
+        if (isFlightDelaySmallClaimAndAirline(caseData)) {
+            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
+        } else if (!isFlightDelayAndSmallClaim(caseData)) {
+            // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
+            locationHelper.getCaseManagementLocation(caseData)
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                        CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+        }
+    }
+
+    public boolean notTransferredOnline(CaseData caseData) {
+        return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
     }
 }
