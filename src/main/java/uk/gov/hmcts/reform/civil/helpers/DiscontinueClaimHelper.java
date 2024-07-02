@@ -18,4 +18,11 @@ public class DiscontinueClaimHelper {
             errors.add("This action is not available for this claim");
         }
     }
+
+    public static boolean is1v2LrVLrCase(CaseData caseData) {
+
+        return !caseData.isApplicantNotRepresented()
+            && !caseData.isRespondent1NotRepresented() && !caseData.isRespondent2NotRepresented()
+            && (MultiPartyScenario.isOneVTwoLegalRep(caseData) || MultiPartyScenario.isOneVTwoTwoLegalRep(caseData));
+    }
 }
