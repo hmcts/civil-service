@@ -45,6 +45,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private CoreCaseUserService coreCaseUserService;
 
+    @Mock
     private static ObjectMapper objectMapper;
 
     private CallbackParams params;
@@ -52,12 +53,6 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-
-    @org.junit.jupiter.api.BeforeAll
-    public static void setUpTest() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-    }
 
     @Nested
     class AssignRolesIn1v1LipCase {
