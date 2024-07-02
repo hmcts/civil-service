@@ -60,23 +60,23 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         DiscontinueClaimHelper.checkState(caseData, errors);
-        if (errors.isEmpty() && MultiPartyScenario.isTwoVOne(caseData)) {
-            List<String> claimantNames = new ArrayList<>();
-            claimantNames.add(caseData.getApplicant1().getPartyName());
-            claimantNames.add(caseData.getApplicant2().getPartyName());
-            claimantNames.add(BOTH);
+        if (errors.isEmpty()) {
+            if (MultiPartyScenario.isTwoVOne(caseData)) {
+                List<String> claimantNames = new ArrayList<>();
+                claimantNames.add(caseData.getApplicant1().getPartyName());
+                claimantNames.add(caseData.getApplicant2().getPartyName());
+                claimantNames.add(BOTH);
 
-            caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+                caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+            }
+            if (is1v2LrVLrCase(caseData)) {
+                List<String> defendantNames = new ArrayList<>();
+                defendantNames.add(caseData.getRespondent1().getPartyName());
+                defendantNames.add(caseData.getRespondent2().getPartyName());
+
+                caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
+            }
         }
-
-        if (errors.isEmpty() && is1v2LrVLrCase(caseData)) {
-            List<String> defendantNames = new ArrayList<>();
-            defendantNames.add(caseData.getRespondent1().getPartyName());
-            defendantNames.add(caseData.getRespondent2().getPartyName());
-
-            caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
