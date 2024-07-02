@@ -143,7 +143,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldHaveNoErrors_when2v1AndPermissionDateInFuture() {
+        void shouldHaveErrors_when2v1AndPermissionDateInFuture() {
             DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
                 .value(DynamicListElement.builder()
                            .label("Both")
@@ -155,17 +155,18 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
             caseData.setPermissionGrantedComplex(PermissionGranted.builder()
                                                      .permissionGrantedJudge("Test")
-                                                     .permissionGrantedDate(LocalDate.of(2070, 12, 12))
+                                                     .permissionGrantedDate(LocalDate.now().plusDays(1))
                                                      .build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors().size()).isEqualTo(1);
+            assertThat(response.getErrors()).containsOnly("Date must be in the past");
         }
 
         @Test
-        void shouldHaveNoErrors_when2v1AndPermissionNotGranted() {
+        void shouldHaveErrors_when2v1AndPermissionNotGranted() {
             DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
                 .value(DynamicListElement.builder()
                            .label("Both")
@@ -180,6 +181,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors().size()).isEqualTo(1);
+            assertThat(response.getErrors()).containsOnly("Unable to discontinue this claim");
         }
     }
 }
