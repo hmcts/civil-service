@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 
 @SpringBootTest(classes = {
     DiscontinueClaimClaimantCallbackHandler.class,
@@ -44,6 +45,18 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
                 .handle(params);
 
             assertThat(response.getData().get("claimantWhoIsDiscontinuing")).isNull();
+        }
+
+        @Test
+        void should_return_error_if_error_list_present() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
         }
 
         @Test
@@ -114,5 +127,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
             assertThat(response.getData().get("selectedClaimantForDiscontinuance")).isNull();
         }
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(DISCONTINUE_CLAIM_CLAIMANT);
     }
 }
