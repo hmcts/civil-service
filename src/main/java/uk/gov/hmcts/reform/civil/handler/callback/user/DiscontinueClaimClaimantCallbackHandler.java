@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -60,7 +59,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
 
-        if(SettleDiscontinueYesOrNoList.NO.equals(caseData.getIsPermissionGranted())) {
+        if (SettleDiscontinueYesOrNoList.NO.equals(caseData.getIsPermissionGranted())) {
             errors.add(ERROR_MESSAGE_UNABLE_TO_DISCONTINUE);
         }
 
