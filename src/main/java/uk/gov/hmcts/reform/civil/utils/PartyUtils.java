@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -36,8 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class PartyUtils {
 
@@ -386,9 +383,11 @@ public class PartyUtils {
         }
 
         return experts.toBuilder().details(
-            wrapElements(unwrapElements(
-                experts.getDetails()).stream().map(
-                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
+            experts.getDetails().stream()
+                .map(listElement -> Element.<Expert>builder()
+                    .id(listElement.getId())
+                    .value(appendWithNewPartyIds(listElement.getValue()))
+                    .build()).toList()).build();
     }
 
     public static Witness appendWithNewPartyIds(Witness witness) {
@@ -401,9 +400,11 @@ public class PartyUtils {
         }
 
         return witnesses.toBuilder().details(
-            wrapElements(unwrapElements(
-                witnesses.getDetails()).stream().map(
-                PartyUtils::appendWithNewPartyIds).collect(Collectors.toList()))).build();
+            witnesses.getDetails().stream()
+                .map(listElement -> Element.<Witness>builder()
+                    .id(listElement.getId())
+                    .value(appendWithNewPartyIds(listElement.getValue()))
+                    .build()).toList()).build();
     }
 
     public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {
