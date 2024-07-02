@@ -15,6 +15,9 @@ public class OrganisationDetailsService {
 
     public String getApplicantLegalOrganisationName(CaseData caseData) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getApplicantOrganisationId());
+        if (caseData.getApplicant1Represented() != null && caseData.getApplicantSolicitor1ClaimStatementOfTruth() == null) {
+            return getLegalOrganisationName(organisation);
+        }
         return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
@@ -29,10 +32,10 @@ public class OrganisationDetailsService {
     }
 
     private String getLegalOrganisationName(Optional<Organisation> organisation) {
-        String respondentLegalOrganizationName = null;
+        String legalOrganisationName = null;
         if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
+            legalOrganisationName = organisation.get().getName();
         }
-        return respondentLegalOrganizationName;
+        return legalOrganisationName;
     }
 }
