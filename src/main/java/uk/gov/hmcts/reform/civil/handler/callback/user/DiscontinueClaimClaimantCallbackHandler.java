@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper.is1v2LrVLrCase;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +95,14 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             claimantNames.add(BOTH);
 
             caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+        }
+
+        if (is1v2LrVLrCase(caseData)) {
+            List<String> defendantNames = new ArrayList<>();
+            defendantNames.add(caseData.getRespondent1().getPartyName());
+            defendantNames.add(caseData.getRespondent2().getPartyName());
+
+            caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
