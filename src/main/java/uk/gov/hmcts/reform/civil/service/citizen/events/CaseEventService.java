@@ -30,7 +30,7 @@ public class CaseEventService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
-    @Value("${caseFlags.logging.enabled:false}")
+    @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
 
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {

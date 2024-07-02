@@ -49,7 +49,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    @Value("${caseFlags.logging.enabled:false}")
+    @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
 
     @Override
