@@ -27,6 +27,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class DashboardScenariosService {
 
+    /**
+     * use this in templates to delete to delete all current notifications before creating new ones.
+     */
+    private static final String DELETE_ALL_CURRENT_NOTIFICATIONS = "*";
     private final ScenarioRepository scenarioRepository;
     private final NotificationTemplateRepository notificationTemplateRepository;
     private final DashboardNotificationService dashboardNotificationService;
@@ -52,14 +56,14 @@ public class DashboardScenariosService {
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
 
+            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
+            deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
+
             //create notifications based on notification template for given scenario Ref.
             createNotificationsForScenario(scenario, uniqueCaseIdentifier, scenarioRequestParams);
 
             //Create or update taskItem(s) based on task items template for given scenario ref.
             createTaskItemsForScenario(scenarioReference, uniqueCaseIdentifier, scenarioRequestParams);
-
-            //Delete old notifications as notification template says for scenario ref (if exist for case ref)
-            deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
         });
     }
 
@@ -74,7 +78,7 @@ public class DashboardScenariosService {
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
-            List<String> keys =  Arrays.asList(requestParamsKeys);
+            List<String> keys = Arrays.asList(requestParamsKeys);
             notificationTemplate.ifPresent(template -> {
                 Map<String, Object> templateParams = scenarioRequestParams.getParams().entrySet().stream()
                     .filter(e -> !keys.isEmpty() && keys.contains(e.getKey()))
@@ -154,19 +158,24 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
+        List<String> notificationsToDelete = Arrays.asList(scenario.getNotificationsToDelete());
+        if (notificationsToDelete.contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
+            dashboardNotificationService.deleteByReference(uniqueCaseIdentifier);
+        } else {
+            notificationsToDelete.forEach(templateName -> {
 
-            Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
-                .findByName(templateName);
+                Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
+                    .findByName(templateName);
 
-            templateToRemove.ifPresent(template -> {
-                int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
-                    template.getName(),
-                    uniqueCaseIdentifier,
-                    template.getRole()
-                );
-                log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
+                templateToRemove.ifPresent(template -> {
+                    int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+                        template.getName(),
+                        uniqueCaseIdentifier,
+                        template.getRole()
+                    );
+                    log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
+                });
             });
-        });
+        }
     }
 }
