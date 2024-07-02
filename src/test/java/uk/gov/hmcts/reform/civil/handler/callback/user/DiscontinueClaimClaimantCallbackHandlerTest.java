@@ -155,7 +155,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
             caseData.setPermissionGrantedComplex(PermissionGranted.builder()
                                                      .permissionGrantedJudge("Test")
-                                                     .permissionGrantedDate(LocalDate.of(2070, 12,12))
+                                                     .permissionGrantedDate(LocalDate.of(2070, 12, 12))
                                                      .build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
