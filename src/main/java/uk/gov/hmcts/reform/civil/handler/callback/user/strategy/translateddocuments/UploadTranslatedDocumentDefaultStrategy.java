@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+
 @Component
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
@@ -30,18 +32,21 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
-        CaseDataLiP caseDataLip = callbackParams.getCaseData().getCaseDataLiP();
+        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
+
+        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
 
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
         }
-        CaseData caseData = callbackParams.getCaseData();
+
         CaseData updatedCaseData = caseData.toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
             .caseDataLiP(caseDataLip)
-            .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(caseData))).build();
+            .businessProcess(BusinessProcess.ready(businessProcessEvent)).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
@@ -51,6 +56,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+            translatedDocuments.forEach(document -> {
+                if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
+                    document.getValue().getFile().setCategoryID("orders");
+                }
+            });
+        }
         return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
     }
 
@@ -62,6 +74,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
             }
         }
+
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+
+            if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE)) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
+            }
+        }
+
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
     }
 }

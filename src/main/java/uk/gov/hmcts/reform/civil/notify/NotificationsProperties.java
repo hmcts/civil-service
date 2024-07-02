@@ -613,4 +613,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String orderBeingTranslatedTemplateWelsh;
 
+    @NotEmpty
+    private String notifyLiPOrderTranslatedTemplate;
+
 }
