@@ -15,3 +15,13 @@ VALUES ('Notice.AAA6.DefendantNoticeOfChange.Claimant',
         '<p class="govuk-body">Your online account will no longer be updated. If there are any further updates to your case these will be by post.</p>',
         '<p class="govuk-body">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach. Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn cael eu hanfon atoch drwy''r post.</p>',
         'CLAIMANT');
+
+
+INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
+                                    scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
+VALUES ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 9, null, null),
+       ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
+        'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 10, null, null),
+       ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
+        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 12, null, null);

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantNocDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +42,32 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach. Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn " +
                         "cael eu hanfon atoch drwy'r post.</p>")
+            );
+
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a>Pay the hearing fee</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a>Talu ffi'r gwrandawiad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[1].reference").value(caseId.toString()),
+                jsonPath("$[1].taskNameEn").value(
+                    "<a>Upload hearing documents</a>"),
+                jsonPath("$[1].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[1].taskNameCy").value(
+                    "<a>Llwytho dogfennau'r gwrandawiad</a>"),
+                jsonPath("$[1].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[2].reference").value(caseId.toString()),
+                jsonPath("$[2].taskNameEn").value(
+                    "<a>Add the trial arrangements</a>"),
+                jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[2].taskNameCy").value(
+                    "<a>Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
             );
 
     }
