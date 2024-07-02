@@ -101,6 +101,10 @@ public class CacheAwareRequestData implements RequestData {
             String requestBody = IOUtils.toString(httpServletRequest.getReader());
             SimpleCallbackRequest callbackRequest = mapper.readValue(requestBody, SimpleCallbackRequest.class);
 
+            if (callbackRequest == null || callbackRequest.getCaseDetails() == null) {
+                return StringUtils.EMPTY;
+            }
+
             return Optional.ofNullable(callbackRequest.getCaseDetails().getId())
                 .map(Object::toString)
                 .orElse(StringUtils.EMPTY);
