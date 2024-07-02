@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
     NotificationClaimantOfHearingHandler.class,
     JacksonAutoConfiguration.class,
 })
-public class NotificationClaimantOfHearingHandlerTest {
+class NotificationClaimantOfHearingHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -688,9 +688,6 @@ public class NotificationClaimantOfHearingHandlerTest {
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING").build()).build())).isEqualTo(TASK_ID_CLAIMANT);
@@ -698,9 +695,6 @@ public class NotificationClaimantOfHearingHandlerTest {
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvokedHMC() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING_HMC").build()).build())).isEqualTo(TASK_ID_CLAIMANT_HMC);

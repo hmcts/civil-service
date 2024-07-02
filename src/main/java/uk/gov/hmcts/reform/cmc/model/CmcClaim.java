@@ -403,6 +403,21 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isSDOOrderInReview() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return false;
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return false;
+    }
+
+    @Override
     public boolean hasClaimEnded() {
         return (Objects.nonNull(response)
             && response.isFullDefence()
@@ -525,6 +540,11 @@ public class CmcClaim implements Claim {
         return false;
     }
 
+    @Override
+    public boolean isNocForDefendant() {
+        return false;
+    }
+
     private boolean isThroughAdmissions(Settlement settlement) {
         List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
@@ -540,5 +560,10 @@ public class CmcClaim implements Claim {
             .map(PartyStatement::getOffer)
             .map(Offer::getPaymentIntention)
             .isPresent();
+    }
+
+    @Override
+    public boolean isCaseStruckOut() { 
+        return false; 
     }
 }

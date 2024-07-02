@@ -62,7 +62,7 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
     }
 
     @Test
-    public void createDashboardNotifications() {
+    void createDashboardNotifications() {
 
         params.put("ccdCaseReference", "1239988");
 

@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
+class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -82,7 +82,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         @Test
-        public void shouldGenerateTwoForm_when1v2() {
+        void shouldGenerateTwoForm_when1v2() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             documents.add(document);
@@ -107,11 +107,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
 
         @Test
-        public void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
+        void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -128,12 +128,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
 
         }
 
         @Test
-        public void shouldNotGenerateOneForm_when1v1Specified() {
+        void shouldNotGenerateOneForm_when1v1Specified() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
@@ -155,12 +155,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
         }
 
         @Test
-        public void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
-            List<CaseDocument> documents = new ArrayList<>();
+        void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .specClaim1v1LrVsLip().build().toBuilder()
                 .addRespondent2(NO)
@@ -176,11 +175,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
         }
 
         @Test
-        public void shouldGenerateTwoForm_when1v2Specified() {
+        void shouldGenerateTwoForm_when1v2Specified() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             documents.add(document);
@@ -205,11 +204,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
 
         @Test
-        public void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
+        void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -226,12 +225,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
 
         }
 
         @Test
-        public void shouldNotGenerateOneForm_when1v1() {
+        void shouldNotGenerateOneForm_when1v1() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
@@ -253,12 +252,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
 
         }
 
         @Test
-        public void shouldAssignCategoryId_whenInvoked() {
+        void shouldAssignCategoryId_whenInvoked() {
             //Given
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);

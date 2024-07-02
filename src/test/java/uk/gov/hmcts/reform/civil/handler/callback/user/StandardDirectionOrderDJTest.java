@@ -52,8 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -717,11 +715,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesTrialHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
             assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
@@ -991,6 +989,35 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(responseCaseData.getEaCourtLocation()).isNull();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"true", "false"})
+        void shouldPopulateEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
+            DynamicList options = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .disposalHearingMethodInPersonDJ(options)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(
+                isLocationWhiteListed);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
         }
     }
 

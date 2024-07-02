@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     DJApplicantReceivedNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-public class DJApplicantReceivedNotificationHandlerTest {
+class DJApplicantReceivedNotificationHandlerTest {
 
     @MockBean
     private NotificationService notificationService;

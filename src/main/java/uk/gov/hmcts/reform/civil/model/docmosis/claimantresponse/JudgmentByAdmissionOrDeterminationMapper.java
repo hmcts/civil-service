@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -33,6 +31,8 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
@@ -176,24 +176,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             : "OCON225a";
     }
 
-    private Party getOrgDetails(OrganisationPolicy organisationPolicy) {
-
-        return Optional.ofNullable(organisationPolicy)
-            .map(OrganisationPolicy::getOrganisation)
-            .map(Organisation::getOrganisationID)
-            .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map(o -> Party.builder()
-                .name(o.getName())
-                .primaryAddress(getAddress(o.getContactInformation().get(0)))
-                .build())).orElse(null);
-    }
-
     private Party getClaimantLipOrLRDetailsForPaymentAddress(CaseData caseData) {
         if (caseData.isApplicantLiP()) {
             return getPartyDetails(caseData.getApplicant1());
         } else {
             if (caseData.getApplicant1OrganisationPolicy() != null) {
-                return getOrgDetails(caseData.getApplicant1OrganisationPolicy());
+                return getOrgDetails(caseData.getApplicant1OrganisationPolicy(), organisationService);
             } else {
                 return null;
             }
@@ -211,19 +199,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
-    private Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
-    }
-
     private Party getRespondentLROrLipDetails(CaseData caseData) {
         if (caseData.isRespondent1LiP()) {
             return getPartyDetails(caseData.getRespondent1());
         } else {
             if (caseData.getRespondent1OrganisationPolicy() != null) {
-                return getOrgDetails(caseData.getRespondent1OrganisationPolicy());
+                return getOrgDetails(caseData.getRespondent1OrganisationPolicy(), organisationService);
             } else {
                 return null;
             }

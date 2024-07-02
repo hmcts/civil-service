@@ -64,7 +64,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
+    void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         true,
@@ -93,7 +93,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
+    void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         false,
@@ -111,7 +111,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void returnErrorIfHelperServiceThrowsErrors() {
+    void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         true,

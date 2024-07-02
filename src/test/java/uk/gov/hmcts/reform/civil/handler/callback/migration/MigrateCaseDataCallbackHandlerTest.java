@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
     MigrateCaseDataCallbackHandler.class,
     CaseMigrationUtility.class,
     JacksonAutoConfiguration.class})
-public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest {
+class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private MigrateCaseDataCallbackHandler handler;
