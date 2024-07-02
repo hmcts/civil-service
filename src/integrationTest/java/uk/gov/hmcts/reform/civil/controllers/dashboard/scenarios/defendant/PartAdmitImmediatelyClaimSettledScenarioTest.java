@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -30,7 +29,6 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
