@@ -35,7 +35,7 @@ public class LipDefendantCaseAssignmentService {
         CaseEventService caseEventService,
         DefendantPinToPostLRspecService defendantPinToPostLRspecService,
         CaseDetailsConverter caseDetailsConverter,
-        @Value("${case-flags.logging.enabled}") boolean caseFlagsLoggingEnabled
+        @Value("${case-flags.logging.enabled:false}") boolean caseFlagsLoggingEnabled
     ) {
         this.idamClient = idamClient;
         this.caseEventService = caseEventService;
@@ -54,8 +54,6 @@ public class LipDefendantCaseAssignmentService {
                 .build();
         Map<String, Object> data = new HashMap<>();
         data.put("defendantUserDetails", defendantUserDetails);
-        log.info("caseFlagsLoggingEnabled: {}", caseFlagsLoggingEnabled);
-        log.info("CASE_FLAGS_LOGGING_ENABLED: {}", System.getenv("CASE_FLAGS_LOGGING_ENABLED"));
         if (caseFlagsLoggingEnabled) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
             log.info(
