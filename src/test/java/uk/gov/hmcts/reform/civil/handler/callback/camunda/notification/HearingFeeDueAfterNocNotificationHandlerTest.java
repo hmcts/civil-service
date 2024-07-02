@@ -137,6 +137,24 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
             verifyNoInteractions(notificationService);
         }
 
+        @Test
+        void shouldNotSendClaimantEmail_whenInvokedAndNoFeeRequired() {
+            when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build().toBuilder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+                .hearingDate(LocalDate.of(1990, 2, 20))
+                .hearingTimeHourMinute("1215")
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .reference("REFERENCE")
+                                              .build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
     }
 
     @NotNull
