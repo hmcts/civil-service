@@ -456,7 +456,7 @@ stitching:
 
 case-flags:
   logging:
-    enabled: ${CASE_FLAGS_LOGGING_ENABLED:true}
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
 
 bundle:
   api:

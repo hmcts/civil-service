@@ -35,7 +35,7 @@ public class LipDefendantCaseAssignmentService {
         CaseEventService caseEventService,
         DefendantPinToPostLRspecService defendantPinToPostLRspecService,
         CaseDetailsConverter caseDetailsConverter,
-        @Value("${case-flags.logging.enabled:false}") boolean caseFlagsLoggingEnabled
+        @Value("${case-flags.logging.enabled}") boolean caseFlagsLoggingEnabled
     ) {
         this.idamClient = idamClient;
         this.caseEventService = caseEventService;
