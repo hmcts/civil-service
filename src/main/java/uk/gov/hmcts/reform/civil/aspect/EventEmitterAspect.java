@@ -30,7 +30,7 @@ public class EventEmitterAspect {
             var businessProcess = caseData.getBusinessProcess();
             var camundaEvent = businessProcess.getCamundaEvent();
             var caseId = caseData.getCcdCaseReference();
-            if (businessProcess != null && businessProcess.getStatus() == READY) {
+            if (businessProcess != null && businessProcess. getStatus() == READY) {
                 log.info(format("Emitting %s camunda event for case through submitted callback: %d",
                                 camundaEvent, caseId));
                 eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);

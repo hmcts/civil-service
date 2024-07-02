@@ -68,9 +68,9 @@ hmc:
 
 serviceRequest:
   api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
+    callback-url: ${SERVICE_REQUEST_UPDATE:}
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
