@@ -32,6 +32,7 @@ class DispatchBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest
     public void setUp() {
         handler = new DispatchBusinessProcessCallbackHandler(new ObjectMapper());
     }
+
     @Nested
     class AboutToStartCallback {
 
