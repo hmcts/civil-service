@@ -84,4 +84,6 @@ public interface DQ {
     StatementOfTruth getStatementOfTruth();
 
     VulnerabilityQuestions getVulnerabilityQuestions();
+
+    DocumentsToBeConsidered getDocumentsToBeConsidered();
 }
