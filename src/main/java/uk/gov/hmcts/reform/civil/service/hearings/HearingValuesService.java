@@ -15,12 +15,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_MISSING_FIELDS;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getDuration;
@@ -77,7 +76,7 @@ public class HearingValuesService {
     private final OrganisationService organisationService;
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
-    private final FeatureToggleService featureToggleService;
+    private final EarlyAdoptersService earlyAdoptersService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
@@ -133,11 +132,7 @@ public class HearingValuesService {
     }
 
     private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (featureToggleService.isEarlyAdoptersEnabled()
-            && (caseData.getEaCourtLocation() != null
-            && caseData.getEaCourtLocation().equals(NO))
-            || !featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                 .getBaseLocation())) {
+        if (!earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData)) {
             throw new NotEarlyAdopterCourtException();
         }
     }
