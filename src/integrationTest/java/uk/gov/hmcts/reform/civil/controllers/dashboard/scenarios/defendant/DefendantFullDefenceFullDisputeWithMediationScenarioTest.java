@@ -37,6 +37,7 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .responseClaimMediationSpecRequired(YesOrNo.YES)
+                .responseClaimTrack("SMALL_CLAIM")
                 .build();
 
         handler.handle(callbackParams(caseData));

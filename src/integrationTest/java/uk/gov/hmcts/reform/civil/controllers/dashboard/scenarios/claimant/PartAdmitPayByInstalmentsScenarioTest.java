@@ -36,6 +36,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
         BigDecimal totalAmount = new BigDecimal("10000");
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
+            .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
