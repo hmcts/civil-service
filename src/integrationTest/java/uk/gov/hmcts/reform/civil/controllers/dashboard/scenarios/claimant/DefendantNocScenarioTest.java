@@ -67,7 +67,14 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[2].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
                 jsonPath("$[2].taskNameCy").value(
                     "<a>Ychwanegu trefniadau'r treial</a>"),
-                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
+                jsonPath("$[2].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName()),
+                jsonPath("$[3].reference").value(caseId.toString()),
+                jsonPath("$[3].taskNameEn").value(
+                    "<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[3].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
+                jsonPath("$[3].taskNameCy").value(
+                    "<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[3].currentStatusCy").value(TaskStatus.INACTIVE.getWelshName())
             );
 
     }

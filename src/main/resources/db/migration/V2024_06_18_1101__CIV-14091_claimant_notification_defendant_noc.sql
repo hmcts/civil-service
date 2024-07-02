@@ -24,4 +24,7 @@ VALUES ('<a>Pay the hearing fee</a>', 'Hearing' ,'<a>Talu ffi''r gwrandawiad</a>
        ('<a>Upload hearing documents</a>', 'Hearing' ,'<a>Llwytho dogfennau''r gwrandawiad</a>',
         'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 10, null, null),
        ('<a>Add the trial arrangements</a>', 'Hearing' ,'<a>Ychwanegu trefniadau''r treial</a>',
-        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 12, null, null);
+        'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 12, null, null),
+       ('<a>Contact the court to request a change to my case</a>', 'Applications',
+        '<a>Contact the court to request a change to my case</a>',
+        'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.ClaimSubmit.Required', '{2, 2}', 'CLAIMANT', 16, null, null);
