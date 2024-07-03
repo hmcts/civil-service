@@ -52,6 +52,7 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildClaimsForDefendantPact(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("Get claimant linked cases")
             .uponReceiving("a request for claims for a claimant")
             .pathFromProviderState(
                 ENDPOINT_PREFIX + CASE_REFERENCE + ENDPOINT_SUFFIX,
