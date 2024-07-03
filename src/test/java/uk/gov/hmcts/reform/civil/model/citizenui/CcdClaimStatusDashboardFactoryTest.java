@@ -234,7 +234,6 @@ class CcdClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
 
-
     @Test
     void given_claimantAcceptedAdmission_whenGetStatus_thenReturnRelevantStatus() {
         CaseData claim = CaseData.builder()
