@@ -127,4 +127,6 @@ public interface Claim {
     boolean isClaimSubmittedWaitingTranslatedDocuments();
 
     boolean isNocForDefendant();
+  
+    boolean isCaseStruckOut();
 }
