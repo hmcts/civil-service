@@ -22,6 +22,12 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     private static final List<CaseState> caseProceedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
             CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
             CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
+    private static final List<CaseState> caseMovedInCaseManStatesCaseProgression =
+        List.of(CaseState.CASE_PROGRESSION,
+                CaseState.HEARING_READINESS,
+                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
+                CaseState.DECISION_OUTCOME,
+                CaseState.All_FINAL_ORDERS_ISSUED);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
 
     public CaseProceedOfflineDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -48,6 +54,13 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
-        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip);
+        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip)
+            || (shouldRecordScenarioInCaseProgression(caseData, isLipvLipOrLRvLip));
+    }
+
+    public boolean shouldRecordScenarioInCaseProgression(CaseData caseData, boolean isLipvLipOrLRvLip) {
+        return featureToggleService.isCaseProgressionEnabled()
+            && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
+            && isLipvLipOrLRvLip;
     }
 }
