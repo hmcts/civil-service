@@ -39,7 +39,7 @@ public class AsyncHandlerConfiguration implements AsyncConfigurer {
 
         private final ApplicationContext context;
 
-        public AsyncTaskDecorator(ApplicationContext context) {
+        AsyncTaskDecorator(ApplicationContext context) {
             this.context = context;
         }
 
