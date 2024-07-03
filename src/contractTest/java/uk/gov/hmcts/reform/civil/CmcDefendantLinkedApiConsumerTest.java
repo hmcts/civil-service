@@ -32,6 +32,8 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT_SUFFIX = "/defendant-link-status";
 
+    private static final String SUBMITTER_ID_SUFFIX = "${submitterId}";
+
     private static final String CASE_REFERENCE = "100";
 
     @Autowired
@@ -55,7 +57,7 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
             .given("Get claimant linked cases")
             .uponReceiving("a request for claims for a claimant")
             .pathFromProviderState(
-                ENDPOINT_PREFIX + CASE_REFERENCE + ENDPOINT_SUFFIX,
+                ENDPOINT_PREFIX + SUBMITTER_ID_SUFFIX + ENDPOINT_SUFFIX,
                 ENDPOINT_PREFIX + CASE_REFERENCE + ENDPOINT_SUFFIX
             )
             .method(HttpMethod.GET.toString())
