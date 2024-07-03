@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@ConditionalOnProperty(value = "assign-roles-on-startup.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "role-initialisation.enabled", havingValue = "true")
 public class RoleAssignmentInitialisationService {
 
     private static final String HEARINGS_SYSTEM_USER_REFERENCE = "civil-hearings-system-user";
