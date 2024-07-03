@@ -29,6 +29,7 @@ public class GeneralAppsTakeOffLineService {
         caseDataBuilder
             .takenOfflineDate(LocalDateTime.now());
         try {
+            //APPLICATION_OFFLINE_UPDATE_CLAIM
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
                 helperService.triggerEvent(caseData, APPLICATION_PROCEEDS_IN_HERITAGE);
 
@@ -38,7 +39,7 @@ public class GeneralAppsTakeOffLineService {
 
             }
         } catch (Exception e) {
-            String errorMessage = "Could not trigger event to take application offline under the case: "
+            String errorMessage = "Could not take application offline for case: "
                 + caseData.getCcdCaseReference();
             log.error(errorMessage, e);
         }

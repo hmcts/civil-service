@@ -93,7 +93,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class CaseDataParent extends CaseDataCaseProgression implements MappableObject {
 

@@ -6,6 +6,11 @@ import java.util.Map;
 
 public interface NotificationData {
 
+    enum CaseHandledOfflineRecipient {
+        RESPONDENT_SOLICITOR1,
+        RESPONDENT_SOLICITOR2
+    }
+
     String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
     String CLAIM_16_DIGIT_NUMBER = "claim16DigitNumber";
     String RESPONDENT_NAME = "defendantName";

@@ -39,7 +39,7 @@ public class LocationHelper {
 
     public LocationHelper(
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
+          @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
         @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
 
         this.ccmccAmount = ccmccAmount;
