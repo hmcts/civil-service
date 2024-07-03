@@ -26,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  * Uses ThreadLocalCache as a cache to avoid accessing http request from spawned threads
  * (http request can be already closed at the time when a new thread accesses it)
  *
- * @see uk.gov.hmcts.reform.civil.config.AsyncHandlerConfiguration.AsyncTaskDecorator
+ * @see uk.gov.hmcts.reform.civil.config.AsyncHandlerConfiguration
  */
 
 @Primary
@@ -109,7 +109,6 @@ public class CacheAwareRequestData implements RequestData {
                 .map(Object::toString)
                 .orElse(StringUtils.EMPTY);
         } catch (IOException e) {
-            //we don't really want to error the whole request if this fails
             log.error("Unable to extract caseId from request body during caching due to exception %s".formatted(e.getMessage()));
             return StringUtils.EMPTY;
         }
