@@ -112,8 +112,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
-        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn();
+        return (null != caseData.getCcjPaymentDetails()
+            && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
     @Override
