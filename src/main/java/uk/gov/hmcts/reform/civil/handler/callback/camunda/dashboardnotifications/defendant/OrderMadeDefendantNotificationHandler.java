@@ -23,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT;
@@ -42,8 +41,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
-                                                          CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT,
-                                                          UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS);
+                                                          CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
 
     public OrderMadeDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
