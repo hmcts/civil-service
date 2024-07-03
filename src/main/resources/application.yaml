@@ -628,8 +628,8 @@ spring:
       on-profile: integration-test
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:hmctspublic.azurecr.io/imported/postgresql:11.1://localhost/cmc
-    jdbcUrl: jdbc:hmctspublic.azurecr.io/imported/postgresql:11.1://localhost/cmc
+    url: jdbc:tc:postgresql:11.4://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
     hikari:
       minimum-idle: 1
       connectionTimeout: 10000
