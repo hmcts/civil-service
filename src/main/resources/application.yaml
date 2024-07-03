@@ -744,3 +744,8 @@ idam:
 caseFlags:
   logging:
     enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
+
+stateflow:
+  engine:
+    simplification:
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
