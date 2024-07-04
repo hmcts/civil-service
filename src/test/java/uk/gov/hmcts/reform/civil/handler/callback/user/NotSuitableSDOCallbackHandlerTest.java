@@ -153,7 +153,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateReasonMoreThan150_whenInvokedAndTOCEnabledOtherReasons() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
-            final int lengthALlowed = 150;
+            final int lengthALlowed = 4000;
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
             params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -184,7 +184,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateTOCReasonMoreThan150_whenInvokedAndTOCEnabledTransferCase() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
-            final int lengthALlowed = 150;
+            final int lengthALlowed = 4000;
 
             caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawnOverLimit().build();
             params = callbackParamsOf(caseData, MID, PAGE_ID);
