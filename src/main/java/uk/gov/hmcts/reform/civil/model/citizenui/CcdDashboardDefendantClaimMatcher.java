@@ -437,9 +437,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isDefaultJudgementIssued() {
-        return nonNull(caseData.getActiveJudgment()) &&
-            DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType()) &&
-            JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
+        return nonNull(caseData.getActiveJudgment())
+            && DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
+            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
     }
 
 }

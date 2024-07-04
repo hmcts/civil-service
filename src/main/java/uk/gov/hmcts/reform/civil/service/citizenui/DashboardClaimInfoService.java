@@ -151,9 +151,9 @@ public class DashboardClaimInfoService {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
         }
 
-        if (caseData.getActiveJudgment() != null &&
-            caseData.getActiveJudgment().getType().equals(JudgmentType.DEFAULT_JUDGMENT) &&
-            caseData.getActiveJudgment().getIssueDate() != null) {
+        if (caseData.getActiveJudgment() != null
+            && caseData.getActiveJudgment().getType().equals(JudgmentType.DEFAULT_JUDGMENT)
+            && caseData.getActiveJudgment().getIssueDate() != null) {
             item.setDefaultJudgementIssuedDate(caseData.getActiveJudgment().getIssueDate());
         }
         return item;
