@@ -25,6 +25,16 @@ public class CmcConsumerTestUtil {
                                     rows
                                         .stringType("reason", "No reason")
                                         .numberType("amount", 20.0)))
+                        .object("breathingSpace", breathingSpace ->
+                            breathingSpace
+                                .stringType("bs_reference_number", "bsReferenceNumber")
+                                .date("bs_entered_date", "yyyy-MM-dd")
+                                .date("bs_lifted_date", "yyyy-MM-dd")
+                                .date("bs_entered_date_by_insolvency_team", "yyyy-MM-dd")
+                                .date("bs_lifted_date_by_insolvency_team", "yyyy-MM-dd")
+                                .date("bs_expected_end_date", "yyyy-MM-dd")
+                                .stringType("bs_lifted_flag", "bsLiftedFlag")
+                        )
                         .minArrayLike("claimants", 1, claimants ->
                             claimants
                                 .stringType("name", "name")
@@ -44,16 +54,6 @@ public class CmcConsumerTestUtil {
                                         .stringType("city", "city")
                                         .stringType("county", "county")
                                         .stringType("postcode", "postcode"))
-                                .object("breathingSpace", breathingSpace ->
-                                    breathingSpace
-                                        .stringType("bsReferenceNumber", "bsReferenceNumber")
-                                        .date("bsEnteredDate", "yyyy-MM-dd")
-                                        .date("bsLiftedDate", "yyyy-MM-dd")
-                                        .date("bsEnteredDateByInsolvencyTeam", "yyyy-MM-dd")
-                                        .date("bsLiftedDateByInsolvencyTeam", "yyyy-MM-dd")
-                                        .date("bsExpectedEndDate", "yyyy-MM-dd")
-                                        .stringType("bsLiftedFlag", "bsLiftedFlag")
-                                )
                         )
                 )
                 .date("responseDeadline", "yyyy-MM-dd")
