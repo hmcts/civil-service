@@ -71,11 +71,27 @@ public class CmcConsumerTestUtil {
                             .numberType("paidAmount", 10.0))
                     .stringType("responseMethod", "OFFLINE"))
                 .date("moneyReceivedOn", "yyyy-MM-dd")
-                .date("countyCourtJudgmentRequestedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                .date("createdAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                .date("reDeterminationRequestedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .stringMatcher(
+                    "countyCourtJudgmentRequestedAt",
+                    "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                    "2020-10-06T18:54:48.785000"
+                )
+                .stringMatcher(
+                    "createdAt",
+                    "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                    "2020-10-06T18:54:48.785000"
+                )
+                .stringMatcher(
+                    "reDeterminationRequestedAt",
+                    "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                    "2020-10-06T18:54:48.785000"
+                )
+                .stringMatcher(
+                    "claimantRespondedAt",
+                    "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                    "2020-10-06T18:54:48.785000"
+                )
                 .date("intentionToProceedDeadline", "yyyy-MM-dd")
-                .date("claimantRespondedAt", "yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .object("claimantResponse", claimantResponse ->
                     claimantResponse
                         .numberType("amountPaid", 50.0)
