@@ -26,8 +26,8 @@ import static uk.gov.hmcts.reform.civil.CmcConsumerTestUtil.buildBundleCreateRes
 import static uk.gov.hmcts.reform.cmc.model.ClaimState.OPEN;
 
 @PactTestFor(providerName = "cmc_claimant")
-@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6669")
-@MockServerConfig(hostInterface = "localhost", port = "6669")
+@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6676")
+@MockServerConfig(hostInterface = "localhost", port = "6676")
 public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/claims/claimant/";
@@ -53,6 +53,7 @@ public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildClaimsForClaimantPact(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("Get claimant cases")
             .uponReceiving("a request for claims for a claimant")
             .pathFromProviderState(ENDPOINT + SUBMITTER_ID_SUFFIX, ENDPOINT + SUBMITTER_ID)
             .method(HttpMethod.GET.toString())
