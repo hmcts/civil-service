@@ -4998,10 +4998,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawnOverLimit() {
 
         atStateApplicantRespondToDefenceAndProceed();
-
         ccdState = JUDICIAL_REFERRAL;
-
-
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
             .input(reason)
             .build();
