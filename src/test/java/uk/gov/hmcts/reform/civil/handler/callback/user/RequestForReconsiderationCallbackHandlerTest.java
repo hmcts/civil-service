@@ -40,7 +40,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -615,6 +617,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            CaseDocument caseDocument = mock(CaseDocument.class);
+            when(caseDocument.getDocumentName()).thenReturn("Generated document name");
+            when(documentService.generateLiPDocument(
+                caseData,
+                params.getParams().get(BEARER_TOKEN).toString(),
+                true
+            )).thenReturn(caseDocument);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -625,6 +634,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
                 .extracting("reasonForReconsiderationTxt")
                 .isEqualTo("Comments from claimant");
+            // link to document is shown in confirmation page, so we always need it
+            assertThat(response.getData()).extracting("requestForReconsiderationDocument")
+                .extracting("documentName")
+                .isEqualTo(caseDocument.getDocumentName());
         }
 
         @Test
@@ -640,6 +653,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+            CaseDocument caseDocument = mock(CaseDocument.class);
+            when(caseDocument.getDocumentName()).thenReturn("Generated document for defendant");
+            when(documentService.generateLiPDocument(
+                caseData,
+                params.getParams().get(BEARER_TOKEN).toString(),
+                false
+            )).thenReturn(caseDocument);
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -649,6 +669,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
                 .extracting("reasonForReconsiderationTxt")
                 .isEqualTo("Comments from defendant");
+            // link to document is shown in confirmation page, so we always need it
+            assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes")
+                .extracting("documentName")
+                .isEqualTo(caseDocument.getDocumentName());
         }
     }
 

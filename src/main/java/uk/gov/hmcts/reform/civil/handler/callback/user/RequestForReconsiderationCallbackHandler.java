@@ -208,14 +208,15 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                                                                         .map(CaseDataLiP::getRequestForReviewCommentsClaimant)
                                                                         .filter(StringUtils::isNotBlank)
                                                                         .orElse(REASON_NOT_PROVIDED));
-            if (caseData.isRespondent1LiP()) {
-                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(
-                        BEARER_TOKEN).toString(),
-                    true
-                ));
-            }
+
+            // visible if respondent is LiP but also because CUI confirmation page includes the link
+            updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
+                caseData,
+                callbackParams.getParams().get(
+                    BEARER_TOKEN).toString(),
+                true
+            ));
+
             updatedData.orderRequestedForReviewClaimant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
@@ -233,14 +234,14 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                     .orElse(REASON_NOT_PROVIDED)
             );
 
-            if (caseData.isApplicantLiP()) {
-                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(
-                        BEARER_TOKEN).toString(),
-                    false
-                ));
-            }
+            // visible if applicant is LiP but also because CUI confirmation page includes the link
+            updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
+                caseData,
+                callbackParams.getParams().get(
+                    BEARER_TOKEN).toString(),
+                false
+            ));
+
             updatedData.orderRequestedForReviewDefendant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
         }
