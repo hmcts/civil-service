@@ -46,7 +46,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseUserService coreCaseUserService;
 
     @Mock
-    private static ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     private CallbackParams params;
     private CaseData caseData;

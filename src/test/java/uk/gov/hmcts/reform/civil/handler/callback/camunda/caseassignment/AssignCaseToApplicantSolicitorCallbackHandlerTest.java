@@ -61,7 +61,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
     private FeatureToggleService toggleService;
 
     @Mock
-    private static ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     private CallbackParams params;
     private CaseData caseData;
@@ -74,13 +74,13 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldReturnSupplementaryDataOnSubmitted() {
-            caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(localCaseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
@@ -91,13 +91,13 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldReturnSpecSupplementaryData() {
-            caseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
             when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
 
-            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(localCaseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
