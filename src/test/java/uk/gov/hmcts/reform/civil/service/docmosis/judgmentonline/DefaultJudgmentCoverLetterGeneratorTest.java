@@ -172,6 +172,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                                         .organisationIdentifier("3456").name("Org2Name")
                                         .contactInformation(List.of(CONTACT_INFORMATION_ORG_2)).build()));
     }
+
     @Test
     void shouldReturnEmptyIfStitchingIsDisabled() {
         // given
