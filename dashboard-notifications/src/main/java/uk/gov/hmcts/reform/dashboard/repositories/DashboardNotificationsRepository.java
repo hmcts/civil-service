@@ -20,5 +20,5 @@ public interface DashboardNotificationsRepository extends CrudRepository<Dashboa
 
     int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
 
-    int deleteByReference(String reference);
+    int deleteByReferenceAndCitizenRole(String reference, String role);
 }

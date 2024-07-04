@@ -3,16 +3,16 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant',
-        '{"*"}',
+        '{"*.role.CLAIMANT"}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant',
-        '{"*"}',
+        '{"*.role.DEFENDANT"}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
         ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant',
-        '{"*"}',
+        '{"*.role.CLAIMANT"}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant',
-        '{"*"}',
+        '{"*.role.DEFENDANT"}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}');
 
 /**

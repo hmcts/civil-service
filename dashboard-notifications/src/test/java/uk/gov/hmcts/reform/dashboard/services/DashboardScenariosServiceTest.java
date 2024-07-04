@@ -31,7 +31,6 @@ class DashboardScenariosServiceTest {
     public static final String SCENARIO_ISSUE_CLAIM_START = "scenario.issue.claim.start";
     public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
     private DashboardScenariosService dashboardScenariosService;
-    private NotificationTemplateEntity notification1;
     private NotificationTemplateEntity notification2;
     @Mock
     private ScenarioRepository scenarioRepository;
@@ -54,7 +53,7 @@ class DashboardScenariosServiceTest {
             taskItemTemplateRepository
         );
 
-        notification1 = NotificationTemplateEntity.builder()
+        NotificationTemplateEntity notification1 = NotificationTemplateEntity.builder()
             .name(NOTIFICATION_ISSUE_CLAIM_START)
             .role("claimant")
             .titleEn("The ${animal} jumped over the ${target}.")
@@ -151,9 +150,9 @@ class DashboardScenariosServiceTest {
                                                 NOTIFICATION_ISSUE_CLAIM_START,
                                                 new String[]{"url, status, helpText, animal, target"}
                                             ))
-                                        .notificationsToDelete(new String[]{"*"})
+                                        .notificationsToDelete(new String[]{"*.role.CLAIMANT"})
                                         .build()));
-        when(dashboardNotificationService.deleteByReference("ccd-case-id"))
+        when(dashboardNotificationService.deleteByReferenceAndCitizenRole("ccd-case-id", "CLAIMANT"))
             .thenReturn(1);
 
         dashboardScenariosService.recordScenarios(
@@ -178,8 +177,8 @@ class DashboardScenariosServiceTest {
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
         verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
-        verify(dashboardNotificationService).deleteByReference(
-            "ccd-case-id"
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            "ccd-case-id", "CLAIMANT"
         );
     }
 

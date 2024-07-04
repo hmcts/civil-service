@@ -29,8 +29,10 @@ public class DashboardScenariosService {
 
     /**
      * use this in templates to delete to delete all current notifications before creating new ones.
+     * The use is as prefix, so that *.role.CLAIMANT deletes all notifications with role CLAIMANT,
+     * and *.role.DEFENDANT deletes all notifications with role DEFENDANT.
      */
-    private static final String DELETE_ALL_CURRENT_NOTIFICATIONS = "*";
+    private static final String DELETE_ALL_NOTIFICATIONS_FOR_ROLE = "*.role.";
     private final ScenarioRepository scenarioRepository;
     private final NotificationTemplateRepository notificationTemplateRepository;
     private final DashboardNotificationService dashboardNotificationService;
@@ -159,11 +161,15 @@ public class DashboardScenariosService {
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
         List<String> notificationsToDelete = Arrays.asList(scenario.getNotificationsToDelete());
-        if (notificationsToDelete.contains(DELETE_ALL_CURRENT_NOTIFICATIONS)) {
-            dashboardNotificationService.deleteByReference(uniqueCaseIdentifier);
-        } else {
-            notificationsToDelete.forEach(templateName -> {
-
+        for (String templateName : notificationsToDelete) {
+            if (templateName.startsWith(DELETE_ALL_NOTIFICATIONS_FOR_ROLE)) {
+                String role = templateName.substring(DELETE_ALL_NOTIFICATIONS_FOR_ROLE.length());
+                int noOfRowsRemoved = dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                    uniqueCaseIdentifier,
+                    role
+                );
+                log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
+            } else {
                 Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                     .findByName(templateName);
 
@@ -175,7 +181,7 @@ public class DashboardScenariosService {
                     );
                     log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
                 });
-            });
+            }
         }
     }
 }
