@@ -670,9 +670,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo markPaidForAllClaimants;
     private DynamicList claimantWhoIsSettling;
     private DynamicList claimantWhoIsDiscontinuing;
+    private DynamicList discontinuingAgainstOneDefendant;
     private String selectedClaimantForDiscontinuance;
     private YesOrNo courtPermissionNeeded;
     private YesOrNo courtPermissionNeededChecked;
+    private YesOrNo isDiscontinuingAgainstBothDefendants;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -1141,6 +1143,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
             return getSystemGeneratedCaseDocuments().stream()
                 .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                     .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+        }
+        return Optional.empty();
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getDecisionOnReconsiderationDocumentFromList() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DECISION_MADE_ON_APPLICATIONS)).findAny();
         }
         return Optional.empty();
     }

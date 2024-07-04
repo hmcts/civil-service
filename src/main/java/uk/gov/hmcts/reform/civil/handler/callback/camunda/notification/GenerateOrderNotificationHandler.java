@@ -98,7 +98,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         }
         if (isLip) {
             if (isLipWelsh) {
-                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+                return notificationsProperties.getOrderBeingTranslatedTemplateWelsh();
             } else {
                 return notificationsProperties.getNotifyLipUpdateTemplate();
             }
