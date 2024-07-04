@@ -9,6 +9,9 @@ public enum DashboardClaimStatus {
     DEFENDANT_APPLY_NOC(
         Claim::isNocForDefendant
     ),
+    HEARING_FEE_UNPAID(
+        Claim::isCaseStruckOut
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),
