@@ -60,7 +60,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     class AboutToStartCallback {
 
         @Test
-        void should_not_return_error() {
+        void should_not_return_error_and_populate_claimant_list_if_2v1_case() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -73,7 +73,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void should_return_error_if_present() {
+        void should_return_error_if_error_not_null() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
