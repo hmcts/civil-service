@@ -54,7 +54,7 @@ public class LipDefendantCaseAssignmentService {
                 .build();
         Map<String, Object> data = new HashMap<>();
         data.put("defendantUserDetails", defendantUserDetails);
-        if (caseFlagsLoggingEnabled) {
+        if (caseFlagsLoggingEnabled && caseDetails.isPresent()) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
             log.info(
                 "case id: {}, respondent flags start of event submission: {}",
