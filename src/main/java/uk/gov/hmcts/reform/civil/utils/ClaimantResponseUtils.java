@@ -93,9 +93,18 @@ public class ClaimantResponseUtils {
 
     public static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-            return caseData.getTotalClaimAmount();
+            return caseData.getTotalClaimAmount().add(getClaimFee(caseData));
         } else {
             return caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
+    }
+
+    private static BigDecimal getClaimFee(CaseData caseData) {
+        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
+        if (caseData.isHelpWithFees()
+            && caseData.getOutstandingFeeInPounds() != null) {
+            claimFee = caseData.getOutstandingFeeInPounds();
+        }
+        return claimFee;
     }
 }
