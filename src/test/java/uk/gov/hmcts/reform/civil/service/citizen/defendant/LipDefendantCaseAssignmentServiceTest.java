@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.citizen.defendant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -57,8 +57,14 @@ class LipDefendantCaseAssignmentServiceTest {
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @InjectMocks
-    private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+
+    LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+
+    @BeforeEach
+    public void setUp() {
+        lipDefendantCaseAssignmentService =
+            new LipDefendantCaseAssignmentService(idamClient, caseEventService, defendantPinToPostLRspecService, caseDetailsConverter, false);
+    }
 
     @Test
     void shouldAddDefendantDetails_whenLipVLipFlagIsEnabled() {
