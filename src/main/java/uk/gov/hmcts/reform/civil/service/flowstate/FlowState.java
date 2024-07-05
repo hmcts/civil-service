@@ -87,7 +87,8 @@ public interface FlowState {
         All_FINAL_ORDERS_ISSUED,
         PREPARE_FOR_HEARING_CONDUCT_HEARING,
         SIGN_SETTLEMENT_AGREEMENT,
-        TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
+        TAKEN_OFFLINE_SPEC_DEFENDANT_NOC,
+        CASE_DISCONTINUED;
 
         public static final String FLOW_NAME = "MAIN";
 
