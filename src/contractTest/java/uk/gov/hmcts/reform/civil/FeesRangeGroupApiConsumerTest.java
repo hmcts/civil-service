@@ -15,8 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +37,9 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     public static final String ENDPOINT = "/fees-register/fees";
 
     @Autowired
-    private FeesApiClient feesApiClient;
+    private FeesClientService feesClientService;
+    @Autowired
+    private FeesConfiguration feesConfiguration;
 
     @Pact(consumer = "civil-service")
     public RequestResponsePact getRangeGroupFees(PactDslWithProvider builder) throws JSONException {
@@ -50,12 +53,7 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "getRangeGroupFees")
     public void verifyRangeGroupFees() {
-        Fee2Dto[] fee = feesApiClient.findRangeGroup(
-            CMC_SERVICE,
-            JURISDICTION_CIVIL,
-            JURISDICTION_CC,
-            CHANNEL,
-            EVENT_ISSUE
+        Fee2Dto[] fee = feesClientService.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent()
         );
         assertThat(fee[0].getCode(), is(equalTo("code")));
     }
@@ -86,20 +84,32 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .object(feeDto -> feeDto
                 .object("applicantType", applicantType ->
                     applicantType
-                        .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        .stringMatcher("creationTime",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
+                        .stringMatcher("lastUpdated",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
                 .object("channelType", channelTypeDto ->
                     channelTypeDto
-                        .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        .stringMatcher("creationTime",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
+                        .stringMatcher("lastUpdated",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
                 .stringType("code", "code")
                 .object("currentVersion", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
                 .object("eventType", eventType -> eventType
-                    .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .stringMatcher("creationTime",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
+                    .stringMatcher("lastUpdated",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
                     .stringType("name", "name"))
                 .stringType("feeType", "FEETYPE")
                 .minArrayLike("feeVersions", 1, feeVersions -> getFeeVersionDto(feeVersions))
@@ -116,8 +126,12 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
                 .numberType("minRange", "minRange")
                 .stringType("rangeUnit", "rangeUnit")
                 .object("serviceType", serviceType -> serviceType
-                    .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .stringMatcher("creationTime",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
+                    .stringMatcher("lastUpdated",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
                     .stringType("name", "name"))
                 .booleanType("unspecifiedClaimAmount")
             )).build();
@@ -139,8 +153,12 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .stringType("siRefId", "siRefId")
             .stringType("status", "status")
             .stringType("statutoryInstrument", "statutoryInstrument")
-            .date("validFrom", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-            .date("validTo", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .stringMatcher("validFrom",
+                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                           "2020-10-06T18:54:48.785000")
+            .stringMatcher("validTo",
+                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                           "2020-10-06T18:54:48.785000")
             .numberType("version")
             .object("volumeAmount", volumeAmount -> volumeAmount
                 .numberType("amount"));

@@ -233,6 +233,13 @@ public class DashboardNotificationsParamsMapper {
             );
         }
 
+        if (nonNull(caseData.getRequestForReconsiderationDeadline())) {
+            params.put("requestForReconsiderationDeadlineEn",
+                       DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
+            params.put("requestForReconsiderationDeadlineCy",
+                       DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
+        }
+
         return params;
     }
 
@@ -243,13 +250,6 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
-
-        if (CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.equals(caseEvent)
-            || CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.equals(caseEvent)) {
-            params.put("requestForReconsiderationDeadlineEn", DateUtils.formatDate(LocalDate.now().plusDays(7)));
-            params.put("requestForReconsiderationDeadlineCy", DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7)));
-        }
-
         return params;
     }
 
@@ -258,7 +258,6 @@ public class DashboardNotificationsParamsMapper {
             case WEEKLY -> "weekly";
             case EVERY_TWO_WEEKS -> "biweekly";
             case MONTHLY -> "monthly";
-            default -> "";
         };
     }
 
