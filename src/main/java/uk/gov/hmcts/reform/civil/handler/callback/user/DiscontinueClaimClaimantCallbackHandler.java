@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PermissionGranted;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper.is1v2LrVLrCase;
+import static uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper.is1v2LrVLrCase;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::populateData)
             .put(callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant)
             .put(callbackKey(MID, "checkPermissionGranted"), this::checkPermissionGrantedFields)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitChanges)
             .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
             .build();
     }
@@ -112,6 +113,21 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     public static boolean validateIfFutureDate(LocalDate date) {
         LocalDate today = LocalDate.now();
         return date.isAfter(today);
+    }
+
+    private CallbackResponse submitChanges(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+            .permissionGrantedComplex(
+                PermissionGranted.builder()
+                    .permissionGrantedJudge(callbackParams.getCaseData().getPermissionGrantedJudgeCopy())
+                    .permissionGrantedDate(callbackParams.getCaseData().getPermissionGrantedDateCopy())
+                    .build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     @Override

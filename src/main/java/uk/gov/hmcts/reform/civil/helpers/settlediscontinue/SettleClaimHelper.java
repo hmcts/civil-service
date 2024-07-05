@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.helpers;
+package uk.gov.hmcts.reform.civil.helpers.settlediscontinue;
 
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;

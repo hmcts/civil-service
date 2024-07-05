@@ -11,21 +11,24 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.helpers.SettleClaimHelper;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermissionList;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PermissionGranted;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -33,6 +36,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT);
+    public static final String UNABLE_TO_VALIDATE = "### Unable to validate information";
+    public static final String INFORMATION_SUCCESSFULLY_VALIDATED = "### Information successfully validated";
+    public static final String NEXT_STEPS = """
+            ### Next steps:
+
+            No further action required.""";
+
     private final ObjectMapper objectMapper;
 
     @Override
@@ -48,11 +58,10 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
         var caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .permissionGrantedComplex(
-                PermissionGranted.builder()
-                    .permissionGrantedJudge(caseData.getPermissionGrantedComplex().getPermissionGrantedJudge())
-                    .permissionGrantedDate(caseData.getPermissionGrantedComplex().getPermissionGrantedDate())
-                    .build());
+            .permissionGrantedJudgeCopy(caseData.getPermissionGrantedComplex() == null ? null
+                                                : caseData.getPermissionGrantedComplex().getPermissionGrantedJudge())
+            .permissionGrantedDateCopy(caseData.getPermissionGrantedComplex() == null ? null
+                                               : caseData.getPermissionGrantedComplex().getPermissionGrantedDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -67,18 +76,39 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
 
-        if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
-            aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CLOSED.name());
+        if (caseData.getTypeOfDiscontinuance() != null) {
+            if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
+                if (DiscontinueClaimHelper.is1v2LrVLrCase(caseData)) {
+                    if (SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsDiscontinuingAgainstBothDefendants())) {
+                        aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
+                    } else {
+                        //part, update case. Needed?
+                    }
+                } else {
+                    aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
+                }
+            } else {
+                //part, update case. Needed?
+            }
         }
+
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
-    private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# Claim marked as settled")
-            .confirmationBody("<br />")
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(format(NEXT_STEPS))
             .build();
+    }
+
+    private static String getHeader(CaseData caseData) {
+        if (ConfirmOrderGivesPermissionList.NO.equals(caseData.getConfirmOrderGivesPermissionList())) {
+            return format(UNABLE_TO_VALIDATE);
+        }
+        return format(INFORMATION_SUCCESSFULLY_VALIDATED);
     }
 
     @Override
