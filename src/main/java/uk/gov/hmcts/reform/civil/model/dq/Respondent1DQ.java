@@ -58,6 +58,7 @@ public class Respondent1DQ implements DQ {
     private YesOrNo responseClaimCourtLocationRequired;
     private RequestedCourt respondToCourtLocation;
     private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
+    private DocumentsToBeConsidered respondent1DQClaimantDocumentsToBeConsidered;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -238,5 +239,11 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQRemoteHearing")
     public RemoteHearing getRemoteHearing() {
         return respondent1DQRemoteHearing;
+    }
+
+    @Override
+    @JsonProperty("respondent1DQClaimantDocumentsToBeConsidered")
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return respondent1DQClaimantDocumentsToBeConsidered;
     }
 }
