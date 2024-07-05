@@ -84,20 +84,32 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .object(feeDto -> feeDto
                 .object("applicantType", applicantType ->
                     applicantType
-                        .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        .stringMatcher("creationTime",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
+                        .stringMatcher("lastUpdated",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
                 .object("channelType", channelTypeDto ->
                     channelTypeDto
-                        .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                        .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        .stringMatcher("creationTime",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
+                        .stringMatcher("lastUpdated",
+                                       "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                       "2020-10-06T18:54:48.785000")
                         .stringType("name", "name"))
                 .stringType("code", "code")
                 .object("currentVersion", feeVersionDto ->
                     getFeeVersionDto(feeVersionDto))
                 .object("eventType", eventType -> eventType
-                    .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .stringMatcher("creationTime",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
+                    .stringMatcher("lastUpdated",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
                     .stringType("name", "name"))
                 .stringType("feeType", "FEETYPE")
                 .minArrayLike("feeVersions", 1, feeVersions -> getFeeVersionDto(feeVersions))
@@ -114,8 +126,12 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
                 .numberType("minRange", "minRange")
                 .stringType("rangeUnit", "rangeUnit")
                 .object("serviceType", serviceType -> serviceType
-                    .date("creationTime", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    .date("lastUpdated", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    .stringMatcher("creationTime",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
+                    .stringMatcher("lastUpdated",
+                                   "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                   "2020-10-06T18:54:48.785000")
                     .stringType("name", "name"))
                 .booleanType("unspecifiedClaimAmount")
             )).build();
@@ -137,8 +153,12 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .stringType("siRefId", "siRefId")
             .stringType("status", "status")
             .stringType("statutoryInstrument", "statutoryInstrument")
-            .date("validFrom", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-            .date("validTo", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .stringMatcher("validFrom",
+                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                           "2020-10-06T18:54:48.785000")
+            .stringMatcher("validTo",
+                           "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                           "2020-10-06T18:54:48.785000")
             .numberType("version")
             .object("volumeAmount", volumeAmount -> volumeAmount
                 .numberType("amount"));
