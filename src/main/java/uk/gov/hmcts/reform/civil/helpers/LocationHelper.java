@@ -47,16 +47,15 @@ public class LocationHelper {
         this.ccmccEpimsId = ccmccEpimsId;
     }
 
-    /**
-     * If the defendant is individual or sole trader, their preferred court is the case's court.
-     * Otherwise, the case's court is the claimant's preferred court.
-     * In multiparty cases we consider the lead claimant and the lead defendant. Lead claimant is claimant 1,
-     * lead defendant is the defendant who responded first to the claim.
-     *
-     * @param caseData case data
-     * @return requested court to be used as case court
-     */
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
+        return getCaseManagementLocationDefault(caseData, false);
+    }
+
+    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData, boolean legalAdvisorSdo) {
+        return getCaseManagementLocationDefault(caseData, legalAdvisorSdo);
+    }
+
+    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData, boolean isLegalAdvisorSdo) {
         List<RequestedCourt> prioritized = new ArrayList<>();
         boolean leadDefendantIs1 = leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
@@ -91,7 +90,8 @@ public class LocationHelper {
             });
 
             Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-            if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+            if (!isLegalAdvisorSdo &&
+                ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
                 return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
                         .caseLocation(getCcmccCaseLocation()).build())
                                        .orElseGet(() -> RequestedCourt.builder()

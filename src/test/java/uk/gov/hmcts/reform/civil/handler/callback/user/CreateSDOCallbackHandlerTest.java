@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
@@ -259,6 +260,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourt() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             String preSelectedCourt = "214320";
@@ -274,7 +276,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
             CaseDocument order = CaseDocument.builder().documentLink(
@@ -302,6 +306,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDynamicListsCorrectly() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
@@ -341,7 +346,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
-
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
             List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
@@ -414,7 +419,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
-
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             String preSelectedCourt = "214320";
@@ -467,7 +472,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
@@ -678,6 +683,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
@@ -726,6 +732,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldPopulateWelshSectionForSDOR2(boolean valid) {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build()
@@ -757,6 +764,104 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage()).isNull();
             }
         }
+
+        @Test
+        void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
+                .totalClaimAmount(BigDecimal.valueOf(999))
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .applicant1(Party.builder()
+                                .type(Party.Type.INDIVIDUAL)
+                                .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQRequestedCourt(
+                                      RequestedCourt.builder()
+                                          .caseLocation(CaseLocationCivil.builder()
+                                                            .baseLocation("app court requested epimm")
+                                                            .region("app court request region").build())
+                                          .responseCourtCode("123")
+                                          .build()
+                                  )
+                                  .build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(
+                                       RequestedCourt.builder()
+                                           .caseLocation(CaseLocationCivil.builder()
+                                                             .baseLocation("def court requested epimm")
+                                                             .region("def court request region").build())
+                                           .responseCourtCode("321")
+                                           .build()
+                                   )
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            System.out.println("BANANANA " + responseCaseData.getCaseManagementLocation());
+
+            assertThat(response.getData()).extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("def court request region", "def court requested epimm");
+        }
+
+        @Test
+        void shouldNotUpdateCaseManagementLocation_whenNotUnder1000SpecCcmcc() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .applicant1(Party.builder()
+                                .type(Party.Type.INDIVIDUAL)
+                                .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQRequestedCourt(
+                                      RequestedCourt.builder()
+                                          .caseLocation(CaseLocationCivil.builder()
+                                                            .baseLocation("app court requested epimm")
+                                                            .region("app court request region").build())
+                                          .responseCourtCode("123")
+                                          .build()
+                                  )
+                                  .build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(
+                                       RequestedCourt.builder()
+                                           .caseLocation(CaseLocationCivil.builder()
+                                                             .baseLocation("def court requested epimm")
+                                                             .region("def court request region").build())
+                                           .responseCourtCode("321")
+                                           .build()
+                                   )
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            System.out.println("BANANANA " + responseCaseData.getCaseManagementLocation());
+
+            assertThat(response.getData()).extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("orange", "1010101");
+        }
+
+
     }
 
     @Nested
@@ -1905,7 +2010,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
-                .applicant1DQWithLocation().build();
+                .applicant1DQWithLocation()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build();
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
