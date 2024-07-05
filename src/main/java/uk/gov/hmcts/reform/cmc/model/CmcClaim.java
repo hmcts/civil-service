@@ -78,11 +78,6 @@ public class CmcClaim implements Claim {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate admissionPayImmediatelyPastPaymentDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate intentionToProceedDeadline;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
