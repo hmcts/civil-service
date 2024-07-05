@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
@@ -248,6 +249,34 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
         assertThat(claimsForDefendant.getClaims().get(0).getPaymentDate()).isEqualTo(DATE_IN_2025.toLocalDate());
+    }
+
+    @Test
+    void shouldIncludeCcjCreationDateDateWhenItExists() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .activeJudgment(JudgmentDetails.builder()
+                                            .createdTimestamp(DATE_IN_2025)
+                                            .build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getCcjRequestedDate()).isEqualTo(DATE_IN_2025);
     }
 
     @Test
