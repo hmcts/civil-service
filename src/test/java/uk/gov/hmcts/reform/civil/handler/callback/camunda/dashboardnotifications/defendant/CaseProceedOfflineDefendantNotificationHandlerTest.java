@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -114,6 +116,36 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedForCaseProgressionOnFastTrackClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(12890L)
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
+                .previousCCDState(CASE_PROGRESSION).build();
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
