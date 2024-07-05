@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.List;
 
@@ -24,14 +23,10 @@ public class HearingFeeUnpaidDefendantNotificationHandler extends CaseProgressio
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_DEFENDANT1);
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForDefendant1";
 
-    private final DashboardNotificationService dashboardNotificationService;
-
     public HearingFeeUnpaidDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                         DashboardNotificationsParamsMapper mapper,
-                                                        FeatureToggleService featureToggleService,
-                                                        DashboardNotificationService dashboardNotificationService) {
+                                                        FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
-        this.dashboardNotificationService = dashboardNotificationService;
     }
 
     @Override
@@ -57,7 +52,11 @@ public class HearingFeeUnpaidDefendantNotificationHandler extends CaseProgressio
     }
 
     @Override
-    protected void beforeRecordScenario(CaseData caseData) {
-        dashboardNotificationService.deleteNotificationsToDefendant(caseData.getCcdCaseReference().toString());
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT",
+            authToken
+        );
     }
 }

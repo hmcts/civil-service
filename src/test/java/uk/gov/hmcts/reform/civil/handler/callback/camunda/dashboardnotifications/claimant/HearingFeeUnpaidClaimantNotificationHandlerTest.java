@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -48,8 +47,6 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
-    @Mock
-    private DashboardNotificationService dashboardNotificationService;
 
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForClaimant";
 
@@ -105,7 +102,8 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-            verify(dashboardNotificationService).deleteNotificationsToClaimant(caseData.getCcdCaseReference().toString());
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(), "CLAIMANT", "BEARER_TOKEN");
         }
 
         @Test

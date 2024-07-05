@@ -103,15 +103,17 @@ public class DashboardNotificationServiceTest {
         @Test
         void deleteAllNotificationsToClaimant() {
             String reference = "reference";
-            dashboardNotificationService.deleteNotificationsToClaimant(reference);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, "CLAIMANT");
+            String claimant = "CLAIMANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
         }
 
         @Test
         void deleteAllNotificationsToDefendant() {
             String reference = "reference";
-            dashboardNotificationService.deleteNotificationsToDefendant(reference);
-            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, "DEFENDANT");
+            String defendant = "DEFENDANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
     }
 
