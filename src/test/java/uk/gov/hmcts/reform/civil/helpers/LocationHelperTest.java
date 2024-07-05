@@ -213,7 +213,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData,true);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());

@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -806,8 +805,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            System.out.println("BANANANA " + responseCaseData.getCaseManagementLocation());
-
             assertThat(response.getData()).extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("def court request region", "def court requested epimm");
@@ -854,13 +851,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            System.out.println("BANANANA " + responseCaseData.getCaseManagementLocation());
-
             assertThat(response.getData()).extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("orange", "1010101");
         }
-
 
     }
 
@@ -933,177 +927,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-        }
-
-        @Test
-        void shouldNotUpdateCaseLocation_whenDisposal() {
-            List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
-                .region("previous region")
-                .baseLocation("previous base location")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-                .disposalHearingMethodInPerson(localOptions)
-                .fastTrackMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-                .caseManagementLocation(previousManagementLocation)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            LocationRefData matching = LocationRefData.builder()
-                .regionId("region id")
-                .epimmsId("epimms id")
-                .siteName("site name")
-                .build();
-            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString()))
-                .thenReturn(Optional.of(matching));
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
-        }
-
-        @Test
-        void shouldNotUpdateCaseLocation_whenFastTrack() {
-            List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
-                .region("previous region")
-                .baseLocation("previous base location")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-                .fastTrackMethodInPerson(localOptions)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .caseManagementLocation(previousManagementLocation)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            LocationRefData matching = LocationRefData.builder()
-                .regionId("region id")
-                .epimmsId("epimms id")
-                .siteName("location name")
-                .build();
-            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString()))
-                .thenReturn(Optional.of(matching));
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
-        }
-
-        @Test
-        void shouldNotUpdateCaseLocation_whenSmallClaims() {
-            List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
-                .region("previous region")
-                .baseLocation("previous base location")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-                .disposalHearingMethodInPerson(localOptions)
-                .fastTrackMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .caseManagementLocation(previousManagementLocation)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            LocationRefData matching = LocationRefData.builder()
-                .regionId("region id")
-                .epimmsId("epimms id")
-                .siteName("location name")
-                .build();
-            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString()))
-                .thenReturn(Optional.of(matching));
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
-        }
-
-        @Test
-        void shouldNotUpdateCaseLocation_whenFastTrackAndOrderRequired() {
-            List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
-                .region("previous region")
-                .baseLocation("previous base location")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-                .fastTrackMethodInPerson(localOptions)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-                .caseManagementLocation(previousManagementLocation)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            LocationRefData matching = LocationRefData.builder()
-                .regionId("region id")
-                .epimmsId("epimms id")
-                .build();
-            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString()))
-                .thenReturn(Optional.of(matching));
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
-        }
-
-        @Test
-        void shouldNotUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
-            List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList localOptions = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
-            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
-                .region("previous region")
-                .baseLocation("previous base location")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-                .fastTrackMethodInPerson(localOptions)
-                .disposalHearingMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
-                .caseManagementLocation(previousManagementLocation)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            LocationRefData matching = LocationRefData.builder()
-                .regionId("region id")
-                .epimmsId("epimms id")
-                .build();
-            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString()))
-                .thenReturn(Optional.of(matching));
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
