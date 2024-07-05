@@ -32,6 +32,8 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT_SUFFIX = "/defendant-link-status";
 
+    private static final String CASE_REFERENCE_ID_SUFFIX = "${caseReference}";
+
     private static final String CASE_REFERENCE = "100";
 
     @Autowired
@@ -52,10 +54,10 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildClaimsForDefendantPact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are claims for the claimant")
-            .uponReceiving("a request for claims for a claimant")
+            .given("Get claimant linked cases status")
+            .uponReceiving("a request for claimant linked cases status for a case reference")
             .pathFromProviderState(
-                ENDPOINT_PREFIX + CASE_REFERENCE + ENDPOINT_SUFFIX,
+                ENDPOINT_PREFIX + CASE_REFERENCE_ID_SUFFIX + ENDPOINT_SUFFIX,
                 ENDPOINT_PREFIX + CASE_REFERENCE + ENDPOINT_SUFFIX
             )
             .method(HttpMethod.GET.toString())
@@ -70,7 +72,6 @@ public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
         return newJsonBody(response ->
                                response
                                    .booleanType("linked", true)
-
         ).build();
     }
 }
