@@ -49,6 +49,15 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return false;
     }
 
+    /**
+     * Called just before a scenario is recorded, when the scenario is known and should record is true.
+     *
+     * @param caseData case info
+     */
+    protected void beforeRecordScenario(CaseData caseData) {
+        // to be overridden
+    }
+
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -57,6 +66,8 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
             caseData)).build();
 
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
+            beforeRecordScenario(caseData);
+
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 scenario,
