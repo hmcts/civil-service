@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper.is1v2LrVLrCase;
 
@@ -44,7 +46,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::populateData)
             .put(callbackKey(MID, "showClaimantConsent"), this::updateSelectedClaimant)
             .put(callbackKey(MID, "checkPermissionGranted"), this::checkPermissionGrantedFields)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit)
             .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
             .build();
     }
@@ -117,5 +119,15 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            .businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT))
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
     }
 }
