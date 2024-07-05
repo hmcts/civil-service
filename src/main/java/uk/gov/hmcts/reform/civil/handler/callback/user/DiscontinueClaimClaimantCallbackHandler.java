@@ -131,8 +131,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         Map<String, String> confirmationContent = getConfirmationContent(caseData);
-        if(!confirmationContent.isEmpty())
-        {
+        if (!confirmationContent.isEmpty()) {
             return SubmittedCallbackResponse.builder()
                     .confirmationHeader(confirmationContent.get("header"))
                     .confirmationBody(confirmationContent.get("body"))
@@ -167,9 +166,9 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         return new HashMap<>();
     }
 
-    private  Map<String, String> addConfirmationContent(String headerContent, String bodyContent) {
+    private Map<String, String> addConfirmationContent(String headerContent, String bodyContent) {
         Map<String, String> confirmationContent = new HashMap<>();
-        confirmationContent.put("header",headerContent);
+        confirmationContent.put("header", headerContent);
         confirmationContent.put("body", bodyContent);
         return confirmationContent;
     }
@@ -198,10 +197,9 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     }
 
     private String updateCaseState(CaseData caseData) {
-        if(DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance()))
-        {
+        if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
             boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
-            if(isNoCourtPermission && isCaseDiscontinued(caseData)) {
+            if (isNoCourtPermission && isCaseDiscontinued(caseData)) {
                 return CASE_DISCONTINUED.name();
             }
         }
