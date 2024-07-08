@@ -5223,6 +5223,11 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(SPEC_DEFENDANT_NOC.fullName());
+
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.LIP_CASE.name(), true),
+                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false)
+            );
         }
 
         @Test
