@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -39,7 +40,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @Component
 @RequiredArgsConstructor
-public class StateFlowEngine {
+@ConditionalOnProperty(value = "stateflow.engine.simplification.enabled", havingValue = "false", matchIfMissing = true)
+public class StateFlowEngine implements IStateFlowEngine {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
@@ -523,10 +525,12 @@ public class StateFlowEngine {
             .build();
     }
 
+    @Override
     public StateFlow evaluate(CaseDetails caseDetails) {
         return evaluate(caseDetailsConverter.toCaseData(caseDetails));
     }
 
+    @Override
     public StateFlow evaluate(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return build(SPEC_DRAFT).evaluate(caseData);
@@ -534,14 +538,17 @@ public class StateFlowEngine {
         return build(DRAFT).evaluate(caseData);
     }
 
+    @Override
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
         return evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
     }
 
+    @Override
     public StateFlow evaluateSpec(CaseData caseData) {
         return build(SPEC_DRAFT).evaluate(caseData);
     }
 
+    @Override
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
             .map(State::getName)
