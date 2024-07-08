@@ -311,6 +311,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )))
                 .transitionTo(SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendantBeforeOffline)
+                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -675,7 +676,6 @@ public class StateFlowEngine implements IStateFlowEngine {
             .state(SIGN_SETTLEMENT_AGREEMENT)
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
             .state(SPEC_DEFENDANT_NOC)
-                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC)
             .build();
     }
