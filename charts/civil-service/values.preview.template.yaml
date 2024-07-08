@@ -24,6 +24,7 @@ java:
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
     CASE_FLAGS_LOGGING_ENABLED: true
+    SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
