@@ -131,6 +131,7 @@ public class JudgeFinalOrderGeneratorTest {
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("1").postcode("1")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+        .externalShortName("ExternalShortName")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
 

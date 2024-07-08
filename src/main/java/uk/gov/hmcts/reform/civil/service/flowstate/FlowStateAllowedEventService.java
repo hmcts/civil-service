@@ -171,7 +171,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @RequiredArgsConstructor
 public class FlowStateAllowedEventService {
 
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
 
     private static final List<CaseEvent> EVENT_WHITELIST = List.of(
@@ -1724,7 +1724,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1736,7 +1737,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
-                DISCONTINUE_CLAIM_CLAIMANT
+                DISCONTINUE_CLAIM_CLAIMANT,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1817,6 +1819,7 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
+                LIP_CLAIM_SETTLED,
                 DISCONTINUE_CLAIM_CLAIMANT
             )
         ),
@@ -1824,7 +1827,8 @@ public class FlowStateAllowedEventService {
             FULL_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1837,6 +1841,7 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
                 SETTLE_CLAIM,
+                LIP_CLAIM_SETTLED,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT
             )
@@ -1851,7 +1856,8 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                NO_REMISSION_HWF
+                NO_REMISSION_HWF,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1865,7 +1871,8 @@ public class FlowStateAllowedEventService {
         entry(
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
