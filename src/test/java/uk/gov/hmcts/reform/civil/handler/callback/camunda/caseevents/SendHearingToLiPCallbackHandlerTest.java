@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_D
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-
 @ExtendWith(MockitoExtension.class)
 public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
