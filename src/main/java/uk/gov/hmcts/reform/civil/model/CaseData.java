@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermissionList;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
@@ -682,7 +682,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate permissionGrantedDateCopy;
     private DiscontinuanceTypeList typeOfDiscontinuance;
     private String partDiscontinuanceDetails;
-    private ConfirmOrderGivesPermissionList confirmOrderGivesPermissionList;
+    private ConfirmOrderGivesPermission confirmOrderGivesPermission;
     private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
 
     @JsonUnwrapped

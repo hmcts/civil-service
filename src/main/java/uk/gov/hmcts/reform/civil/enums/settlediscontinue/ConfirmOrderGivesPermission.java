@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ConfirmOrderGivesPermissionList {
+public enum ConfirmOrderGivesPermission {
     YES("Yes"),
     NO("No");
 
-    private final String displayedValue;
+    private final String selectedValue;
 }
