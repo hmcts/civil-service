@@ -303,7 +303,8 @@ public class StateFlowEngine implements IStateFlowEngine {
                             FlowFlag.LIP_CASE.name(), false,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
                         )))
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant)))
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant))
+                                                                                                      .and(not(nocSubmittedForLiPDefendantBeforeOffline)))
                     .set(flags -> flags.putAll(
                         Map.of(
                             FlowFlag.LIP_CASE.name(), true,
