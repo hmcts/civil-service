@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
@@ -10,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
 
 @Service
@@ -24,8 +25,10 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private static final String TASK_ID = "GenerateNoticeOfDiscontinueClaim";
 
     @Override
+
+
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptySubmittedCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     @Override
