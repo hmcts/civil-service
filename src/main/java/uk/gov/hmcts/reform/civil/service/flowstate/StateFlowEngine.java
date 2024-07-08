@@ -311,6 +311,11 @@ public class StateFlowEngine implements IStateFlowEngine {
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )))
                 .transitionTo(SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendantBeforeOffline)
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )))
                 .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
