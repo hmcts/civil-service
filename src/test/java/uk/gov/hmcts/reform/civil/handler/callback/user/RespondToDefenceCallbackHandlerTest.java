@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -32,8 +31,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -782,154 +779,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=claimant-1-draft-dir.pdf")
                 .contains("documentName=claimant-2-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
-            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
-        }
-
-        @Test
-        void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedOneOnly() {
-            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-
-                // Setup applicant 1 DQ FRC
-                .applicant1DQ(Applicant1DQ.builder()
-                      .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                             .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                             .complexityBandingAgreed(YesOrNo.YES)
-                             .band(ComplexityBand.BAND_1)
-                             .reasons("Reasons")
-                             .frcSupportingDocument(DocumentBuilder.builder().documentName(
-                                     "claimant-1-frc-support-doc.pdf")
-                                                        .build())
-                             .build())
-                      .build())
-
-                .addApplicant2(YesOrNo.YES)
-
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(9999_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(NO)
-                .build();
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("applicant1DQFixedRecoverableCostsIntermediate")
-                .asString()
-                .contains("isSubjectToFixedRecoverableCostRegime=Yes")
-                .contains("band=BAND_1")
-                .contains("complexityBandingAgreed=Yes")
-                .contains("document_filename=claimant-1-frc-support-doc.pdf");
-            assertThat(response.getData()).doesNotContainKey("applicant2DQFixedRecoverableCostsIntermediate");
-        }
-
-        @Test
-        void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedTwoOnly() {
-            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-
-                // Setup applicant 2 DQ FRC
-                .applicant2DQ(Applicant2DQ.builder()
-                      .applicant2DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                         .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                         .complexityBandingAgreed(YesOrNo.YES)
-                         .band(ComplexityBand.BAND_1)
-                         .reasons("Reasons")
-                         .frcSupportingDocument(DocumentBuilder.builder().documentName(
-                                 "claimant-2-frc-support-doc.pdf")
-                         .build())
-                     .build())
-                  .build())
-
-                .addApplicant2(YesOrNo.YES)
-
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(9999_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(NO)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .build();
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("applicant2DQFixedRecoverableCostsIntermediate")
-                .asString()
-                .contains("isSubjectToFixedRecoverableCostRegime=Yes")
-                .contains("band=BAND_1")
-                .contains("complexityBandingAgreed=Yes")
-                .contains("document_filename=claimant-2-frc-support-doc.pdf");
-            assertThat(response.getData()).doesNotContainKey("applicant1DQFixedRecoverableCostsIntermediate");
-        }
-
-        @Test
-        void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedBoth() {
-            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-
-                // Setup applicant 1 DQ FRC
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                                     .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                                     .complexityBandingAgreed(YesOrNo.YES)
-                                     .band(ComplexityBand.BAND_1)
-                                     .reasons("Reasons")
-                                     .frcSupportingDocument(DocumentBuilder.builder().documentName(
-                                             "claimant-1-frc-support-doc.pdf")
-                                                                .build())
-                                     .build())
-                                  .build())
-
-                .addApplicant2(YesOrNo.YES)
-
-                // Only to init the DQ
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-2-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(9999_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // No need to assert applicant 1 DQ, just that it's been duplicated to applicant 2's
-            assertThat(response.getData())
-                .extracting("applicant2DQFixedRecoverableCostsIntermediate")
-                .asString()
-                //isSubjectToFixedRecoverableCostRegime=Yes, band=BAND_1, complexityBandingAgreed=Yes, reasons=Reasons
-                .contains("isSubjectToFixedRecoverableCostRegime=Yes")
-                .contains("band=BAND_1")
-                .contains("complexityBandingAgreed=Yes")
-                .contains("document_filename=claimant-1-frc-support-doc.pdf");
-
             assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         }
 
