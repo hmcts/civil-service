@@ -134,6 +134,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Not suitable for SDO.";
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
                     "RPA Reason: Judgement by Admission requested and claim moved offline.";
+                case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC -> "RPA Reason: Notice of Change filed.";
                 default -> {
                     log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;

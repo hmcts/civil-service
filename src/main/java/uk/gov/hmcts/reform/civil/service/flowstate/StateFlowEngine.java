@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRes
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
@@ -184,6 +185,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -307,7 +309,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                             FlowFlag.LIP_CASE.name(), true,
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )))
-                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
+                .transitionTo(SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendantBeforeOffline)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -671,6 +673,8 @@ public class StateFlowEngine implements IStateFlowEngine {
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
+            .state(SPEC_DEFENDANT_NOC)
+                .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC)
             .build();
     }
