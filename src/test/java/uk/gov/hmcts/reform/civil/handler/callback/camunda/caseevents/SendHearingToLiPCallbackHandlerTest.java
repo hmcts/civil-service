@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,30 +32,23 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_D
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    SendHearingToLiPCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+
+@ExtendWith(MockitoExtension.class)
 public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private SendHearingToLiPCallbackHandler handler;
-    @MockBean
+    @Mock
     private SendHearingBulkPrintService sendHearingBulkPrintService;
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
     @Mock
     private DashboardApiClient dashboardApiClient;
 
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
-
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
 
     @Test
     void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
@@ -95,6 +86,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build())).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT.name());
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -111,6 +103,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT.name());
         // when
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
