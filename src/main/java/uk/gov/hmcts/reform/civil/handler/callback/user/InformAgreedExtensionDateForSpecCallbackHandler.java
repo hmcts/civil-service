@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -63,7 +63,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final UserService userService;
     private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
