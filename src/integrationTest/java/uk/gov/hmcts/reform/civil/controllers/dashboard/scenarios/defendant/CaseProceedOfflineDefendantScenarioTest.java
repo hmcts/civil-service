@@ -54,7 +54,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
                     "<a>Upload hearing documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Not available yet")
+                jsonPath("$[0].currentStatusEn").value("Inactive")
 
             );
     }
