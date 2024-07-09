@@ -31,9 +31,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_
 public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT);
-    public static final String UNABLE_TO_VALIDATE = "# Unable to validate information";
-    public static final String INFORMATION_SUCCESSFULLY_VALIDATED = "# Information successfully validated";
-    public static final String NEXT_STEPS = """
+    private static final String UNABLE_TO_VALIDATE = "# Unable to validate information";
+    private static final String INFORMATION_SUCCESSFULLY_VALIDATED = "# Information successfully validated";
+    private static final String NEXT_STEPS = """
             ### Next steps:
 
             No further action required.""";
@@ -43,13 +43,13 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateJudgeNameAndDate,
+            callbackKey(ABOUT_TO_START), this::populateJudgeNameAndDateCopies,
             callbackKey(ABOUT_TO_SUBMIT), this::submitChanges,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
-    private CallbackResponse populateJudgeNameAndDate(CallbackParams callbackParams) {
+    private CallbackResponse populateJudgeNameAndDateCopies(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .permissionGrantedJudgeCopy(caseData.getPermissionGrantedComplex() == null ? null
