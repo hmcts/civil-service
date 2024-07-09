@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.notification.defendantresponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -17,14 +16,9 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -38,11 +32,10 @@ public class DefendantResponseApplicantSolicitorOneSpecNotifier implements Notif
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
 
-    private void notifySolicitorsForDefendantResponse(CaseData caseData, CaseEvent caseEvent) {
+    public void notifySolicitorsForDefendantResponse(CaseData caseData) {
         String recipient;
         recipient = getRecipient(caseData);
-        sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
-
+        sendNotificationToSolicitorSpec(caseData, recipient);
     }
 
     @Nullable
@@ -53,14 +46,14 @@ public class DefendantResponseApplicantSolicitorOneSpecNotifier implements Notif
 
     }
 
-    protected void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
+    protected void sendNotificationToSolicitorSpec(CaseData caseData, String recipient) {
         String emailTemplate;
 
         emailTemplate = getEmailTemplate(caseData);
         notificationService.sendMail(
             recipient,
             emailTemplate,
-            addPropertiesSpec(caseData, caseEvent),
+            addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
@@ -84,7 +77,8 @@ public class DefendantResponseApplicantSolicitorOneSpecNotifier implements Notif
     }
 
 
-    protected Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
@@ -96,46 +90,22 @@ public class DefendantResponseApplicantSolicitorOneSpecNotifier implements Notif
                 + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
                 + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
             return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
             );
         } else {
             return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         }
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
-            );
-        } else {
-            //if there are 2 respondents on the case, concatenate the names together for the template subject line
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME,
-                getPartyNameBasedOnType(caseData.getRespondent1())
-                    .concat(" and ")
-                    .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                PARTY_REFERENCES, buildPartiesReferences(caseData),
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
-            );
-        }
-    }
-
-
     //finding legal org name
-    private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
+    private String getLegalOrganisationName(CaseData caseData) {
         String organisationID;
 
         YesOrNo applicant1Represented = caseData.getApplicant1Represented();

@@ -1,39 +1,47 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 @RequiredArgsConstructor
-public class DefendantResponseApplicantSolicitorOneUnspecNotifier extends DefendantResponseSolicitorNotifier {
-
-    //NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE
+public class DefendantResponseRespondentSolicitorOneCCUnspecNotifier extends DefendantResponseSolicitorNotifier {
+    //NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
+
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
     @Override
     protected String getRecipient(CaseData caseData) {
-        YesOrNo applicant1Represented = caseData.getApplicant1Represented();
-        return NO.equals(applicant1Represented) ? caseData.getApplicant1().getPartyEmail()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor1EmailAddress());
+            return emailAddress.orElse(null);
+        } else {
+            var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress());
+            return emailAddress.orElse(null);
+        }
     }
 
-    @Override
     protected void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,

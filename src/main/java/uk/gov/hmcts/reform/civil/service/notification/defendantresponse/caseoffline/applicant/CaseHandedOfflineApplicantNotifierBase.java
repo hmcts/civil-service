@@ -9,6 +9,11 @@ import java.util.Map;
 
 public abstract class CaseHandedOfflineApplicantNotifierBase implements NotificationData {
 
+    enum CaseHandledOfflineRecipient {
+        RESPONDENT_SOLICITOR1,
+        RESPONDENT_SOLICITOR2
+    }
+
     protected static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
     private final NotificationService notificationService;
 

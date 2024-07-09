@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface NotificationData {
 
-    enum CaseHandledOfflineRecipient {
+     enum CaseHandledOfflineRecipient {
         RESPONDENT_SOLICITOR1,
         RESPONDENT_SOLICITOR2
     }

@@ -33,11 +33,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotifier implements Not
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
 
-    public enum CaseHandledOfflineRecipient {
-        RESPONDENT_SOLICITOR1,
-        RESPONDENT_SOLICITOR2
-    }
-
 
     public CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData, CaseHandledOfflineRecipient recipientType) {
 

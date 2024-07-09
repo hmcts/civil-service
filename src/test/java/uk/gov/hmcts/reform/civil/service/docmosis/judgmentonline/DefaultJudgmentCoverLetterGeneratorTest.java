@@ -46,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -130,11 +131,11 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                 .getDocumentTitle(), LETTER_CONTENT, DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)))
             .willReturn(COVER_LETTER);
 
-        given(documentGeneratorService.generateDocmosisDocument(
+        lenient().when(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG)
         ))
-            .willReturn(new DocmosisDocument(
+            .thenReturn(new DocmosisDocument(
                 DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG.getDocumentTitle(),
                 LETTER_CONTENT
             ));
