@@ -68,9 +68,9 @@ hmc:
 
 serviceRequest:
   api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
+    callback-url: ${SERVICE_REQUEST_UPDATE:}
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
@@ -632,8 +632,8 @@ spring:
       on-profile: integration-test
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:11.4://localhost/cmc
-    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
+    url: jdbc:tc:postgresql:15://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
       minimum-idle: 1
       connectionTimeout: 10000
@@ -744,3 +744,13 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+    
+caseFlags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
+
+stateflow:
+  engine:
+    simplification:
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
+
