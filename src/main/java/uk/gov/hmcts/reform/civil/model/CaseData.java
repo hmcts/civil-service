@@ -34,9 +34,11 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -112,7 +114,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
@@ -676,6 +677,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettleDiscontinueYesOrNoList courtPermissionNeeded;
     private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
+    private SettlementReason settleReason;
+    private final MarkPaidConsentList markPaidConsent;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -1022,8 +1025,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isPartAdmitClaimSpec()
                 && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
                 && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-                && getCcdState() == AWAITING_APPLICANT_INTENTION);
+            && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
