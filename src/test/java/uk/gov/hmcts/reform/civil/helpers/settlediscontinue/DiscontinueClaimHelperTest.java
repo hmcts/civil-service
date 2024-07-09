@@ -39,14 +39,14 @@ public class DiscontinueClaimHelperTest {
     }
 
     @Test
-    void shouldNotReturn_error_when_claim_is_1v2_LRvLiP() {
+    void shouldReturn_error_when_claim_is_1v2_LRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
             .build();
         List<String> errors = new ArrayList<>();
         DiscontinueClaimHelper.checkState(caseData, errors);
         assertThat(errors).isNotNull();
-        assertThat(errors).isEmpty();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
     }
 
     @Test
@@ -63,25 +63,25 @@ public class DiscontinueClaimHelperTest {
     }
 
     @Test
-    void shouldNotReturn_error_when_claim_is_1v2_LRvLRvLiP() {
+    void shouldReturn_error_when_claim_is_1v2_LRvLRvLiP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented()
             .build();
         List<String> errors = new ArrayList<>();
         DiscontinueClaimHelper.checkState(caseData, errors);
         assertThat(errors).isNotNull();
-        assertThat(errors).isEmpty();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
     }
 
     @Test
-    void shouldNotReturn_error_when_claim_is_1v2_LRvLiPvLR() {
+    void shouldReturn_error_when_claim_is_1v2_LRvLiPvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented()
             .build();
         List<String> errors = new ArrayList<>();
         DiscontinueClaimHelper.checkState(caseData, errors);
         assertThat(errors).isNotNull();
-        assertThat(errors).isEmpty();
+        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
     }
 
     @Test
@@ -97,14 +97,15 @@ public class DiscontinueClaimHelperTest {
     }
 
     @Test
-    void shouldReturn_error_when_claim_is_2v1_LRvLiP() {
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLRWithDiffLR() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimSubmitted2v1RespondentUnrepresented()
-            .build();
+                .atStateClaimSubmittedTwoRespondentRepresentatives()
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+                .build();
         List<String> errors = new ArrayList<>();
         DiscontinueClaimHelper.checkState(caseData, errors);
         assertThat(errors).isNotNull();
-        assertThat(errors.get(0)).isEqualTo("This action is not available for this claim");
+        assertThat(errors).isEmpty();
     }
 
     @Test

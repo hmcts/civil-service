@@ -119,9 +119,21 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldNotReturn_error_when_claim_is_1v2_LRvLR() {
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLRsameLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
+            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLRdiffLR() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmittedTwoRespondentRepresentatives()
             .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
             .build();
         List<String> errors = new ArrayList<>();

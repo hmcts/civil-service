@@ -32,8 +32,11 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
@@ -53,6 +56,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
     RoboticsDataMapper.class,
@@ -69,8 +75,8 @@ class RoboticsDataMapperTest {
         .postCode("AB1 2XY")
         .county("My county")
         .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
+            .dxNumber("DX 12345")
+            .build()))
         .build();
     private static final Organisation ORGANISATION = Organisation.builder()
         .organisationIdentifier("QWERTY R")
@@ -121,13 +127,13 @@ class RoboticsDataMapperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
             .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                         .organisationName("My Organisation")
-                                                         .email("me@server.net")
-                                                         .phoneNumber("0123456789")
-                                                         .fax("9999999999")
-                                                         .dx("Dx")
-                                                         .address(Address.builder().build())
-                                                         .build())
+                .organisationName("My Organisation")
+                .email("me@server.net")
+                .phoneNumber("0123456789")
+                .fax("9999999999")
+                .dx("Dx")
+                .address(Address.builder().build())
+                .build())
             .build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
@@ -248,8 +254,8 @@ class RoboticsDataMapperTest {
     @Test
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
         assertThrows(NullPointerException.class, () ->
-                         mapper.toRoboticsCaseData(null, BEARER_TOKEN),
-                     "caseData cannot be null"
+                mapper.toRoboticsCaseData(null, BEARER_TOKEN),
+            "caseData cannot be null"
         );
     }
 
@@ -413,14 +419,14 @@ class RoboticsDataMapperTest {
                 caseData.getApplicant1OrganisationPolicy().toBuilder()
                     .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
                     .build())
-        .respondent1OrganisationPolicy(
-            caseData.getApplicant1OrganisationPolicy().toBuilder()
-                .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
-                .build())
-        .respondent2OrganisationPolicy(
-            caseData.getApplicant1OrganisationPolicy().toBuilder()
-                .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
-                .build())
+            .respondent1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                    .build())
+            .respondent2OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                    .build())
             .build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
