@@ -51,6 +51,21 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
     class AboutToStartCallback {
 
         @Test
+        void shouldHandleNullValues_WhenAboutToStartIsInvoked() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            assertThat(response.getData()).extracting("permissionGrantedJudgeCopy")
+                .isNull();
+            assertThat(response.getData()).extracting("permissionGrantedDateCopy")
+                .isNull();
+        }
+
+        @Test
         void shouldPopulateJudgeAndDateCopies_WhenAboutToStartIsInvoked() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
