@@ -137,6 +137,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_moreTimeRequested_whenGetStatus_thenReturnMoreTimeRequested() {
         CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .respondent1TimeExtensionDate(LocalDateTime.now().plusDays(30))
             .build();
