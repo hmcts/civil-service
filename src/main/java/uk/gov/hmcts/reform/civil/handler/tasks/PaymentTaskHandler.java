@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
 
@@ -31,7 +31,7 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
 
     private CaseData data;
 

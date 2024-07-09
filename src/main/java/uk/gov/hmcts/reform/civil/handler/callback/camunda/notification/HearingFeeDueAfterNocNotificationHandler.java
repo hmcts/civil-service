@@ -57,7 +57,7 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
 
     private CallbackResponse notifyApplicantSolicitorForHearingFeeUnpaidNoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!hearingAlreadyPaidCheck(caseData)) {
+        if (!hearingAlreadyPaidCheck(caseData) && nonNull(caseData.getHearingFee())) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getHearingFeeUnpaidNoc(),
