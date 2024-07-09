@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
     @MockBean
     private NotificationsProperties notificationsProperties;
     @MockBean
-    private StateFlowEngine stateFlowEngine;
+    private IStateFlowEngine stateFlowEngine;
     @Autowired
     private CaseProceedsInCasemanRespondentNotificationHandler handler;
 

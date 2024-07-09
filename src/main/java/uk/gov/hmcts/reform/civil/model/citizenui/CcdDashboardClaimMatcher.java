@@ -54,4 +54,13 @@ public abstract class CcdDashboardClaimMatcher {
             && caseData.isSmallClaim()
             && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0);
     }
+
+    public boolean isCaseStruckOut() {
+        return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
+    }
+
+    public boolean hasResponseDeadlineBeenExtended() {
+        return caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
 }
