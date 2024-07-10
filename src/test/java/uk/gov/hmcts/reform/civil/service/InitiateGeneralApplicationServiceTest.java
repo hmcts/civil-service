@@ -55,7 +55,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -1094,7 +1096,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationRefDataService.getCnbcLocation(any()))
             .thenReturn(LocationRefData.builder().regionId("2").epimmsId("11111").build());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM);
+            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -1117,7 +1119,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationRefDataService.getCnbcLocation(any()))
             .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM);
+            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -1154,7 +1156,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationRefDataService.getCcmccLocation(any()))
             .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForCaseManagementLocation(UNSPEC_CLAIM);
+            .getTestCaseDataForCaseManagementLocation(UNSPEC_CLAIM, AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 

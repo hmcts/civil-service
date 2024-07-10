@@ -685,10 +685,10 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
-    public CaseData getTestCaseDataForCaseManagementLocation(CaseCategory caseType) {
+    public CaseData getTestCaseDataForCaseManagementLocation(CaseCategory caseType, CaseState caseState) {
         return CaseData.builder()
             .caseAccessCategory(caseType)
-            .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .ccdState(caseState)
             .ccdCaseReference(1234L)
             .respondent1Represented(NO)
             .caseManagementLocation(CaseLocationCivil.builder().region("2")
