@@ -4,13 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -52,25 +50,21 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    OrderMadeClaimantNotificationHandler.class,
-    DashboardApiClient.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private OrderMadeClaimantNotificationHandler handler;
-    @MockBean
+    @Mock
     private DashboardApiClient dashboardApiClient;
-    @MockBean
+    @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
+    @Mock
+    private ObjectMapper objectMapper;
 
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
 
@@ -380,7 +374,6 @@ public class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandle
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()

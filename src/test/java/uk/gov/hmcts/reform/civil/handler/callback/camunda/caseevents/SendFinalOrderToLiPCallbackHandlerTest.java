@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,30 +32,22 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_L
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    SendFinalOrderToLiPCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private SendFinalOrderToLiPCallbackHandler handler;
-    @MockBean
+    @Mock
     private SendFinalOrderBulkPrintService sendFinalOrderBulkPrintService;
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
     @Mock
     private DashboardApiClient dashboardApiClient;
 
     public static final String TASK_ID_DEFENDANT = "SendFinalOrderToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
-
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
 
     @Test
     void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
@@ -97,6 +87,7 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_FINAL_ORDER_TO_LIP_DEFENDANT.name());
         // when
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -112,6 +103,7 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_FINAL_ORDER_TO_LIP_CLAIMANT.name());
         // when
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
