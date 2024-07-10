@@ -18,7 +18,6 @@ public enum CaseState {
     CASE_STAYED,
     All_FINAL_ORDERS_ISSUED,
     CASE_SETTLED,
-    CASE_DISCONTINUED,
     CLOSED
 }
 
