@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.CourtPermissionNeeded;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
@@ -197,7 +198,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private String updateCaseState(CaseData caseData) {
         if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
-            boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
+            boolean isNoCourtPermission = CourtPermissionNeeded.NO.equals(caseData.getCourtPermissionNeeded());
             if (isNoCourtPermission && isCaseDiscontinued(caseData)) {
                 return CASE_DISCONTINUED.name();
             }
