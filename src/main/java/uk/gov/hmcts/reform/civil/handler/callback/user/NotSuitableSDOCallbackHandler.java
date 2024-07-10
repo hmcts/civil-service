@@ -92,7 +92,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
-        final int lengthAllowed = 150;
+        final int lengthAllowed = 4000;
         List<String> errors = new ArrayList<>();
         String reason;
 
