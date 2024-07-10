@@ -1086,6 +1086,29 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmptyForGaLips() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(
+            any(),
+            any()
+        )).thenReturn(getEmptyCourLocationsRefObject());
+        when(locationRefDataService.getCnbcLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("2").epimmsId("11111").build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isNull();
+    }
+
+    @Test
     void shouldPopulateLocationDetailsForFAForLipsEnabled() {
         when(locationRefDataService.getCourtLocationsByEpimmsId(
             any(),
