@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
@@ -66,9 +66,8 @@ public class SendFinalOrderBulkPrintService {
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
         if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
-            return Objects.nonNull(translatedDocuments)
-                && !List.of(caseData.getTranslatedDocuments()).isEmpty()
+            List<Element<TranslatedDocument>> translatedDocuments = ListUtils.emptyIfNull(caseData.getTranslatedDocuments());
+            return (!translatedDocuments.isEmpty())
                 && isEligibleToGetTranslatedOrder(caseData, task)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE);
         }

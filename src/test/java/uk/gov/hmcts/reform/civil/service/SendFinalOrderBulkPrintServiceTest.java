@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -76,9 +78,15 @@ class SendFinalOrderBulkPrintServiceTest {
     private CaseData buildCaseDataForTranslatedOrder(Party party, TranslatedDocumentType documentType) {
         TranslatedDocument translatedDocument = TranslatedDocument.builder().documentType(documentType).file(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder =
-            CaseDataBuilder.builder().caseDataLip(CaseDataLiP.builder().translatedDocuments(
-                wrapElements(translatedDocument)).build())
+            CaseDataBuilder.builder().caseDataLip(
+                CaseDataLiP.builder()
+                    .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                    .translatedDocuments(wrapElements(translatedDocument))
+                    .build())
             .respondent1(party)
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
             .applicant1(party);
         return caseDataBuilder.build();
     }
@@ -273,6 +281,7 @@ class SendFinalOrderBulkPrintServiceTest {
             .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(Language.BOTH.toString())
             .build();
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
