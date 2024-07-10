@@ -69,7 +69,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
 
-        if (caseData.getTypeOfDiscontinuance() != null) {
+        if (caseData.getTypeOfDiscontinuance() != null
+            && ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
             if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
                 if (!DiscontinueClaimHelper.is1v2LrVLrCase(caseData)
                     || DiscontinueClaimHelper.is1v2LrVLrCase(caseData)
