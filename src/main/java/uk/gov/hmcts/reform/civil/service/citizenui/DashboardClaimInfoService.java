@@ -150,6 +150,9 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
         }
+        if (caseData.getActiveJudgment() != null) {
+            item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
+        }
 
         if (caseData.getActiveJudgment() != null
             && caseData.getActiveJudgment().getType().equals(JudgmentType.DEFAULT_JUDGMENT)
