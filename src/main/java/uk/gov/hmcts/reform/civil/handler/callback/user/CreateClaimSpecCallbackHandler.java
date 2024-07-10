@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -549,10 +548,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                            .value(DynamicListElement.builder()
                                                                       .label(pbaNumbers.get(0))
                                                                       .build()).build());
-        }
-
-        if (caseData.getApplicant1().getIndividualFirstName().equals("Kiyron")) {
-            throw new CaseNotFoundException();
         }
 
         List<String> errors = new ArrayList<>();
