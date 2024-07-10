@@ -9,5 +9,5 @@ public enum DiscontinuanceTypeList {
     FULL_DISCONTINUANCE("Full discontinuance"),
     PART_DISCONTINUANCE("Part discontinuance");
 
-    private final String displayedValue;
+    private final String type;
 }
