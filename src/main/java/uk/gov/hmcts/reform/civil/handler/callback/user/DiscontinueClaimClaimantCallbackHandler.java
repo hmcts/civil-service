@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
+import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -105,25 +106,28 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     private CallbackResponse populateData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         final var caseDataBuilder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
 
-        if (MultiPartyScenario.isTwoVOne(caseData)) {
-            List<String> claimantNames = new ArrayList<>();
-            claimantNames.add(caseData.getApplicant1().getPartyName());
-            claimantNames.add(caseData.getApplicant2().getPartyName());
-            claimantNames.add(BOTH);
+        DiscontinueClaimHelper.checkState(caseData, errors);
+        if (errors.isEmpty()) {
+            if (MultiPartyScenario.isTwoVOne(caseData)) {
+                List<String> claimantNames = new ArrayList<>();
+                claimantNames.add(caseData.getApplicant1().getPartyName());
+                claimantNames.add(caseData.getApplicant2().getPartyName());
+                claimantNames.add(BOTH);
 
-            caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+                caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+            }
+            if (is1v2LrVLrCase(caseData)) {
+                List<String> defendantNames = new ArrayList<>();
+                defendantNames.add(caseData.getRespondent1().getPartyName());
+                defendantNames.add(caseData.getRespondent2().getPartyName());
+
+                caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
+            }
         }
-
-        if (is1v2LrVLrCase(caseData)) {
-            List<String> defendantNames = new ArrayList<>();
-            defendantNames.add(caseData.getRespondent1().getPartyName());
-            defendantNames.add(caseData.getRespondent2().getPartyName());
-
-            caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
