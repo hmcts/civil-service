@@ -28,9 +28,8 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     );
     private static final String TASK_ID = "GenerateNoticeOfDiscontinueClaim";
     private final ObjectMapper objectMapper;
-    private final IStateFlowEngine stateFlowEngine;
-    @Override
 
+    @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit);
     }
