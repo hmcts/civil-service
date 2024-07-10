@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @SpringBootTest(classes = {
     NotifyRoboticsOnContinuousFeedHandler.class,
+    RoboticsNotifier.class,
     JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
     RoboticsDataMapperForSpec.class,

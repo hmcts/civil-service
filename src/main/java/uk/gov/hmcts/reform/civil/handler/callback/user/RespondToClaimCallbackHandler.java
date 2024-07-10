@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -375,13 +376,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate, allocatedTrack);
 
+        updatedCaseDataBuilder
+            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
         // 1v2 same legal rep - will respond for both and set applicant 1 response deadline
         if (respondent2HasSameLegalRep(caseData)) {
             // if responses are marked as same, copy respondent 1 values into respondent 2
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
                 updatedCaseDataBuilder.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
                 updatedCaseDataBuilder
-                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
                     .nextDeadline(applicant1Deadline.toLocalDate())
@@ -402,7 +404,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
 
                 updatedCaseDataBuilder
-                    .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
                     .nextDeadline(applicant1Deadline.toLocalDate())
@@ -439,8 +440,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             // only represents 2nd respondent - need to wait for respondent 1 before setting applicant response deadline
         } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-            updatedCaseDataBuilder.respondent2ResponseDate(responseDate)
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+            updatedCaseDataBuilder.respondent2ResponseDate(responseDate);
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedCaseDataBuilder
@@ -463,9 +463,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedCaseDataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
-            updatedCaseDataBuilder.respondent1ResponseDate(responseDate)
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
-
+            updatedCaseDataBuilder.respondent1ResponseDate(responseDate);
             if (respondent2NotPresent(caseData)
                 || applicant2Present(caseData)
                 || caseData.getRespondent2ResponseDate() != null) {
@@ -568,7 +566,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper))
-            .state("AWAITING_APPLICANT_INTENTION")
+            .state(AWAITING_APPLICANT_INTENTION.name())
             .build();
     }
 

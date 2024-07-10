@@ -51,6 +51,7 @@ public class DirectionsQuestionnairePreparer {
 
             ArrayList<Element<CaseDocument>> updatedDocuments =
                 new ArrayList<>(caseData.getSystemGeneratedCaseDocuments());
+
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null
                 && (caseData.getRespondent1ClaimResponseTypeForSpec()
