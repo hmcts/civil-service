@@ -35,7 +35,7 @@ public class SendFinalOrderBulkPrintService {
     }
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
-        if (checkTranslatedFinalOrderDocumentAvailable(caseData)) {
+        if (checkTranslatedFinalOrderDocumentAvailable(caseData, task)) {
             Document document = caseData.getTranslatedDocuments().get(0).getValue().getFile();
             sendBulkPrint(authorisation, caseData, task, document, TRANSLATED_ORDER_PACK_LETTER_TYPE);
         }
@@ -64,10 +64,12 @@ public class SendFinalOrderBulkPrintService {
             && !caseData.getFinalOrderDocumentCollection().isEmpty();
     }
 
-    private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData) {
+    private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
         if (featureToggleService.isCaseProgressionEnabled()) {
             List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
             return Objects.nonNull(translatedDocuments)
+                && !List.of(caseData.getTranslatedDocuments()).isEmpty()
+                && isEligibleToGetTranslatedOrder(caseData, task)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE);
         }
         return false;
@@ -80,5 +82,13 @@ public class SendFinalOrderBulkPrintService {
     private List<String> getRecipientsList(CaseData caseData, String task) {
         return isDefendantPrint(task) ? List.of(caseData.getRespondent1().getPartyName())
             : List.of(caseData.getApplicant1().getPartyName());
+    }
+
+    private boolean isEligibleToGetTranslatedOrder(CaseData caseData, String task) {
+        if (isDefendantPrint(task)) {
+            return caseData.isRespondent1NotRepresented() && caseData.isRespondentResponseBilingual();
+        } else {
+            return caseData.isApplicant1NotRepresented() && caseData.isClaimantBilingual();
+        }
     }
 }

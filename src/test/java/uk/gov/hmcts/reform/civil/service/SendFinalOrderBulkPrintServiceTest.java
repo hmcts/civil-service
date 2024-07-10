@@ -263,4 +263,23 @@ class SendFinalOrderBulkPrintServiceTest {
         // then
         verifyNoInteractions(bulkPrintService);
     }
+
+    @Test
+    void shouldNotDownloadDocumentAndNotPrintTranslatedLetterToClaimantLiPWhenThereIsNoTranslatedOrder() {
+        // given
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+
+        // when
+        sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
 }
