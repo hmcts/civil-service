@@ -177,8 +177,9 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders"),
     SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS("Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders"),
     SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT("Scenario.AAA6.CP.ReconDecisionMade.Claimant"),
-    SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT("Scenario.AAA6.CP.ReconDecisionMade.Defendant");
-
+    SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT("Scenario.AAA6.CP.ReconDecisionMade.Defendant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant");
     private final String scenario;
 
     DashboardScenarios(String scenario) {
