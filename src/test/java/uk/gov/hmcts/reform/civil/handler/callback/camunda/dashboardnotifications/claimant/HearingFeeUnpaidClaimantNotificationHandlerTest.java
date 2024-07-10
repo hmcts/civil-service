@@ -102,6 +102,8 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(), "CLAIMANT", "BEARER_TOKEN");
         }
 
         @Test
