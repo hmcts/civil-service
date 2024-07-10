@@ -61,4 +61,9 @@ public abstract class CcdDashboardClaimMatcher {
     public boolean isCaseStruckOut() {
         return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
     }
+
+    public boolean hasResponseDeadlineBeenExtended() {
+        return caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
 }
