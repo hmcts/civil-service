@@ -75,10 +75,10 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @BeforeEach
         void setup() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
@@ -95,10 +95,10 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @BeforeEach
         void setup() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
             when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
 
-            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }

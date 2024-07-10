@@ -42,6 +42,12 @@ class JudgmentOnlineMapperTest {
         JudgmentDetails historicJudgment = caseData.getHistoricJudgment().get(0).getValue();
         assertEquals(historicJudgment.getJudgmentId(), 1);
 
+        try {
+            // if this test runs too fast, the time is the same and sort does not work as expected
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         //RECORD JUDGMENT 2
         caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER);
         caseData.setJoAmountCostOrdered("1200");
@@ -58,6 +64,12 @@ class JudgmentOnlineMapperTest {
         caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
         setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
+        try {
+            // if this test runs too fast, the time is the same and sort does not work as expected
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         //RECORD judgment 3
         caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER);
         caseData.setJoAmountCostOrdered("1200");

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
@@ -97,6 +98,22 @@ public class DashboardNotificationServiceTest {
 
             //then
             verify(dashboardNotificationsRepository).deleteById(id);
+        }
+
+        @Test
+        void deleteAllNotificationsToClaimant() {
+            String reference = "reference";
+            String claimant = "CLAIMANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
+        }
+
+        @Test
+        void deleteAllNotificationsToDefendant() {
+            String reference = "reference";
+            String defendant = "DEFENDANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
     }
 

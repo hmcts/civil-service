@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,6 +33,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +46,21 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
@@ -64,7 +76,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
-    private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
+    public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
@@ -73,6 +85,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
+    private static final List<CaseState> stateAfterJudicialReferral = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
+                                                                         AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
+                                                                         AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM, IN_MEDIATION);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -99,12 +114,27 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isEarlyAdoptersEnabled()
-            && (Objects.isNull(caseData.getCaseManagementLocation())
+
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            // If Pre SDO allow GA in all locations.
+            // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+            if (inStateAfterJudicialReferral(caseData.getCcdState())
+                && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+                log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
+                errors.add(NOT_IN_EA_REGION);
+            }
+            if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
+                log.info("Gen apps for case {} not allowed pre sdo", caseData.getCcdCaseReference());
+                errors.add(NOT_IN_EA_REGION);
+            }
+        } else {
+            if (featureToggleService.isEarlyAdoptersEnabled()
+                && (Objects.isNull(caseData.getCaseManagementLocation())
                 || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))
-                )) {
-            errors.add(NOT_IN_EA_REGION);
+                                                                                      .getBaseLocation())))) {
+                log.info("Gen apps for case {} not whitelisted in case progression", caseData.getCcdCaseReference());
+                errors.add(NOT_IN_EA_REGION);
+            }
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
@@ -304,10 +334,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = updatedCaseData;
         }
 
+        Map<String, Object> data = initiateGeneralApplicationService
+                .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                        .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService
-                      .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                          .toString()).toMap(objectMapper)).build();
+                .data(data).build();
     }
 
     /**
@@ -336,4 +367,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private boolean caseContainsLiP(CaseData caseData) {
         return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
+
+    private boolean inStateAfterJudicialReferral(CaseState state) {
+        return !stateAfterJudicialReferral.contains(state);
+    }
+
 }

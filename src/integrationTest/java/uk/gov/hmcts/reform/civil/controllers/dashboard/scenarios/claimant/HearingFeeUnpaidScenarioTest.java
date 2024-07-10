@@ -27,7 +27,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
     @BeforeEach
     public void before() {
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
     }
 
@@ -58,12 +58,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -103,12 +103,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -146,12 +146,12 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">This is because the hearing fee was not paid by "
                         + DateUtils.formatDate(hearingDueDate)
-                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hearing notice.</a></p>"),
+                        + " as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hearing notice</a>.</p>"),
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
                         + DateUtils.formatDateInWelsh(hearingDueDate)
-                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" class=\"govuk-link\">hysbysiad o wrandawiad.</a></p>")
+                        + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")

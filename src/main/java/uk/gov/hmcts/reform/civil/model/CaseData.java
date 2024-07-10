@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -29,16 +27,19 @@ import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -113,13 +114,12 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -129,195 +129,194 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Long ccdCaseReference;
+    private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private CaseState ccdState;
-    private CaseState previousCCDState;
-    private GAApplicationType generalAppType;
-    private GARespondentOrderAgreement generalAppRespondentAgreement;
-    private GAPbaDetails generalAppPBADetails;
-    private String generalAppDetailsOfOrder;
-    private String generalAppReasonsOfOrder;
-    private YesOrNo generalAppAskForCosts;
-    private GAInformOtherParty generalAppInformOtherParty;
-    private GAUrgencyRequirement generalAppUrgencyRequirement;
-    private GAStatementOfTruth generalAppStatementOfTruth;
-    private GAHearingDetails generalAppHearingDetails;
-    private GASolicitorDetailsGAspec generalAppApplnSolicitor;
-    private SRPbaDetails hearingFeePBADetails;
-    private SRPbaDetails claimIssuedPBADetails;
-    private String applicantPartyName;
+    private final CaseState ccdState;
+    private final CaseState previousCCDState;
+    private final GAApplicationType generalAppType;
+    private final GARespondentOrderAgreement generalAppRespondentAgreement;
+    private final GAPbaDetails generalAppPBADetails;
+    private final String generalAppDetailsOfOrder;
+    private final String generalAppReasonsOfOrder;
+    private final YesOrNo generalAppAskForCosts;
+    private final GAInformOtherParty generalAppInformOtherParty;
+    private final GAUrgencyRequirement generalAppUrgencyRequirement;
+    private final GAStatementOfTruth generalAppStatementOfTruth;
+    private final GAHearingDetails generalAppHearingDetails;
+    private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final SRPbaDetails hearingFeePBADetails;
+    private final SRPbaDetails claimIssuedPBADetails;
+    private final String applicantPartyName;
 
-    private YesOrNo generalAppVaryJudgementType;
-    private YesOrNo generalAppParentClaimantIsApplicant;
-    private GAHearingDateGAspec generalAppHearingDate;
-    private Document generalAppN245FormUpload;
-
-    @Builder.Default
-    private List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
+    private final YesOrNo generalAppVaryJudgementType;
+    private final YesOrNo generalAppParentClaimantIsApplicant;
+    private final GAHearingDateGAspec generalAppHearingDate;
+    private final Document generalAppN245FormUpload;
 
     @Builder.Default
-    private List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
 
-    private List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
-    private List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
-    private List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
-    private List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
-    private SolicitorReferences solicitorReferences;
-    private SolicitorReferences solicitorReferencesCopy;
-    private String respondentSolicitor2Reference;
-    private CourtLocation courtLocation;
-    private Party applicant1;
-    private Party applicant2;
-    private CorrectEmail applicantSolicitor1CheckEmail;
-    private IdamUserDetails applicantSolicitor1UserDetails;
-    private YesOrNo addApplicant2;
-    private YesOrNo addRespondent2;
-    private YesOrNo respondent2SameLegalRepresentative;
-    private Party respondent1;
-    private Party respondent1Copy;
-    private Party respondent2;
-    private Party respondent2Copy;
-    private Party respondent1DetailsForClaimDetailsTab;
-    private Party respondent2DetailsForClaimDetailsTab;
-    private YesOrNo respondent1Represented;
-    private YesOrNo respondent2Represented;
-    private YesOrNo respondent1OrgRegistered;
-    private YesOrNo respondent2OrgRegistered;
-    private String respondentSolicitor1EmailAddress;
-    private String respondentSolicitor2EmailAddress;
-    private YesOrNo uploadParticularsOfClaim;
-    private String detailsOfClaim;
-    private ClaimValue claimValue;
-    private Fee claimFee;
-    private String serviceRequestReference;
-    private String paymentReference;
-    private DynamicList applicantSolicitor1PbaAccounts;
-    private ClaimTypeUnspec claimTypeUnSpec;
-    private ClaimType claimType;
+    @Builder.Default
+    private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
+
+    private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
+    private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
+    private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
+    private final SolicitorReferences solicitorReferences;
+    private final SolicitorReferences solicitorReferencesCopy;
+    private final String respondentSolicitor2Reference;
+    private final CourtLocation courtLocation;
+    private final Party applicant1;
+    private final Party applicant2;
+    private final CorrectEmail applicantSolicitor1CheckEmail;
+    private final IdamUserDetails applicantSolicitor1UserDetails;
+    private final YesOrNo addApplicant2;
+    private final YesOrNo addRespondent2;
+    private final YesOrNo respondent2SameLegalRepresentative;
+    private final Party respondent1;
+    private final Party respondent1Copy;
+    private final Party respondent2;
+    private final Party respondent2Copy;
+    private final Party respondent1DetailsForClaimDetailsTab;
+    private final Party respondent2DetailsForClaimDetailsTab;
+    private final YesOrNo respondent1Represented;
+    private final YesOrNo respondent2Represented;
+    private final YesOrNo respondent1OrgRegistered;
+    private final YesOrNo respondent2OrgRegistered;
+    private final String respondentSolicitor1EmailAddress;
+    private final String respondentSolicitor2EmailAddress;
+    private final YesOrNo uploadParticularsOfClaim;
+    private final String detailsOfClaim;
+    private final ClaimValue claimValue;
+    private final Fee claimFee;
+    private final String serviceRequestReference;
+    private final String paymentReference;
+    private final DynamicList applicantSolicitor1PbaAccounts;
+    private final ClaimTypeUnspec claimTypeUnSpec;
+    private final ClaimType claimType;
     private HelpWithFees generalAppHelpWithFees;
-    private HelpWithFeesDetails claimIssuedHwfDetails;
-    private HelpWithFeesDetails hearingHwfDetails;
-    private FeeType hwfFeeType;
-    private SuperClaimType superClaimType;
-    private String claimTypeOther;
-    private PersonalInjuryType personalInjuryType;
-    private String personalInjuryTypeOther;
-    private StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
-    private StatementOfTruth uiStatementOfTruth;
-    private String legacyCaseReference;
-    private AllocatedTrack allocatedTrack;
-    private PaymentDetails paymentDetails;
-    private PaymentDetails claimIssuedPaymentDetails;
-    private PaymentDetails hearingFeePaymentDetails;
-    private OrganisationPolicy applicant1OrganisationPolicy;
-    private OrganisationPolicy applicant2OrganisationPolicy;
-    private OrganisationPolicy respondent1OrganisationPolicy;
-    private OrganisationPolicy respondent2OrganisationPolicy;
-    private SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
-    private SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
-    private YesOrNo applicantSolicitor1ServiceAddressRequired;
-    private Address applicantSolicitor1ServiceAddress;
-    private YesOrNo respondentSolicitor1ServiceAddressRequired;
-    private Address respondentSolicitor1ServiceAddress;
-    private YesOrNo respondentSolicitor2ServiceAddressRequired;
-    private Address respondentSolicitor2ServiceAddress;
-    private StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
+    private final HelpWithFeesDetails claimIssuedHwfDetails;
+    private final HelpWithFeesDetails hearingHwfDetails;
+    private final FeeType hwfFeeType;
+    private final SuperClaimType superClaimType;
+    private final String claimTypeOther;
+    private final PersonalInjuryType personalInjuryType;
+    private final String personalInjuryTypeOther;
+    private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
+    private final StatementOfTruth uiStatementOfTruth;
+    private final String legacyCaseReference;
+    private final AllocatedTrack allocatedTrack;
+    private final PaymentDetails paymentDetails;
+    private final PaymentDetails claimIssuedPaymentDetails;
+    private final PaymentDetails hearingFeePaymentDetails;
+    private final OrganisationPolicy applicant1OrganisationPolicy;
+    private final OrganisationPolicy applicant2OrganisationPolicy;
+    private final OrganisationPolicy respondent1OrganisationPolicy;
+    private final OrganisationPolicy respondent2OrganisationPolicy;
+    private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
+    private final SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
+    private final YesOrNo applicantSolicitor1ServiceAddressRequired;
+    private final Address applicantSolicitor1ServiceAddress;
+    private final YesOrNo respondentSolicitor1ServiceAddressRequired;
+    private final Address respondentSolicitor1ServiceAddress;
+    private final YesOrNo respondentSolicitor2ServiceAddressRequired;
+    private final Address respondentSolicitor2ServiceAddress;
+    private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
 
     @Builder.Default
-    private List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-    private List<Element<ManageDocument>> manageDocuments;
-    private Document specClaimTemplateDocumentFiles;
-    private Document specClaimDetailsDocumentFiles;
-    private List<Evidence> speclistYourEvidenceList;
-    private YesOrNo specApplicantCorrespondenceAddressRequired;
-    private Address specApplicantCorrespondenceAddressdetails;
-    private YesOrNo specRespondentCorrespondenceAddressRequired;
-    private Address specRespondentCorrespondenceAddressdetails;
-    private YesOrNo specAoSRespondent2HomeAddressRequired;
-    private Address specAoSRespondent2HomeAddressDetails;
+    private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+    private final List<Element<ManageDocument>> manageDocuments;
+    private final Document specClaimTemplateDocumentFiles;
+    private final Document specClaimDetailsDocumentFiles;
+    private final List<Evidence> speclistYourEvidenceList;
+    private final YesOrNo specApplicantCorrespondenceAddressRequired;
+    private final Address specApplicantCorrespondenceAddressdetails;
+    private final YesOrNo specRespondentCorrespondenceAddressRequired;
+    private final Address specRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondent2HomeAddressRequired;
+    private final Address specAoSRespondent2HomeAddressDetails;
 
-    private LocalDate respondentSolicitor1AgreedDeadlineExtension;
-    private LocalDate respondentSolicitor2AgreedDeadlineExtension;
-    private ResponseIntention respondent1ClaimResponseIntentionType;
-    private ResponseIntention respondent2ClaimResponseIntentionType;
-    private ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
-    private ServedDocumentFiles servedDocumentFiles;
+    private final LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    private final LocalDate respondentSolicitor2AgreedDeadlineExtension;
+    private final ResponseIntention respondent1ClaimResponseIntentionType;
+    private final ResponseIntention respondent2ClaimResponseIntentionType;
+    private final ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
+    private final ServedDocumentFiles servedDocumentFiles;
 
-    private YesOrNo respondentResponseIsSame;
-    private YesOrNo defendantSingleResponseToBothClaimants;
-    private RespondentResponseType respondent1ClaimResponseType;
-    private RespondentResponseType respondent2ClaimResponseType;
-    private RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
-    private ResponseDocument respondent1ClaimResponseDocument;
-    private ResponseDocument respondent2ClaimResponseDocument;
-    private ResponseDocument respondentSharedClaimResponseDocument;
-    private CaseDocument respondent1GeneratedResponseDocument;
-    private CaseDocument respondent2GeneratedResponseDocument;
-    private LocalDate claimMovedToMediationOn;
-
-    @Builder.Default
-    private List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
-
-    private YesOrNo applicant1ProceedWithClaim;
-    private YesOrNo applicant1ProceedWithClaimMultiParty2v1;
-    private YesOrNo applicant2ProceedWithClaimMultiParty2v1;
-    private YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
-    private YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
-    private YesOrNo applicant1ProceedWithClaimRespondent2;
-    private ResponseDocument applicant1DefenceResponseDocument;
-    private ResponseDocument claimantDefenceResDocToDefendant2;
+    private final YesOrNo respondentResponseIsSame;
+    private final YesOrNo defendantSingleResponseToBothClaimants;
+    private final RespondentResponseType respondent1ClaimResponseType;
+    private final RespondentResponseType respondent2ClaimResponseType;
+    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    private final ResponseDocument respondent1ClaimResponseDocument;
+    private final ResponseDocument respondent2ClaimResponseDocument;
+    private final ResponseDocument respondentSharedClaimResponseDocument;
+    private final CaseDocument respondent1GeneratedResponseDocument;
+    private final CaseDocument respondent2GeneratedResponseDocument;
+    private final LocalDate claimMovedToMediationOn;
 
     @Builder.Default
-    private List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+    private final List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
+
+    private final YesOrNo applicant1ProceedWithClaim;
+    private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
+    private final YesOrNo applicant1ProceedWithClaimRespondent2;
+    private final ResponseDocument applicant1DefenceResponseDocument;
+    private final ResponseDocument claimantDefenceResDocToDefendant2;
 
     @Builder.Default
-    private List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
+    private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
 
     @Builder.Default
     @JsonProperty("duplicateClaimantDefResponseDocs")
-    private List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
+    private final List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
-    private List<ClaimAmountBreakup> claimAmountBreakup;
-    private List<TimelineOfEvents> timelineOfEvents;
+    private final List<ClaimAmountBreakup> claimAmountBreakup;
+    private final List<TimelineOfEvents> timelineOfEvents;
     /**
      * money amount in pounds.
      */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
-    private YesOrNo claimInterest;
-    private InterestClaimOptions interestClaimOptions;
-    private SameRateInterestSelection sameRateInterestSelection;
-    private BigDecimal breakDownInterestTotal;
-    private String breakDownInterestDescription;
-    private InterestClaimFromType interestClaimFrom;
-    private InterestClaimUntilType interestClaimUntil;
-    private LocalDate interestFromSpecificDate;
-    private String interestFromSpecificDateDescription;
-    private String calculatedInterest;
-    private String specRespondentSolicitor1EmailAddress;
-    private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
-    private Address specAoSApplicantCorrespondenceAddressdetails;
-    private YesOrNo specAoSRespondentCorrespondenceAddressRequired;
-    private Address specAoSRespondentCorrespondenceAddressdetails;
-    private YesOrNo specRespondent1Represented;
-    private YesOrNo specRespondent2Represented;
-    private List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private List<TimelineOfEvents> specResponseTimelineOfEvents2;
-    private TimelineUploadTypeSpec specClaimResponseTimelineList;
-    private ResponseDocument specResponseTimelineDocumentFiles;
-    private List<Evidence> specResponselistYourEvidenceList;
-    private List<Evidence> specResponselistYourEvidenceList2;
+    private final YesOrNo claimInterest;
+    private final InterestClaimOptions interestClaimOptions;
+    private final SameRateInterestSelection sameRateInterestSelection;
+    private final BigDecimal breakDownInterestTotal;
+    private final String breakDownInterestDescription;
+    private final InterestClaimFromType interestClaimFrom;
+    private final InterestClaimUntilType interestClaimUntil;
+    private final LocalDate interestFromSpecificDate;
+    private final String interestFromSpecificDateDescription;
+    private final String calculatedInterest;
+    private final String specRespondentSolicitor1EmailAddress;
+    private final YesOrNo specAoSApplicantCorrespondenceAddressRequired;
+    private final Address specAoSApplicantCorrespondenceAddressdetails;
+    private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
+    private final Address specAoSRespondentCorrespondenceAddressdetails;
+    private final YesOrNo specRespondent1Represented;
+    private final YesOrNo specRespondent2Represented;
+    private final List<TimelineOfEvents> specResponseTimelineOfEvents;
+    private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList;
+    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final List<Evidence> specResponselistYourEvidenceList;
+    private final List<Evidence> specResponselistYourEvidenceList2;
 
-    private String detailsOfWhyDoesYouDisputeTheClaim;
-    private String detailsOfWhyDoesYouDisputeTheClaim2;
+    private final String detailsOfWhyDoesYouDisputeTheClaim;
+    private final String detailsOfWhyDoesYouDisputeTheClaim2;
 
-    private ResponseDocument respondent1SpecDefenceResponseDocument;
-    private ResponseDocument respondent2SpecDefenceResponseDocument;
+    private final ResponseDocument respondent1SpecDefenceResponseDocument;
+    private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -337,80 +336,80 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
     }
 
-    private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
-    private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
-    private RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
-    private RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
-    private RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
-    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
-    private String defenceRouteRequired;
-    private String responseClaimTrack;
-    private RespondToClaim respondToClaim;
-    private RespondToClaim respondToAdmittedClaim;
+    private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
+    private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
+    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
+    private final String defenceRouteRequired;
+    private final String responseClaimTrack;
+    private final RespondToClaim respondToClaim;
+    private final RespondToClaim respondToAdmittedClaim;
     /**
      * money amount in pence.
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal respondToAdmittedClaimOwingAmount;
+    private final BigDecimal respondToAdmittedClaimOwingAmount;
     /**
      * money amount in pounds.
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
-    private YesOrNo specDefenceFullAdmittedRequired;
-    private PaymentUponCourtOrder respondent1CourtOrderPayment;
-    private RepaymentPlanLRspec respondent1RepaymentPlan;
-    private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
-    private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
-    private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
-    private String responseToClaimAdmitPartWhyNotPayLRspec;
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private final YesOrNo specDefenceFullAdmittedRequired;
+    private final PaymentUponCourtOrder respondent1CourtOrderPayment;
+    private final RepaymentPlanLRspec respondent1RepaymentPlan;
+    private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
+    private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
+    private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
-    private YesOrNo responseClaimMediationSpecRequired;
-    private SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
-    private YesOrNo defenceAdmitPartEmploymentTypeRequired;
-    private YesOrNo responseClaimExpertSpecRequired;
-    private YesOrNo applicant1ClaimExpertSpecRequired;
-    private String responseClaimWitnesses;
-    private String applicant1ClaimWitnesses;
-    private YesOrNo smallClaimHearingInterpreterRequired;
-    private String smallClaimHearingInterpreterDescription;
-    private List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
-    private YesOrNo specDefenceAdmittedRequired;
+    private final YesOrNo responseClaimMediationSpecRequired;
+    private final SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
+    private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
+    private final YesOrNo responseClaimExpertSpecRequired;
+    private final YesOrNo applicant1ClaimExpertSpecRequired;
+    private final String responseClaimWitnesses;
+    private final String applicant1ClaimWitnesses;
+    private final YesOrNo smallClaimHearingInterpreterRequired;
+    private final String smallClaimHearingInterpreterDescription;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
+    private final YesOrNo specDefenceAdmittedRequired;
 
-    private MediationContactInformation app1MediationContactInfo;
-    private MediationAvailability app1MediationAvailability;
-    private MediationContactInformation resp1MediationContactInfo;
-    private MediationContactInformation resp2MediationContactInfo;
-    private MediationAvailability resp1MediationAvailability;
-    private MediationAvailability resp2MediationAvailability;
+    private final MediationContactInformation app1MediationContactInfo;
+    private final MediationAvailability app1MediationAvailability;
+    private final MediationContactInformation resp1MediationContactInfo;
+    private final MediationContactInformation resp2MediationContactInfo;
+    private final MediationAvailability resp1MediationAvailability;
+    private final MediationAvailability resp2MediationAvailability;
 
-    private String additionalInformationForJudge;
-    private String applicantAdditionalInformationForJudge;
+    private final String additionalInformationForJudge;
+    private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
-    private ExpertRequirements respondToClaimExperts;
+    private final ExpertRequirements respondToClaimExperts;
 
-    private String caseNote;
-    private List<Element<CaseNote>> caseNotes;
+    private final String caseNote;
+    private final List<Element<CaseNote>> caseNotes;
 
     @Valid
-    private CloseClaim withdrawClaim;
+    private final CloseClaim withdrawClaim;
 
     @Valid
-    private CloseClaim discontinueClaim;
+    private final CloseClaim discontinueClaim;
 
-    private BusinessProcess businessProcess;
-
-    @JsonUnwrapped
-    private Respondent1DQ respondent1DQ;
+    private final BusinessProcess businessProcess;
 
     @JsonUnwrapped
-    private Respondent2DQ respondent2DQ;
+    private final Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
-    private Applicant1DQ applicant1DQ;
+    private final Respondent2DQ respondent2DQ;
 
     @JsonUnwrapped
-    private Applicant2DQ applicant2DQ;
+    private final Applicant1DQ applicant1DQ;
+
+    @JsonUnwrapped
+    private final Applicant2DQ applicant2DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -418,30 +417,30 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || businessProcess.getStatus() == FINISHED;
     }
 
-    private LitigationFriend genericLitigationFriend;
-    private LitigationFriend respondent1LitigationFriend;
-    private LitigationFriend respondent2LitigationFriend;
+    private final LitigationFriend genericLitigationFriend;
+    private final LitigationFriend respondent1LitigationFriend;
+    private final LitigationFriend respondent2LitigationFriend;
 
-    private YesOrNo applicant1LitigationFriendRequired;
-    private LitigationFriend applicant1LitigationFriend;
+    private final YesOrNo applicant1LitigationFriendRequired;
+    private final LitigationFriend applicant1LitigationFriend;
 
-    private YesOrNo applicant2LitigationFriendRequired;
-    private LitigationFriend applicant2LitigationFriend;
+    private final YesOrNo applicant2LitigationFriendRequired;
+    private final LitigationFriend applicant2LitigationFriend;
 
-    private DynamicList defendantSolicitorNotifyClaimOptions;
-    private DynamicList defendantSolicitorNotifyClaimDetailsOptions;
-    private DynamicList selectLitigationFriend;
-    private String litigantFriendSelection;
+    private final DynamicList defendantSolicitorNotifyClaimOptions;
+    private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
+    private final DynamicList selectLitigationFriend;
+    private final String litigantFriendSelection;
     @Valid
-    private ClaimProceedsInCaseman claimProceedsInCaseman;
+    private final ClaimProceedsInCaseman claimProceedsInCaseman;
     @Valid
-    private ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
-    private YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
+    private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
     private YesOrNo applicantsProceedIntention;
-    private MultiPartyScenario claimantResponseScenarioFlag;
+    private final MultiPartyScenario claimantResponseScenarioFlag;
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
@@ -456,89 +455,89 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo specFullAdmitPaid;
 
     // dates
-    private LocalDateTime submittedDate;
-    private LocalDateTime paymentSuccessfulDate;
-    private LocalDate issueDate;
-    private LocalDateTime claimNotificationDeadline;
-    private LocalDateTime claimNotificationDate;
-    private LocalDateTime claimDetailsNotificationDeadline;
-    private LocalDateTime claimDetailsNotificationDate;
-    private LocalDateTime respondent1ResponseDeadline;
-    private LocalDateTime respondent2ResponseDeadline;
-    private LocalDateTime addLegalRepDeadlineRes1;
-    private LocalDateTime addLegalRepDeadlineRes2;
-    private LocalDateTime claimDismissedDeadline;
-    private LocalDateTime respondent1TimeExtensionDate;
-    private LocalDateTime respondent2TimeExtensionDate;
-    private LocalDateTime respondent1AcknowledgeNotificationDate;
-    private LocalDateTime respondent2AcknowledgeNotificationDate;
-    private LocalDateTime respondent1ResponseDate;
-    private LocalDateTime respondent2ResponseDate;
-    private LocalDateTime applicant1ResponseDeadline;
-    private LocalDateTime applicant1ResponseDate;
-    private LocalDateTime applicant2ResponseDate;
-    private LocalDateTime takenOfflineDate;
-    private LocalDateTime takenOfflineByStaffDate;
-    private LocalDateTime unsuitableSDODate;
-    private OtherDetails  otherDetails;
-    private LocalDateTime claimDismissedDate;
-    private String claimAmountBreakupSummaryObject;
-    private LocalDateTime respondent1LitigationFriendDate;
-    private LocalDateTime respondent2LitigationFriendDate;
-    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
-    private YesOrNo respondent1ResponseDeadlineChecked;
-    private String paymentTypePBA;
-    private String paymentTypePBASpec;
-    private String whenToBePaidText;
+    private final LocalDateTime submittedDate;
+    private final LocalDateTime paymentSuccessfulDate;
+    private final LocalDate issueDate;
+    private final LocalDateTime claimNotificationDeadline;
+    private final LocalDateTime claimNotificationDate;
+    private final LocalDateTime claimDetailsNotificationDeadline;
+    private final LocalDateTime claimDetailsNotificationDate;
+    private final LocalDateTime respondent1ResponseDeadline;
+    private final LocalDateTime respondent2ResponseDeadline;
+    private final LocalDateTime addLegalRepDeadlineRes1;
+    private final LocalDateTime addLegalRepDeadlineRes2;
+    private final LocalDateTime claimDismissedDeadline;
+    private final LocalDateTime respondent1TimeExtensionDate;
+    private final LocalDateTime respondent2TimeExtensionDate;
+    private final LocalDateTime respondent1AcknowledgeNotificationDate;
+    private final LocalDateTime respondent2AcknowledgeNotificationDate;
+    private final LocalDateTime respondent1ResponseDate;
+    private final LocalDateTime respondent2ResponseDate;
+    private final LocalDateTime applicant1ResponseDeadline;
+    private final LocalDateTime applicant1ResponseDate;
+    private final LocalDateTime applicant2ResponseDate;
+    private final LocalDateTime takenOfflineDate;
+    private final LocalDateTime takenOfflineByStaffDate;
+    private final LocalDateTime unsuitableSDODate;
+    private final OtherDetails otherDetails;
+    private final LocalDateTime claimDismissedDate;
+    private final String claimAmountBreakupSummaryObject;
+    private final LocalDateTime respondent1LitigationFriendDate;
+    private final LocalDateTime respondent2LitigationFriendDate;
+    private final LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+    private final YesOrNo respondent1ResponseDeadlineChecked;
+    private final String paymentTypePBA;
+    private final String paymentTypePBASpec;
+    private final String whenToBePaidText;
 
-    private LocalDateTime respondent1LitigationFriendCreatedDate;
-    private LocalDateTime respondent2LitigationFriendCreatedDate;
-
-    @Builder.Default
-    private List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-
-    private Respondent1DebtLRspec specDefendant1Debts;
-    private Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
-    private String detailsOfDirection;
-
-    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private CaseLocationCivil caseManagementLocation;
-    private CaseManagementCategory caseManagementCategory;
-    private String locationName;
-    private DynamicList defendantDetailsSpec;
-    private DynamicList defendantDetails;
-    private String bothDefendants;
-    private String bothDefendantsSpec;
-    private String partialPaymentAmount;
-    private YesOrNo partialPayment;
-    private LocalDate paymentSetDate;
-    private String repaymentSummaryObject;
-    private YesOrNo paymentConfirmationDecisionSpec;
-    private String repaymentDue;
-    private String repaymentSuggestion;
-    private String currentDatebox;
-    private LocalDate repaymentDate;
-    private String caseNameHmctsInternal;
-    private String caseNamePublic;
+    private final LocalDateTime respondent1LitigationFriendCreatedDate;
+    private final LocalDateTime respondent2LitigationFriendCreatedDate;
 
     @Builder.Default
-    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+    private final List<IdValue<Bundle>> caseBundles = new ArrayList<>();
 
-    private String hearingSelection;
+    private final Respondent1DebtLRspec specDefendant1Debts;
+    private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
+    private final String detailsOfDirection;
 
-    private YesOrNo isRespondent1;
-    private YesOrNo isRespondent2;
-    private YesOrNo isApplicant1;
-    private YesOrNo disabilityPremiumPayments;
-    private YesOrNo severeDisabilityPremiumPayments;
+    private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final CaseLocationCivil caseManagementLocation;
+    private final CaseManagementCategory caseManagementCategory;
+    private final String locationName;
+    private final DynamicList defendantDetailsSpec;
+    private final DynamicList defendantDetails;
+    private final String bothDefendants;
+    private final String bothDefendantsSpec;
+    private final String partialPaymentAmount;
+    private final YesOrNo partialPayment;
+    private final LocalDate paymentSetDate;
+    private final String repaymentSummaryObject;
+    private final YesOrNo paymentConfirmationDecisionSpec;
+    private final String repaymentDue;
+    private final String repaymentSuggestion;
+    private final String currentDatebox;
+    private final LocalDate repaymentDate;
+    private final String caseNameHmctsInternal;
+    private final String caseNamePublic;
 
-    private String currentDefendant;
-    private YesOrNo claimStarted;
-    private String currentDefendantName;
+    @Builder.Default
+    private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+
+    private final String hearingSelection;
+
+    private final YesOrNo isRespondent1;
+    private final YesOrNo isRespondent2;
+    private final YesOrNo isApplicant1;
+    private final YesOrNo disabilityPremiumPayments;
+    private final YesOrNo severeDisabilityPremiumPayments;
+
+    private final String currentDefendant;
+    private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
     @JsonUnwrapped
-    private BreathingSpaceInfo breathing;
-    private String applicantVRespondentText;
+    private final BreathingSpaceInfo breathing;
+    private final String applicantVRespondentText;
 
     private YesOrNo setRequestDJDamagesFlagForWA;
     private String featureToggleWA;
@@ -548,88 +547,88 @@ public class CaseData extends CaseDataParent implements MappableObject {
     /**
      * RTJ = Refer To Judge.
      */
-    private String eventDescriptionRTJ;
+    private final String eventDescriptionRTJ;
     /**
      * RTJ = Refer To Judge.
      */
-    private String additionalInformationRTJ;
+    private final String additionalInformationRTJ;
     /**
      * Refer To Judge(Defence received in time).
      */
     private List<ConfirmationToggle> confirmReferToJudgeDefenceReceived;
 
     //general application order documents
-    private List<Element<CaseDocument>> generalOrderDocument;
-    private List<Element<CaseDocument>> generalOrderDocStaff;
-    private List<Element<CaseDocument>> generalOrderDocClaimant;
-    private List<Element<CaseDocument>> generalOrderDocRespondentSol;
-    private List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
+    private final List<Element<CaseDocument>> generalOrderDocument;
+    private final List<Element<CaseDocument>> generalOrderDocStaff;
+    private final List<Element<CaseDocument>> generalOrderDocClaimant;
+    private final List<Element<CaseDocument>> generalOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
 
-    private List<Element<CaseDocument>> consentOrderDocument;
-    private List<Element<CaseDocument>> consentOrderDocStaff;
-    private List<Element<CaseDocument>> consentOrderDocClaimant;
-    private List<Element<CaseDocument>> consentOrderDocRespondentSol;
-    private List<Element<CaseDocument>> consentOrderDocRespondentSolTwo;
+    private final List<Element<CaseDocument>> consentOrderDocument;
+    private final List<Element<CaseDocument>> consentOrderDocStaff;
+    private final List<Element<CaseDocument>> consentOrderDocClaimant;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSolTwo;
 
-    private List<Element<Document>> generalAppEvidenceDocument;
+    private final List<Element<Document>> generalAppEvidenceDocument;
 
-    private List<Element<Document>> gaEvidenceDocStaff;
-    private List<Element<Document>> gaEvidenceDocClaimant;
-    private List<Element<Document>> gaEvidenceDocRespondentSol;
-    private List<Element<Document>> gaEvidenceDocRespondentSolTwo;
-    private List<Element<CaseDocument>> gaAddlDoc;
-    private List<Element<CaseDocument>> gaAddlDocStaff;
-    private List<Element<CaseDocument>> gaAddlDocClaimant;
-    private List<Element<CaseDocument>> gaAddlDocRespondentSol;
-    private List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
-    private List<Element<CaseDocument>> gaAddlDocBundle;
+    private final List<Element<Document>> gaEvidenceDocStaff;
+    private final List<Element<Document>> gaEvidenceDocClaimant;
+    private final List<Element<Document>> gaEvidenceDocRespondentSol;
+    private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
+    private final List<Element<CaseDocument>> gaAddlDoc;
+    private final List<Element<CaseDocument>> gaAddlDocStaff;
+    private final List<Element<CaseDocument>> gaAddlDocClaimant;
+    private final List<Element<CaseDocument>> gaAddlDocRespondentSol;
+    private final List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
+    private final List<Element<CaseDocument>> gaAddlDocBundle;
 
-    private List<Element<CaseDocument>> gaRespondDoc;
+    private final List<Element<CaseDocument>> gaRespondDoc;
 
     @Builder.Default
-    private List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
+    private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
     // GA for LIP
-    private YesOrNo isGaApplicantLip;
-    private YesOrNo isGaRespondentOneLip;
-    private YesOrNo isGaRespondentTwoLip;
+    private final YesOrNo isGaApplicantLip;
+    private final YesOrNo isGaRespondentOneLip;
+    private final YesOrNo isGaRespondentTwoLip;
 
     //case progression
-    private List<Element<DocumentWithName>> documentAndName;
-    private List<Element<DocumentWithName>> documentAndNameToAdd;
-    private List<Element<DocumentAndNote>> documentAndNote;
-    private List<Element<DocumentAndNote>> documentAndNoteToAdd;
-    private CaseNoteType caseNoteType;
-    private String caseNoteTA;
-    private List<Element<CaseNote>> caseNotesTA;
-    private LocalDateTime noteAdditionDateTime;
-    private String caseTypeFlag;
-    private String witnessStatementFlag;
-    private String witnessSummaryFlag;
-    private String witnessReferredStatementFlag;
-    private String expertReportFlag;
-    private String expertJointFlag;
-    private String trialAuthorityFlag;
-    private String trialCostsFlag;
-    private String trialDocumentaryFlag;
+    private final List<Element<DocumentWithName>> documentAndName;
+    private final List<Element<DocumentWithName>> documentAndNameToAdd;
+    private final List<Element<DocumentAndNote>> documentAndNote;
+    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
+    private final CaseNoteType caseNoteType;
+    private final String caseNoteTA;
+    private final List<Element<CaseNote>> caseNotesTA;
+    private final LocalDateTime noteAdditionDateTime;
+    private final String caseTypeFlag;
+    private final String witnessStatementFlag;
+    private final String witnessSummaryFlag;
+    private final String witnessReferredStatementFlag;
+    private final String expertReportFlag;
+    private final String expertJointFlag;
+    private final String trialAuthorityFlag;
+    private final String trialCostsFlag;
+    private final String trialDocumentaryFlag;
 
-    private YesOrNo urgentFlag;
-    private String caseProgAllocatedTrack;
-    private DynamicList evidenceUploadOptions;
+    private final YesOrNo urgentFlag;
+    private final String caseProgAllocatedTrack;
+    private final DynamicList evidenceUploadOptions;
 
-    private List<Element<RegistrationInformation>> registrationTypeRespondentOne;
-    private List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
-    private String respondent1DocumentURL;
-    private String respondent2DocumentURL;
-    private String respondent2DocumentGeneration;
-    private String hearingHelpFeesReferenceNumber;
+    private final String respondent1DocumentURL;
+    private final String respondent2DocumentURL;
+    private final String respondent2DocumentGeneration;
+    private final String hearingHelpFeesReferenceNumber;
 
-    private String hearingLocationCourtName;
+    private final String hearingLocationCourtName;
     // bulk claims
-    private String bulkCustomerId;
-    private String sdtRequestIdFromSdt;
-    private List<Element<String>> sdtRequestId;
+    private final String bulkCustomerId;
+    private final String sdtRequestIdFromSdt;
+    private final List<Element<String>> sdtRequestId;
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
@@ -651,7 +650,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
 
-    private TransferCaseDetails transferCaseDetails;
+    private final TransferCaseDetails transferCaseDetails;
 
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
@@ -672,6 +671,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //Settle And Discontinue
     private YesOrNo markPaidForAllClaimants;
     private DynamicList claimantWhoIsSettling;
+    private DynamicList claimantWhoIsDiscontinuing;
+    private DynamicList discontinuingAgainstOneDefendant;
+    private String selectedClaimantForDiscontinuance;
+    private SettleDiscontinueYesOrNoList courtPermissionNeeded;
+    private SettleDiscontinueYesOrNoList isPermissionGranted;
+    private PermissionGranted permissionGrantedComplex;
+    private SettlementReason settleReason;
+    private final MarkPaidConsentList markPaidConsent;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -971,7 +978,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
             if (applicant1SuggestedPayImmediately()) {
                 whenWillThisAmountBePaid = getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec();
             } else if (applicant1SuggestedPayBySetDate()) {
-                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(PaymentBySetDate::getPaymentSetDate).orElse(null);
+                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(
+                    PaymentBySetDate::getPaymentSetDate).orElse(null);
             }
             firstRepaymentDate = getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         } else {
@@ -981,11 +989,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
             firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
                 null);
         }
-        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
+        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(
+            getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
-        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
+        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(
+            null);
         boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
-                                                    ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
+            || (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
             || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
@@ -997,7 +1007,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(
+                extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
+                DATE_TIME_AT
+            );
         }
         return null;
     }
@@ -1012,8 +1025,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isPartAdmitClaimSpec()
                 && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
                 && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-                && getCcdState() == AWAITING_APPLICANT_INTENTION);
+            && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
@@ -1132,8 +1144,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+        }
+        return Optional.empty();
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getDecisionOnReconsiderationDocumentFromList() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DECISION_MADE_ON_APPLICATIONS)).findAny();
         }
         return Optional.empty();
     }
@@ -1226,8 +1248,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
     }
@@ -1492,6 +1514,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
         return hasApplicant1CourtDecisionInFavourOfClaimant()
-                && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
+            && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPDefendantBeforeOffline() {
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null;
+    }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPDefendant() {
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     }
 }

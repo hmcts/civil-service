@@ -45,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private DeadlinesCalculator deadlinesCalculator;

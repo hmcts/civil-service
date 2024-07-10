@@ -14,20 +14,24 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,6 +54,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     ExitSurveyContentService.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -132,7 +139,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("Yes"));
+            assertEquals("Yes", response.getData().get("isRespondent1"));
         }
 
         @Test
@@ -150,7 +157,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("No"));
+            assertEquals("No", response.getData().get("isRespondent1"));
         }
     }
 
@@ -285,10 +292,10 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
                 .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
-                             + "'Litigation Friend' (litigation friend)");
+                    + "'Litigation Friend' (litigation friend)");
             assertThat(response.getData()).extracting("caseNamePublic")
                 .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
-                             + "'Litigation Friend' (litigation friend)");
+                    + "'Litigation Friend' (litigation friend)");
         }
 
         @Test

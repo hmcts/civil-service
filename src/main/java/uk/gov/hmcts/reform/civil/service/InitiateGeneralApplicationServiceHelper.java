@@ -14,16 +14,17 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -46,6 +47,8 @@ public class InitiateGeneralApplicationServiceHelper {
     public static final String RESPONDENT_ID = "002";
     public static final String RESPONDENT2_ID = "003";
     public static final String APPLICANT2_ID = "004";
+    private static final int LIP_URGENT_DAYS = 11;
+    private static final String LIP_URGENT_REASON = "There is a hearing on the main case within 10 days";
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
                                                             CaseData caseData, UserDetails userDetails) {
@@ -63,8 +66,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignmentUserRole> respondentSolicitors = userRoles.getCaseAssignmentUserRoles().stream()
-            .filter(CA -> !CA.getUserId().equals(userDetails.getId()))
-            .collect(Collectors.toList());
+            .filter(caseAssigned -> !caseAssigned.getUserId().equals(userDetails.getId()))
+            .toList();
 
         /*
          * Set GA applicant solicitor details
@@ -79,7 +82,7 @@ public class InitiateGeneralApplicationServiceHelper {
             .surname(userDetails.getSurname());
 
         List<CaseAssignmentUserRole> applicantSolicitor = userRoles.getCaseAssignmentUserRoles()
-            .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
+            .stream().filter(user -> !respondentSolicitors.contains(user)).toList();
         boolean sameDefSol1v2 = applicantSolicitor.size() == 2
                 && applicantSolicitor.get(0).getUserId()
                 .equals(applicantSolicitor.get(1).getUserId());
@@ -93,7 +96,7 @@ public class InitiateGeneralApplicationServiceHelper {
         }
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
-        GAParties applicantPartyData = GAParties.builder().build();
+        GAParties applicantPartyData;
         /*
          * Set GA respondent solicitors' details
          * */
@@ -120,8 +123,23 @@ public class InitiateGeneralApplicationServiceHelper {
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
-
+        checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, caseData);
         return applicationBuilder.build();
+    }
+
+    private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
+                                 GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                 CaseData caseData) {
+        if (Objects.nonNull(isGaAppSameAsParentCaseClLip)
+                && Objects.nonNull(caseData.getHearingDate())
+                && LocalDate.now().plusDays(LIP_URGENT_DAYS).isAfter(caseData.getHearingDate())) {
+            applicationBuilder.generalAppUrgencyRequirement(
+                    GAUrgencyRequirement
+                            .builder()
+                            .generalAppUrgency(YES)
+                            .urgentAppConsiderationDate(caseData.getHearingDate())
+                            .reasonsForUrgency(LIP_URGENT_REASON).build());
+        }
     }
 
     private Boolean setSingleGaApplicant(List<CaseAssignmentUserRole> applicantSolicitor,
@@ -191,7 +209,7 @@ public class InitiateGeneralApplicationServiceHelper {
                                                                                   String respondent1OrgCaseRole) {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        respondentSolicitors.forEach((respSol) -> {
+        respondentSolicitors.forEach(respSol -> {
             GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder specBuilder = GASolicitorDetailsGAspec
                     .builder();
 
@@ -276,7 +294,7 @@ public class InitiateGeneralApplicationServiceHelper {
             ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
 
         Optional<CaseAssignmentUserRole> applicantSol = userRoles.getCaseAssignmentUserRoles().stream()
-            .filter(CA -> CA.getUserId().equals(userDetails.getId())).findFirst();
+            .filter(caseAssigned -> caseAssigned.getUserId().equals(userDetails.getId())).findFirst();
         if (applicantSol.isPresent()) {
             CaseAssignmentUserRole applicantSolicitor = applicantSol.get();
             /*GA for Lips is only 1v1*/
@@ -287,13 +305,11 @@ public class InitiateGeneralApplicationServiceHelper {
                     .litigiousPartyID(APPLICANT_ID)
                     .build();
             }
-            if (applicant2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                if (caseData.getApplicant2() != null) {
-                    return GAParties.builder()
+            if (applicant2OrgCaseRole.equals(applicantSolicitor.getCaseRole()) && (caseData.getApplicant2() != null)) {
+                return GAParties.builder()
                         .applicantPartyName(caseData.getApplicant2().getPartyName())
                         .litigiousPartyID(APPLICANT2_ID)
                         .build();
-                }
             }
             /*GA for Lips is only 1v1*/
             if (respondent1OrgCaseRole.equals(applicantSolicitor.getCaseRole())
@@ -303,13 +319,11 @@ public class InitiateGeneralApplicationServiceHelper {
                     .litigiousPartyID(RESPONDENT_ID)
                     .build();
             }
-            if (respondent2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                if (caseData.getRespondent2() != null) {
-                    return GAParties.builder()
+            if (respondent2OrgCaseRole.equals(applicantSolicitor.getCaseRole()) && caseData.getRespondent2() != null) {
+                return GAParties.builder()
                         .applicantPartyName(caseData.getRespondent2().getPartyName())
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build();
-                }
             }
         }
         return GAParties.builder().build();
@@ -338,7 +352,7 @@ public class InitiateGeneralApplicationServiceHelper {
     public CaseAssignmentUserRolesResource getUserRoles(String parentCaseId) {
         CaseAssignmentUserRolesResource userRoles = caseAssignmentApi.getUserRoles(
             getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
-        log.info("UserRoles from API :" + userRoles);
+        log.info("UserRoles from API: {}", userRoles);
         return userRoles;
     }
 

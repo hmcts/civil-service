@@ -921,13 +921,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
             .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                         + " Digital Portal with the particulars of claim")
-            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                        + "and uploaded to the Digital Portal by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
+                        "directly and uploaded to the Digital Portal by 4pm on")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)))
             .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input4("and uploaded to the Digital Portal by")
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)))
+            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
+            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
             .build();
 
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
@@ -1551,13 +1551,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
+        if (featureToggleService.isNationalRolloutEnabled()) {
             // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
             if (!sdoSubmittedPreCPForLiPCase(caseData)
-                // If both SDO court AND case managment location is a EA approved court.
-                // check epimm from judge selected court in SDO journey
+                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(NO);
+            }
+        } else if (featureToggleService.isEarlyAdoptersEnabled()) {
+            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+            if (!sdoSubmittedPreCPForLiPCase(caseData)
                 && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                // check epimm from case management location
                 && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
@@ -1633,7 +1640,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
-        return !featureToggleService.isCaseProgressionEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
+        return !featureToggleService.isCaseProgressionEnabled()
+            && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
     }
 
     private DynamicList deleteLocationList(DynamicList list) {

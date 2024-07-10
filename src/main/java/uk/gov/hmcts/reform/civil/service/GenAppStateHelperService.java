@@ -42,10 +42,10 @@ public class GenAppStateHelperService {
     public enum RequiredState {
         APPLICATION_CLOSED("APPLICATION_CLOSED"),
         APPLICATION_PROCEEDS_OFFLINE("PROCEEDS_IN_HERITAGE");
-        private final String requiredState;
+        private final String state;
 
         public String getRequiredState() {
-            return this.requiredState;
+            return this.state;
         }
     }
 

@@ -99,7 +99,7 @@ public class InitiateGeneralApplicationService {
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(dataBuilder, caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -121,8 +121,7 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
-                                                CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -355,14 +354,26 @@ public class InitiateGeneralApplicationService {
                 }
             }
         } else {
-            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            CaseLocationCivil courtLocation = CaseLocationCivil.builder()
+            CaseLocationCivil courtLocation;
+            if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+                LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+                courtLocation = CaseLocationCivil.builder()
+                    .region(cnbcLocation.getRegionId())
+                    .baseLocation(cnbcLocation.getEpimmsId())
+                    .siteName(cnbcLocation.getSiteName())
+                    .address(cnbcLocation.getCourtAddress())
+                    .postcode(cnbcLocation.getPostcode())
+                    .build();
+            } else {
+                LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+                courtLocation = CaseLocationCivil.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
                     .address(ccmccLocation.getCourtAddress())
                     .postcode(ccmccLocation.getPostcode())
                     .build();
+            }
             return Pair.of(courtLocation, true);
         }
     }
@@ -418,7 +429,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
-        if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
+        if (isDefendant1RespondedFirst(caseData) && !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
             return CaseLocationCivil.builder()

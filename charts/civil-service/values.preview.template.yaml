@@ -23,12 +23,14 @@ java:
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    CASE_FLAGS_LOGGING_ENABLED: true
+    SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
       secrets:
         - name: civil-idam-client-secret
-          alias: idam.client.secret
+          alias: CIVIL_CLIENT_SECRET
         - name: microservicekey-civil-service
           alias: idam.s2s-auth.totp_secret
         - name: system-update-user-username

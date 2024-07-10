@@ -159,7 +159,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         if (!isAdmin(authToken)) {
             List<UpdatePartyDetailsForm> expertsWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
                 .stream()
-                .filter(e -> e.getPartyId() == null).toList();
+                .filter(e -> e.getPartyId() == null)
+                .toList();
 
             if (!expertsWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_EXPERTS);
@@ -183,7 +184,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         if (!isAdmin(authToken)) {
             List<UpdatePartyDetailsForm> witnessesWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
                 .stream()
-                .filter(e -> e.getPartyId() == null).toList();
+                .filter(e -> e.getPartyId() == null)
+                .toList();
 
             if (!witnessesWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_WITNESSES);
@@ -676,7 +678,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Contact information changed")
-            .confirmationBody("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab.")
+            .confirmationBody("### What happens next\nAny changes made to contact details have been updated.")
             .build();
     }
 

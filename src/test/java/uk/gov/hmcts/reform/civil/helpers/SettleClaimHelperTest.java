@@ -14,22 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SettleClaimHelperTest {
 
     @Test
-    void test_state() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        List<String> errors = new ArrayList<>();
-        SettleClaimHelper.checkState(caseData, errors);
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void test_state_all_final_orders_issued() {
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        List<String> errors = new ArrayList<>();
-        SettleClaimHelper.checkState(caseData, errors);
-        assertThat(errors).isNotEmpty();
-    }
-
-    @Test
     void shouldReturn_error_when_claim_is_1v1_LiPvLIP() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1UnrepresentedDefendantSpec()
@@ -135,9 +119,21 @@ public class SettleClaimHelperTest {
     }
 
     @Test
-    void shouldNotReturn_error_when_claim_is_1v2_LRvLR() {
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLRsameLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
+            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .build();
+        List<String> errors = new ArrayList<>();
+        SettleClaimHelper.checkState(caseData, errors);
+        assertThat(errors).isNotNull();
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldNotReturn_error_when_claim_is_1v2_LRvLRdiffLR() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmittedTwoRespondentRepresentatives()
             .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
             .build();
         List<String> errors = new ArrayList<>();

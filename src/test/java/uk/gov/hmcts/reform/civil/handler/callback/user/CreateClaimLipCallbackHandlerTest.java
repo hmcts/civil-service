@@ -27,8 +27,11 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -51,9 +54,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class,
     StateFlowEngine.class,
-    InterestCalculator.class,
-    StateFlowEngine.class,
-    },
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
+    InterestCalculator.class
+},
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -127,19 +132,19 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(toggleService.isHmcEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName(DEFENDANT_PARTY_NAME)
-                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                    .type(Party.Type.INDIVIDUAL)
+                    .partyName(DEFENDANT_PARTY_NAME)
+                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder()
-                                 .type(Party.Type.ORGANISATION)
-                                 .partyName("Test Inc")
-                                 .partyEmail("claimant@email.com").build())
+                    .type(Party.Type.ORGANISATION)
+                    .partyName("Test Inc")
+                    .partyEmail("claimant@email.com").build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
@@ -150,15 +155,15 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName(DEFENDANT_PARTY_NAME)
-                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                    .type(Party.Type.INDIVIDUAL)
+                    .partyName(DEFENDANT_PARTY_NAME)
+                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
@@ -171,10 +176,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetOrganisationPolicies_whenInvoked() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
@@ -186,10 +191,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetCaseManagementLocation() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("caseManagementLocation.region")
@@ -202,10 +207,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetFlightDelayType() {
             caseData.setIsFlightDelayClaim(YesOrNo.YES);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("claimType")

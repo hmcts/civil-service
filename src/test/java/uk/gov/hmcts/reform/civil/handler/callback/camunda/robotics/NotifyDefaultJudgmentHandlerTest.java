@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -22,7 +21,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -59,6 +61,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
@@ -108,7 +113,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotNotifyRobotics_whenLrDisabled() {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
         }
@@ -118,7 +123,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
@@ -136,7 +141,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).respondent1Represented(YesOrNo.NO).build();
+                .toBuilder().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             //When

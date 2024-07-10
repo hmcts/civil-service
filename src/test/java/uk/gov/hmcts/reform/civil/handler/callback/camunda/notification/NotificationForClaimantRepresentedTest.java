@@ -110,7 +110,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void notifyApplicantAfterNocApproval() {
+        void notifyApplicantAfterNocApproval() {
 
             //Given
             CaseData caseData = CaseData.builder()
@@ -138,7 +138,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void notifyApplicantAfterNocApprovalBilingual() {
+        void notifyApplicantAfterNocApprovalBilingual() {
 
             //Given
             CaseData caseData = CaseData.builder()
