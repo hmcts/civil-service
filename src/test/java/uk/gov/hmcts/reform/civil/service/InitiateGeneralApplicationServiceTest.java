@@ -1124,7 +1124,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-            .isEqualTo("574546");
+            .isEqualTo("11111");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
             .isEqualTo("locationOfRegion2");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
