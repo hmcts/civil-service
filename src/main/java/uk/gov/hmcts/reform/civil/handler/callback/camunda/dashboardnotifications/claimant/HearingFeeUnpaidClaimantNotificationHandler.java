@@ -50,4 +50,13 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CaseProgression
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicantNotRepresented();
     }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            authToken
+        );
+    }
 }
