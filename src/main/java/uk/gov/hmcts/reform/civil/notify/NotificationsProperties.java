@@ -614,6 +614,9 @@ public class NotificationsProperties {
     private String orderBeingTranslatedTemplateWelsh;
 
     @NotEmpty
+    private String notifyLiPOrderTranslatedTemplate;
+
+    @NotEmpty
     private String notifyClaimDiscontinuedLRTemplate;
 
 }
