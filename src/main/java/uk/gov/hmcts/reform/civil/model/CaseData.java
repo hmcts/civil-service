@@ -1518,6 +1518,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean nocApplyForLiPDefendantBeforeOffline() {
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null;
+    }
+
+    @JsonIgnore
     public boolean nocApplyForLiPDefendant() {
         return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     }
