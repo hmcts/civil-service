@@ -25,7 +25,6 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
     @Test
     void should_create_claimant_settled_claim_scenario() throws Exception {
 
-
         String caseId = "1234678912";
         LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
 
