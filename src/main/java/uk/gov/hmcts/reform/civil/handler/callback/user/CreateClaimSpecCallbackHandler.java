@@ -551,6 +551,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                                       .build()).build());
         }
 
+        if (caseData.getApplicant1().getIndividualFirstName().equals("Kiyron")) {
+            throw new CaseNotFoundException();
+        }
+
         List<String> errors = new ArrayList<>();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
@@ -573,10 +577,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                         .scheduledDate(flightDelayDetails.getScheduledDate())
                                         .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
                                         .build());
-        }
-
-        if (caseData.getApplicant1().getIndividualFirstName().equals("Kiyron")) {
-            throw new CaseNotFoundException();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
