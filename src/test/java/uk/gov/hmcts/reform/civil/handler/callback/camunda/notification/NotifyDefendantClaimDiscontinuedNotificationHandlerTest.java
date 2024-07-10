@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,11 +30,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 
 @SpringBootTest(classes = {
-    NotifyClaimantClaimDiscontinuedNotificationHandler.class,
+    NotifyDefendantClaimDiscontinuedNotificationHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-class NotifyClaimantClaimDiscontinuedNotificationHandlerTest extends BaseCallbackHandlerTest {
+class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
@@ -49,7 +50,7 @@ class NotifyClaimantClaimDiscontinuedNotificationHandlerTest extends BaseCallbac
     private OrganisationService organisationService;
 
     @Autowired
-    private NotifyClaimantClaimDiscontinuedNotificationHandler handler;
+    private NotifyDefendantClaimDiscontinuedNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -58,45 +59,41 @@ class NotifyClaimantClaimDiscontinuedNotificationHandlerTest extends BaseCallbac
         void setup() {
             when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(
                 TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
 
         @Test
-        void shouldNotifyClaimantJudgmentByAdmission_whenInvoked() {
+        void shouldNotifyDefendantJudgmentByAdmission_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .atStateClaimDraft().build();
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_DISCONTINUANCE_CLAIMANT1.name())
+                             .eventId(CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1.name())
                              .build())
                 .build();
 
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
-                "applicantsolicitor@example.com",
+                "respondentsolicitor@example.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
-                "claimant-claim-discontinued-8372942374"
+                addPropertiesLR(caseData),
+                "defendant-claim-discontinued-000DC001"
             );
         }
     }
 
-    public Map<String, String> getNotificationDataMap(CaseData caseData) {
+    public Map<String, String> addPropertiesLR(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData)
+            LEGAL_ORG_NAME, "Test Org Name"
         );
-    }
-
-    public String getApplicantLegalOrganizationName(CaseData caseData) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }

@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_JUDGMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
@@ -65,7 +63,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 addPropertiesLR(caseData),
                 getReferenceTemplate(caseData)
             );
-        }else{
+        } else {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 getLIPTemplate(),
@@ -89,13 +87,13 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-
     public Map<String, String> addPropertiesLR(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
         );
     }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(

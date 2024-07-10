@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -194,13 +195,6 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         return (isNotBothClaimantsSelected || isNotAgainstBothDefendants);
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(updateCaseState(caseData))
-                .build();
-    }
-
     private String updateCaseState(CaseData caseData) {
         if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
             boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
@@ -222,12 +216,13 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .state(updateCaseState(caseData))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }

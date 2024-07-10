@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.CourtPermissionNeeded;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
@@ -673,7 +674,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DynamicList claimantWhoIsDiscontinuing;
     private DynamicList discontinuingAgainstOneDefendant;
     private String selectedClaimantForDiscontinuance;
-    private SettleDiscontinueYesOrNoList courtPermissionNeeded;
+    private CourtPermissionNeeded courtPermissionNeeded;
     private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
     private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
@@ -1519,5 +1520,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean nocApplyForLiPDefendant() {
         return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+    }
+
+    @JsonIgnore
+    public boolean isJudgeOrderVerificationRequired() {
+        return (this.getCourtPermissionNeeded() != null && this.getCourtPermissionNeeded().equals(SettleDiscontinueYesOrNoList.YES));
     }
 }

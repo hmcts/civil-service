@@ -1065,6 +1065,5 @@ public class FlowPredicate {
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
 
-    public static final Predicate<CaseData> hasCourtPermissionGranted = caseData ->
-        caseData.getIsPermissionGranted() != null;
+    public static final Predicate<CaseData> isCourtPermissionNeeded = CaseData::isJudgeOrderVerificationRequired;
 }

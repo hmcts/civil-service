@@ -8,7 +8,8 @@ public class SettleDiscontinueUtil {
     private SettleDiscontinueUtil() {
         //NO-OP
     }
-    public static boolean hasCourtPermissionGranted(CaseData caseData) {
-        return caseData.getIsPermissionGranted().equals(SettleDiscontinueYesOrNoList.YES);
+
+    public static boolean isJudgeOrderVerificationRequired(CaseData caseData) {
+        return  (caseData.getCourtPermissionNeeded() != null && caseData.getCourtPermissionNeeded().equals(SettleDiscontinueYesOrNoList.YES));
     }
 }
