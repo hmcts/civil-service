@@ -174,25 +174,36 @@ public class InitiateGeneralApplicationService {
         itemList.add(element(civil));
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
-
-        Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
-        if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
-            caseLocation.getLeft().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
-            caseLocation.getLeft().setRegion(caseData.getCaseManagementLocation().getRegion());
+        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData.getCcdState())) {
+            LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseData.getCaseManagementLocation().getBaseLocation(), authToken);
+            applicationBuilder.caseManagementLocation(CaseLocationCivil.builder()
+                                                          .region(caseData.getCaseManagementLocation().getRegion())
+                                                          .baseLocation(caseData.getCaseManagementLocation().getBaseLocation())
+                                                          .siteName(locationDetails.getSiteName())
+                                                          .address(locationDetails.getCourtAddress())
+                                                          .postcode(locationDetails.getPostcode())
+                                                          .build());
+            applicationBuilder.locationName(locationDetails.getSiteName());
+            applicationBuilder.isCcmccLocation(NO);
+        } else {
+            Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+            if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
+                caseLocation.getLeft().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+                caseLocation.getLeft().setRegion(caseData.getCaseManagementLocation().getRegion());
+            }
+            //Setting Work Allocation location and location name
+            if (Objects.isNull(caseLocation.getLeft().getSiteName())
+                && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
+                LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
+                caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
+                caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
+                caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
+            }
+            applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+            applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
+                                                ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
+            applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
         }
-        //Setting Work Allocation location and location name
-        if (Objects.isNull(caseLocation.getLeft().getSiteName())
-            && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
-            LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
-            caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
-            caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
-            caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
-        }
-        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
-        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
-                                            ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
-
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
@@ -319,6 +330,10 @@ public class InitiateGeneralApplicationService {
             || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles)));
     }
 
+    public boolean caseContainsLiP(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
+    }
+
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         return helper.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
     }
@@ -354,28 +369,32 @@ public class InitiateGeneralApplicationService {
                 }
             }
         } else {
-            CaseLocationCivil courtLocation;
-            if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-                LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
-                courtLocation = CaseLocationCivil.builder()
-                    .region(cnbcLocation.getRegionId())
-                    .baseLocation(cnbcLocation.getEpimmsId())
-                    .siteName(cnbcLocation.getSiteName())
-                    .address(cnbcLocation.getCourtAddress())
-                    .postcode(cnbcLocation.getPostcode())
-                    .build();
-            } else {
-                LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-                courtLocation = CaseLocationCivil.builder()
-                    .region(ccmccLocation.getRegionId())
-                    .baseLocation(ccmccLocation.getEpimmsId())
-                    .siteName(ccmccLocation.getSiteName())
-                    .address(ccmccLocation.getCourtAddress())
-                    .postcode(ccmccLocation.getPostcode())
-                    .build();
-            }
-            return Pair.of(courtLocation, true);
+            return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
+    }
+
+    private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocationBeforeSdo(CaseData caseData, String authToken) {
+        CaseLocationCivil courtLocation;
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+            courtLocation = CaseLocationCivil.builder()
+                .region(cnbcLocation.getRegionId())
+                .baseLocation(cnbcLocation.getEpimmsId())
+                .siteName(cnbcLocation.getSiteName())
+                .address(cnbcLocation.getCourtAddress())
+                .postcode(cnbcLocation.getPostcode())
+                .build();
+        } else {
+            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+            courtLocation = CaseLocationCivil.builder()
+                .region(ccmccLocation.getRegionId())
+                .baseLocation(ccmccLocation.getEpimmsId())
+                .siteName(ccmccLocation.getSiteName())
+                .address(ccmccLocation.getCourtAddress())
+                .postcode(ccmccLocation.getPostcode())
+                .build();
+        }
+        return Pair.of(courtLocation, true);
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
