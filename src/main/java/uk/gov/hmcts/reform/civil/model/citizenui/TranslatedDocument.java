@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
@@ -24,11 +25,12 @@ public class TranslatedDocument {
 
     @JsonIgnore
     public DocumentType getCorrespondingDocumentType(TranslatedDocumentType documentType) {
-        return switch (documentType) {
-            case DEFENDANT_RESPONSE -> DEFENCE_TRANSLATED_DOCUMENT;
-            case CLAIM_ISSUE -> CLAIM_ISSUE_TRANSLATED_DOCUMENT;
-            case CLAIMANT_INTENTION -> CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
-            case ORDER_NOTICE -> ORDER_NOTICE_TRANSLATED_DOCUMENT;
-        };
+        switch (documentType) {
+            case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
+            case CLAIM_ISSUE : return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
+            case CLAIMANT_INTENTION : return CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
+            case ORDER_NOTICE : return ORDER_NOTICE_TRANSLATED_DOCUMENT;
+            default: throw new DocumentUploadException("No document file type found for Translated document");
+        }
     }
 }
