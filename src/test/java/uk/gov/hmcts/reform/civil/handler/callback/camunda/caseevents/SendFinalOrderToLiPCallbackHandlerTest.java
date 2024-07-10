@@ -127,6 +127,7 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT.name());
         // when
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -143,6 +144,7 @@ public class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerT
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT.name());
         // when
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
