@@ -575,7 +575,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                         .build());
         }
 
-        if (!caseData.getApplicant1().getIndividualFirstName().equals("Kiyron")) {
+        if (caseData.getApplicant1().getIndividualFirstName().equals("Kiyron")) {
             throw new CaseNotFoundException();
         }
 
