@@ -35,7 +35,8 @@ public class SendFinalOrderBulkPrintService {
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkTranslatedFinalOrderDocumentAvailable(caseData, task)) {
-            Document document = caseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink();
+            Document document = caseData.getSystemGeneratedCaseDocuments()
+                .get(caseData.getSystemGeneratedCaseDocuments().size() - 1).getValue().getDocumentLink();
             sendBulkPrint(authorisation, caseData, task, document, TRANSLATED_ORDER_PACK_LETTER_TYPE);
         }
     }
@@ -46,14 +47,15 @@ public class SendFinalOrderBulkPrintService {
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
         byte[] letterContent;
         try {
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+            //letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error("Failed getting letter content for Final Order ");
             throw new DocumentDownloadException(document.getDocumentFileName(), e);
         }
         List<String> recipients = getRecipientsList(caseData, task);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), letterType, recipients);
+        log.info("Sending bulk print");
+        //bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                    // caseData.getLegacyCaseReference(), letterType, recipients);
     }
 
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
@@ -68,7 +70,8 @@ public class SendFinalOrderBulkPrintService {
             List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
             return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
                 && isEligibleToGetTranslatedOrder(caseData, task)
-                && systemGeneratedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE_TRANSLATED_DOCUMENT);
+                && systemGeneratedDocuments
+                .get(systemGeneratedDocuments.size() - 1).getValue().getDocumentType().equals(ORDER_NOTICE_TRANSLATED_DOCUMENT);
         }
         return false;
     }
