@@ -187,7 +187,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenLessThan1000AndDuringSdo_locationIsPreferredLocation() {
+    void whenLessThan1000AndDuringSdo_locationIsPreferredLocation() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(999))
@@ -215,8 +215,8 @@ public class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
 
-        Assertions.assertThat(court.isPresent()).isTrue();
-        Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
+        Assertions.assertThat(court).isPresent();
+        Assertions.assertThat(court).contains(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
     }
 
     @Test
