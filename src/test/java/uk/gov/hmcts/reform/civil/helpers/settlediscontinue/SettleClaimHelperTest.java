@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.helpers;
+package uk.gov.hmcts.reform.civil.helpers.settlediscontinue;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
