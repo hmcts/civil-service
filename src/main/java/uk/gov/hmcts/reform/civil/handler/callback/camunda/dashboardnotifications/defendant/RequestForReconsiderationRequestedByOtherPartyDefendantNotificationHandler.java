@@ -54,7 +54,7 @@ public class RequestForReconsiderationRequestedByOtherPartyDefendantNotification
                 return SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT.getScenario();
             }
         } else {
-            if(caseData.getOrderRequestedForReviewDefendant() == YesOrNo.YES
+            if (caseData.getOrderRequestedForReviewDefendant() == YesOrNo.YES
                 && caseData.getOrderRequestedForReviewClaimant() == YesOrNo.YES) {
                 return SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE.getScenario();
             } else {
