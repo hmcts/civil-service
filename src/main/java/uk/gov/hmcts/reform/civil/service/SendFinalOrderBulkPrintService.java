@@ -53,7 +53,6 @@ public class SendFinalOrderBulkPrintService {
             throw new DocumentDownloadException(document.getDocumentFileName(), e);
         }
         List<String> recipients = getRecipientsList(caseData, task);
-        log.info("Sending bulk print");
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                      caseData.getLegacyCaseReference(), letterType, recipients);
     }
