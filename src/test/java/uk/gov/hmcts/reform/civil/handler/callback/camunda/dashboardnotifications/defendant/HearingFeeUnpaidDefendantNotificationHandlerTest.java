@@ -103,6 +103,8 @@ public class HearingFeeUnpaidDefendantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(), "DEFENDANT", "BEARER_TOKEN");
         }
 
         @Test
