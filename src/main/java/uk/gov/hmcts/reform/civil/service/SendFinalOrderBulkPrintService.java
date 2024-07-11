@@ -47,15 +47,15 @@ public class SendFinalOrderBulkPrintService {
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
         byte[] letterContent;
         try {
-            //letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error("Failed getting letter content for Final Order ");
             throw new DocumentDownloadException(document.getDocumentFileName(), e);
         }
         List<String> recipients = getRecipientsList(caseData, task);
         log.info("Sending bulk print");
-        //bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                    // caseData.getLegacyCaseReference(), letterType, recipients);
+        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                     caseData.getLegacyCaseReference(), letterType, recipients);
     }
 
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
