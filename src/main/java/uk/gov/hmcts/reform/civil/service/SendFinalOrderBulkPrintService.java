@@ -1,21 +1,20 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class SendFinalOrderBulkPrintService {
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkTranslatedFinalOrderDocumentAvailable(caseData, task)) {
-            Document document = caseData.getTranslatedDocuments().get(0).getValue().getFile();
+            Document document = caseData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink();
             sendBulkPrint(authorisation, caseData, task, document, TRANSLATED_ORDER_PACK_LETTER_TYPE);
         }
     }
@@ -66,10 +65,10 @@ public class SendFinalOrderBulkPrintService {
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
         if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<TranslatedDocument>> translatedDocuments = ListUtils.emptyIfNull(caseData.getTranslatedDocuments());
-            return (!translatedDocuments.isEmpty())
+            List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+            return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
                 && isEligibleToGetTranslatedOrder(caseData, task)
-                && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE);
+                && systemGeneratedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE_TRANSLATED_DOCUMENT);
         }
         return false;
     }

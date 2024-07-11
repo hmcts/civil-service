@@ -10,6 +10,7 @@ import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -17,8 +18,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
@@ -75,15 +74,15 @@ class SendFinalOrderBulkPrintServiceTest {
         return caseDataBuilder.build();
     }
 
-    private CaseData buildCaseDataForTranslatedOrder(Party party, TranslatedDocumentType documentType) {
-        TranslatedDocument translatedDocument = TranslatedDocument.builder().documentType(documentType).file(DOCUMENT_LINK).build();
+    private CaseData buildCaseDataForTranslatedOrder(Party party, DocumentType documentType) {
+        CaseDocument translatedDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder =
             CaseDataBuilder.builder().caseDataLip(
                 CaseDataLiP.builder()
                     .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
-                    .translatedDocuments(wrapElements(translatedDocument))
                     .build())
             .respondent1(party)
+                .systemGeneratedCaseDocuments(wrapElements(translatedDocument))
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -225,7 +224,7 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintTranslatedLetterToClaimantLiPSuccessfully() {
         // given
         Party claimant = PartyBuilder.builder().individual().build();
-        CaseData caseData = buildCaseDataForTranslatedOrder(claimant, TranslatedDocumentType.ORDER_NOTICE);
+        CaseData caseData = buildCaseDataForTranslatedOrder(claimant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
@@ -241,7 +240,7 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintTranslatedLetterToDefendantLiPSuccessfully() {
         // given
         Party defendant = PartyBuilder.builder().individual().build();
-        CaseData caseData = buildCaseDataForTranslatedOrder(defendant, TranslatedDocumentType.ORDER_NOTICE);
+        CaseData caseData = buildCaseDataForTranslatedOrder(defendant, DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
