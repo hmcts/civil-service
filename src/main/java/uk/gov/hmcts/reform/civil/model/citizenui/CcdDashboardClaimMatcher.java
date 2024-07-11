@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.math.BigDecimal;
@@ -19,11 +20,14 @@ public abstract class CcdDashboardClaimMatcher {
 
     public boolean hasDefendantRejectedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
-            && !caseData.isRespondentSignedSettlementAgreement() && !isSettled();
+            && !caseData.isRespondentSignedSettlementAgreement() && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean hasClaimantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired() && !isSettled();
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && !caseData.isSettlementAgreementDeadlineExpired() && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
@@ -52,5 +56,14 @@ public abstract class CcdDashboardClaimMatcher {
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && caseData.isSmallClaim()
             && (caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0);
+    }
+
+    public boolean isCaseStruckOut() {
+        return Objects.nonNull(caseData.getCaseDismissedHearingFeeDueDate());
+    }
+
+    public boolean hasResponseDeadlineBeenExtended() {
+        return caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 }

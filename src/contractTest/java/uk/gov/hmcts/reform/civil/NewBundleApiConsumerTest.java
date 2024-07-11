@@ -69,7 +69,6 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildCreateBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are documents to be bundled")
             .uponReceiving("a new bundle request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
@@ -207,7 +206,9 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
                                                            .stringType("description", "description")
                                                            .stringType("stitchStatus", "stitchStatus")
                                                            .stringType("fileName", "fileName")
-                                                           .date("createdOn", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                                                           .stringMatcher("createdOn",
+                                                                          "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                                                          "2020-10-06T18:54:48.785000")
                                                            .date("bundleHearingDate", "yyyy-MM-dd")
                                                            .object("stitchedDocument", stitchedDocument ->
                                                                stitchedDocument

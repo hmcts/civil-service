@@ -94,6 +94,8 @@ public interface Claim {
 
     boolean isSDOOrderInReviewOtherParty();
 
+    boolean isDecisionForReconsiderationMade();
+
     boolean isClaimantDefaultJudgement();
 
     boolean isPartialAdmissionAccepted();
@@ -125,4 +127,6 @@ public interface Claim {
     boolean isClaimSubmittedWaitingTranslatedDocuments();
 
     boolean isNocForDefendant();
+  
+    boolean isCaseStruckOut();
 }
