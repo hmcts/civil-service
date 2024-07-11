@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
