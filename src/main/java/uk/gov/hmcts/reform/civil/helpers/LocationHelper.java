@@ -61,12 +61,12 @@ public class LocationHelper {
         Supplier<Party.Type> getDefendantType;
         Supplier<Optional<RequestedCourt>> getDefendantCourt;
         if (leadDefendantIs1) {
-            log.debug("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
+            log.info("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent1()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent1DQ())
                 .map(Respondent1DQ::getRespondent1DQRequestedCourt);
         } else {
-            log.debug("Case {}, lead defendant is 2", caseData.getLegacyCaseReference());
+            log.info("Case {}, lead defendant is 2", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent2()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent2DQ())
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
@@ -74,18 +74,18 @@ public class LocationHelper {
 
         if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
-            log.debug(
+            log.info(
                 "Case {}, defendant is a person, so their court request has priority",
                 caseData.getLegacyCaseReference()
             );
             getDefendantCourt.get()
                 .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
-                    log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
+                    log.info("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
                 });
             getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
-                log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                log.info("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                 prioritized.add(requestedCourt);
             });
 
@@ -101,18 +101,18 @@ public class LocationHelper {
                 return byParties;
             }
         } else {
-            log.debug(
+            log.info(
                 "Case {}, defendant is a group, so claimant's court request has priority",
                 caseData.getLegacyCaseReference()
             );
             getClaimantRequestedCourt(caseData)
                 .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
-                    log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                    log.info("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
                 });
             getDefendantCourt.get().ifPresent(requestedCourt -> {
-                log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
+                log.info("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                 prioritized.add(requestedCourt);
             });
             return prioritized.stream().findFirst();
@@ -258,8 +258,8 @@ public class LocationHelper {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
         if (log.isDebugEnabled()) {
             String reference = updatedData.build().getLegacyCaseReference();
-            log.debug("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
-            log.debug(
+            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            log.info(
                 "Case {}, there {} a location matching to requested court",
                 reference,
                 matchingLocation.isPresent() ? "is" : "is not"
