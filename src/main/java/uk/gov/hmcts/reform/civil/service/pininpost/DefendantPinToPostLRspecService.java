@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -99,5 +100,11 @@ public class DefendantPinToPostLRspecService {
         DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked(caseReference);
         log.info("ocmc case reference {} defendent status is {}", caseReference, status.isLinked());
         return status.isLinked();
+    }
+
+    public boolean isDefendantLinked(CaseDetails caseDetails) {
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        IdamUserDetails defendantUserDetails = caseData.getDefendantUserDetails();
+        return defendantUserDetails != null && defendantUserDetails.getId() != null && defendantUserDetails.getEmail() != null;
     }
 }
