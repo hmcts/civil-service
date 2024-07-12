@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermis
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -83,6 +84,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                 caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
             }
         }
+
+        caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
 
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
