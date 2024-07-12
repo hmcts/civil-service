@@ -20,11 +20,14 @@ public abstract class CcdDashboardClaimMatcher {
 
     public boolean hasDefendantRejectedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
-            && !caseData.isRespondentSignedSettlementAgreement() && !isSettled();
+            && !caseData.isRespondentSignedSettlementAgreement() && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean hasClaimantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired() && !isSettled();
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && !caseData.isSettlementAgreementDeadlineExpired() && !isSettled()
+            && !caseData.isCcjRequestJudgmentByAdmission();
     }
 
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
