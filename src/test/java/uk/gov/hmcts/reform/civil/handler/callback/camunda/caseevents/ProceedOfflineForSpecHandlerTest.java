@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -15,14 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM_SPEC;
 
-@SpringBootTest(classes = {
-    ProceedOfflineForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
 class ProceedOfflineForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private ProceedOfflineForSpecCallbackHandler handler;
+    ProceedOfflineForSpecCallbackHandler handler;
+    @org.junit.jupiter.api.BeforeEach
+    public void setUp() {
+        handler = new uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.ProceedOfflineForSpecCallbackHandler(new com.fasterxml.jackson.databind.ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule()));
+    }
 
     @Test
     void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
