@@ -15,28 +15,9 @@ import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CONTACT_DETAILS_CHANGE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.*;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @Component
 public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
@@ -47,7 +28,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions() {
-        this.moveTo(CLAIM_NOTIFIED).onlyWhen(claimNotified)
+        this.moveTo(CLAIM_NOTIFIED).onlyWhen(claimNotified.and(not(judgeOrderVerificationRequired)))
             .moveTo(TAKEN_OFFLINE_BY_STAFF).onlyWhen(takenOfflineByStaffAfterClaimIssue)
             .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyWhen(takenOfflineAfterClaimNotified)
             .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyWhen(pastClaimNotificationDeadline)
@@ -56,7 +37,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)))
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true))
             .moveTo(FULL_DEFENCE).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
-                                               .and(not(pastClaimNotificationDeadline)))
+                                               .and(not(pastClaimNotificationDeadline)).and(not(judgeOrderVerificationRequired)))
             .moveTo(PART_ADMISSION).onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
             .moveTo(FULL_ADMISSION).onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
             .moveTo(COUNTER_CLAIM).onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
@@ -67,7 +48,9 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
             .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim))
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE)
-            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim));
+            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim))
+            .moveTo(CASE_DISCONTINUED).onlyWhen(judgeOrderVerificationRequired)
+            .set(flags -> flags.put(FlowFlag.JUDGE_ORDER_VERIFICATION_REQUIRED.name(), true));
     }
 
     public static final Predicate<CaseData> claimNotified = caseData ->

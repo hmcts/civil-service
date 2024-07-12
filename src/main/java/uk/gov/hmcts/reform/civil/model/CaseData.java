@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
@@ -685,8 +687,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
     private SettlementReason settleReason;
     private final MarkPaidConsentList markPaidConsent;
-    private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
-    private DiscontinuanceTypeList typeOfDiscontinuance;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -1537,6 +1537,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgeOrderVerificationRequired() {
-        return (this.getCourtPermissionNeeded() != null || CourtPermissionNeeded.YES.equals(this.getCourtPermissionNeeded()));
+        return (this.getCourtPermissionNeeded() != null || SettleDiscontinueYesOrNoList.YES.equals(this.getCourtPermissionNeeded()));
     }
 }
