@@ -6,33 +6,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.CourtPermissionNeeded;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper.is1v2LrVLrCase;
 
 @Service
@@ -196,9 +189,16 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         return (isNotBothClaimantsSelected || isNotAgainstBothDefendants);
     }
 
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(updateCaseState(caseData))
+                .build();
+    }
+
     private String updateCaseState(CaseData caseData) {
         if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
-            boolean isNoCourtPermission = CourtPermissionNeeded.NO.equals(caseData.getCourtPermissionNeeded());
+            boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
             if (isNoCourtPermission && isCaseDiscontinued(caseData)) {
                 return CASE_DISCONTINUED.name();
             }
