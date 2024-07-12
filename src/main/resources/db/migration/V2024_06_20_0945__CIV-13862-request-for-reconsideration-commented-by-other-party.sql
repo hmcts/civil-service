@@ -7,13 +7,13 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
   Create a notification for the Defendant to know
  */
 VALUES ('Scenario.AAA6.CP.ReviewOrderRequestedbyRecipient.Defendant',
-        '{}', '{"Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant": []}'),
+        '{Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Claimant}', '{"Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Defendant": []}'),
 /**
   Defendant has commented the request for SDO reconsideration that Claimant created in the first place
   Create a notification for the Claimant to know
  */
  ('Scenario.AAA6.CP.ReviewOrderRequestedbyRecipient.Claimant',
-        '{}', '{"Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Claimant": []}');
+        '{Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Defendant}', '{"Notice.AAA6.CP.ReviewOrderRequestedbyRecipient.Recipient.Claimant": []}');
 
 /**
  * Add notification template
