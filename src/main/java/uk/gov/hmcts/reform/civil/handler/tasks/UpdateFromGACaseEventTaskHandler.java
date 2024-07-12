@@ -65,7 +65,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                         "General application parent case link not found"));
 
             generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
-                                                                       .getCase(parseLong(generalAppCaseId)));
+                .getCase(parseLong(generalAppCaseId)));
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
                 civilCaseId,
@@ -128,7 +128,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
     @SuppressWarnings("unchecked")
     protected int checkIfDocumentExists(List<Element<?>> civilCaseDocumentList,
-                                      List<Element<?>> gaCaseDocumentlist) {
+                                        List<Element<?>> gaCaseDocumentlist) {
         if (gaCaseDocumentlist.get(0).getValue().getClass().equals(CaseDocument.class)) {
             List<Element<CaseDocument>> civilCaseList = civilCaseDocumentList.stream()
                 .map(element -> (Element<CaseDocument>) element)
@@ -138,8 +138,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                 .toList();
 
             return civilCaseList.stream().filter(civilDocument -> gaCaseList
-                .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentLink()
-                    .equals(civilDocument.getValue().getDocumentLink()))).toList().size();
+                .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentLink().getDocumentUrl()
+                    .equals(civilDocument.getValue().getDocumentLink().getDocumentUrl()))).toList().size();
         } else {
             List<Element<Document>> civilCaseList = civilCaseDocumentList.stream()
                 .map(element -> (Element<Document>) element)
@@ -155,7 +155,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         }
     }
 
-    protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
+    protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName)
+        throws Exception {
         String civilDocPrefix = docFieldName;
         if (civilDocPrefix.equals("generalAppEvidence")) {
             civilDocPrefix = "gaEvidence";
@@ -181,50 +182,50 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
         String toCivilStaffList = civilDocPrefix + CIVIL_DOC_STAFF_SUFFIX;
         updateDocCollection(output, generalAppCaseData, fromGaList,
-                civilCaseData, toCivilStaffList);
+            civilCaseData, toCivilStaffList);
         //Claimant collection will hold ga doc accessible for Claimant
         String toCivilClaimantList = civilDocPrefix + CIVIL_DOC_CLAIMANT_SUFFIX;
         if (canViewClaimant(civilCaseData, generalAppCaseData)) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
-                    civilCaseData, toCivilClaimantList);
+                civilCaseData, toCivilClaimantList);
         }
         //RespondentSol collection will hold ga doc accessible for RespondentSol1
         String toCivilRespondentSol1List = civilDocPrefix + CIVIL_DOC_RESPONDENT_SOL_SUFFIX;
         if (canViewResp(civilCaseData, generalAppCaseData, "1")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
-                    civilCaseData, toCivilRespondentSol1List);
+                civilCaseData, toCivilRespondentSol1List);
         }
         //Respondent2Sol collection will hold ga doc accessible for RespondentSol2
         String toCivilRespondentSol2List = civilDocPrefix + CIVIL_DOC_RESPONDENT_SOL_TWO_SUFFIX;
         if (canViewResp(civilCaseData, generalAppCaseData, "2")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
-                    civilCaseData, toCivilRespondentSol2List);
+                civilCaseData, toCivilRespondentSol2List);
         }
     }
 
     /**
      * Update GA document collection at civil case.
      *
-     * @param output      output map for update civil case.
-     * @param civilCaseData civil case data.
-     * @param generalAppCaseData    GA case data.
-     * @param fromGaList base ga field name.
-     *                     when get from GA data,
-     *                     add 'get' to the name then call getter to access related GA document field.
-     * @param toCivilList base civil field name.
-     *                     when get from Civil data,
-     *                     add 'get' to the name then call getter to access related Civil document field.
-     *                    when update output, use name as key to hold to-be-update collection
+     * @param output             output map for update civil case.
+     * @param civilCaseData      civil case data.
+     * @param generalAppCaseData GA case data.
+     * @param fromGaList         base ga field name.
+     *                           when get from GA data,
+     *                           add 'get' to the name then call getter to access related GA document field.
+     * @param toCivilList        base civil field name.
+     *                           when get from Civil data,
+     *                           add 'get' to the name then call getter to access related Civil document field.
+     *                           when update output, use name as key to hold to-be-update collection
      */
     @SuppressWarnings("unchecked")
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
-                        CaseData civilCaseData, String toCivilList) throws Exception {
+                                       CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
-                                                     "get" + StringUtils.capitalize(fromGaList));
+            "get" + StringUtils.capitalize(fromGaList));
         List<Element<?>> gaDocs =
             (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
-                                                        "get" + StringUtils.capitalize(toCivilList));
+            "get" + StringUtils.capitalize(toCivilList));
         List<Element<?>> civilDocs =
             (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
@@ -247,8 +248,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
-                        .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
+            .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
+                .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
     }
 
     protected boolean canViewResp(CaseData civilCaseData, CaseData generalAppCaseData, String respondent) {
@@ -262,7 +263,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
-                        .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
+            .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
+                .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
     }
 }
