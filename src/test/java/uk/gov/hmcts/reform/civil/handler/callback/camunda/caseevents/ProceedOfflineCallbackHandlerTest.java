@@ -15,12 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    ProceedOfflineCallbackHandler handler ;
+    ProceedOfflineCallbackHandler handler;
 
     @BeforeEach
     public void setUp() {
         handler = new ProceedOfflineCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()));
     }
+
     @Test
     void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();

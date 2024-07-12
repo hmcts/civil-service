@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -15,9 +18,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_
 class ProceedOfflineForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     ProceedOfflineForSpecCallbackHandler handler;
-    @org.junit.jupiter.api.BeforeEach
+
+    @BeforeEach
     public void setUp() {
-        handler = new uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.ProceedOfflineForSpecCallbackHandler(new com.fasterxml.jackson.databind.ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule()));
+        handler = new ProceedOfflineForSpecCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()));
     }
 
     @Test
