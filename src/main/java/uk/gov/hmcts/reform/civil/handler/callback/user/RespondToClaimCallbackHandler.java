@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
@@ -19,7 +21,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -30,8 +31,6 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -40,13 +39,15 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -106,14 +107,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -236,13 +238,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
-                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-                    }
-                }
+            } else if (respondent2HasSameLegalRep(caseData)
+                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
+                && (caseData.getRespondent2DQ() != null
+                && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
             }
         }
         return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
@@ -255,13 +255,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
-                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
-                    }
-                }
+            } else if (respondent2HasSameLegalRep(caseData)
+                && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
+                && (caseData.getRespondent2DQ() != null
+                && caseData.getRespondent2DQ().getRespondent2DQExperts() != null)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
             }
         }
         return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
@@ -271,16 +269,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
         Hearing hearing = caseData.getRespondent1DQ().getHearing();
 
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                hearing = caseData.getRespondent2DQ().getHearing();
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
-                        hearing = caseData.getRespondent2DQ().getHearing();
-                    }
-                }
-            }
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            && (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || (respondent2HasSameLegalRep(caseData)
+            && caseData.getRespondentResponseIsSame() != null
+            && caseData.getRespondentResponseIsSame() == NO
+            && caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getHearing() != null))) {
+            hearing = caseData.getRespondent2DQ().getHearing();
         }
 
         List<String> errors = unavailableDateValidator.validate(hearing);
@@ -351,10 +347,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
-            if (caseData.getRespondent1Copy().getPrimaryAddress() == null) {
-                throw new IllegalArgumentException("Primary Address cannot be empty");
-            }
+        if (ofNullable(caseData.getRespondent1Copy()).isPresent()
+            && (caseData.getRespondent1Copy().getPrimaryAddress() == null)) {
+            throw new IllegalArgumentException("Primary Address cannot be empty");
         }
 
         // persist respondent address (ccd issue)
@@ -518,6 +513,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         if (toggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToRespondentExperts(updatedData);
@@ -748,15 +744,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
-        );
+        return solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, caseRole);
     }
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {

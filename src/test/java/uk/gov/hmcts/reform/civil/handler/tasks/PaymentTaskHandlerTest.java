@@ -27,7 +27,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.util.Map;
 
@@ -47,8 +50,10 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHa
     PaymentTaskHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
-})
+    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 class PaymentTaskHandlerTest {
 
@@ -88,6 +93,7 @@ class PaymentTaskHandlerTest {
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                                                   FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                                                   FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                                                  FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                                                   FlowFlag.BULK_CLAIM_ENABLED.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();

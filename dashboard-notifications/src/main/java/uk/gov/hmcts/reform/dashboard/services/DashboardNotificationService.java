@@ -105,4 +105,9 @@ public class DashboardNotificationService {
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
         return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
     }
+
+    public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {
+        int deleted = dashboardNotificationsRepository.deleteByReferenceAndCitizenRole(reference, citizenRole);
+        log.info("{} notifications removed for claim = {}", deleted, reference);
+    }
 }

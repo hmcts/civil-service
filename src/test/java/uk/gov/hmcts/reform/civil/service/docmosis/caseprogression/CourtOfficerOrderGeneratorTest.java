@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +17,12 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -57,6 +55,7 @@ class CourtOfficerOrderGeneratorTest {
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
         .courtAddress("12").postcode("34")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+        .externalShortName("Court Name Short")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("123456").build();
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("123456").build();
@@ -68,13 +67,13 @@ class CourtOfficerOrderGeneratorTest {
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
     @Autowired
     private CourtOfficerOrderGenerator generator;
 
     @BeforeEach
     public void setUp() {
-        when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
         when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
         when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
             locationRefData
@@ -149,31 +148,13 @@ class CourtOfficerOrderGeneratorTest {
         when(documentManagementService
                  .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
             .thenReturn(COURT_OFFICER_ORDER_DOC);
+        when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1111111").build())
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, "BEARER_TOKEN"));
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldThrowLocationRefDataExceptionOnGeneratingFreeFormOrder_whenLocationServiceDoesNotReturnOnlyASingleLocation() {
-        when(locationRefDataService.getCourtLocationsByEpimmsId("BEARER_TOKEN", caseManagementLocation.getBaseLocation()))
-            .thenReturn(List.of(locationRefData, locationRefData));
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(COURT_OFFICER_ORDER_PDF)))
-            .thenReturn(new DocmosisDocument(COURT_OFFICER_ORDER_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService
-                 .uploadDocument("BEARER_TOKEN", new PDF(courtOrderFileName, bytes, COURT_OFFICER_ORDER)))
-            .thenReturn(COURT_OFFICER_ORDER_DOC);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .caseManagementLocation(caseManagementLocation)
-            .build();;
-
-        assertThrows(LocationRefDataException.class, () -> generator.generate(caseData, "BEARER_TOKEN"),
-                     "Unexpected amount of locations (2) where matched against location epimms id: 123456"
-        );
     }
 
 }

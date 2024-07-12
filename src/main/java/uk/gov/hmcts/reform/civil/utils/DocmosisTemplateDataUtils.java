@@ -72,8 +72,8 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
-            String errorMsg = String.format("Applicant1 not found for claim number: "
-                                                + caseData.getCcdCaseReference());
+            String errorMsg = String.format("Applicant1 not found for claim number: %s",
+                                            caseData.getCcdCaseReference());
             log.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }

@@ -3,16 +3,16 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant',
-        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+        '{}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant',
-        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+        '{}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
         ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant',
-        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+         '{}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant" : ["hearingDueDateEn", "hearingDueDateCy"]}'),
        ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Defendant',
-        '{"Notice.AAA6.CP.Hearing.Scheduled.BothParties"}',
+        '{}',
         '{"Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant" : ["hearingDueDateEn", "hearingDueDateCy"]}');
 
 /**
@@ -21,12 +21,12 @@ VALUES ('Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant',
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant', 'The claim has been struck out', 'Mae''r hawliad wedi cael ei ddileu',
-        '<p class="govuk-body">This is because the hearing fee was not paid by ${hearingDueDateEn} as stated in the <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">hearing notice.</a></p>',
-        '<p class="govuk-body">Y rheswm am hyn yw na thalwyd ffi''r gwrandawiad erbyn ${hearingDueDateCy} fel y nodir yn yr <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">hysbysiad o wrandawiad.</a></p>',
+        '<p class="govuk-body">This is because the hearing fee was not paid by ${hearingDueDateEn} as stated in the <a href="{VIEW_HEARING_NOTICE}" rel="noopener noreferrer" target="_blank" class="govuk-link">hearing notice</a>.</p>',
+        '<p class="govuk-body">Y rheswm am hyn yw na thalwyd ffi''r gwrandawiad erbyn ${hearingDueDateCy} fel y nodir yn yr <a href="{VIEW_HEARING_NOTICE}" rel="noopener noreferrer" target="_blank" class="govuk-link">hysbysiad o wrandawiad</a>.</p>',
         'CLAIMANT'),
        ('Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant', 'The claim has been struck out', 'Mae''r hawliad wedi cael ei ddileu',
-        '<p class="govuk-body">This is because the hearing fee was not paid by ${hearingDueDateEn} as stated in the <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">hearing notice.</a></p>',
-        '<p class="govuk-body">Y rheswm am hyn yw na thalwyd ffi''r gwrandawiad erbyn ${hearingDueDateCy} fel y nodir yn yr <a href="{VIEW_HEARING_NOTICE}" class="govuk-link">hysbysiad o wrandawiad.</a></p>',
+        '<p class="govuk-body">This is because the hearing fee was not paid by ${hearingDueDateEn} as stated in the <a href="{VIEW_HEARING_NOTICE}" rel="noopener noreferrer" target="_blank" class="govuk-link">hearing notice</a>.</p>',
+        '<p class="govuk-body">Y rheswm am hyn yw na thalwyd ffi''r gwrandawiad erbyn ${hearingDueDateCy} fel y nodir yn yr <a href="{VIEW_HEARING_NOTICE}" rel="noopener noreferrer" target="_blank" class="govuk-link">hysbysiad o wrandawiad</a>.</p>',
         'DEFENDANT');
 
 /**

@@ -114,7 +114,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED_HEADER);
+        } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both"))) {
@@ -126,7 +128,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()) {
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
+        } else if (caseData.isLRvLipOneVOne()) {
             return format(JUDGMENT_REQUESTED_LIP_CASE);
         } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
@@ -182,7 +189,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
@@ -404,8 +411,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getRepaymentDate().isBefore(eligibleDate.plusDays(1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }

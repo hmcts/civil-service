@@ -43,7 +43,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,8 +90,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
     CaseEventTaskHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
-})
+    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
 
@@ -643,6 +648,7 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
@@ -650,18 +656,27 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_ADMISSION)
                 || state.equals(PART_ADMISSION)
                 || state.equals(COUNTER_CLAIM)
-                || state.equals(FULL_DEFENCE_PROCEED)
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)
                 || state.equals(CLAIM_DETAILS_NOTIFIED)
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                               FlowFlag.BULK_CLAIM_ENABLED.name(), false
+                );
+            } else if (state.equals(FULL_DEFENCE_PROCEED)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.MINTI_ENABLED.name(), false
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                          FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                           FlowFlag.BULK_CLAIM_ENABLED.name(), false
                     );
         }

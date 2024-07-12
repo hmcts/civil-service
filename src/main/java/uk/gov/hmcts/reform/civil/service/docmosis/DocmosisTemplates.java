@@ -20,8 +20,8 @@ public enum DocmosisTemplates {
     N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", "default_judgment_spec_form_%s.pdf"),
     N121_SPEC_CLAIMANT("CV-SPC-DEC-ENG-00912.docx", "default_judgment_spec_form_%s.pdf"),
     N121("CV-UNS-DEC-ENG-01280.docx", "default_judgment_form_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1v1("CV-SPC-HRN-ENG-01361.docx", "%s_response_sealed_form.pdf"),
-    DEFENDANT_RESPONSE_SPEC_SEALED_1v2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V1("CV-SPC-HRN-ENG-01361.docx", "%s_response_sealed_form.pdf"),
+    DEFENDANT_RESPONSE_SPEC_SEALED_1V2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS("CV-SPC-HRN-ENG-01362.docx", "%s_response_sealed_form.pdf"),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     SDO_DISPOSAL("CV-UNS-STD-ENG-01381.docx", "disposal_hearing_sdo_%s.pdf"),
@@ -72,6 +72,7 @@ public enum DocmosisTemplates {
     HEARING_FAST_TRACK_AHN("CV-UNS-HNO-ENG-01203.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION_AHN("CV-UNS-HNO-ENG-01204.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_claim_%s.pdf"),
+    REQUEST_FOR_RECONSIDERATION("CV-SPC-CLM-ENG-REQUEST-RECONSIDERATION.docx", "%s_request_for_reconsideration.pdf"),
 
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
@@ -86,7 +87,11 @@ public enum DocmosisTemplates {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
-    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf");
+    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf"),
+    JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
+    JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
+    JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
+    JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf");
 
     private final String template;
     private final String documentTitle;

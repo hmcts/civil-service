@@ -23,12 +23,14 @@ java:
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    CASE_FLAGS_LOGGING_ENABLED: true
+    SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
       secrets:
         - name: civil-idam-client-secret
-          alias: idam.client.secret
+          alias: CIVIL_CLIENT_SECRET
         - name: microservicekey-civil-service
           alias: idam.s2s-auth.totp_secret
         - name: system-update-user-username
@@ -112,10 +114,14 @@ xui-webapp:
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    devcpuRequests: 500m
-    devmemoryRequests: 512Mi
-    devcpuLimits: 1
-    devmemoryLimits: 1Gi
+    memoryRequests: 2Gi
+    cpuRequests: 2000m
+    memoryLimits: 4Gi
+    cpuLimits: 3500m
+    devmemoryRequests: 6Gi
+    devcpuRequests: 2000m
+    devmemoryLimits: 8Gi
+    devcpuLimits: 4500m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health

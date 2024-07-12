@@ -34,12 +34,13 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -48,8 +49,10 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
@@ -113,19 +116,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final UnavailableDateValidator unavailableDateValidator;
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private static final String datePattern = "dd MMMM yyyy";
+    private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you cannot attend hearing within next 3 months.";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.";
@@ -426,6 +430,26 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
+        // Copy Clm1 DQ FRC to Clm2 DQ
+        if (getMultiPartyScenario(caseData) == TWO_V_ONE
+            && caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
+            if (caseData.getApplicant2DQ() == null
+                || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
+                FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
+
+                builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
+                    FixedRecoverableCosts.builder()
+                            .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
+                            .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
+                            .band(app1Frc.getBand())
+                            .reasons(app1Frc.getReasons())
+                            .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
+                            .build())
+                    .build());
+            }
+        }
+
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
                                                                        featureToggleService.isUpdateContactDetailsEnabled());
 
@@ -493,6 +517,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         builder.businessProcess(businessProcess);
 
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)
@@ -526,7 +552,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -705,18 +731,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondToAdmittedClaim() != null
             && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
             return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return deadlineCalculatorService.calculateExtendedDeadline(
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH));
         }
         return null;
     }
@@ -767,8 +793,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             errors.add("Enter a valid amount for equal instalments");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
             1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));

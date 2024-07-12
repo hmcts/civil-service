@@ -227,7 +227,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 
@@ -254,7 +254,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 
@@ -282,7 +282,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 

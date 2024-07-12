@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
@@ -26,9 +25,13 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -66,6 +69,9 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     FeatureToggleService.class,
     AssignCategoryId.class
 })
@@ -110,8 +116,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isEqualTo(response.getData().get("respondent2"));
+            assertThat(response.getData())
+                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
+            assertThat(response.getData())
+                .containsEntry("respondent2Copy", response.getData().get("respondent2"));
         }
 
         @Test
@@ -159,7 +167,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
+            assertThat(response.getData())
+                .containsEntry("respondent1Copy", response.getData().get("respondent1"));
             assertThat(response.getData().get("respondent2Copy")).isNull();
         }
 
@@ -174,8 +183,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
-                                 .individualDateOfBirth(LocalDate.now().plusDays(1))
-                                 .build())
+                    .individualDateOfBirth(LocalDate.now().plusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -188,8 +197,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().soleTrader()
-                                 .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
-                                 .build())
+                    .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -202,8 +211,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().individual()
-                                 .individualDateOfBirth(LocalDate.now().minusYears(1))
-                                 .build())
+                    .individualDateOfBirth(LocalDate.now().minusYears(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -216,8 +225,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(PartyBuilder.builder().soleTrader()
-                                 .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
-                                 .build())
+                    .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -501,8 +510,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
                 .solicitorReferencesCopy(SolicitorReferences.builder()
-                                             .respondentSolicitor1Reference("abc")
-                                             .build())
+                    .respondentSolicitor1Reference("abc")
+                    .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -534,8 +543,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             + "%n%n[Download the Acknowledgement of Claim form]"
                             + "(/cases/case-details/%s#CaseDocuments)",
 
-                formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference())
-                                          + exitSurveyContentService.respondentSurvey())
+                        formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference())
+                        + exitSurveyContentService.respondentSurvey())
                     .build());
         }
     }

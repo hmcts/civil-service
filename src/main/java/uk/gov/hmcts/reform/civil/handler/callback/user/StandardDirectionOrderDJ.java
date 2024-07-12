@@ -61,12 +61,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -79,9 +79,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -94,6 +92,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -108,7 +108,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private static final String UNSPEC_SERVICE_ID = "AAA7";
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
@@ -220,7 +220,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .getListItems()
                 .stream()
                 .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-                .collect(Collectors.toList());
+                .toList();
             hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
             hearingMethodList.setValue(hearingMethodListWithoutNotInAttendance.stream().filter(
                 elem -> HearingMethod.IN_PERSON.getLabel().equals(elem.getLabel())).findFirst().orElse(null));
@@ -745,11 +745,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationReferenceDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationReferenceDataService::getDisplayEntry,
                                                  null, true
             );
         }
@@ -775,16 +775,26 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isEarlyAdoptersEnabled()) {
-            // check epimm from judge selected court in SDO journey
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                // check epimm from case management location
-                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+                caseDataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+                caseDataBuilder.eaCourtLocation(NO);
+            }
+        } else {
+            if (featureToggleService.isEarlyAdoptersEnabled()) {
+                // check epimm from judge selected court in SDO journey
+                if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+                    // check epimm from case management location
+                    && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+                } else {
+                    log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+                }
             }
         }
 
@@ -909,39 +919,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             return null;
         }
         return DynamicList.builder().value(list.getValue()).build();
-    }
-
-    private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
-                                                      DynamicList caseDataList) {
-        if (Objects.isNull(caseDataList) || Objects.isNull(locations)) {
-            return null;
-        }
-        String locationLabel = caseDataList.getValue().getLabel();
-        var preferredLocation =
-            locations
-                .stream()
-                .filter(locationRefData -> checkLocation(
-                    locationRefData,
-                    locationLabel
-                )).findFirst();
-        return preferredLocation.orElse(null);
-    }
-
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
-        String locationLabel = location.getSiteName()
-            + " - " + location.getCourtAddress()
-            + " - " + location.getPostcode();
-        return locationLabel.equals(locationTempLabel);
-    }
-
-    private DynamicList getLocationListFromCaseData(DynamicList hearingList, DynamicList trialList) {
-        if (nonNull(hearingList) && nonNull(hearingList.getValue())) {
-            return hearingList;
-        } else if (nonNull(trialList) && nonNull(trialList.getValue())) {
-            return trialList;
-        } else {
-            return null;
-        }
     }
 
     private String validateInputValue(CallbackParams callbackParams) {

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 
-public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrationTest {
+public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
 
     @Autowired
     private HearingScheduledClaimantNotificationHandler handler;
@@ -35,7 +35,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
@@ -60,11 +60,16 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Your hearing has been scheduled for 1 April 2024 at "
                         + "Name. Please keep your contact details and anyone you wish to rely on in court up" +
-                        " to date. You can update contact details by telephoning the court at 0300 123 7050." +
-                        " <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a>.</p>"),
+                        " to date. You can update contact details by telephoning the court at 0300 123 7050.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" " +
+                        "target=\"_blank\" class=\"govuk-link\">View the hearing notice</a></p>"),
                 jsonPath("$[0].titleCy").value("Mae gwrandawiad wedi'i drefnu"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae eich gwrandawiad wedi'i drefnu ar gyfer 1 Ebrill 2024 yn Name. Cadwch eich manylion cyswllt chi a manylion cyswllt unrhyw un yr hoffech ddibynnu arnynt yn y llys yn gyfredol. Gallwch ddiweddaru manylion cyswllt drwy ffonio'r llys ar 0300 303 5174. <a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Gweld yr hysbysiad o wrandawiad</a>.</p>")
+                    "<p class=\"govuk-body\">Mae eich gwrandawiad wedi'i drefnu ar gyfer 1 Ebrill 2024 yn Name. " +
+                        "Cadwch eich manylion cyswllt chi a manylion cyswllt unrhyw un yr hoffech ddibynnu arnynt yn y llys yn gyfredol. " +
+                        "Gallwch ddiweddaru manylion cyswllt drwy ffonio'r llys ar 0300 303 5174.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" " +
+                        "class=\"govuk-link\">Gweld yr hysbysiad o wrandawiad</a></p>")
             );
 
         //Verify task Item is created
@@ -94,7 +99,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();

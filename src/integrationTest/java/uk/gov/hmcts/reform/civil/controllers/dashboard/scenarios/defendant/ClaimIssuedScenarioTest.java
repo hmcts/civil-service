@@ -86,8 +86,10 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[11].currentStatusEn").value("Available"),
                 jsonPath("$[12].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[12].currentStatusEn").value("Not available yet"),
-                jsonPath("$[13].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[13].currentStatusEn").value("Not available yet")
+                jsonPath("$[13].taskNameEn").value("<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Contact the court to request a change to my case</a>"),
+                jsonPath("$[13].currentStatusEn").value("Optional"),
+                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[14].currentStatusEn").value("Not available yet")
 
             );
 
@@ -96,11 +98,11 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("You haven´t responded to the claim"),
+                jsonPath("$[0].titleEn").value("You haven't responded to the claim"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You need to respond before 4pm on 6 May 2024."
-                               + " There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
-                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
+                               + " There are {daysLeftToRespond} days remaining.</p><p class=\"govuk-body\"><a href=\"{RESPONSE_TASK_LIST_URL}\""
+                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a></p>")
             );
     }
 
@@ -162,8 +164,10 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[12].currentStatusEn").value("Available"),
                 jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),
-                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[14].currentStatusEn").value("Not available yet")
+                jsonPath("$[14].taskNameEn").value("<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Contact the court to request a change to my case</a>"),
+                jsonPath("$[14].currentStatusEn").value("Optional"),
+                jsonPath("$[15].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[15].currentStatusEn").value("Not available yet")
 
             );
 
@@ -172,11 +176,12 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("You haven´t responded to the claim"),
+                jsonPath("$[0].titleEn").value("You haven't responded to the claim"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">You need to respond before 4pm on 6 May 2024."
-                               + " There are {daysLeftToRespond} days remaining. <a href=\"{RESPONSE_TASK_LIST_URL}\""
-                               + "  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.</p>")
+                               + " There are {daysLeftToRespond} days remaining.</p><p class=\"govuk-body\">" +
+                               "<a href=\"{RESPONSE_TASK_LIST_URL}\"  rel=\"noopener noreferrer\" " +
+                               "class=\"govuk-link\">Respond to the claim</a></p>")
             );
     }
 }

@@ -14,11 +14,21 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_FAST_TRACK;
 
 @Service
 public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE);
+    private static final List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
+            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
+    private static final List<CaseState> caseMovedInCaseManStatesCaseProgression =
+        List.of(CaseState.CASE_PROGRESSION,
+                CaseState.HEARING_READINESS,
+                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
+                CaseState.DECISION_OUTCOME,
+                CaseState.All_FINAL_ORDERS_ISSUED);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCaseProceedOffline";
 
     public CaseProceedOfflineClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
@@ -39,13 +49,21 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     @Override
     public String getScenario(CaseData caseData) {
+        if (featureToggleService.isCaseProgressionEnabled() && caseData.isFastTrackClaim()) {
+            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_FAST_TRACK.getScenario();
+        }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario();
     }
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return ((CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getPreviousCCDState()
-                || CaseState.AWAITING_APPLICANT_INTENTION == caseData.getPreviousCCDState())
-                && caseData.isLipvLipOneVOne());
+        return (caseData.getPreviousCCDState() != null && caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
+                && caseData.isLipvLipOneVOne()) || (shouldRecordScenarioInCaseProgression(caseData));
+    }
+
+    public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
+        return featureToggleService.isCaseProgressionEnabled()
+            && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
+            && caseData.isLipvLipOneVOne();
     }
 }

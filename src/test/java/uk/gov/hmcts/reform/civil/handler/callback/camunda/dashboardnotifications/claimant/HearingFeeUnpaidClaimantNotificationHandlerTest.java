@@ -72,7 +72,7 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         }
 
         @Test
@@ -102,6 +102,8 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(), "CLAIMANT", "BEARER_TOKEN");
         }
 
         @Test

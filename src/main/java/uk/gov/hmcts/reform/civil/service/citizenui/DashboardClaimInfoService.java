@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -80,8 +79,7 @@ public class DashboardClaimInfoService {
 
     private List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         log.info("-----------calling ocmc claimant claims-------------");
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorisation, claimantId);
-        return ocmcClaims;
+        return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
     }
 
     private List<DashboardClaimInfo> getDashboardItemsForCurrentPage(List<DashboardClaimInfo> ocmcClaims,
@@ -114,7 +112,7 @@ public class DashboardClaimInfoService {
     private List<DashboardClaimInfo> sortOcmcCases(List<DashboardClaimInfo> ocmcCases) {
         return ocmcCases.stream()
             .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims, boolean isClaimant) {
@@ -126,7 +124,7 @@ public class DashboardClaimInfoService {
                 caseDetails,
                 isClaimant
             ))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails, boolean isClaimant) {
@@ -150,6 +148,9 @@ public class DashboardClaimInfoService {
 
         if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+        if (caseData.getActiveJudgment() != null) {
+            item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
         }
 
         return item;

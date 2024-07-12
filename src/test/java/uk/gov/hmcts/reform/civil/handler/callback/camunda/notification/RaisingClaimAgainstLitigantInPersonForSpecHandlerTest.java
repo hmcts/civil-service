@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 @SpringBootTest(classes = {
     RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler.class
 })
-public class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
+class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     private static final String TEMPLATE_ID = "template-id";
 

@@ -1,0 +1,23 @@
+{
+  "payment_groups":[
+    {
+      "payment_group_reference":"2022-1655915218557",
+      "date_created":"2022-06-22T16:26:58.660+00:00",
+      "date_updated":"2022-06-22T16:26:58.660+00:00",
+      "fees":[
+        {
+          "id":1,
+          "code":"FEE0442",
+          "version":"2",
+          "volume":1,
+          "calculated_amount":275,
+          "ccd_case_number":"1655902469266236",
+          "date_created":"2022-06-22T16:26:58.603+00:00",
+          "date_updated":"2022-06-22T16:26:58.727+00:00",
+          "amount_due":275
+        }
+      ],
+      "service_request_status":"Not paid"
+    }
+  ]
+}

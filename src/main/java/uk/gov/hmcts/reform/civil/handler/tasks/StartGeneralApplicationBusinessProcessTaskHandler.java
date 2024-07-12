@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
 
@@ -36,7 +36,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
 
     private VariableMap variables;
 
@@ -77,15 +77,16 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
 
         if (firstGA.isPresent()) {
             GeneralApplication ga = firstGA.get().getValue();
-            switch (ga.getBusinessProcess().getStatusOrDefault()) {
-                case READY:
-                case DISPATCHED:
-                    ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
-                    return updateBusinessProcess(caseId, startEventResponse, generalApplications);
-                default:
-                    throw new BpmnError("ABORT");
+            String status = String.valueOf(ga.getBusinessProcess().getStatusOrDefault());
+
+            if (status.equals("READY") || status.equals("DISPATCHED")) {
+                ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
+                return updateBusinessProcess(caseId, startEventResponse, generalApplications);
+            } else {
+                throw new BpmnError("ABORT");
             }
         }
+
         return data;
     }
 
