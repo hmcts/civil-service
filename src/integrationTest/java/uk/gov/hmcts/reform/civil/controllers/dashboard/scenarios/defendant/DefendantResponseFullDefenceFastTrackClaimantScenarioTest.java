@@ -16,6 +16,7 @@ import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 
 public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends DashboardBaseIntegrationTest {
@@ -38,6 +39,7 @@ public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends D
             .respondent1(Party.builder().individualFirstName("James")
                     .individualLastName("John").type(Party.Type.INDIVIDUAL).build())
             .responseClaimTrack(FAST_CLAIM.name())
+            .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .build();
 
         handler.handle(callbackParams(caseData));
