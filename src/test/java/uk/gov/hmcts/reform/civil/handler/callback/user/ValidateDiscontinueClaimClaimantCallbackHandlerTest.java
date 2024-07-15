@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 
 @SpringBootTest(classes = {
     ValidateDiscontinueClaimClaimantCallbackHandler.class,
@@ -97,9 +98,10 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             //Then
-            assertThat(response.getData()).extracting("confirmOrderGivesPermission")
-                .isNull();
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
+            assertThat(updatedData.getConfirmOrderGivesPermission()).isNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
 
         @Test
@@ -114,9 +116,10 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             //Then
-            assertThat(response.getData()).extracting("confirmOrderGivesPermission")
-                .isEqualTo("YES");
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
+            assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
 
         @Test
@@ -133,9 +136,10 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             //Then
-            assertThat(response.getData()).extracting("confirmOrderGivesPermission")
-                .isEqualTo("YES");
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
+            assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
 
         @Test
@@ -152,7 +156,9 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
 
         @Test
@@ -166,7 +172,9 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
     }
 
