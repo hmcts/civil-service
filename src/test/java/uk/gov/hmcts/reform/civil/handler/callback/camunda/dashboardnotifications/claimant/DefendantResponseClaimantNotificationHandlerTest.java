@@ -336,6 +336,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 .ccdCaseReference(1234L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
                 .responseClaimTrack(FAST_CLAIM.name())
                 .build();
@@ -371,6 +372,7 @@ public class DefendantResponseClaimantNotificationHandlerTest extends BaseCallba
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
                 .responseClaimMediationSpecRequired(YesOrNo.YES)
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
