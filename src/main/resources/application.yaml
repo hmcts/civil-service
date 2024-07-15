@@ -68,9 +68,9 @@ hmc:
 
 serviceRequest:
   api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
+    callback-url: ${SERVICE_REQUEST_UPDATE:}
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
@@ -440,6 +440,7 @@ notifications:
 
   notifyClaimantLRJudgmentByAdmissionTemplate: "af5a407a-d295-48ae-9bd0-8ac029c0a697"
   notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLiPOrderTranslatedTemplate: "d81749f7-cef5-4159-8d99-146eb572a690"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -453,6 +454,10 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
+
+case-flags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
 
 bundle:
   api:
@@ -628,8 +633,8 @@ spring:
       on-profile: integration-test
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:11.4://localhost/cmc
-    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
+    url: jdbc:tc:postgresql:15://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
       minimum-idle: 1
       connectionTimeout: 10000
@@ -740,7 +745,13 @@ idam:
     id: civil-service
     redirect_uri: https://localhost:3000/oauth2/callback
     secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
-
+    
 caseFlags:
   logging:
     enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
+
+stateflow:
+  engine:
+    simplification:
+      enabled: ${SIMPLE_STATE_FLOW_ENGINE_ENABLED:false}
+
