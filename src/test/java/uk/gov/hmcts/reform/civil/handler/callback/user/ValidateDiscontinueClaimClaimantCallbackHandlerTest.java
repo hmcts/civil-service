@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermis
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PermissionGranted;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -34,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_
     JacksonAutoConfiguration.class
 })
 public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private RuntimeService runTimeService;
 
     @Autowired
     private ValidateDiscontinueClaimClaimantCallbackHandler handler;
@@ -47,6 +54,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             ### Next steps:
 
             No further action required.""";
+    private static final String processId = "process-id";
 
     @Nested
     class AboutToStartCallback {
@@ -64,6 +72,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
                 .isNull();
             assertThat(response.getData()).extracting("permissionGrantedDateCopy")
                 .isNull();
+
         }
 
         @Test
@@ -92,7 +101,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldDoNothing_WhenTypeOfDiscontinuanceIsNullAndAboutToSubmitIsInvoked() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -101,13 +111,37 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
             assertThat(updatedData.getConfirmOrderGivesPermission()).isNull();
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", false);
+        }
+
+        @Test
+        void shouldNotChangeCaseState_When1v2FullDiscontAgainstBothDefButNoPermissionAndAboutToSubmitIsInvoked() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build())
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getState()).isNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", false);
         }
 
         @Test
         void shouldUpdateCaseWithoutStateChange_WhenPartDiscontinuanceAndAboutToSubmitIsInvoked() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
@@ -119,7 +153,9 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
             assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", true);
         }
 
         @Test
@@ -127,7 +163,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build())
-                .build();
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
@@ -139,7 +175,9 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isNull();
             assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", true);
         }
 
         @Test
@@ -147,7 +185,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build())
-                .build();
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
@@ -158,13 +196,16 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", true);
         }
 
         @Test
         void shouldDiscontinueCase_When1v1FullDiscontinuanceAndAboutToSubmitIsInvoked() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -174,7 +215,9 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", true);
         }
     }
 
