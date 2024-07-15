@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.advice;
 
 import feign.FeignException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.request.RequestData;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
@@ -18,14 +22,14 @@ import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ResourceExceptionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+public class ResourceExceptionHandlerTest {
 
+    @Mock
+    private RequestData requestData;
+
+    @InjectMocks
     private ResourceExceptionHandler handler;
-
-    @BeforeEach
-    void setUp() {
-        handler = new ResourceExceptionHandler();
-    }
 
     @Test
     void shouldReturnNotFound_whenCallbackExceptionThrown() {
