@@ -96,7 +96,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         for (String s : row) {
             builder.append(s).append(",");
         }
-        builder.append("\n");
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\r\n");
 
         return builder.toString();
     }

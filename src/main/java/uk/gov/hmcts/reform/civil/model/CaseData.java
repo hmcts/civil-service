@@ -34,10 +34,14 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -675,6 +679,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettleDiscontinueYesOrNoList courtPermissionNeeded;
     private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
+    private String permissionGrantedJudgeCopy;
+    private LocalDate permissionGrantedDateCopy;
+    private DiscontinuanceTypeList typeOfDiscontinuance;
+    private String partDiscontinuanceDetails;
+    private ConfirmOrderGivesPermission confirmOrderGivesPermission;
+    private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
+    private SettlementReason settleReason;
+    private final MarkPaidConsentList markPaidConsent;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
@@ -1511,6 +1523,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isCourtDecisionInClaimantFavourImmediateRePayment() {
         return hasApplicant1CourtDecisionInFavourOfClaimant()
             && getApplicant1RepaymentOptionForDefendantSpec() == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPDefendantBeforeOffline() {
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null;
     }
 
     @JsonIgnore
