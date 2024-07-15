@@ -573,6 +573,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                         .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
                                         .build());
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
