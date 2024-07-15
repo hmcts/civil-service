@@ -269,7 +269,7 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .activeJudgment(JudgmentDetails.builder()
+                            .activeJudgment(JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT)
                                             .createdTimestamp(DATE_IN_2025)
                                             .build())
                             .build());
