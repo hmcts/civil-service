@@ -72,8 +72,7 @@ public class NotifyClaimantLrValidationDiscontinuanceFailureHandler extends Call
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
-                DEFENDANT_NAME,  getDefendantNameBasedOnCaseType(caseData)
+                LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService)
             );
     }
 
