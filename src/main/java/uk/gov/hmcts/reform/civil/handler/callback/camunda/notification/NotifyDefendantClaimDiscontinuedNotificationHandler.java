@@ -75,7 +75,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-       @Override
+    @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER,
