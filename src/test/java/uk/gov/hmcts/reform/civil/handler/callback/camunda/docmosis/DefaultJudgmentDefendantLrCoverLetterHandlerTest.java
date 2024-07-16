@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.Defaul
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.DefaultJudgmentDefendantLrCoverLetterHandler.TASK_ID_DEFENDANT_2;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallbackHandlerTest {
+class DefaultJudgmentDefendantLrCoverLetterHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private DefaultJudgmentDefendantLrCoverLetterHandler handler;
