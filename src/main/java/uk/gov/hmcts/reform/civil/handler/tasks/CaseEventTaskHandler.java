@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -46,7 +46,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
 
     private CaseData data;
@@ -134,6 +134,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Not suitable for SDO.";
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
                     "RPA Reason: Judgement by Admission requested and claim moved offline.";
+                case SPEC_DEFENDANT_NOC -> "RPA Reason: Notice of Change filed.";
                 default -> {
                     log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;

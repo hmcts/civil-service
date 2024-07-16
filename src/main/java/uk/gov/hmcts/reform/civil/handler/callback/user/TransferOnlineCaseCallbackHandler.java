@@ -120,8 +120,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
         }
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            log.info("new location epimm is {}", newCourtLocation.getEpimmsId());
+        if (nonNull(newCourtLocation) && featureToggleService.isNationalRolloutEnabled()) {
             if (featureToggleService.isPartOfNationalRollout(newCourtLocation.getEpimmsId())) {
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
                 if (featureToggleService.isHmcEnabled()) {

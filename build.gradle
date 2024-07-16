@@ -121,7 +121,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.742'
+        version: '1.12.761'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -294,7 +294,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -404,7 +404,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
@@ -432,7 +432,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.49.1'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.1'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
@@ -451,7 +451,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'

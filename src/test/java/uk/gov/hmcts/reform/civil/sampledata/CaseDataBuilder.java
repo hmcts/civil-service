@@ -234,6 +234,80 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataBuilder {
 
+    final String reason = """
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+            felis, ultricies nec, pellentesque eu, pretium quis, sem.
+            venenatis vitae, justo. Nullam dictum felis eu pede molli
+            consequat vitae, eleifend ac, enim. Aliquam lorem ante, d
+            nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam
+            quam nunc, blandit vel, luctus pulvinar, hendrerit id, lo
+            faucibus tincidunt. Duis leo. Sed fringilla mauris sit am
+            vulputate eleifend sapien. Vestibulum purus quam, sceleri
+            primis in faucibus orci luctus et ultrices posuere cubili
+            ipsum. Sed aliquam ultrices mauris. Integer ante arcu, ac
+            volutpat pretium libero. Cras id dui. Aenean ut eros et n
+            Phasellus nec sem in justo pellentesque facilisis. Etiam\s
+            non, euismod vitae, posuere imperdiet, leo. Maecenas male
+            ante ipsum primis in faucibus orci luctus et ultrices pos
+            vestibulum elit. Aenean tellus metus, bibendum sed, posue
+            cursus feugiat, nunc augue blandit nunc, eu sollicitudin\s
+            venenatis condimentum, sem libero volutpat nibh, nec pell
+            tincidunt libero. Phasellus dolor. Maecenas vestibulum mo
+            posuere eget, vestibulum et, tempor auctor, justo. In ac\s
+            rhoncus pede. Pellentesque habitant morbi tristique senec
+            In hac habitasse platea dictumst. Curabitur at lacus ac v
+            sem. Pellentesque libero tortor, tincidunt et, tincidunt\s
+            leo quis pede. Donec interdum, metus et hendrerit aliquet
+            venenatis vulputate lorem. Morbi nec metus. Phasellus bla
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+            felis, ultricies nec, pellentesque eu, pretium quis, sem.
+            venenatis vitae, justo. Nullam dictum felis eu pede molli
+            consequat vitae, eleifend ac, enim. Aliquam lorem ante, d
+            nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam
+            quam nunc, blandit vel, luctus pulvinar, hendrerit id, lo
+            faucibus tincidunt. Duis leo. Sed fringilla mauris sit am
+            vulputate eleifend sapien. Vestibulum purus quam, sceleri
+            primis in faucibus orci luctus et ultrices posuere cubili
+            ipsum. Sed aliquam ultrices mauris. Integer ante arcu, ac
+            volutpat pretium libero. Cras id dui. Aenean ut eros et n
+            Phasellus nec sem in justo pellentesque facilisis. Etiam\s
+            non, euismod vitae, posuere imperdiet, leo. Maecenas male
+            ante ipsum primis in faucibus orci luctus et ultrices pos
+            vestibulum elit. Aenean tellus metus, bibendum sed, posue
+            cursus feugiat, nunc augue blandit nunc, eu sollicitudin\s
+            venenatis condimentum, sem libero volutpat nibh, nec pell
+            tincidunt libero. Phasellus dolor. Maecenas vestibulum mo
+            posuere eget, vestibulum et, tempor auctor, justo. In ac\s
+            rhoncus pede. Pellentesque habitant morbi tristique senec
+            In hac habitasse platea dictumst. Curabitur at lacus ac v
+            sem. Pellentesque libero tortor, tincidunt et, tincidunt\s
+            leo quis pede. Donec interdum, metus et hendrerit aliquet
+            venenatis vulputate lorem. Morbi nec metus. Phasellus bla
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum eu, tincidunt eu, varius ut, felis. In auctor l
+            Nullam cursus lacinia erat. Praesent blandit laoreet nibh
+            orci leo non est. Quisque id mi. Ut tincidunt tincidunt e
+            habitasse platea dictumst. Fusce a quam. Etiam ut purus m
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            Sed augue ipsum, egestas nec, vestibulum et, malesuada ad
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero. Praesent nonummy mi in odio. Nunc inter
+            fermentum libero.Praesent nonummy mi in odio au.
+            """;
+
     public static final String LEGACY_CASE_REFERENCE = "000DC001";
     public static final Long CASE_ID = 1594901956117591L;
     public static final LocalDateTime SUBMITTED_DATE_TIME = LocalDateTime.now();
@@ -4952,11 +5026,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawnOverLimit() {
 
         atStateApplicantRespondToDefenceAndProceed();
-
         ccdState = JUDICIAL_REFERRAL;
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+            .input(reason)
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -4984,8 +5056,7 @@ public class CaseDataBuilder {
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
         tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+            .reasonForCaseTransferJudgeTxt(reason)
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;

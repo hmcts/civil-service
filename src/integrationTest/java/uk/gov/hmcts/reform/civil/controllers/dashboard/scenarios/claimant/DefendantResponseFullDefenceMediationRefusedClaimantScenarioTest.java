@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
@@ -40,6 +41,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
                     .build())
             .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .applicant1ResponseDeadline(LocalDateTime.of(2024, 3, 21, 16, 0))
             .responseClaimMediationSpecRequired(NO)
             .applicant1Represented(NO)

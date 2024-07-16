@@ -1862,7 +1862,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 )
                 .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
                 .build();
-            CaseLocationCivil requestCourt = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
