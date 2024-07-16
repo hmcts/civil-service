@@ -90,10 +90,6 @@ public interface FlowState {
 
         SPEC_DEFENDANT_NOC,
         TAKEN_OFFLINE_SPEC_DEFENDANT_NOC,
-
-        PENDING_CASE_ISSUED,
-        AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-        AWAITING_APPLICANT_INTENTION,
         CASE_DISCONTINUED;
 
         public static final String FLOW_NAME = "MAIN";
