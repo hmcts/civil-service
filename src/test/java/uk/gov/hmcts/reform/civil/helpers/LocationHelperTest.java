@@ -39,7 +39,6 @@ class LocationHelperTest {
     private final CaseLocationCivil defendant2PreferredCourt = CaseLocationCivil.builder()
         .baseLocation("101010").region("region 3").build();
 
-
     @Test
     void thereIsAMatchingLocation() {
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
