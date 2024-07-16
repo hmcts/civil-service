@@ -93,7 +93,8 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
-        if (isSDOEvent(callbackParams)
+        if (featureToggleService.isCaseProgressionEnabled()
+            && isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
