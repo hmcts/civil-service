@@ -688,7 +688,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettlementReason settleReason;
     private final MarkPaidConsentList markPaidConsent;
     private YesOrNo claimantsConsentToDiscontinuance;
-    private CaseDocument noticeOfDiscontinue;
+    private CaseDocument noticeOfDiscontinueCWDoc;
+    private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 

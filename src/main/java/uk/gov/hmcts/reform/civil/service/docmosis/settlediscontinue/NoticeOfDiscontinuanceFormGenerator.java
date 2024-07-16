@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.settleanddiscontinue;
+package uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.CourtOfficerOrderForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceForm;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -22,32 +21,32 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.NOTIC
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerator<CourtOfficerOrderForm> {
+public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerator<NoticeOfDiscontinuanceForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generateDocs(CaseData caseData, String authorisation) {
-        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, authorisation);
+        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData);
         DocmosisTemplates docmosisTemplate = NOTICE_OF_DISCONTINUANCE_PDF;
-
         DocmosisDocument docmosisDocument =
-            documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+                documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+
         return documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                getFileName(caseData, docmosisTemplate),
-                docmosisDocument.getBytes(),
-                DocumentType.NOTICE_OF_DISCONTINUANCE
-            )
+                authorisation,
+                new PDF(
+                        getFileName(caseData, docmosisTemplate),
+                        docmosisDocument.getBytes(),
+                        DocumentType.NOTICE_OF_DISCONTINUANCE
+                )
         );
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
-        return String.format(docmosisTemplate.getDocumentTitle(),  caseData.getLegacyCaseReference());
+        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String authorisation) {
+    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData) {
         var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
                 .caseNumber(caseData.getCcdCaseReference().toString())
                 .claimant1Name(caseData.getApplicant1().getPartyName())
@@ -57,14 +56,16 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
                 .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
                 .claimantWhoIsDiscontinue(getClaimantWhoIsDiscontinue(caseData))
-                .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance()) ? caseData.getClaimantsConsentToDiscontinuance().toString() : null)
+                .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
+                        ? caseData.getClaimantsConsentToDiscontinuance().toString() : null)
                 .courtPermission(caseData.getCourtPermissionNeeded().getDisplayedValue())
                 .permissionGranted(nonNull(caseData.getIsPermissionGranted()) ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
                 .judgeName(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedJudge() : null)
                 .judgementDate(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
-                .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().getType())
+                .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
+                .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
                 .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
                 .discontinuingAgainstOneDefendant(nonNull(caseData.getDiscontinuingAgainstOneDefendant())
                         ? caseData.getDiscontinuingAgainstOneDefendant().getValue().getLabel() : null)

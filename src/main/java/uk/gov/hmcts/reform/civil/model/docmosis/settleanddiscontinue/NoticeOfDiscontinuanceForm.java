@@ -35,5 +35,6 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private String discontinuingAgainstBothDefendants;
     private String discontinuingAgainstOneDefendant;
     private String typeOfDiscontinuance;
+    private String typeOfDiscontinuanceTxt;
     private String partOfDiscontinuanceTxt;
 }

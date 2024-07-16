@@ -11,20 +11,21 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -54,8 +55,19 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder);
+        CaseData updatedData = caseDataBuilder.build();
+        if(isPermissionRequired(caseData)) {
+            assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueCWDoc());
+            updatedData.setNoticeOfDiscontinueAllParitiesDoc(null);
+            System.out.println("isPermissionRequired--------if--------");
+        } else {
+            assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueAllParitiesDoc());
+            updatedData.setNoticeOfDiscontinueCWDoc(null);
+            System.out.println("isPermissionRequired-------else---------");
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(updatedData.toMap(objectMapper))
                 .build();
     }
 
@@ -63,7 +75,16 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseDocument caseDocument = formGenerator.generateDocs(
                 callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
+        caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
+    }
+
+    private boolean isPermissionRequired(CaseData caseData) {
+        return SettleDiscontinueYesOrNoList.YES.equals(caseData.getCourtPermissionNeeded())
+                && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
+    }
+
+    private void assignDiscontinuanceCategoryId(CaseDocument caseDocument ) {
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.NOTICE_OF_DISCONTINUE.getValue());
-        caseDataBuilder.noticeOfDiscontinue(caseDocument);
     }
 }
