@@ -26,6 +26,7 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
     public static final String TASK_ID = "UpdateVisibilityNoticeOfDiscontinuance";
 
     private final RuntimeService runTimeService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
