@@ -1064,6 +1064,4 @@ public class FlowPredicate {
         caseData.getTakenOfflineByStaffDate() != null
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
-
-    public static final Predicate<CaseData> judgeOrderVerificationRequired = CaseData::isJudgeOrderVerificationRequired;
 }

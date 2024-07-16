@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -36,9 +37,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
 
+    private final RuntimeService runTimeService;
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateNoticeOfDiscontinueDoc);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit);
     }
 
     @Override
@@ -51,9 +54,10 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         return TASK_ID;
     }
 
-    private CallbackResponse generateNoticeOfDiscontinueDoc(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        updateCamundaVars(caseData);
         buildDocument(callbackParams, caseDataBuilder);
         CaseData updatedData = caseDataBuilder.build();
 
@@ -86,5 +90,13 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.NOTICE_OF_DISCONTINUE.getValue());
+    }
+
+    private void updateCamundaVars(CaseData caseData) {
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "JUDGE_ORDER_VERIFICATION_REQUIRED",
+            caseData.isJudgeOrderVerificationRequired()
+        );
     }
 }

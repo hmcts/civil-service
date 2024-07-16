@@ -45,7 +45,7 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(15);
+        assertThat(result).hasSize(14);
 
         assertTransition(result.get(0), "MAIN.CLAIM_ISSUED", "MAIN.CLAIM_NOTIFIED");
         assertTransition(result.get(1), "MAIN.CLAIM_ISSUED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
@@ -61,7 +61,6 @@ public class ClaimIssuedTransitionBuilderTest {
         assertTransition(result.get(11), "MAIN.CLAIM_ISSUED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED");
         assertTransition(result.get(12), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE");
         assertTransition(result.get(13), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GO_OFFLINE");
-        assertTransition(result.get(14), "MAIN.CLAIM_ISSUED", "MAIN.CASE_DISCONTINUED");
     }
 
     @Test
