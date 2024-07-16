@@ -36,7 +36,6 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
-
     private final RuntimeService runTimeService;
 
     @Override

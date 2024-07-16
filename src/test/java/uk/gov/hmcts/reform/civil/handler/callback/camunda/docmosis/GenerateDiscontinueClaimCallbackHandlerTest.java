@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -49,6 +51,9 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private GenerateDiscontinueClaimCallbackHandler handler;
     @MockBean
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
+    @MockBean
+    private RuntimeService runTimeService;
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @Nested
     class AboutToSubmitCallback {
@@ -61,6 +66,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant1(getPartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES)
                     .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
+                    .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
                     .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -82,6 +88,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant1(getPartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
                     .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+                    .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
