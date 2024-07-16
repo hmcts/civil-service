@@ -140,15 +140,14 @@ public class FeatureToggleService {
     }
 
     public boolean isNationalRolloutEnabled() {
-        return featureToggleApi.isFeatureEnabled("enable-national-rollout");
+        return true;
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && featureToggleApi
-            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
+        return locationEpimms != null && true;
     }
 
     public boolean isGenAppsAllowedPreSdo() {
-        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
+        return true;
     }
 }
