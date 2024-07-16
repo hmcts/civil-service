@@ -38,7 +38,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyDefendantJudgmentByAdmission
+            this::notifyDefendantClaimDiscontinued
         );
     }
 
@@ -52,7 +52,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendantJudgmentByAdmission(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendantClaimDiscontinued(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (!caseData.isRespondent1LiP()) {
