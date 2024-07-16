@@ -195,7 +195,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty();
+        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
     }
 
     @Override
