@@ -7,20 +7,14 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
 
-public abstract class CaseHandedOfflineApplicantNotifierBase implements NotificationData {
-
-    enum CaseHandledOfflineRecipient {
-        RESPONDENT_SOLICITOR1,
-        RESPONDENT_SOLICITOR2
-    }
+public abstract class CaseHandledOfflineApplicantSolicitorNotifier implements NotificationData {
 
     protected static final String REFERENCE_TEMPLATE = "defendant-response-case-handed-offline-applicant-notification-%s";
     private final NotificationService notificationService;
 
-    protected CaseHandedOfflineApplicantNotifierBase(NotificationService notificationService) {
+    protected CaseHandledOfflineApplicantSolicitorNotifier(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
-
 
     protected void sendNotificationToSolicitor(CaseData caseData, String recipient, String templateID) {
         notificationService.sendMail(
@@ -35,4 +29,7 @@ public abstract class CaseHandedOfflineApplicantNotifierBase implements Notifica
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
+
+
+    public abstract void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData);
 }

@@ -75,7 +75,7 @@ public class CaseEventService {
             log.info(
                 "caseid: {}, respondent flags after civil commons call: {}",
                 params.getCaseId(),
-                respondent1.get("flags").toString()
+                respondent1.get("flags") != null ? respondent1.get("flags").toString() : "null"
             );
         }
         return coreCaseDataApi.submitEventForCitizen(

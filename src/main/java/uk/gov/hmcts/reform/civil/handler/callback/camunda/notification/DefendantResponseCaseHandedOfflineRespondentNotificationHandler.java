@@ -9,7 +9,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.DefendantResponseCaseHandedOfflineRespondentNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.CaseHandledOffLineRespondentSolicitorNotifierFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     );
     public static final String TASK_ID_RESPONDENT1 = "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor1";
     public static final String TASK_ID_RESPONDENT2 = "DefendantResponseCaseHandedOfflineNotifyRespondentSolicitor2";
-    private static final String REFERENCE_TEMPLATE =
-        "defendant-response-case-handed-offline-respondent-notification-%s";
 
-    private final DefendantResponseCaseHandedOfflineRespondentNotifier defendantResponseCaseHandedOfflineRespondentNotifier;
+    private final CaseHandledOffLineRespondentSolicitorNotifierFactory caseHandledOffLineRespondentSolicitorNotifierFactory;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,10 +58,11 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     private CallbackResponse notifyRespondentSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
-        defendantResponseCaseHandedOfflineRespondentNotifier.notifyRespondentSolicitorForCaseHandedOffline(caseData,
-            NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE.equals(caseEvent)
-                ? DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR1
-                : DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2);
+        caseHandledOffLineRespondentSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(caseData)
+            .notifyRespondentSolicitorForCaseHandedOffline(caseData,
+                NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE.equals(caseEvent)
+                    ? CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR1
+                    : CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2);
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

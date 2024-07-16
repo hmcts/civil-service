@@ -20,7 +20,10 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.DefendantResponseCaseHandedOfflineRespondentNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.CaseHandledOffLineRespondentSolicitorNotifierFactory;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.CaseHandledOfflineRespondentSolicitorSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.respondent.CaseHandledOfflineRespondentSolicitorUnspecNotifier;
 
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +52,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @SpringBootTest(classes = {
     DefendantResponseCaseHandedOfflineRespondentNotificationHandler.class,
-    DefendantResponseCaseHandedOfflineRespondentNotifier.class,
+    CaseHandledOffLineRespondentSolicitorNotifierFactory.class,
+    CaseHandledOfflineRespondentSolicitorUnspecNotifier.class,
+    CaseHandledOfflineRespondentSolicitorSpecNotifier.class,
     JacksonAutoConfiguration.class
 })
 class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -63,7 +68,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
     @Autowired
     private DefendantResponseCaseHandedOfflineRespondentNotificationHandler handler;
     @Autowired
-    private DefendantResponseCaseHandedOfflineRespondentNotifier notifer;
+    private CaseHandledOfflineRespondentSolicitorSpecNotifier caseHandledOfflineRespondentSolicitorSpecNotifier;
 
     @Nested
     class AboutToSubmitCallback {
@@ -617,8 +622,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             .atStateNotificationAcknowledged()
             .build();
 
-        assertThat(notifer.addPropertiesSpec1v2DiffSol(caseData,
-            DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
+        assertThat(caseHandledOfflineRespondentSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData,
+            CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber", "000DC001");
     }
@@ -629,8 +634,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .build();
-        assertThat(notifer.addPropertiesSpec1v2DiffSol(caseData,
-            DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
+        assertThat(caseHandledOfflineRespondentSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData,
+            CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2))
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber", "000DC001");
     }

@@ -1,10 +1,11 @@
-package uk.gov.hmcts.reform.civil.service.notification.defendantresponse;
+package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-public abstract class DefendantResponseSolicitorNotifier implements NotificationData {
+public abstract class FullDefenceSolicitorNotifier implements NotificationData {
 
+    protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     public void notifySolicitorForDefendantResponse(CaseData caseData) {
         String recipient;

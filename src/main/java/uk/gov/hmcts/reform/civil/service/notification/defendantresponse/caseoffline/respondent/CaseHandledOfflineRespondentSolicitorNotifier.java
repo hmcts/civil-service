@@ -4,13 +4,14 @@ import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
-public abstract class CaseHandedOfflineRespondentNotifierBase implements NotificationData {
+public abstract class CaseHandledOfflineRespondentSolicitorNotifier implements NotificationData {
 
     protected static final String REFERENCE_TEMPLATE =
         "defendant-response-case-handed-offline-respondent-notification-%s";
@@ -22,7 +23,7 @@ public abstract class CaseHandedOfflineRespondentNotifierBase implements Notific
         if (is1v1Or2v1Case(caseData)) {
             recipientEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            if (recipientType.equals(DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR1)) {
+            if (recipientType.equals(CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR1)) {
                 recipientEmailAddress = caseData.getRespondentSolicitor1EmailAddress();
             } else {
                 recipientEmailAddress = caseData.getRespondentSolicitor2EmailAddress();
@@ -40,6 +41,6 @@ public abstract class CaseHandedOfflineRespondentNotifierBase implements Notific
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
-    abstract void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,
+    public abstract void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,
                                                                        CaseHandledOfflineRecipient recipientType);
 }

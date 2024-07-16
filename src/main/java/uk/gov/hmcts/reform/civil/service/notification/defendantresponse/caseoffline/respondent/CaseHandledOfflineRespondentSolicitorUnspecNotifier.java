@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoff
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Component
 @AllArgsConstructor
-public class NotifyRespondentSolicitorCaseOfflineUnspec extends CaseHandedOfflineRespondentNotifierBase {
+public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHandledOfflineRespondentSolicitorNotifier {
 
     private static final String REFERENCE_TEMPLATE =
         "defendant-response-case-handed-offline-respondent-notification-%s";
@@ -22,7 +22,7 @@ public class NotifyRespondentSolicitorCaseOfflineUnspec extends CaseHandedOfflin
     private final NotificationsProperties notificationsProperties;
 
     @Override
-    void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData, NotificationData.CaseHandledOfflineRecipient recipientType) {
+    public void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData, CaseHandledOfflineRecipient recipientType) {
         sendNotificationToSolicitor(caseData, getRecipientEmailAddress(caseData, recipientType), getTemplateId(caseData));
 
     }
@@ -49,7 +49,6 @@ public class NotifyRespondentSolicitorCaseOfflineUnspec extends CaseHandedOfflin
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
-
 
 
 }

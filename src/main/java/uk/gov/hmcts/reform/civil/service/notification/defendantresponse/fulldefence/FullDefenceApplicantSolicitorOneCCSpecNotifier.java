@@ -1,11 +1,9 @@
-package uk.gov.hmcts.reform.civil.service.notification.defendantresponse;
+package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -23,11 +21,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 @RequiredArgsConstructor
-public class DefendantResponseApplicantSolicitorOneCCSpecNotifier extends DefendantResponseSolicitorNotifier {
+public class FullDefenceApplicantSolicitorOneCCSpecNotifier extends FullDefenceSolicitorNotifier {
 
     //NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
-    private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
-
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;

@@ -509,8 +509,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedCaseDataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
-        updatedData.isRespondent1(null);
-        assembleResponseDocuments(caseData, updatedData);
+        updatedCaseDataBuilder.isRespondent1(null);
+        assembleResponseDocuments(caseData, updatedCaseDataBuilder);
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         if (toggleService.isUpdateContactDetailsEnabled()) {

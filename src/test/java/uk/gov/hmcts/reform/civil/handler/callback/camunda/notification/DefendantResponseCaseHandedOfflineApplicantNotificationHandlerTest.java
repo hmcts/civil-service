@@ -8,15 +8,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.applicant.CaseHandledOffLineApplicantSolicitorNotifierFactory;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.applicant.CaseHandledOfflineApplicantSolicitorSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.applicant.CaseHandledOfflineApplicantSolicitorUnspecNotifier;
 
 import java.util.Map;
 
@@ -42,6 +45,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @SpringBootTest(classes = {
     DefendantResponseCaseHandedOfflineApplicantNotificationHandler.class,
+    CaseHandledOffLineApplicantSolicitorNotifierFactory.class,
+    CaseHandledOfflineApplicantSolicitorUnspecNotifier.class,
+    CaseHandledOfflineApplicantSolicitorSpecNotifier.class,
     JacksonAutoConfiguration.class
 })
 class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -52,11 +58,12 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Autowired
     private DefendantResponseCaseHandedOfflineApplicantNotificationHandler handler;
+
+    @Autowired
+    private CaseHandledOfflineApplicantSolicitorSpecNotifier caseHandledOfflineApplicantSolicitorSpecNotifier;
 
     @Nested
     class AboutToSubmitCallback {
@@ -73,8 +80,8 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
+                    .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                    .build())
                 .build();
 
             handler.handle(params);
@@ -100,8 +107,8 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
+                    .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                    .build())
                 .build();
 
             handler.handle(params);
@@ -128,8 +135,8 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
+                    .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                    .build())
                 .build();
 
             handler.handle(params);
@@ -157,8 +164,8 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
-                             .build())
+                    .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                    .build())
                 .build();
 
             handler.handle(params);
@@ -209,7 +216,7 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
                     .atStateNotificationAcknowledged()
                     .build();
 
-                assertThat(handler.addPropertiesSpec1v2DiffSol(caseData))
+                assertThat(caseHandledOfflineApplicantSolicitorSpecNotifier.addPropertiesSpec1v2DiffSol(caseData))
                     .containsEntry("legalOrgName", "Signer Name")
                     .containsEntry("claimReferenceNumber", "000DC001");
 

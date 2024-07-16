@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.notification.defendantresponse;
+package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 @RequiredArgsConstructor
-public class DefendantResponseApplicantNotifier implements NotificationData {
+public class FullDefenceApplicantNotifier implements NotificationData {
 
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 

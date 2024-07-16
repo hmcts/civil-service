@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 @AllArgsConstructor
-public class NotifyRespondentSolicitorCaseOfflineSpec extends CaseHandedOfflineRespondentNotifierBase {
+public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandledOfflineRespondentSolicitorNotifier {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -36,7 +37,7 @@ public class NotifyRespondentSolicitorCaseOfflineSpec extends CaseHandedOfflineR
         } else if (MultiPartyScenario.getMultiPartyScenario(caseData)
             .equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
             && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null
-            || DefendantResponseCaseHandedOfflineRespondentNotifier.CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2.equals(recipientType))) {
+            || CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2.equals(recipientType))) {
             sendNotificationToSolicitorSpec(caseData, recipientEmailAddress, recipientType);
         }
 
