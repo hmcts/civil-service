@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -20,13 +19,13 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -57,27 +56,27 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder);
         CaseData updatedData = caseDataBuilder.build();
-        if (isPermissionRequired(caseData)) {
+
+        if (nonNull(updatedData.getNoticeOfDiscontinueCWDoc())) {
             assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueCWDoc());
-            updatedData.setNoticeOfDiscontinueAllParitiesDoc(null);
-            log.info("isPermissionRequired--------if------------------");
         } else {
             assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueAllParitiesDoc());
-            updatedData.setNoticeOfDiscontinueCWDoc(null);
-            log.info("isPermissionRequired--------else--------");
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper))
                 .build();
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        CaseData caseData = callbackParams.getCaseData();
         CaseDocument caseDocument = formGenerator.generateDocs(
                 callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
-        caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
+        if (isPermissionRequired(caseData)) {
+            caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
+        } else {
+            caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
+        }
     }
 
     private boolean isPermissionRequired(CaseData caseData) {
