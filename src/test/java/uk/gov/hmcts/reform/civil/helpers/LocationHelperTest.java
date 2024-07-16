@@ -187,6 +187,39 @@ public class LocationHelperTest {
     }
 
     @Test
+    void whenLessThan1000AndDuringSdo_locationIsPreferredLocation() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(999))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .responseCourtCode("123")
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
+
+        Assertions.assertThat(court).isPresent();
+        Assertions.assertThat(court).contains(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
+    }
+
+    @Test
     public void whenDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
