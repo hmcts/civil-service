@@ -50,11 +50,8 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         updateCamundaVars(caseData);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private void updateCamundaVars(CaseData caseData) {
