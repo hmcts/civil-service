@@ -1524,6 +1524,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1560,6 +1562,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
