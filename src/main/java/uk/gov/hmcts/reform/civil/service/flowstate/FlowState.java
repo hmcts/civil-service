@@ -89,8 +89,7 @@ public interface FlowState {
         SIGN_SETTLEMENT_AGREEMENT,
 
         SPEC_DEFENDANT_NOC,
-        TAKEN_OFFLINE_SPEC_DEFENDANT_NOC,
-        CASE_DISCONTINUED;
+        TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 
         public static final String FLOW_NAME = "MAIN";
 
