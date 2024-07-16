@@ -88,7 +88,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isClaima
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.judgeOrderVerificationRequired;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.lipFullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
@@ -135,7 +134,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -387,7 +385,7 @@ public class StateFlowEngine implements IStateFlowEngine {
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
             .state(CLAIM_ISSUED)
-                .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified.and(not(judgeOrderVerificationRequired)))
+                .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
                 .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
@@ -400,7 +398,7 @@ public class StateFlowEngine implements IStateFlowEngine {
                        flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true)
                    )
                 .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
-                                                       .and(not(pastClaimNotificationDeadline)).and(not(judgeOrderVerificationRequired)))
+                                                       .and(not(pastClaimNotificationDeadline)))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
@@ -412,9 +410,6 @@ public class StateFlowEngine implements IStateFlowEngine {
                     .onlyIf(divergentRespondWithDQAndGoOfflineSpec.and(specClaim))
                 .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
                     .onlyIf(divergentRespondGoOfflineSpec.and(specClaim))
-                .transitionTo(CASE_DISCONTINUED).onlyIf(judgeOrderVerificationRequired)
-                    .set(flags ->
-                         flags.put(FlowFlag.JUDGE_ORDER_VERIFICATION_REQUIRED.name(), true))
             .state(CONTACT_DETAILS_CHANGE)
                 .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(isRespondentResponseLangIsBilingual)))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)))
@@ -687,7 +682,6 @@ public class StateFlowEngine implements IStateFlowEngine {
             .state(SPEC_DEFENDANT_NOC)
                 .transitionTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC).onlyIf(nocSubmittedForLiPDefendant)
             .state(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC)
-            .state(CASE_DISCONTINUED)
             .build();
     }
 
