@@ -72,7 +72,7 @@ class NotifyClaimantLrValidationDiscontinuanceFailureHandlerTest extends BaseCal
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_CLAIMANT_LR_VALIDATION_DICONTINUANCE_FAILURE.name())
+                             .eventId(CaseEvent.NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT.name())
                              .build())
                 .build();
 

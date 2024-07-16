@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -41,7 +40,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             No further action required.""";
 
     private final ObjectMapper objectMapper;
-    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -87,7 +85,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             }
         }
 
-        updateCamundaVars(caseData);
         caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
 
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
@@ -114,11 +111,4 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
         return EVENTS;
     }
 
-    private void updateCamundaVars(CaseData caseData) {
-        runTimeService.setVariable(
-            caseData.getBusinessProcess().getProcessInstanceId(),
-            "discontinuanceValidationSuccess",
-            ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())
-        );
-    }
 }

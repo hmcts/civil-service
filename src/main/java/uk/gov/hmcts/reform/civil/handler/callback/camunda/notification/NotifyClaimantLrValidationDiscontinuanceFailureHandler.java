@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LR_VALIDATION_DICONTINUANCE_FAILURE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Service
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 public class NotifyClaimantLrValidationDiscontinuanceFailureHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_LR_VALIDATION_DICONTINUANCE_FAILURE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT);
     public static final String TASK_ID = "NotifyValidationFailureClaimant";
     private static final String REFERENCE_TEMPLATE =
         "claimant-notify-validation-failure-%s";
