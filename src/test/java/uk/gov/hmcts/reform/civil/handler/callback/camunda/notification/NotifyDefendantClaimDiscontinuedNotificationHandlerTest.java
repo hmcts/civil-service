@@ -64,7 +64,7 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        void shouldNotifyDefendantJudgmentByAdmission_whenInvoked() {
+        void shouldNotifyDefendantLRClaimDiscontinued_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -84,16 +84,17 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 TEMPLATE_ID,
-                addPropertiesLR(caseData),
+                addProperties(caseData),
                 "defendant-claim-discontinued-000DC001"
             );
         }
     }
 
-    public Map<String, String> addPropertiesLR(CaseData caseData) {
+    public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME, "Test Org Name"
         );
     }
+
 }
