@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -99,12 +101,19 @@ public class CaseAssignmentController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Boolean> isDefendantLinked(
+    public ResponseEntity<DefendantLinkStatus> isDefendantLinked(
         @PathVariable("caseReference") String caseReference) {
-        log.info("Check civil claim reference {} is linked to defendant", caseReference);
+        log.info("Check claim reference {} is linked to defendant", caseReference);
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
-        boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
-        return new ResponseEntity<>(status, HttpStatus.OK);
+        boolean isOcmcCase = caseDetails.getCaseTypeId().equals(CaseDefinitionConstants.CMC_CASE_TYPE);
+        boolean status;
+        if (isOcmcCase) {
+            status = defendantPinToPostLRspecService.isOcmcDefendantLinked(caseReference);
+        } else {
+            status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+        }
+        DefendantLinkStatus defendantLinkStatus = new DefendantLinkStatus(isOcmcCase, status);
+        return new ResponseEntity<>(defendantLinkStatus, HttpStatus.OK);
     }
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
