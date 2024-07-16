@@ -101,15 +101,16 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
-        //pass
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl(
                     "url").build()).build())))
                 .respondent1Represented(YesOrNo.NO).build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
@@ -134,8 +135,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     ElementUtils.element(CaseDocument.builder().documentLink(
                         Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
                 .respondent1Represented(YesOrNo.NO).build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
@@ -160,8 +163,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     ElementUtils.element(CaseDocument.builder().documentLink(
                         Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
                 .respondent1Represented(YesOrNo.NO).build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
@@ -195,8 +200,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                                ))
                                .build())
                 .build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
@@ -232,8 +239,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                                ))
                                .build())
                 .build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
