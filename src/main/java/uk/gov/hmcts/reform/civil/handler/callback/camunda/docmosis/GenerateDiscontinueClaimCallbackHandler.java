@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONT
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -58,11 +60,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         if (isPermissionRequired(caseData)) {
             assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueCWDoc());
             updatedData.setNoticeOfDiscontinueAllParitiesDoc(null);
-            System.out.println("isPermissionRequired--------if--------");
+            log.info("isPermissionRequired--------if------------------");
         } else {
             assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueAllParitiesDoc());
             updatedData.setNoticeOfDiscontinueCWDoc(null);
-            System.out.println("isPermissionRequired-------else---------");
+            log.info("isPermissionRequired--------else--------");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
