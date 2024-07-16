@@ -71,7 +71,8 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
-            && isEligibleForReconsideration(caseData)) {
+            && isEligibleForReconsideration(caseData)
+            && featureToggleService.isCaseProgressionEnabled()) {
             caseDataBuilder.requestForReconsiderationDeadline(getDateWithoutBankHolidays());
         }
         HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseDataBuilder.build(), caseEvent);
@@ -93,8 +94,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
-        if (featureToggleService.isCaseProgressionEnabled()
-            && isSDOEvent(callbackParams)
+        if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT.getScenario();
         }
