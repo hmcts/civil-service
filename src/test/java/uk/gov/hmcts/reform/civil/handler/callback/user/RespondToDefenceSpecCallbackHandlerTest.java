@@ -1053,7 +1053,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .courtAddress("Lane 1").postcode("123").build();
                 when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                     .thenReturn(locationA);
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -1063,6 +1062,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .responseCourtLocations(DynamicList.builder().build())
                                 .build()).build())
                     .responseClaimTrack(FAST_CLAIM.name())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbc region").build())
                     .build();
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1142,7 +1142,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateApplicantRespondToDefenceAndProceed()
                     .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .caseManagementLocation(CaseLocationCivil.builder().build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbc region").build())
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
@@ -1316,6 +1316,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant2(Party.builder().type(INDIVIDUAL).build())
                     .respondent1(Party.builder().type(INDIVIDUAL).build())
                     .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                     .build();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1341,6 +1342,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1(PartyBuilder.builder().individual().build())
                     .atStateApplicantRespondToDefenceAndProceed()
                     .applicant2DQSmallClaimExperts(null, NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1369,7 +1371,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1391,7 +1395,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
-                                 .companyName("company name").build()).build();
+                                 .companyName("company name").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1449,7 +1455,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1465,7 +1473,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1482,7 +1492,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             //When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1501,7 +1513,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             //When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1521,6 +1535,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.INDIVIDUAL)
                                  .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1541,6 +1556,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
                                                                .documentType(DIRECTIONS_QUESTIONNAIRE)
                                                                .build()))
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
             // When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1585,7 +1601,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .type(Party.Type.COMPANY)
                                                           .primaryAddress(Address.builder().build())
                                                           .build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1607,6 +1625,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.INDIVIDUAL)
                                  .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1627,7 +1646,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL).build()).build();
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1657,6 +1678,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.INDIVIDUAL)
                                  .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1683,7 +1705,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
                                  .primaryAddress(Address.builder().build())
-                                 .build()).build();
+                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1708,7 +1732,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.INDIVIDUAL)
-                                 .build()).build();
+                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1779,6 +1805,107 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldUpdateLocation_WhenCmlIsCnbcToggleOn() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
+        }
+
+        @Test
+        void shouldNotUpdateLocation_WhenCmlIsNotCnbcAndToggleOn() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("3", "12345");
+        }
+
+        @Test
+        void shouldUpdateLocation_WhenCmlIsCnbcToggleOnFlightDelayOtherSmall() {
+            // Given
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
+            given(featureToggleService.isSdoR2Enabled()).willReturn(true);
+            LocationRefData locationA = LocationRefData.builder()
+                .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                .courtAddress("Lane 1").postcode("123").build();
+            when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                .thenReturn(locationA);
+
+            DynamicList airlineList = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("OTHER").label("OTHER").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .applicant1DQ(
+                    Applicant1DQ.builder().applicant1DQRequestedCourt(
+                        RequestedCourt.builder()
+                            .responseCourtLocations(DynamicList.builder().build())
+                            .build()).build())
+                .flightDelay(FlightDelayDetails.builder()
+                                 .airlineList(airlineList)
+                                 .flightCourtLocation(null)
+                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .build();
+
+            caseData.setIsFlightDelayClaim(YES);
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
+        }
+
+        @Test
+        void shouldUpdateLocation_preferredLocationBehaviourWhenToggleOff() {
+            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
         }
     }
 
@@ -2400,6 +2527,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
 
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
