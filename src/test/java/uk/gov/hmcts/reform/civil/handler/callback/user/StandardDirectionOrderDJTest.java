@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -664,6 +665,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         void shouldPopulateLocationListsWithPreselectedCourt() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .atStateClaimIssuedTrialHearing()
                 .build();
 
