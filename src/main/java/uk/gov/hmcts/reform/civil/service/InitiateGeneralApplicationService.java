@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -132,13 +133,13 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
-        applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
-        applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
+        applicationBuilder.claimant1PartyName(getPartyNameBasedOnType(caseData.getApplicant1()));
+        applicationBuilder.defendant1PartyName(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (YES.equals(caseData.getAddApplicant2())) {
-            applicationBuilder.claimant2PartyName(caseData.getApplicant2().getPartyName());
+            applicationBuilder.claimant2PartyName(getPartyNameBasedOnType(caseData.getApplicant2()));
         }
         if (YES.equals(caseData.getAddRespondent2())) {
-            applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
+            applicationBuilder.defendant2PartyName(getPartyNameBasedOnType(caseData.getRespondent2()));
         }
 
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())

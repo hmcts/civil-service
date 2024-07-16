@@ -130,6 +130,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private UserService userService;
+
     @MockBean
     private UserRoleCaching userRoleCaching;
 
