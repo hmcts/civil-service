@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
@@ -56,7 +55,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder);
         CaseData updatedData = caseDataBuilder.build();
-        if(isPermissionRequired(caseData)) {
+        if (isPermissionRequired(caseData)) {
             assignDiscontinuanceCategoryId(updatedData.getNoticeOfDiscontinueCWDoc());
             updatedData.setNoticeOfDiscontinueAllParitiesDoc(null);
             System.out.println("isPermissionRequired--------if--------");
@@ -84,7 +83,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
                 && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
     }
 
-    private void assignDiscontinuanceCategoryId(CaseDocument caseDocument ) {
+    private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.NOTICE_OF_DISCONTINUE.getValue());
     }
 }
