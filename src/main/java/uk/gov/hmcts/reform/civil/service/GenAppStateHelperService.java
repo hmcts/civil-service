@@ -64,7 +64,7 @@ public class GenAppStateHelperService {
     }
 
     public boolean triggerEvent(CaseData caseData, CaseEvent event) {
-        if (Objects.isNull(caseData.getGeneralApplications()) || !caseData.getGeneralApplications().isEmpty()) {
+        if (Objects.isNull(caseData.getGeneralApplications())) {
             return false;
         }
         caseData.getGeneralApplications()
