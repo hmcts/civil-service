@@ -1,14 +1,17 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
   id 'application'
   id 'checkstyle'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.5'
+  id 'io.spring.dependency-management' version '1.1.6'
   id 'org.springframework.boot' version '2.7.18'
   id 'org.owasp.dependencycheck' version '9.2.0'
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1253'
   id "org.flywaydb.flyway" version "10.15.0"
 }
 
@@ -16,12 +19,11 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.10.2',
-  junitPlatform     : '1.10.2',
+  junit             : '5.10.3',
+  junitPlatform     : '1.10.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.32',
-  pact              : '3.5.24',
+  lombok            : '1.18.34',
   springSecurity    : '5.8.12',
   camunda           : '7.20.0',
   jackson           : '2.17.1',
@@ -119,14 +121,14 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.742'
+        version: '1.12.761'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.24') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.26') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -214,11 +216,11 @@ task integration(type: Test) {
 }
 
 task contract(type: Test) {
-  useJUnitPlatform()
-  description = "Runs pact contract tests"
-  group = "Delivery pipeline"
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+  group = 'Delivery pipeline'
+  description = 'Runs the consumer Pact tests'
+  setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
+  setClasspath(sourceSets.contractTest.runtimeClasspath)
+  systemProperty 'pact.rootDir', "pacts"
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -292,7 +294,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -334,6 +336,7 @@ configurations.all {
     }
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
@@ -356,7 +359,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.1'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.2'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -364,13 +367,12 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
 
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.2.1'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.4'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.5'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
@@ -383,13 +385,12 @@ dependencies {
     exclude group: 'java-logging', module: ' java-logging'
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.1.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.2'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
@@ -402,13 +403,13 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.23.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.23.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.89'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.91'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.22'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
@@ -430,14 +431,14 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.49.1'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.1'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.17'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.17'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.18'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.18'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -446,19 +447,20 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.2:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.3:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
 
   // dashboard specific changes
 
@@ -467,8 +469,6 @@ dependencies {
   testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
   // dashboard specific changes ends
 
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -495,16 +495,69 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runAndPublishConsumerPactTests(type: Test) {
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+task buildCCDXlsx(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://localhost:4000'
+  environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://localhost:9999'
+  environment 'CCD_DEF_AAC_URL', 'http://localhost:4502'
+  commandLine './bin/build-civil-xlsx-definitions.sh'
+}
+
+task runOtherServices(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'ADDITIONAL_COMPOSE_FILES', 'cftlib-additional-services.yml'
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+
+  commandLine './bin/add-services.sh'
+  doLast() {
+    importBpmnDiagrams
+  }
+}
+
+task importBpmnDiagrams(type: Exec) {
+  group 'ccd tasks'
+
+  dependsOn(runOtherServices)
+
+  environment 'CAMUNDA_BASE_URL', 'http://localhost:9404'
+  environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+
+  commandLine './bin/import-bpmn-diagram-cftlib.sh'
+}
+
+bootWithCCD {
+  group 'ccd tasks'
+
+  dependsOn(buildCCDXlsx)
+  dependsOn(runOtherServices)
+  dependsOn(importBpmnDiagrams)
+
+  //AAT or Local (IDAM and S2S Simulators)
+  authMode = AuthMode.AAT
+
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+
+  doFirst() {
+    project.file('./.aat-env').readLines().each() {
+      def index = it.indexOf("=")
+      def key = it.substring(0, index)
+      def value = it.substring(index + 1)
+      environment(key, value)
+    }
+  }
 
 }
 
-runAndPublishConsumerPactTests.dependsOn contract
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
+task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contract)
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
+}
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
@@ -512,13 +565,9 @@ project.ext {
 
 pact {
   publish {
-    pactDirectory = 'target/pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if (pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
-      excludes = ['civil_service-Idam_api']
-      pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
-    }
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
+    pactDirectory = 'pacts'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pactVersion
   }
 }

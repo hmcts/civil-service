@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -22,33 +20,29 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenAppStateHelperService.class,
-    TriggerGenAppLocationUpdateCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 
  class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     TriggerGenAppLocationUpdateCallbackHandler handler;
 
-    @MockBean
+    @Mock
     private GenAppStateHelperService helperService;
+
+    @Mock
+    private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     private static final String authToken = "Bearer TestAuthToken";
 
@@ -106,8 +100,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
         String expectedErrorMessage = "Could not trigger event to update location on application under case: "
             + caseData.getCcdCaseReference();
         when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
-        when(helperService.triggerEvent(any(CaseData.class), eq(TRIGGER_LOCATION_UPDATE)))
-            .thenThrow(new RuntimeException());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

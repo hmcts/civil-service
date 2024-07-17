@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -70,7 +70,7 @@ public class InitiateGeneralApplicationService {
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final UserRoleCaching userRoleCaching;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
@@ -99,7 +99,7 @@ public class InitiateGeneralApplicationService {
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(dataBuilder, caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -121,8 +121,7 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
-                                                CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -430,7 +429,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
-        if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
+        if (isDefendant1RespondedFirst(caseData) && !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
             return CaseLocationCivil.builder()

@@ -24,7 +24,7 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isDashboardServiceEnabled()
+        return featureToggleService.isLipVLipEnabled()
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
@@ -49,6 +49,16 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         return false;
     }
 
+    /**
+     * Called just before a scenario is recorded, when the scenario is known and should record is true.
+     *
+     * @param caseData case info
+     * @param authToken auth token
+     */
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        // to be overridden
+    }
+
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -57,6 +67,8 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
             caseData)).build();
 
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
+            beforeRecordScenario(caseData, authToken);
+
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 scenario,

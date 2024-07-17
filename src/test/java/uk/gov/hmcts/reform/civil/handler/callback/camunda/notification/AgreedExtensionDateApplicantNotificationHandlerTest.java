@@ -116,7 +116,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .build();
 
-                Map<String, String> expectedNotificationData = getNotificationDataMap(
+                Map<String, String> localExpectedNotificationData = getNotificationDataMap(
                     caseData.getRespondent2ResponseDeadline().toLocalDate()
                 );
 
@@ -125,7 +125,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     templateId,
-                    expectedNotificationData,
+                    localExpectedNotificationData,
                     reference
                 );
             }

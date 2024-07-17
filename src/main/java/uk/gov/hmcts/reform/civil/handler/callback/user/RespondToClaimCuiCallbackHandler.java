@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -48,6 +49,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    @Value("${case-flags.logging.enabled:false}")
+    private boolean caseFlagsLoggingEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,6 +69,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui before about to start: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
+        }
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1());
 
@@ -75,6 +86,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui before about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                callbackParams.getCaseData().getRespondent1().getFlags()
+            );
+        }
+
         CaseData caseData = getUpdatedCaseData(callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
@@ -86,6 +105,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             addEventAndDateAddedToRespondentExperts(builder);
             addEventAndDateAddedToRespondentWitnesses(builder);
         }
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(
             builder, featureToggleService.isUpdateContactDetailsEnabled());
@@ -108,6 +128,14 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui after about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
+        }
+
         return responseBuilder.build();
     }
 
@@ -121,7 +149,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null).name())
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
                 responseDate,
                 allocatedTrack

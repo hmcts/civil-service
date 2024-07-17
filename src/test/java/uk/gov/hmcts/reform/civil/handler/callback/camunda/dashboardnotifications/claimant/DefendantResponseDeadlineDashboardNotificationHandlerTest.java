@@ -69,7 +69,7 @@ public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends B
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

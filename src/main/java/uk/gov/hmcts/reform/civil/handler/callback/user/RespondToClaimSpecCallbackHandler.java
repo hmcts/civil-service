@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -52,7 +51,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -60,11 +58,13 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -163,13 +163,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final List<RespondToClaimConfirmationHeaderSpecGenerator> confirmationHeaderGenerators;
     private final FeatureToggleService toggleService;
     private final UserService userService;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final FrcDocumentsUtils frcDocumentsUtils;
 
     public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
         + "cannot attend hearing within next 3 months.";
@@ -1391,7 +1392,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
-        final AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
@@ -1450,7 +1450,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
             }
 
             // 1v1, 2v1
@@ -1467,7 +1467,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedData
                 .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
+                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
@@ -1620,6 +1620,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
+        frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -1870,8 +1871,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         );
     }
 
-    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
-        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate, allocatedTrack);
+    private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate) {
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

@@ -10,9 +10,9 @@ VALUES ('Scenario.AAA6.ClaimIssue.Response.Required', '{}', '{"Notice.AAA6.Claim
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA6.ClaimIssue.Response.Required', 'You haven´t responded to the claim', 'Nid ydych wedi ymateb i''r hawliad',
-        '<p class="govuk-body">You need to respond before ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a>.</p>',
-        '<p class="govuk-body">Mae angen i chi ymateb cyn ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Ymateb i''r hawliad</a>.</p>',
+VALUES ('Notice.AAA6.ClaimIssue.Response.Required', 'You haven''t responded to the claim', 'Nid ydych wedi ymateb i''r hawliad',
+        '<p class="govuk-body">You need to respond before ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining.</p><p class="govuk-body"><a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a></p>',
+        '<p class="govuk-body">Mae angen i chi ymateb cyn ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill.</p><p class="govuk-body"><a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Ymateb i''r hawliad</a></p>',
         'DEFENDANT');
 
 /**
@@ -53,5 +53,8 @@ values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">V
         'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{3, 3}', 'DEFENDANT', 13),
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>Gweld y Dyfarniad</a>',
         'Dyfarniad gan y llys', 'Judgment.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 14),
+       ('<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+        'Applications', '<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+        'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.Response.Required', '{4, 4}', 'DEFENDANT', 15),
        ('<a>View applications</a>', 'Applications' ,'<a>Gweld y cais i gyd</a>',
-        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 15);
+        'Ceisiadau', 'Application.View', 'Scenario.AAA6.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 16);

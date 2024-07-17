@@ -14,9 +14,9 @@ import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class UpdateCaseManagementDetailsService {
 
     private final LocationHelper locationHelper;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final AirlineEpimsService airlineEpimsService;
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";

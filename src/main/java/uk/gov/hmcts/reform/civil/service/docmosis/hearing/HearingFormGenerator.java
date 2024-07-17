@@ -2,23 +2,22 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
@@ -48,8 +47,9 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private LocationRefData caseManagementLocationDetails;
+    private final DocumentHearingLocationHelper documentHearingLocationHelper;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
@@ -73,17 +73,11 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public HearingForm getTemplateData(CaseData caseData, String authorisation) {
-        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authorisation));
-        var foundLocations = locations.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
-        } else {
-            throw new IllegalArgumentException("Base Court Location not found, in location data");
-        }
+        caseManagementLocationDetails = documentHearingLocationHelper
+            .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
         return HearingForm.builder()
-            .courtName(caseManagementLocationDetails.getVenueName())
+            .courtName(caseManagementLocationDetails.getExternalShortName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getCcdCaseReference().toString())

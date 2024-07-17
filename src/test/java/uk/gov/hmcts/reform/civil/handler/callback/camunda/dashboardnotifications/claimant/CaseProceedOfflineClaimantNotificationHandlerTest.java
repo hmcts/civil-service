@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,10 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_FAST_TRACK;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -72,7 +76,7 @@ public class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallb
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -85,6 +89,124 @@ public class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallb
                     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
                     "BEARER_TOKEN",
                     ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedForCaseProgression() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedForCaseProgressionOnFastTrackClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
+                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_FAST_TRACK.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenNotInvoked() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                    .respondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .ccdCaseReference(1234L)
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient, never()).recordScenario(
+                    caseData.getCcdCaseReference().toString(),
+                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                    "BEARER_TOKEN",
+                    ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenCaseProgressionIsNotEnabledAndIsOnCaseProgressionState() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
     }

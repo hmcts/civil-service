@@ -70,6 +70,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     public String getScenario(CaseData caseData) {
         if (isCaseStateSettled(caseData)) {
             return getCaseSettledScenarios(caseData);
+        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         } else if (isCourtDecisionRejected(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario();
         } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
@@ -95,8 +97,6 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     private String getCaseSettledScenarios(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && caseData.isClaimantIntentionSettlePartAdmit()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         }
         return null;
     }
