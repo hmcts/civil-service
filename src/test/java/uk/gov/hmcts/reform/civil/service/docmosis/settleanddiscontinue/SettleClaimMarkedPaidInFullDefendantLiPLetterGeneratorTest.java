@@ -54,7 +54,7 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
     private static final String SETTLE_CLAIM_PAID_IN_FULL_LETTER = "settle-claim-paid-in-full-letter";
     public static final String TASK_ID = "SendSettleClaimPaidInFullLetterLipDef";
     private static final String TEST = "test";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
+    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, TEST);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
