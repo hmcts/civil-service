@@ -111,7 +111,6 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
-
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalledWhenClaimantRejectsThePartAdmit() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
