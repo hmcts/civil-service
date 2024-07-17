@@ -63,7 +63,6 @@ public class NotifyDefaultJudgmentHandler extends CallbackHandler {
         return EVENTS;
     }
 
-
     private boolean isSpecHandler(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(CaseEvent.NOTIFY_RPA_DJ_SPEC.name());

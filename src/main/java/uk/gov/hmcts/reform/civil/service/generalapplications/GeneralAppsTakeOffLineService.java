@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.generalapplications;
 
-import io.jsonwebtoken.lang.Collections;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +15,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_PROCEEDS_
 @AllArgsConstructor
 public class GeneralAppsTakeOffLineService {
 
-
     private final GenAppStateHelperService helperService;
     private static final String APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION = "Proceeds In Heritage";
-
 
     public void takeOffLine(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
@@ -34,8 +30,8 @@ public class GeneralAppsTakeOffLineService {
                 helperService.triggerEvent(caseData, APPLICATION_PROCEEDS_IN_HERITAGE);
 
                 caseData = helperService.updateApplicationDetailsInClaim(caseData,
-                            APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
-                            GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
+                    APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
+                    GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
 
             }
         } catch (Exception e) {
@@ -43,6 +39,5 @@ public class GeneralAppsTakeOffLineService {
                 + caseData.getCcdCaseReference();
             log.error(errorMessage, e);
         }
-
     }
 }

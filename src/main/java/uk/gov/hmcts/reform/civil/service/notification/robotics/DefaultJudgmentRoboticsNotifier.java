@@ -25,7 +25,6 @@ public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
         this.toggleService = toggleService;
     }
 
-
     @Override
     public void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken) {
         if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {

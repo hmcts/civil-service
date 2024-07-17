@@ -24,7 +24,6 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
 
-
     @Override
     public void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,
                                                               CaseHandledOfflineRecipient recipientType) {
@@ -40,7 +39,6 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
             || CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR2.equals(recipientType))) {
             sendNotificationToSolicitorSpec(caseData, recipientEmailAddress, recipientType);
         }
-
     }
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData,

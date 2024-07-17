@@ -50,5 +50,4 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
-
 }

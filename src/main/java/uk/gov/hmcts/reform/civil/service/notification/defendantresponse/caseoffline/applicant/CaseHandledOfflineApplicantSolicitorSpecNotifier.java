@@ -33,7 +33,6 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
         this.organisationService = organisationService;
     }
 
-
     public void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData) {
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String templateID;
@@ -57,7 +56,6 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
         }
 
     }
-
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {
         String emailTemplate = notificationsProperties.getClaimantSolicitorCounterClaimForSpec();

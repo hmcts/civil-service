@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 @Component
 @RequiredArgsConstructor
 public class FullDefenceRespondentSolicitorTwoCCUnspecNotifier extends FullDefenceSolicitorUnspecNotifier {
+
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 

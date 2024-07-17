@@ -30,6 +30,5 @@ public abstract class CaseHandledOfflineApplicantSolicitorNotifier implements No
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
-
     public abstract void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData);
 }

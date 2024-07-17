@@ -21,12 +21,13 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 @RequiredArgsConstructor
-public class  FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefenceSolicitorNotifier {
+public class FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefenceSolicitorNotifier {
 
     //NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+
     @Override
     protected String getRecipient(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null

@@ -22,7 +22,6 @@ public class DefendantResponseNonCamundaWorkFlow {
     private final DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     private final IStateFlowEngine stateFlowEngine;
 
-
     public void processWorkflow(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String userToken = (String) callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN);
@@ -36,12 +35,9 @@ public class DefendantResponseNonCamundaWorkFlow {
             || flowState.equals(COUNTER_CLAIM.fullName())
             || flowState.equals(FULL_DEFENCE.fullName())) {
             directionsQuestionnairePreparer.prepareDirectionsQuestionnaire(caseData, userToken);
-
-        }
-        else if (flowState.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())) {
+        } else if (flowState.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())) {
             directionsQuestionnairePreparer.prepareDirectionsQuestionnaire(caseData, userToken);
         }
-
 
     }
 

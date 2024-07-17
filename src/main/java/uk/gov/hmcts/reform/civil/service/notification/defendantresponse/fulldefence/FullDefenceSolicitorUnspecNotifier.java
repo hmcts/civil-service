@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-public abstract class FullDefenceSolicitorUnspecNotifier extends  FullDefenceSolicitorNotifier{
+public abstract class FullDefenceSolicitorUnspecNotifier extends FullDefenceSolicitorNotifier {
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {

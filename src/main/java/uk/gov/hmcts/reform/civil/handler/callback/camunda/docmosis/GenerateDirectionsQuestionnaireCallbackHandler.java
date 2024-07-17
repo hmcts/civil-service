@@ -52,14 +52,12 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         return EVENTS;
     }
 
-
     /**
      * Next version for prepareDirectionsQuestionnaire.
      *
      * @param callbackParams parameters of the callback
      * @return response of the callback
      */
-
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = directionsQuestionnairePreparer.prepareDirectionsQuestionnaire(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());

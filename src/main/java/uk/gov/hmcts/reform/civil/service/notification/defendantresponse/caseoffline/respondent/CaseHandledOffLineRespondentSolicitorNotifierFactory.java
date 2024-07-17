@@ -13,7 +13,7 @@ public class CaseHandledOffLineRespondentSolicitorNotifierFactory {
     private final CaseHandledOfflineRespondentSolicitorUnspecNotifier caseHandledOfflineRespondentSolicitorUnspecNotifier;
     private final CaseHandledOfflineRespondentSolicitorSpecNotifier caseHandledOfflineRespondentSolicitorSpecNotifier;
 
-    public CaseHandledOfflineRespondentSolicitorNotifier getCaseHandledOfflineSolicitorNotifier(CaseData caseData){
+    public CaseHandledOfflineRespondentSolicitorNotifier getCaseHandledOfflineSolicitorNotifier(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseHandledOfflineRespondentSolicitorSpecNotifier;
         } else {
