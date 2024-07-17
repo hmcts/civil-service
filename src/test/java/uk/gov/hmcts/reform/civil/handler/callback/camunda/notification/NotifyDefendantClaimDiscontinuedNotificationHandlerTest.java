@@ -97,6 +97,7 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
                 "defendant-claim-discontinued-000DC001"
             );
         }
+
         @Test
         void shouldNotifyRespondentLip_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
