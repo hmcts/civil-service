@@ -19,13 +19,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1;
 
 @SpringBootTest(classes = {
-    ClaimDiscontinuedLiPDefendant1LetterHandler.class,
+    ClaimDiscontinuedEmptyHandler.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimDiscontinuedLiPDefendant1LetterHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimDiscontinuedEmptyHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private ClaimDiscontinuedLiPDefendant1LetterHandler handler;
+    private ClaimDiscontinuedEmptyHandler handler;
 
     public static final String TASK_ID_DEFENDANT = "ClaimDiscontinuedLiPLetterDef1";
 
