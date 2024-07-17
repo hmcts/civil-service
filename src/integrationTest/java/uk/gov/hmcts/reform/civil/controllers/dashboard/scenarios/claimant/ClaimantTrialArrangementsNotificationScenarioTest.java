@@ -78,7 +78,5 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
                 jsonPath("$[1].hintTextCy").value("Deadline is 12am on 4 Mawrth 2024")
             );
     }
-
-
 }
 
