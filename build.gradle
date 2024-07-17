@@ -4,7 +4,7 @@ plugins {
   id 'application'
   id 'checkstyle'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.5'
+  id 'io.spring.dependency-management' version '1.1.6'
   id 'org.springframework.boot' version '2.7.18'
   id 'org.owasp.dependencycheck' version '9.2.0'
   id 'com.github.ben-manes.versions' version '0.51.0'
@@ -19,8 +19,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.10.2',
-  junitPlatform     : '1.10.2',
+  junit             : '5.10.3',
+  junitPlatform     : '1.10.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.32',
@@ -454,13 +454,13 @@ dependencies {
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
 
   // dashboard specific changes
 
