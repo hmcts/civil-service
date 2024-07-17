@@ -48,7 +48,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData) {
         var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
-                .caseNumber(caseData.getLegacyCaseReference().toString())
+                .caseNumber(caseData.getLegacyCaseReference())
                 .claimant1Name(caseData.getApplicant1().getPartyName())
                 .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
                 .defendant1Name(caseData.getRespondent1().getPartyName())
