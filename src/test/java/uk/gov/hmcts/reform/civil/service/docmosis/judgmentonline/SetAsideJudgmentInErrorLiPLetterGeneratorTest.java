@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -33,21 +33,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER;
 
-@SpringBootTest(classes = {
-    SetAsideJudgmentInErrorLiPLetterGenerator.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
 
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @Mock
     private BulkPrintService bulkPrintService;
-    @Autowired
+    @InjectMocks
     private SetAsideJudgmentInErrorLiPLetterGenerator setAsideJudgmentInErrorLiPLetterGenerator;
     private static final String SET_ASIDE_JUDGMENT_LETTER = "set-aside-judgment-letter";
 

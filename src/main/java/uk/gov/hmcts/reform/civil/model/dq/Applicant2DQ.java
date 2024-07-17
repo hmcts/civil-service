@@ -170,4 +170,9 @@ public class Applicant2DQ implements DQ {
     public VulnerabilityQuestions getVulnerabilityQuestions() {
         return applicant2DQVulnerabilityQuestions;
     }
+
+    @Override
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return null;
+    }
 }

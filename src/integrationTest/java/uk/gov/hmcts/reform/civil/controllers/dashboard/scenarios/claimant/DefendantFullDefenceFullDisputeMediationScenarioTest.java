@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
@@ -42,6 +43,7 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .build();
 
         handler.handle(callbackParams(caseData));
