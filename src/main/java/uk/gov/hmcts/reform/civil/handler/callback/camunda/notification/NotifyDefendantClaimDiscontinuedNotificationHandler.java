@@ -69,8 +69,8 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 getLIPTemplate(),
                 addPropertiesLip(caseData),
                 getReferenceTemplate(caseData)
-        );
-    }
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
