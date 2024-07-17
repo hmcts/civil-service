@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.TrialArrangementsDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
 
@@ -35,7 +36,7 @@ public class DefendantTrialArrangementsNotificationScenarioTest extends CaseProg
             .drawDirectionsOrderSmallClaims(NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .orderType(OrderType.DECIDE_DAMAGES)
-            .hearingDate(LocalDate.of(2024, 03, 25))
+            .hearingDate(LocalDate.of(2024, 04, 1))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -53,6 +54,20 @@ public class DefendantTrialArrangementsNotificationScenarioTest extends CaseProg
                 "Cadarnhau eich trefniadau treial"),
                 jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rhaid i chi <a href=\"{ADD_TRIAL_ARRANGEMENTS}\" class=\"govuk-link\">gadarnhau eich trefniadau treial</a> erbyn 4 Mawrth 2024. Mae hyn yn golygu y bydd angen i chi gadarnhau a yw'r achos yn barod ar gyfer treial ai peidio. Bydd angen i chi hefyd gadarnhau a yw'r amgylchiadau wedi newid ers i chi gwblhau'r holiadur cyfarwyddiadau. Cyfeiriwch at yr <a href=\"{VIEW_DEFENDANT_HEARING_REQS}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">holiadur a gyflwynwyd gennych</a> os nad ydych yn siŵr beth ddywedoch chi o'r blaen.</p>")
+            );
+
+        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
+                    "<a href={ADD_TRIAL_ARRANGEMENTS} class=\"govuk-link\">Add the trial arrangements</a>"),
+                jsonPath("$[0].currentStatusEn").value(TaskStatus.ACTION_NEEDED.getName()),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={ADD_TRIAL_ARRANGEMENTS} class=\"govuk-link\">Ychwanegu trefniadau'r treial</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
+                jsonPath("$[1].hintTextEn").value("Deadline is 12am on 4 March 2024"),
+                jsonPath("$[1].hintTextCy").value("Deadline is 12am on 4 Mawrth 2024")
             );
     }
 }
