@@ -1815,8 +1815,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1835,8 +1833,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1909,7 +1905,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsExactly("3", "12345");
+                .containsExactly("10", "214320");
         }
     }
 

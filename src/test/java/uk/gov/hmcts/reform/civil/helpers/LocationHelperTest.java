@@ -82,6 +82,7 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
@@ -115,6 +116,7 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
@@ -147,6 +149,7 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
@@ -157,7 +160,7 @@ class LocationHelperTest {
     }
 
     @Test
-    void whenDefendantIsPerson_courtIsDefendantsPreferred() {
+    void whenDefendantIsPerson_courtIsClaimantsPreferredAsUnspec() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -176,13 +179,14 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
             .build();
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
-        Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(defendant1PreferredCourt);
+        Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(claimantPreferredCourt);
     }
 
     @Test
@@ -207,6 +211,7 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
@@ -236,6 +241,7 @@ class LocationHelperTest {
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
                                        .build()
                                )
                                .build())
@@ -246,7 +252,7 @@ class LocationHelperTest {
     }
 
     @Test
-    void whenUnspecDefendant1IndividualDefendant2Company_thenCourtIsDefendant1() {
+    void whenUnspecDefendant1IndividualDefendant2Company_thenCourtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -264,6 +270,7 @@ class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
+                                       .responseCourtCode("123")
                                        .caseLocation(defendant1PreferredCourt)
                                        .build()
                                )
@@ -274,6 +281,7 @@ class LocationHelperTest {
             .respondent2DQ(Respondent2DQ.builder()
                                .respondent2DQRequestedCourt(
                                    RequestedCourt.builder()
+                                       .responseCourtCode("123")
                                        .caseLocation(defendant2PreferredCourt)
                                        .build()
                                )
@@ -284,7 +292,7 @@ class LocationHelperTest {
             .build();
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
-        Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(defendant1PreferredCourt);
+        Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(claimantPreferredCourt);
     }
 
     @Test
@@ -298,6 +306,7 @@ class LocationHelperTest {
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
+                                      .responseCourtCode("123")
                                       .caseLocation(claimantPreferredCourt)
                                       .build()
                               )
@@ -308,6 +317,7 @@ class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
+                                       .responseCourtCode("123")
                                        .caseLocation(defendant1PreferredCourt)
                                        .build())
                                .build())
@@ -317,6 +327,7 @@ class LocationHelperTest {
             .respondent2DQ(Respondent2DQ.builder()
                                .respondent2DQRequestedCourt(
                                    RequestedCourt.builder()
+                                       .responseCourtCode("123")
                                        .caseLocation(defendant2PreferredCourt)
                                        .build())
                                .build())

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -60,12 +61,12 @@ public class LocationHelper {
         Supplier<Party.Type> getDefendantType;
         Supplier<Optional<RequestedCourt>> getDefendantCourt;
         if (leadDefendantIs1) {
-            log.debug("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
+            log.info("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent1()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent1DQ())
                 .map(Respondent1DQ::getRespondent1DQRequestedCourt);
         } else {
-            log.debug("Case {}, lead defendant is 2", caseData.getLegacyCaseReference());
+            log.info("Case {}, lead defendant is 2", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent2()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent2DQ())
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
@@ -78,33 +79,47 @@ public class LocationHelper {
                 return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
             } else {
                 log.info("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getLegacyCaseReference());
-                assignPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
                 return prioritized.stream().findFirst();
             }
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
-            assignPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+            assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
             return prioritized.stream().findFirst();
         }
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assignPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+            getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+                log.info("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                prioritized.add(requestedCourt);
+            });
             return prioritized.stream().findFirst();
         }
 
         return Optional.empty();
     }
 
-    private void assignPreferredCourt(CaseData caseData, Supplier<Party.Type> getDefendantType,
+    private void assignSpecPreferredCourt(CaseData caseData, Supplier<Party.Type> getDefendantType,
                                       Supplier<Optional<RequestedCourt>> getDefendantCourt, List<RequestedCourt> prioritized) {
         if (PEOPLE.contains(getDefendantType.get())) {
-            log.info("Case {}, defendant is a person, so their court request has priority ", caseData.getLegacyCaseReference());
-            getDefendantCourt.get().ifPresent(prioritized::add);
-        } else {
-            log.info("Case {}, defendant is a group, so claimant's court request has priority ", caseData.getLegacyCaseReference());
-            getClaimantRequestedCourt(caseData).ifPresent(prioritized::add);
+            getDefendantCourt.get()
+                .filter(this::hasInfo)
+                .ifPresent(requestedCourt -> {
+                    log.info("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
+                    prioritized.add(requestedCourt);
+                });
         }
+        getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+            log.info("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+            prioritized.add(requestedCourt);
+        });
+    }
+
+    private boolean hasInfo(RequestedCourt requestedCourt) {
+        return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
+            || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
+            .map(DynamicList::getValue).isPresent();
     }
 
     private BigDecimal getClaimValue(CaseData caseData) {
