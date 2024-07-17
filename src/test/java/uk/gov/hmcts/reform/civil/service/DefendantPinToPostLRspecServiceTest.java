@@ -194,8 +194,20 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         @Test
-        void shouldReturnFalseIfUserDetailsIsEmpty() {
-            CaseData caseData = new CaseDataBuilder().defendantUserDetails(IdamUserDetails.builder().build()).build();
+        void shouldReturnFalseIfUserDetailsEmailIsEmpty() {
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(IdamUserDetails.builder().id("1234").build()).build();
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
+
+            assertFalse(status);
+        }
+
+        @Test
+        void shouldReturnFalseIfUserDetailsIdIsEmpty() {
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(
+                IdamUserDetails.builder().email("test@test.com").build()
+            ).build();
             CaseDetails caseDetails = createCaseDetails(caseData);
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
