@@ -1,17 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import org.camunda.bpm.engine.RuntimeService;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
 
 @ExtendWith(SpringExtension.class)
@@ -25,21 +34,35 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private GenerateDiscontinueClaimCallbackHandler handler;
+    @MockBean
+    private RuntimeService runTimeService;
 
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).containsOnly(GEN_NOTICE_OF_DISCONTINUANCE, GEN_NOTICE_OF_DISCONTINUANCE);
+    private static final String processId = "process-id";
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
+            caseData.setCourtPermissionNeeded(
+                toggleState ? SettleDiscontinueYesOrNoList.YES : SettleDiscontinueYesOrNoList.NO);
+
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(GEN_NOTICE_OF_DISCONTINUANCE.name())
+                             .build())
+                .build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(runTimeService).setVariable(processId, "JUDGE_ORDER_VERIFICATION_REQUIRED", toggleState);
+        }
     }
 
-    @Test
-    void shouldReturnSpecCamundaTask_whenSpecEvent() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "GEN_NOTICE_OF_DISCONTINUANCE").build()).build())).isEqualTo("GenerateNoticeOfDiscontinueClaim");
-    }
-
-    @Test
-    void shouldReturnUnSpecCamundaTask_whenUnSpecEvent() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "GEN_NOTICE_OF_DISCONTINUANCE").build()).build())).isEqualTo("GenerateNoticeOfDiscontinueClaim");
-    }
 }
