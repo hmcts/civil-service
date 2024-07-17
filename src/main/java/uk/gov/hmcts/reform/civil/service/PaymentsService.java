@@ -158,7 +158,10 @@ public class PaymentsService {
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
-        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+        CreateServiceRequestDTO createServiceRequestDTO = buildServiceRequest(caseData);
+        log.info("Service request payment amount for {} is {}", caseData.getCcdCaseReference(),
+                 createServiceRequestDTO.getFees()[0].getCalculatedAmount());
+        return paymentsClient.createServiceRequest(authToken, createServiceRequestDTO);
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
