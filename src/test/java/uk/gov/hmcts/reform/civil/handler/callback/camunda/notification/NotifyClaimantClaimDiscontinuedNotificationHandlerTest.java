@@ -61,7 +61,7 @@ class NotifyClaimantClaimDiscontinuedNotificationHandlerTest extends BaseCallbac
         }
 
         @Test
-        void shouldNotifyClaimantJudgmentByAdmission_whenInvoked() {
+        void shouldNotifyClaimantClaimDiscontinued_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
