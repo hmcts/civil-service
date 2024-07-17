@@ -443,6 +443,8 @@ notifications:
   notifyLiPOrderTranslatedTemplate: "d81749f7-cef5-4159-8d99-146eb572a690"
   notifyClaimDiscontinuedLRTemplate: "9a7cc57b-38ab-4c0b-b63a-f5927241f18e"
 
+  notifyClaimantLrValidationDiscontinuanceFailureTemplate: "25398d9e-bb5f-4778-b76f-625c355f7c06"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

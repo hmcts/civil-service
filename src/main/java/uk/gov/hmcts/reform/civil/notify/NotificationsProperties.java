@@ -619,4 +619,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyClaimDiscontinuedLRTemplate;
 
+    @NotEmpty
+    private String notifyClaimantLrValidationDiscontinuanceFailureTemplate;
+
 }
