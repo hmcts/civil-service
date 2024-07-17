@@ -23,7 +23,7 @@ def versions = [
   junitPlatform     : '1.10.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.32',
+  lombok            : '1.18.34',
   springSecurity    : '5.8.12',
   camunda           : '7.20.0',
   jackson           : '2.17.1',
@@ -128,7 +128,7 @@ allprojects {
         entry 'aws-java-sdk-s3'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.24') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.26') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
