@@ -144,7 +144,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && true;
+        return true;
     }
 
     public boolean isGenAppsAllowedPreSdo() {
