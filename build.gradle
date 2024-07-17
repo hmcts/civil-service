@@ -19,8 +19,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.10.2',
-  junitPlatform     : '1.10.2',
+  junit             : '5.10.3',
+  junitPlatform     : '1.10.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.32',
@@ -359,7 +359,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.1'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.2'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -454,13 +454,13 @@ dependencies {
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.2')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.3')
 
   // dashboard specific changes
 
