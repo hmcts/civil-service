@@ -46,21 +46,16 @@ public class DefendantPinToPostLRspecService {
     }
 
     public Map<String, Object> removePinInPostData(CaseDetails caseDetails) {
-        try {
-            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-            DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
-                .citizenCaseRole(pinInPostData.getCitizenCaseRole())
-                .respondentCaseRole(pinInPostData.getRespondentCaseRole())
-                .expiryDate(pinInPostData.getExpiryDate()).build();
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
+        DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
+            .citizenCaseRole(pinInPostData.getCitizenCaseRole())
+            .respondentCaseRole(pinInPostData.getRespondentCaseRole())
+            .expiryDate(pinInPostData.getExpiryDate()).build();
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("respondent1PinToPostLRspec", updatePinInPostData);
-            return data;
-        } catch (FeignException e) {
-            log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
-            throw e;
-        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("respondent1PinToPostLRspec", updatePinInPostData);
+        return data;
     }
 
     public DefendantPinToPostLRspec buildDefendantPinToPost() {
