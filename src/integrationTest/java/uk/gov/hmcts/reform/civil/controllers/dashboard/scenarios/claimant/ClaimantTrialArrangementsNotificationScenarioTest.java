@@ -74,8 +74,8 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
                 jsonPath("$[0].taskNameCy").value(
                     "<a href={ADD_TRIAL_ARRANGEMENTS} class=\"govuk-link\">Ychwanegu trefniadau'r treial</a>"),
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.ACTION_NEEDED.getWelshName()),
-                jsonPath("$[1].hintTextEn").value("Deadline is 12am on 4 March 2024"),
-                jsonPath("$[1].hintTextCy").value("Deadline is 12am on 4 Mawrth 2024")
+                jsonPath("$[0].hintTextEn").value("Deadline is 12am on 4 March 2024"),
+                jsonPath("$[0].hintTextCy").value("Deadline is 12am on 4 Mawrth 2024")
             );
     }
 }
