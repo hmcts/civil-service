@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
-//fail
 @ExtendWith(MockitoExtension.class)
 class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
