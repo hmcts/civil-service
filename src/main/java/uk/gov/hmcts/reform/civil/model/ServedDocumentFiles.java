@@ -12,6 +12,8 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Data
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Builder
 public class ServedDocumentFiles {
 
