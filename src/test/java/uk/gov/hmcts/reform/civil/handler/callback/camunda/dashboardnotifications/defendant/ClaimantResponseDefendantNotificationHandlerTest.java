@@ -671,4 +671,34 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             ScenarioRequestParams.builder().params(params).build()
         );
     }
+
+    @Test
+    void shouldReturnNullWhenNothingIsMatched() {
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1000001L)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            null,
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
 }
