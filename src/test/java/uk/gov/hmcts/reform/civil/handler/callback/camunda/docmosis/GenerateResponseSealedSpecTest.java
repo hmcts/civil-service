@@ -5,11 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -46,31 +44,26 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateResponseSealedSpec.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+//fail
+@ExtendWith(MockitoExtension.class)
 class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private GenerateResponseSealedSpec handler;
 
-    @MockBean
+    @Mock
     private SealedClaimResponseFormGeneratorForSpec sealedClaimResponseFormGeneratorForSpec;
 
-    @Autowired
+    @InjectMocks
     private ObjectMapper mapper;
 
-    @Autowired
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @Mock
     private CivilDocumentStitchingService civilDocumentStitchingService;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
