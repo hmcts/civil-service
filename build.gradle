@@ -24,7 +24,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.34',
-  springSecurity    : '5.8.12',
+  springSecurity    : '5.8.13',
   camunda           : '7.20.0',
   jackson           : '2.17.2',
   testcontainers    : '1.19.8'
@@ -102,7 +102,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.24'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.13'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
