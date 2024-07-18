@@ -8,9 +8,7 @@ public abstract class FullDefenceSolicitorNotifier implements NotificationData {
     protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     public void notifySolicitorForDefendantResponse(CaseData caseData) {
-        String recipient;
-        recipient = getRecipient(caseData);
-        sendNotificationToSolicitor(caseData, recipient);
+        sendNotificationToSolicitor(caseData, getRecipient(caseData));
 
     }
 
