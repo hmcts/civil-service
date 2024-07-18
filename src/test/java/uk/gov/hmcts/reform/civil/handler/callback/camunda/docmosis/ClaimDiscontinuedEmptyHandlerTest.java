@@ -27,7 +27,7 @@ public class ClaimDiscontinuedEmptyHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ClaimDiscontinuedEmptyHandler handler;
 
-    public static final String TASK_ID_DEFENDANT = "ClaimDiscontinuedLiPLetterDef1";
+    public static final String TASK_ID_DEFENDANT = "ClaimDiscontinuedEmptyHandler";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
