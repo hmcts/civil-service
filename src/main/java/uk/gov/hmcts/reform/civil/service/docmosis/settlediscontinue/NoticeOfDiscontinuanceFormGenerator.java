@@ -59,7 +59,8 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
                         ? caseData.getClaimantsConsentToDiscontinuance().toString() : null)
                 .courtPermission(caseData.getCourtPermissionNeeded().getDisplayedValue())
-                .permissionGranted(nonNull(caseData.getIsPermissionGranted()) ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
+                .permissionGranted(nonNull(caseData.getIsPermissionGranted())
+                        ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
                 .judgeName(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedJudge() : null)
                 .judgementDate(isCourtPermissionGranted(caseData)
@@ -67,17 +68,24 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
                 .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
                 .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
-                .discontinuingAgainstOneDefendant(nonNull(caseData.getDiscontinuingAgainstOneDefendant())
-                        ? caseData.getDiscontinuingAgainstOneDefendant().getValue().getLabel() : null)
+                .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
                 .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
                         ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null);
         return noticeOfDiscontinueBuilder.build();
     }
 
     private String getClaimantWhoIsDiscontinue(CaseData caseData) {
-        return nonNull(caseData.getClaimantWhoIsDiscontinuing())
+        return (nonNull(caseData.getClaimantWhoIsDiscontinuing())
+                && nonNull(caseData.getClaimantWhoIsDiscontinuing().getValue()))
                 ? caseData.getClaimantWhoIsDiscontinuing().getValue().getLabel()
                 : caseData.getApplicant1().getPartyName();
+    }
+
+    private String getDiscontinueAgainstOneDefendant(CaseData caseData) {
+        return (nonNull(caseData.getDiscontinuingAgainstOneDefendant())
+                && nonNull(caseData.getDiscontinuingAgainstOneDefendant().getValue()))
+                ? caseData.getDiscontinuingAgainstOneDefendant().getValue().getLabel()
+                : null;
     }
 
     private boolean isCourtPermissionGranted(CaseData caseData) {
