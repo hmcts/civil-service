@@ -63,7 +63,8 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateCUIResponseSealedFormCallBackHandler(mapper, formGenerator, systemGeneratedDocumentService, assignCategoryId, civilDocumentStitchingService, featureToggleService);
+        handler = new GenerateCUIResponseSealedFormCallBackHandler(mapper, formGenerator, systemGeneratedDocumentService,
+                                                                   assignCategoryId, civilDocumentStitchingService, featureToggleService);
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
