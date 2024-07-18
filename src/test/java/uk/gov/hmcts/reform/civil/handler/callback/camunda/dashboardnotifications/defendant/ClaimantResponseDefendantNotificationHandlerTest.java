@@ -645,7 +645,6 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
