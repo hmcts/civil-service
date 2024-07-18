@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -46,7 +47,8 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
-
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParamsTestSDO(caseData));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.now().plusDays(7));
