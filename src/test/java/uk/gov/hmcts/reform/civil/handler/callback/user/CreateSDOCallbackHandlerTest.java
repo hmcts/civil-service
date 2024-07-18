@@ -277,8 +277,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .caseAccessCategory(UNSPEC_CLAIM)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -439,8 +437,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -503,8 +499,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(fastTrackList)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -1586,10 +1580,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                   .region("dummy region")
                                                   .build()
                                           ).build()
-                                  ).build())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-                .build();
+                                  ).build()
+                ).build();
 
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObject());
@@ -1838,8 +1830,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .build();
             given(locationRefDataService.getHearingCourtLocations(any()))
@@ -2493,10 +2483,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDRHFields() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-                .build();
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
                 LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
