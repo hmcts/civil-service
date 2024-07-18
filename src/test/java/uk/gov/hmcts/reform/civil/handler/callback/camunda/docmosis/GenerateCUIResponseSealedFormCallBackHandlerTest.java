@@ -5,11 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -42,30 +40,32 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateCUIResponseSealedFormCallBackHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+    @InjectMocks
     private GenerateCUIResponseSealedFormCallBackHandler handler;
-    @MockBean
+    @Mock
     private SealedClaimLipResponseFormGenerator formGenerator;
 
-    @MockBean
+    @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
-    @MockBean
+    @Mock
     private CivilDocumentStitchingService civilDocumentStitchingService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @Mock
     private AssignCategoryId assignCategoryId;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateCUIResponseSealedFormCallBackHandler(mapper, formGenerator, systemGeneratedDocumentService, assignCategoryId, civilDocumentStitchingService, featureToggleService);
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     private static final CaseDocument FORM =
             CaseDocument.builder()
@@ -108,14 +108,9 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
                     .build();
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
-    }
-
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder().build();
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -127,7 +122,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         //Given
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder().build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         //When
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -139,6 +133,8 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()),
                 element(CaseDocument.builder().documentName("document name").build()));
