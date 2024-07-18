@@ -12,14 +12,12 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT2;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1;
 
 @Service
 @RequiredArgsConstructor
 public class ClaimDiscontinuedEmptyHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1,
         NOTIFY_DISCONTINUANCE_DEFENDANT2);
     public static final String TASK_ID = "ClaimDiscontinuedEmptyHandler";
 
