@@ -82,7 +82,6 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
             .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
             .dateOfEvent(LocalDate.now())
-            .nameAndContactDetailsOwningCourt("nameAndContactDetailsOwningCourt") //TODO
             .build();
     }
 }

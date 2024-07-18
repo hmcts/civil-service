@@ -29,5 +29,4 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetter implements MappableOb
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate dateOfEvent;
-    private final String nameAndContactDetailsOwningCourt;
 }

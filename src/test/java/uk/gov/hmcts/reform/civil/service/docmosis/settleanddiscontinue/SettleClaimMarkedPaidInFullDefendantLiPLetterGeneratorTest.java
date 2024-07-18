@@ -63,7 +63,7 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        // given
+        //Given
         when(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER)
@@ -96,10 +96,10 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             .legacyCaseReference("100DC001")
             .build();
 
-        // when
+        //When
         settleClaimMarkedPaidInFullDefendantLiPLetterGenerator.generateAndPrintSettleClaimPaidInFullLetter(caseData, BEARER_TOKEN);
 
-        // then
+        //Then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
