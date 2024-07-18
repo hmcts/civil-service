@@ -26,9 +26,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DELETE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT_RECIPIENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DELETE;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestForReconsiderationRequestedByOtherPartyDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -61,7 +62,7 @@ public class RequestForReconsiderationRequestedByOtherPartyDefendantNotification
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTime() {
+    public void configureDashboardNotificationsForDefendantRequest() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -87,7 +88,7 @@ public class RequestForReconsiderationRequestedByOtherPartyDefendantNotification
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTimeOtherPartyLR() {
+    public void configureDashboardNotificationsForDefendantRequestOtherPartyLR() {
 
         HashMap<String, Object> params = new HashMap<>();
 
@@ -113,7 +114,35 @@ public class RequestForReconsiderationRequestedByOtherPartyDefendantNotification
     }
 
     @Test
-    public void configureDashboardNotificationsForDefendantRequestMoreTimeSecondRequest() {
+    public void configureDashboardNotificationsForDefendantRequestOtherPartyLRSecondRequest() {
+
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+            .toBuilder().respondent1Represented(YesOrNo.YES)
+            .orderRequestedForReviewDefendant(YesOrNo.YES)
+            .orderRequestedForReviewClaimant(YesOrNo.YES)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotificationsForDefendantRequestSecondRequest() {
 
         HashMap<String, Object> params = new HashMap<>();
 
