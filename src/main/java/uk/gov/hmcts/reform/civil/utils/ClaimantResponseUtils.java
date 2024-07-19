@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 
@@ -14,13 +12,13 @@ import java.time.LocalDate;
 
 import static java.util.Objects.isNull;
 
+@Component
+@RequiredArgsConstructor
 public class ClaimantResponseUtils {
 
-    private ClaimantResponseUtils() {
-        //NO-OP
-    }
+    private final InterestCalculator interestCalculator;
 
-    public static String getClaimantRepaymentType(CaseData caseData) {
+    public String getClaimantRepaymentType(CaseData caseData) {
         PaymentType claimantRepaymentOption = caseData.getApplicant1RepaymentOptionForDefendantSpec();
         if (claimantRepaymentOption == null) {
             return "No payment type selected";
@@ -32,7 +30,7 @@ public class ClaimantResponseUtils {
         }
     }
 
-    public static String getDefendantRepaymentOption(CaseData caseData) {
+    public String getDefendantRepaymentOption(CaseData caseData) {
         RespondentResponsePartAdmissionPaymentTimeLRspec defendantRepaymentOption = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         if (defendantRepaymentOption == null) {
             return "No payment type selected";
@@ -45,7 +43,7 @@ public class ClaimantResponseUtils {
         }
     }
 
-    public static LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
+    public LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
         BigDecimal paymentAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         LocalDate firstRepaymentDate = caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         PaymentFrequencyClaimantResponseLRspec repaymentFrequency = caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec();
@@ -63,7 +61,7 @@ public class ClaimantResponseUtils {
         };
     }
 
-    public static LocalDate getDefendantFinalRepaymentDate(CaseData caseData) {
+    public LocalDate getDefendantFinalRepaymentDate(CaseData caseData) {
         RepaymentPlanLRspec repaymentPlanLRspec = caseData.getRespondent1RepaymentPlan();
         if (isNull(repaymentPlanLRspec)) {
             return null;
@@ -87,19 +85,21 @@ public class ClaimantResponseUtils {
         };
     }
 
-    private static long getNumberOfInstallmentsAfterFirst(BigDecimal totalAmount, BigDecimal paymentAmount) {
+    private long getNumberOfInstallmentsAfterFirst(BigDecimal totalAmount, BigDecimal paymentAmount) {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
     }
 
-    public static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+    public BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+        //BigDecimal interest = Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO);
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-            return caseData.getTotalClaimAmount().add(getClaimFee(caseData));
+            return caseData.getTotalClaimAmount().add(getClaimFee(caseData)).add(interest);
         } else {
             return caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
     }
 
-    private static BigDecimal getClaimFee(CaseData caseData) {
+    private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
         if (caseData.isHelpWithFees()
             && caseData.getOutstandingFeeInPounds() != null) {
@@ -107,4 +107,5 @@ public class ClaimantResponseUtils {
         }
         return claimFee;
     }
+
 }

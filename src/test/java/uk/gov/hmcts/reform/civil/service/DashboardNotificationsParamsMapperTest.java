@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
@@ -65,9 +66,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private ClaimantResponseUtils claimantResponseUtils;
+
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper(featureToggleService);
+        mapper = new DashboardNotificationsParamsMapper(featureToggleService, claimantResponseUtils);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 

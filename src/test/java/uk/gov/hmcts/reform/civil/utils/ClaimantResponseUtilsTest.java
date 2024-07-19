@@ -1,15 +1,22 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -17,13 +24,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getClaimantFinalRepaymentDate;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getClaimantRepaymentType;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantFinalRepaymentDate;
-import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
-
+@ExtendWith(MockitoExtension.class)
 public class ClaimantResponseUtilsTest {
+
+    @Mock
+    private InterestCalculator interestCalculator;
+
+    private ClaimantResponseUtils claimantResponseUtils;
+
+    @BeforeEach
+    void setUp() {
+        claimantResponseUtils = new ClaimantResponseUtils(interestCalculator);
+    }
 
     @Test
     void shouldReturnFinalPaymentDateForDefendant() {
@@ -36,7 +51,7 @@ public class ClaimantResponseUtilsTest {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
-        LocalDate finalDate = getClaimantFinalRepaymentDate(caseData);
+        LocalDate finalDate = claimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
         assertThat(finalDate).isNotNull();
     }
 
@@ -47,7 +62,7 @@ public class ClaimantResponseUtilsTest {
             .applicant1RepaymentOptionForDefendantSpec(input)
             .build();
 
-        String actualOutput = getClaimantRepaymentType(caseData);
+        String actualOutput = claimantResponseUtils.getClaimantRepaymentType(caseData);
         Assertions.assertEquals(expectedOutput, actualOutput);
     }
 
@@ -61,7 +76,7 @@ public class ClaimantResponseUtilsTest {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
-        LocalDate finalDate = getClaimantFinalRepaymentDate(caseData);
+        LocalDate finalDate = claimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
         assertThat(finalDate).isNull();
     }
 
@@ -78,23 +93,25 @@ public class ClaimantResponseUtilsTest {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
-        LocalDate finalRepaymentDate = getDefendantFinalRepaymentDate(caseData);
+        LocalDate finalRepaymentDate = claimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
         assertThat(finalRepaymentDate).isNotNull();
     }
 
     @Test
     void shouldReturnDefendantFinalRepaymentDateWhenFullAdmission() {
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
         CaseData caseData = CaseData.builder()
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder().repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .firstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .paymentAmount(new BigDecimal(10000)).build())
             .issueDate(LocalDate.now())
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
             .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
-        LocalDate finalRepaymentDate = getDefendantFinalRepaymentDate(caseData);
+        LocalDate finalRepaymentDate = claimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
         assertThat(finalRepaymentDate).isNotNull();
     }
 
@@ -105,7 +122,7 @@ public class ClaimantResponseUtilsTest {
             .defenceAdmitPartPaymentTimeRouteRequired(input)
             .build();
 
-        String actualOutput = getDefendantRepaymentOption(caseData);
+        String actualOutput = claimantResponseUtils.getDefendantRepaymentOption(caseData);
         Assertions.assertEquals(expectedOutput, actualOutput);
     }
 }
