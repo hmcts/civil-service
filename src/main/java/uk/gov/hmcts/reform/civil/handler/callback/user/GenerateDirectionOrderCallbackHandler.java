@@ -146,14 +146,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
     // Final orders can be submitted multiple times, we want each one to be a "clean slate"
     // so we remove previously selected options from both Free form orders and assisted orders.
     // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
+
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        return nullPreviousSelections(caseDataBuilder);
+    }
 
+    private CallbackResponse nullPreviousSelections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         caseDataBuilder.finalOrderSelection(null);
         // Free form orders
         caseDataBuilder
@@ -499,6 +502,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             }
         }
 
+        nullPreviousSelections(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state.name())

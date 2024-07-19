@@ -132,15 +132,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                           .build())
         .build();
 
-    private static LocationRefData locationRefDataAfterSdo =   LocationRefData.builder().siteName("SiteName after Sdo")
+    private static final LocationRefData locationRefDataAfterSdo =   LocationRefData.builder().siteName("SiteName after Sdo")
         .courtAddress("1").postcode("1")
         .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
-
-    private static LocationRefData locationRefDataBeforeSdo =   LocationRefData.builder().siteName("SiteName before Sdo")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name Ccmc").region("Region").regionId("4").courtVenueId("000")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
 
@@ -367,7 +361,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
             when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            String advancedDate = LocalDate.now().plusDays(14).toString();
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -831,6 +824,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -838,6 +832,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(updatedData).extracting("finalOrderFurtherHearingToggle").isNull();
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
