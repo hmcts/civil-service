@@ -50,8 +50,7 @@ public class FeesPaymentService {
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
-                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)
-                        .setScale(2, RoundingMode.CEILING))
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
             .language(caseData.isClaimantBilingual() ? "cy" : "En")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
