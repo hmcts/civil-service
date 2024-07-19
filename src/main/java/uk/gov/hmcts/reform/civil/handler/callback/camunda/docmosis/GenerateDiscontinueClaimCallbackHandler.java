@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -75,16 +74,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseDocument caseDocument = formGenerator.generateDocs(
                 callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (isPermissionRequired(caseData)) {
+        if (caseData.isJudgeOrderVerificationRequired()) {
             caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
         } else {
             caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
         }
-    }
-
-    private boolean isPermissionRequired(CaseData caseData) {
-        return SettleDiscontinueYesOrNoList.YES.equals(caseData.getCourtPermissionNeeded())
-                && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
