@@ -21,9 +21,11 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
@@ -90,6 +92,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             }
         } else if (isClaimantRejectRepaymentPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
+        } else if (isLrvLipFullDefenceNotProceed(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
         }
         return null;
     }
@@ -184,5 +188,13 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     private boolean isCarmApplicableForMediation(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData);
+    }
+
+    private boolean isLrvLipFullDefenceNotProceed(CaseData caseData) {
+        return (!NO.equals(caseData.getApplicant1Represented())
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            && NO.equals(caseData.getApplicant1ProceedWithClaim())
+            && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+        );
     }
 }
