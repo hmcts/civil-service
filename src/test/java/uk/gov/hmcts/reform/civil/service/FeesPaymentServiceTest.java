@@ -67,7 +67,7 @@ class FeesPaymentServiceTest {
         = CardPaymentServiceRequestDTO.builder()
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
         .language("En")
-        .amount(new BigDecimal("232.12")).currency("GBP").build();
+        .amount(new BigDecimal("232.00")).currency("GBP").build();
 
     @Autowired
     private FeesPaymentService feesPaymentService;
@@ -89,10 +89,10 @@ class FeesPaymentServiceTest {
             .data(Map.of(
                 "hearingFeePBADetails",
                 SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build())
+                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
                     .build(),
                 "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build()
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
