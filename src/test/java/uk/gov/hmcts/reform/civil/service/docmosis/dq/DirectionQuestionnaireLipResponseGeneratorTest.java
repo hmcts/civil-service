@@ -158,4 +158,59 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                                             .question("Are there any documents the claimants have that you want the court to consider?")
                                                                             .build());
     }
+
+    @Test
+    void shouldGenerateTemplateDataForMultiTrack() {
+        //Given
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(stateFlow.getState()).thenReturn(State.from("IN_MEDIATION"));
+        given(caseData.getCaseAccessCategory()).willReturn(CaseCategory.SPEC_CLAIM);
+        given(caseData.getBusinessProcess()).willReturn(BusinessProcess.builder()
+                                                            .camundaEvent("DEFENDANT_RESPONSE_CUI")
+                                                            .build());
+        given(caseData.getApplicant1()).willReturn(Party.builder()
+                                                       .partyName("app1")
+                                                       .type(Party.Type.COMPANY)
+                                                       .build());
+        given(caseData.getRespondent1()).willReturn(Party.builder()
+                                                        .partyName("res1")
+                                                        .type(Party.Type.COMPANY)
+                                                        .build());
+        given(caseData.getRespondent1ResponseDate()).willReturn(LocalDateTime.of(2024, 10, 1, 1, 1, 1));
+        given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.MULTI_CLAIM.name());
+        given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
+                                                          .specRespondent1DQDisclosureOfElectronicDocuments(
+                                                              DisclosureOfElectronicDocuments.builder()
+                                                                  .reachedAgreement(YesOrNo.YES)
+                                                                  .build()
+                                                          )
+                                                          .specRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                              DisclosureOfNonElectronicDocuments.builder()
+                                                                  .bespokeDirections("directions")
+                                                                  .build()
+                                                          )
+                                                          .respondent1DQClaimantDocumentsToBeConsidered(
+                                                              DocumentsToBeConsidered.builder()
+                                                                  .hasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                  .details("details")
+                                                                  .build())
+                                                          .build());
+        //When
+        DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
+
+        //Then
+        assertThat(templateData.getAllocatedTrack()).isEqualTo("MULTI_CLAIM");
+        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(DisclosureOfElectronicDocuments.builder()
+                                                                                    .reachedAgreement(YesOrNo.YES)
+                                                                                    .build());
+        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
+                                                                                       .bespokeDirections("directions")
+                                                                                       .build());
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(DocumentsToBeConsideredSection.builder()
+                                                                            .hasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                            .details("details")
+                                                                            .sectionHeading("Claimants documents to be considered")
+                                                                            .question("Are there any documents the claimants have that you want the court to consider?")
+                                                                            .build());
+    }
 }
