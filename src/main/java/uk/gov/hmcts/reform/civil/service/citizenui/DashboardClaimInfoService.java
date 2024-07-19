@@ -149,9 +149,14 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
         }
+        log.info("-----------HAS APPLICANT1ACCEPTEDCCJ {} -------------",caseData.hasApplicant1AcceptedCcj());
+        log.info("-----------getApplicant1ResponseDate {} -------------", caseData.getApplicant1ResponseDate());
         if (caseData.hasApplicant1AcceptedCcj()) {
             item.setCcjRequestedDate(caseData.getApplicant1ResponseDate());
         }
+
+        log.info("-----------getActiveJudgment {} -------------",caseData.getActiveJudgment());
+
         if (caseData.getActiveJudgment() != null) {
             item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
         }
