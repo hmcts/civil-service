@@ -735,7 +735,6 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(1000003L)
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
 
