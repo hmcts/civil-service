@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -57,8 +58,9 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
                 .claimantWhoIsDiscontinue(getClaimantWhoIsDiscontinue(caseData))
                 .claimantsConsentToDiscontinuance(nonNull(caseData.getClaimantsConsentToDiscontinuance())
-                        ? caseData.getClaimantsConsentToDiscontinuance().toString() : null)
-                .courtPermission(caseData.getCourtPermissionNeeded().getDisplayedValue())
+                        ? getConsentToDiscontinue(caseData) : null)
+                .courtPermission(nonNull(caseData.getCourtPermissionNeeded())
+                        ? caseData.getCourtPermissionNeeded().getDisplayedValue() : null)
                 .permissionGranted(nonNull(caseData.getIsPermissionGranted())
                         ? caseData.getIsPermissionGranted().getDisplayedValue() : null)
                 .judgeName(isCourtPermissionGranted(caseData)
@@ -88,9 +90,13 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 : null;
     }
 
+    private String getConsentToDiscontinue(CaseData caseData) {
+        return YesOrNo.YES.equals(
+                caseData.getClaimantsConsentToDiscontinuance()) ? "Yes" : "No";
+    }
+
     private boolean isCourtPermissionGranted(CaseData caseData) {
         return nonNull(caseData.getIsPermissionGranted())
                 && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
     }
 }
-

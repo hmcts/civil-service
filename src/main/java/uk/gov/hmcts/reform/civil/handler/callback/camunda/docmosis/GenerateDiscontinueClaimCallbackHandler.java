@@ -75,16 +75,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseDocument caseDocument = formGenerator.generateDocs(
                 callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (isPermissionRequired(caseData)) {
+        if (caseData.isJudgeOrderVerificationRequired()) {
             caseDataBuilder.noticeOfDiscontinueCWDoc(caseDocument);
         } else {
             caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseDocument);
         }
-    }
-
-    private boolean isPermissionRequired(CaseData caseData) {
-        return SettleDiscontinueYesOrNoList.YES.equals(caseData.getCourtPermissionNeeded())
-                && SettleDiscontinueYesOrNoList.YES.equals(caseData.getIsPermissionGranted());
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
