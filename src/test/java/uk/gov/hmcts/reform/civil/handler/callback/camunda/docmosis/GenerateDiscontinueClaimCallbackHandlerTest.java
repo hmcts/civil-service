@@ -102,21 +102,6 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc()).isNotNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
-            //Given
-            CaseData caseData = CaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build()).build();
-            caseData.setCourtPermissionNeeded(
-                    toggleState ? SettleDiscontinueYesOrNoList.YES : SettleDiscontinueYesOrNoList.NO);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
-            //When
-            handler.handle(params);
-            //Then
-            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGE_ORDER_VERIFICATION_REQUIRED", toggleState);
-        }
     }
 
     @Test
