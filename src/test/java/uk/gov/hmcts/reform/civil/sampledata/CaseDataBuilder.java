@@ -684,6 +684,9 @@ public class CaseDataBuilder {
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
     private String claimantBilingualLanguagePreference;
 
+    private CaseDocument noticeOfDiscontinueCWDoc;
+    private CaseDocument noticeOfDiscontinueAllParitiesDoc;
+
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
@@ -7404,6 +7407,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder noticeOfDiscontinueCWDoc(CaseDocument noticeOfDiscontinueCWDoc) {
+        this.noticeOfDiscontinueCWDoc = noticeOfDiscontinueCWDoc;
+        return this;
+    }
+
+    public CaseDataBuilder noticeOfDiscontinueAllParitiesDoc(CaseDocument noticeOfDiscontinueAllParitiesDoc) {
+        this.noticeOfDiscontinueAllParitiesDoc = noticeOfDiscontinueAllParitiesDoc;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -7743,6 +7756,8 @@ public class CaseDataBuilder {
             .paymentSetDate(paymentSetDate)
             .repaymentFrequency(repaymentFrequency)
             .repaymentDate(repaymentDate)
+            .noticeOfDiscontinueCWDoc(noticeOfDiscontinueCWDoc)
+            .noticeOfDiscontinueAllParitiesDoc(noticeOfDiscontinueAllParitiesDoc)
             .build();
     }
 
