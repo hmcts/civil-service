@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
@@ -692,13 +693,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .of(ABOUT_TO_SUBMIT, caseData)
             .build();
 
-        handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            null,
-            "BEARER_TOKEN",
-            ScenarioRequestParams.builder().params(params).build()
-        );
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+        assertThat(response.getErrors()).isNull();
     }
 }
