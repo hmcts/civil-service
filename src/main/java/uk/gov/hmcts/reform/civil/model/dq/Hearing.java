@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.HearingLength;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -11,12 +13,14 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Hearing {
 
-    private final HearingLength hearingLength;
-    private final String hearingLengthHours;
-    private final String hearingLengthDays;
-    private final YesOrNo unavailableDatesRequired;
-    private final List<Element<UnavailableDate>> unavailableDates;
+    private HearingLength hearingLength;
+    private String hearingLengthHours;
+    private String hearingLengthDays;
+    private YesOrNo unavailableDatesRequired;
+    private List<Element<UnavailableDate>> unavailableDates;
 
 }
