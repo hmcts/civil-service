@@ -95,7 +95,6 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateForm_whenAboutToSubmitCalledLipVLipEnabled() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
             directionQuestionnaireLipResponseGenerator);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder().build();
 
