@@ -10,13 +10,15 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 @Builder(toBuilder = true)
 public class Hearing {
 
-    private final HearingLength hearingLength;
-    private final String hearingLengthHours;
-    private final String hearingLengthDays;
-    private final YesOrNo unavailableDatesRequired;
-    private final List<Element<UnavailableDate>> unavailableDates;
+    private HearingLength hearingLength;
+    private String hearingLengthHours;
+    private String hearingLengthDays;
+    private YesOrNo unavailableDatesRequired;
+    private List<Element<UnavailableDate>> unavailableDates;
 
 }

@@ -5,10 +5,12 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 @Builder
 public class DisclosureOfElectronicDocuments {
 
-    private final YesOrNo reachedAgreement;
-    private final YesOrNo agreementLikely;
-    private final String reasonForNoAgreement;
+    private YesOrNo reachedAgreement;
+    private YesOrNo agreementLikely;
+    private String reasonForNoAgreement;
 }

@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 @Data
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 @Builder(toBuilder = true)
 public class RequestedCourt {
 
@@ -16,11 +18,11 @@ public class RequestedCourt {
      * @deprecated location is mandatory for all parties now
      */
     @Deprecated(forRemoval = true)
-    private final YesOrNo requestHearingAtSpecificCourt;
-    private final String otherPartyPreferredSite;
-    private final String responseCourtCode;
-    private final String reasonForHearingAtSpecificCourt;
-    private final DynamicList responseCourtLocations;
-    private final CaseLocationCivil caseLocation;
-    private final String responseCourtName;
+    private YesOrNo requestHearingAtSpecificCourt;
+    private String otherPartyPreferredSite;
+    private String responseCourtCode;
+    private String reasonForHearingAtSpecificCourt;
+    private DynamicList responseCourtLocations;
+    private CaseLocationCivil caseLocation;
+    private String responseCourtName;
 }

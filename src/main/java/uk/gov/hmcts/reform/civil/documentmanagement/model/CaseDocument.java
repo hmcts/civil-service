@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.documentmanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import java.time.LocalDateTime;
 

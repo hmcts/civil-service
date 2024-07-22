@@ -5,10 +5,12 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 @Builder
 public class DisclosureOfNonElectronicDocuments {
 
-    private final YesOrNo directionsForDisclosureProposed;
-    private final YesOrNo standardDirectionsRequired;
-    private final String bespokeDirections;
+    private YesOrNo directionsForDisclosureProposed;
+    private YesOrNo standardDirectionsRequired;
+    private String bespokeDirections;
 }

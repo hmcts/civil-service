@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
+@lombok.AllArgsConstructor
+@lombok.NoArgsConstructor
 @Builder(toBuilder = true)
 public class Witnesses {
 
-    private final YesOrNo witnessesToAppear;
-    private final List<Element<Witness>> details;
+    private YesOrNo witnessesToAppear;
+    private List<Element<Witness>> details;
 }
