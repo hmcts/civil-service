@@ -754,16 +754,16 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         gaCaseData = handler.mergeBundle(gaCaseData);
         assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(1);
 
-        List<Element<CaseDocument>> addlDoc = new ArrayList<>() {{
-            add(Element.<CaseDocument>builder()
+        List<Element<CaseDocument>> addlDoc = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
                     .id(UUID.fromString(uid))
                     .value(pdfDocument).build());
-        }};
-        List<Element<CaseDocument>> addlDocBundle = new ArrayList<>() {{
-            add(Element.<CaseDocument>builder()
+            }};
+        List<Element<CaseDocument>> addlDocBundle = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
                     .id(UUID.fromString(uid))
                     .value(pdfDocument).build());
-        }};
+            }};
 
         gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
                 .toBuilder()
