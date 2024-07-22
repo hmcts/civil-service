@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -17,11 +18,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-
 import java.util.Map;
 import java.util.Optional;
-
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,11 +28,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 
 @SpringBootTest(classes = {
-    NotifyDefendant2ClaimDiscontinuedNotificationHandler.class,
+    NotifyClaimantLrValidationDiscontinuanceFailureHandler.class,
     NotificationsProperties.class,
     JacksonAutoConfiguration.class
 })
-class NotifyDefendant2ClaimDiscontinuedNotificationHandlerTest extends BaseCallbackHandlerTest {
+class NotifyClaimantLrValidationDiscontinuanceFailureHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
@@ -50,51 +48,56 @@ class NotifyDefendant2ClaimDiscontinuedNotificationHandlerTest extends BaseCallb
     private OrganisationService organisationService;
 
     @Autowired
-    private NotifyDefendant2ClaimDiscontinuedNotificationHandler handler;
+    private NotifyClaimantLrValidationDiscontinuanceFailureHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyClaimantLrValidationDiscontinuanceFailureTemplate()).thenReturn(
                 TEMPLATE_ID);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name 2").build()));
         }
 
         @Test
-        void shouldNotifyDefendant2ClaimDiscontinued_whenInvoked() {
+        void shouldNotifyClaimantLrValidationDiscontinuanceFailure_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .atStateClaimDraft().build();
+                .atStateClaimDraft()
+                .applicant1Represented(YesOrNo.YES)
+                .build();
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT2.name())
+                             .eventId(CaseEvent.NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT.name())
                              .build())
                 .build();
 
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
-                "respondentsolicitor2@example.com",
+                "applicantsolicitor@example.com",
                 TEMPLATE_ID,
-                addProperties(caseData),
-                "defendant2-claim-discontinued-000DC001"
-            );
-
-        }
-
-        public Map<String, String> addProperties(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                LEGAL_ORG_NAME, "Test Org Name 2"
+                getNotificationDataMap(caseData),
+                "claimant-notify-validation-failure-8372942374"
             );
         }
+    }
+
+    public Map<String, String> getNotificationDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData)
+        );
+    }
+
+    public String getApplicantLegalOrganizationName(CaseData caseData) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }

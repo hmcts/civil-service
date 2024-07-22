@@ -17,19 +17,18 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT2;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
-public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends CallbackHandler
+public class NotifyClaimantLrValidationDiscontinuanceFailureHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DISCONTINUANCE_DEFENDANT2);
-    public static final String TASK_ID = "NotifyDefendant2ClaimDiscontinued";
-
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_VALIDATION_DICONTINUANCE_FAILURE_CLAIMANT);
+    public static final String TASK_ID = "NotifyValidationFailureClaimant";
     private static final String REFERENCE_TEMPLATE =
-        "defendant2-claim-discontinued-%s";
+        "claimant-notify-validation-failure-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -39,7 +38,7 @@ public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends Callba
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyDefendant2ClaimDiscontinued
+            this::notifyClaimantValidationFailure
         );
     }
 
@@ -53,13 +52,13 @@ public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends Callba
         return EVENTS;
     }
 
-    private CallbackResponse notifyDefendant2ClaimDiscontinued(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantValidationFailure(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!caseData.isRespondent2LiP()) {
+        if (!caseData.isApplicantLiP()) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor2EmailAddress(),
-                getLRTemplate(),
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
@@ -68,21 +67,20 @@ public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends Callba
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String getLRTemplate() {
-        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService)
+            );
+    }
+
+    private String getTemplate() {
+        return notificationsProperties.getNotifyClaimantLrValidationDiscontinuanceFailureTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
-            LEGAL_ORG_NAME,
-            getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
-        );
-    }
 }
