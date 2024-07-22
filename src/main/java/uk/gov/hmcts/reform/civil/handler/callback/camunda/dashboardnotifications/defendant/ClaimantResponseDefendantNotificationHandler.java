@@ -94,7 +94,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
         } else if (
             !featureToggleService.isJudgmentOnlineLive()
-                && !NO.equals(caseData.getApplicant1Represented())
+                && !caseData.isApplicantLiP()
                 && caseData.hasApplicantAcceptedRepaymentPlan()
                 && caseData.isCcjRequestJudgmentByAdmission()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
