@@ -163,6 +163,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
@@ -182,6 +183,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
