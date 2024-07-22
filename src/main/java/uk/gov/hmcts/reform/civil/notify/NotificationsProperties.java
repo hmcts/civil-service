@@ -609,4 +609,17 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLIPJudgmentByAdmissionTemplate;
+
+    @NotEmpty
+    private String orderBeingTranslatedTemplateWelsh;
+
+    @NotEmpty
+    private String notifyLiPOrderTranslatedTemplate;
+
+    @NotEmpty
+    private String notifyClaimantLrValidationDiscontinuanceFailureTemplate;
+
+    @NotEmpty
+    private String notifyClaimDiscontinuedLRTemplate;
+
 }

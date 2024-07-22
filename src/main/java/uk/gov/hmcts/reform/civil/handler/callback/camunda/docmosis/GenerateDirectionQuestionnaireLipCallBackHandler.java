@@ -50,7 +50,8 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isFullAdmitClaimSpec()) {
+        if (caseData.isFullAdmitClaimSpec()
+            || caseData.isClaimantAcceptedClaimAmount()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
@@ -62,9 +63,9 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService
                                               .getSystemGeneratedDocumentsWithAddedDocument(sealedDQForm, caseData));
         if (sealedDQForm.getDocumentName().contains("defendant")) {
-            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
         } else {
-            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.APP1_DQ.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

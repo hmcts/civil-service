@@ -69,7 +69,6 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildCreateBundleResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are documents to be bundled")
             .uponReceiving("a new bundle request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
@@ -133,13 +132,13 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
             .individualTitle("Mr")
             .individualFirstName(applicant)
             .individualLastName("Silvassauro")
-            .individualDateOfBirth(LocalDate.now().minusDays(10))
+            .individualDateOfBirth(LocalDate.of(2019, 1, 1))
             .companyName("company")
             .organisationName("org")
             .soleTraderTitle("soleTr")
             .soleTraderFirstName("soleTrFN")
             .soleTraderLastName("soleTrLN")
-            .soleTraderDateOfBirth(LocalDate.now().minusDays(10))
+                .soleTraderDateOfBirth(LocalDate.of(2019, 1, 1))
             .primaryAddress(getTestAddress("rua1"))
             .partyName(applicant)
             .bulkClaimPartyName("bulk")
@@ -156,12 +155,12 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
         return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
                            .value(UnavailableDate.builder()
                                       .who("who")
-                                      .date(LocalDate.now())
-                                      .fromDate(LocalDate.now())
-                                      .toDate(LocalDate.now())
+                                      .date(LocalDate.of(2020, 1, 1))
+                                      .fromDate(LocalDate.of(2020, 1, 1))
+                                      .toDate(LocalDate.of(2020, 1, 1))
                                       .unavailableDateType(UnavailableDateType.DATE_RANGE)
                                       .eventAdded("eventAdd")
-                                      .dateAdded(LocalDate.now())
+                                      .dateAdded(LocalDate.of(2020, 1, 1))
                                       .build()).build());
     }
 
@@ -207,7 +206,9 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
                                                            .stringType("description", "description")
                                                            .stringType("stitchStatus", "stitchStatus")
                                                            .stringType("fileName", "fileName")
-                                                           .date("createdOn", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+                                                           .stringMatcher("createdOn",
+                                                                          "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                                                          "2020-10-06T18:54:48.785000")
                                                            .date("bundleHearingDate", "yyyy-MM-dd")
                                                            .object("stitchedDocument", stitchedDocument ->
                                                                stitchedDocument

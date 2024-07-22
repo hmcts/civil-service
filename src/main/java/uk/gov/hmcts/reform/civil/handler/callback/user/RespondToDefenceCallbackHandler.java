@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -89,6 +91,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final AssignCategoryId assignCategoryId;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
+    @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -192,6 +195,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
+    private boolean bothApplicantDecidesToProceedWithClaim2v1(CaseData caseData) {
+        return YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+    }
+
     private boolean anyApplicantDecidesToProceedWithClaim(CaseData caseData) {
         return YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
@@ -249,11 +257,37 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.build().getCaseManagementLocation()
         );
 
-        updateCaseManagementLocation(callbackParams, builder);
+        // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
+        if (featureToggleService.isNationalRolloutEnabled()) {
+            if (notTransferredOnline(caseData)) {
+                updateCaseManagementLocation(callbackParams, builder);
+            }
+        } else {
+            updateCaseManagementLocation(callbackParams, builder);
+        }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
+            if (bothApplicantDecidesToProceedWithClaim2v1(caseData)
+                && caseData.getApplicant1DQ() != null
+                && caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate() != null) {
+
+                if (caseData.getApplicant2DQ() == null
+                    || caseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCostsIntermediate() == null) {
+                    FixedRecoverableCosts app1Frc = caseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate();
+
+                    builder.applicant2DQ(Applicant2DQ.builder().applicant2DQFixedRecoverableCostsIntermediate(
+                            FixedRecoverableCosts.builder()
+                                .isSubjectToFixedRecoverableCostRegime(app1Frc.getIsSubjectToFixedRecoverableCostRegime())
+                                .complexityBandingAgreed(app1Frc.getComplexityBandingAgreed())
+                                .band(app1Frc.getBand())
+                                .reasons(app1Frc.getReasons())
+                                .frcSupportingDocument(app1Frc.getFrcSupportingDocument())
+                                .build())
+                             .build());
+                }
+            }
         }
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
@@ -342,8 +376,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
     }
 
-    private void updateCaseManagementLocation(CallbackParams callbackParams,
-                                              CaseData.CaseDataBuilder builder) {
+    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
@@ -357,8 +390,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
+            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
         }
     }
 
@@ -452,5 +484,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .confirmationHeader(format(title, claimNumber))
             .confirmationBody(body + exitSurveyContentService.applicantSurvey())
             .build();
+    }
+
+    public boolean notTransferredOnline(CaseData caseData) {
+        return caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
     }
 }
