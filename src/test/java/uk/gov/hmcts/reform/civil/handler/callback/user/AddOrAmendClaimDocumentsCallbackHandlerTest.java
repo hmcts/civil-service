@@ -2,18 +2,17 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 
@@ -23,103 +22,111 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    AddOrAmendClaimDocumentsCallbackHandler.class,
-    ExitSurveyConfiguration.class,
-    ExitSurveyContentService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private AddOrAmendClaimDocumentsCallbackHandler handler;
 
-    @Autowired
+    @Mock
     private ExitSurveyContentService exitSurveyContentService;
+
+    private static final String PAGE_ID = "particulars-of-claim";
+    private final CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseDataBuilder.builder()
+        .atStateClaimDraft()
+        .build()
+        .toBuilder();
 
     @Nested
     class MidEventParticularsOfClaimCallback {
 
-        private final String pageId = "particulars-of-claim";
-        private final CaseData.CaseDataBuilder caseDataBuilder =
-            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
-
         @Test
         void shouldNotReturnErrors_whenNoDocuments() {
             CaseData caseData = caseDataBuilder.build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
         void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmpty() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            CaseData caseData = caseDataBuilder
+                .servedDocumentFiles(ServedDocumentFiles.builder().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                                                                        .particularsOfClaimText("Some string")
-                                                                        .build()).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            CaseData caseData = caseDataBuilder
+                .servedDocumentFiles(ServedDocumentFiles.builder()
+                                         .particularsOfClaimText("Some string")
+                                         .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
         void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                                                                        .particularsOfClaimText("Some string")
-                                                                        .particularsOfClaimDocument(
-                                                                            wrapElements(Document.builder().build()))
-                                                                        .build()).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            CaseData caseData = caseDataBuilder
+                .servedDocumentFiles(ServedDocumentFiles.builder()
+                                         .particularsOfClaimText("Some string")
+                                         .particularsOfClaimDocument(wrapElements(Document.builder().build()))
+                                         .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).containsOnly(
                 "You need to either upload 1 Particulars of claim only or enter the "
-                    + "Particulars of claim text in the field provided. You cannot do both.");
+                    + "Particulars of claim text in the field provided. You cannot do both."
+            );
         }
 
         @Test
         void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmitted() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                                                                        .particularsOfClaimText("Some string").build())
-                                                                        .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            CaseData caseData = caseDataBuilder
+                .servedDocumentFiles(ServedDocumentFiles.builder()
+                                         .particularsOfClaimText("Some string")
+                                         .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
+    }
 
-        @Nested
-        class SubmittedCallback {
+    @Nested
+    class SubmittedCallback {
 
-            @Test
-            void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-                assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Documents uploaded successfully%n## Claim number: 000DC001"))
-                        .confirmationBody(exitSurveyContentService.applicantSurvey())
-                        .build());
-            }
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            SubmittedCallbackResponse expectedResponse = SubmittedCallbackResponse.builder()
+                .confirmationHeader(format("# Documents uploaded successfully%n## Claim number: 000DC001"))
+                .confirmationBody(exitSurveyContentService.applicantSurvey())
+                .build();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
         }
     }
 }

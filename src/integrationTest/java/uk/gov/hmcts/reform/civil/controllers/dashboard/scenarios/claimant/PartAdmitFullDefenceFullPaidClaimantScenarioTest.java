@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
@@ -35,11 +34,13 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
         LocalDate deadline = LocalDate.of(2024, 7, 25);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
+            .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDateTime.of(deadline, LocalTime.now()))
+            .responseClaimTrack("SMALL_CLAIM")
             .respondToClaim(RespondToClaim.builder()
                                 .howMuchWasPaid(new BigDecimal(100000))
                                 .whenWasThisAmountPaid(paymentDate)
@@ -92,6 +93,7 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
+            .responseClaimTrack("SMALL_CLAIM")
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
@@ -101,7 +103,6 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                                         .howMuchWasPaid(new BigDecimal(100000))
                                         .whenWasThisAmountPaid(paymentDate)
                                         .build())
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 
