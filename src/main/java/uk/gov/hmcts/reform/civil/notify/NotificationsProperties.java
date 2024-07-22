@@ -617,6 +617,9 @@ public class NotificationsProperties {
     private String notifyLiPOrderTranslatedTemplate;
 
     @NotEmpty
+    private String notifyClaimantLrValidationDiscontinuanceFailureTemplate;
+
+    @NotEmpty
     private String notifyClaimDiscontinuedLRTemplate;
 
 }
