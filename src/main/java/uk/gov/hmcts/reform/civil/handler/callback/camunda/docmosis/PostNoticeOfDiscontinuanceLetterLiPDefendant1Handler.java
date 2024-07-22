@@ -49,14 +49,10 @@ public class PostNoticeOfDiscontinuanceLetterLiPDefendant1Handler extends Callba
 
     private CallbackResponse sendNoticeOfDiscontinuanceLetterToLiPDefendant1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isRespondent1Lip(caseData)) {
+        if (caseData.isRespondent1LiP()) {
             generateNoticeOfDiscontinuanceLiPDefendantLetter(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private boolean isRespondent1Lip(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
 
     private void generateNoticeOfDiscontinuanceLiPDefendantLetter(CallbackParams callbackParams) {
