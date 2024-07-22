@@ -13,7 +13,8 @@ public enum DocCategory {
     DQ_APP1("DQApplicant"),
     DQ_DEF1("DQRespondent"),
     DQ_DEF2("DQRespondentTwo"),
-    HEARING_NOTICES("hearingNotices");
+    HEARING_NOTICES("hearingNotices"),
+    NOTICE_OF_DISCONTINUE("discontinueNotices");
 
     private final String value;
 }
