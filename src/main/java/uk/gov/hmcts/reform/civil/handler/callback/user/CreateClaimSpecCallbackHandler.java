@@ -528,9 +528,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
 
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+//        if (toggleService.isHmcEnabled()) {
+        populateWithPartyIds(dataBuilder);
+//        }
 
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
