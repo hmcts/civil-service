@@ -26,10 +26,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONT
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-            GEN_NOTICE_OF_DISCONTINUANCE
+        GEN_NOTICE_OF_DISCONTINUANCE
     );
     private static final String TASK_ID = "GenerateNoticeOfDiscontinueClaim";
     private final ObjectMapper objectMapper;
@@ -54,8 +55,8 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         updateCamundaVars(caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder);
         CaseData updatedData = caseDataBuilder.build();
 
