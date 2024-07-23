@@ -193,6 +193,11 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("respondent2DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return respondent2DQLanguageLRspec;

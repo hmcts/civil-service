@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -41,25 +41,22 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER;
 
-@SpringBootTest(classes = {
-    RecordJudgmentDeterminationOfMeansPiPLetterGenerator.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class RecordJudgmentDeterminationOfMeansLiPLetterGeneratorTest {
 
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @Mock
     private BulkPrintService bulkPrintService;
-    @MockBean
+    @Mock
     private PinInPostConfiguration pinInPostConfiguration;
-    @MockBean
+    @Mock
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    @Autowired
+    @InjectMocks
     private RecordJudgmentDeterminationOfMeansPiPLetterGenerator recordJudgmentDeterminationOfMeansPiPLetterGenerator;
     private static final String RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER = "record-judgment-determination-of-means-letter";
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};

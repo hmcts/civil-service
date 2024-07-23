@@ -142,7 +142,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseContainsLiP(caseData)) {
+        if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()) {
                 errors.add(LR_VS_LIP);
             } else {
@@ -334,10 +334,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData = updatedCaseData;
         }
 
+        Map<String, Object> data = initiateGeneralApplicationService
+                .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                        .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(initiateGeneralApplicationService
-                      .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
-                          .toString()).toMap(objectMapper)).build();
+                .data(data).build();
     }
 
     /**
@@ -361,10 +362,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
-    }
-
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private boolean inStateAfterJudicialReferral(CaseState state) {

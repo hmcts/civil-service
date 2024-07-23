@@ -150,6 +150,14 @@ public class DashboardClaimInfoService {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
         }
 
+        if (caseData.hasApplicant1AcceptedCcj()) {
+            item.setCcjRequestedDate(caseData.getApplicant1ResponseDate());
+        }
+
+        if (caseData.getActiveJudgment() != null) {
+            item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
+        }
+
         return item;
     }
 

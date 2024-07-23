@@ -12,10 +12,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipResponseGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -26,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
@@ -46,7 +50,11 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @MockBean
     private DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
     @MockBean
+    private DirectionQuestionnaireLipResponseGenerator directionQuestionnaireLipResponseGenerator;
+    @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @MockBean
     private AssignCategoryId assignCategoryId;
 
@@ -92,6 +100,18 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     }
 
     @Test
+    void shouldGenerateForm_whenAboutToSubmitCalledLipVLipEnabled() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
+            directionQuestionnaireLipResponseGenerator);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder().build();
+
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
+    }
+
+    @Test
     void shouldNotGenerateForm_whenAboutToSubmitCalledWithFullAdmission() {
         // Given
         CaseData caseData = CaseData.builder()
@@ -107,6 +127,42 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             systemGeneratedDocumentService,
             never()
         ).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+    }
+
+    @Test
+    void shouldNotGenerateForm_whenAboutToSubmitCalledWhenClaimantAcceptThePartAdmit() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .build();
+
+        // Call the handler's callback method
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        // Verify interactions
+        verify(directionsQuestionnaireLipGenerator, never()).generate(any(CaseData.class), anyString());
+        verify(
+            systemGeneratedDocumentService,
+            never()
+        ).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+    }
+
+    @Test
+    void shouldGenerateForm_whenAboutToSubmitCalledWhenClaimantRejectsThePartAdmit() {
+        // Given
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .build();
+
+        // Call the handler's callback method
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        // Verify interactions
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
