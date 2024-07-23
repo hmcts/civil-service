@@ -11,10 +11,17 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,6 +45,14 @@ public class BundleCreationService {
                             bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
                                 bundleConfig,
                                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
+    }
+
+    public BundleCreateResponse createBundle(Long caseId) {
+        CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
+        return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
+                                      bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
+                                                                                           bundleConfig,
+                                                                                           caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
     }
 
     private String getAccessToken() {
