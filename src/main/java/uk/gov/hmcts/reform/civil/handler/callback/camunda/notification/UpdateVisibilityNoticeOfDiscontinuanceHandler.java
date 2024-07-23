@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE;
 
@@ -53,10 +54,12 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
     private CallbackResponse updateVisibilityNoticeDiscontinuance(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         updateCamundaVars(caseData);
-        if (ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
+        if (ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())
+                && nonNull(caseData.getNoticeOfDiscontinueCWDoc())) {
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseData.getNoticeOfDiscontinueCWDoc());
-            caseDataBuilder.noticeOfDiscontinueCWDoc(null);
+            caseDataBuilder
+                .noticeOfDiscontinueAllParitiesDoc(caseData.getNoticeOfDiscontinueCWDoc())
+                .noticeOfDiscontinueCWDoc(null);
             CaseData updatedData = caseDataBuilder.build();
             assignCategoryId.assignCategoryIdToCaseDocument(updatedData.getNoticeOfDiscontinueAllParitiesDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
             return AboutToStartOrSubmitCallbackResponse.builder()

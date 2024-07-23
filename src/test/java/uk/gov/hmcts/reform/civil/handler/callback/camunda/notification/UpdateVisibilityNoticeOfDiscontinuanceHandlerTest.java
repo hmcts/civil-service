@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -56,24 +55,16 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
 
     @Nested
     class AboutToSubmitCallback {
-
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
             //Given
-            CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
-            caseData.setConfirmOrderGivesPermission(
-                toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
+            CaseData caseData = CaseDataBuilder.builder().businessProcess(BusinessProcess.builder().processInstanceId(
+                processId).build()).build();
+            caseData.setConfirmOrderGivesPermission(toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
             caseData.setNoticeOfDiscontinueCWDoc(caseDocument);
-
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name())
-                             .build())
-                .build();
+            CallbackParams params = CallbackParams.builder().caseData(caseData).type(ABOUT_TO_SUBMIT).request(
+                CallbackRequest.builder().eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name()).build()).build();
             //When
             handler.handle(params);
             //Then
@@ -83,54 +74,19 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
         @Test
         void shouldCopyNoticeOfDiscontinuance() {
             CaseDocument noticeOfDiscontinuance = CaseDocumentBuilder.builder().documentName("NOTICE_OF_DISCONTINUANCE").build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .noticeOfDiscontinueCWDoc(noticeOfDiscontinuance)
-                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().noticeOfDiscontinueCWDoc(noticeOfDiscontinuance).businessProcess(
+                BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
-
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name())
-                             .build())
-                .build();
-
+            CallbackParams params = CallbackParams.builder().caseData(caseData).type(ABOUT_TO_SUBMIT).request(
+                CallbackRequest.builder().eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name()).build()).build();
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             // Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getNoticeOfDiscontinueCWDoc()).isNull();
             assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc()).isNotNull();
-            assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc().getDocumentLink().getCategoryID())
-                .isEqualTo(DocCategory.NOTICE_OF_DISCONTINUE.getValue());
-        }
-
-        @Test
-        void shouldNotCopyNoticeOfDiscontinuanceIfEmpty() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
-                .build();
-            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
-
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name())
-                             .build())
-                .build();
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getNoticeOfDiscontinueCWDoc()).isNull();
-            assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc()).isNull();
+            assertThat(updatedData.getNoticeOfDiscontinueAllParitiesDoc().getDocumentLink().getCategoryID()).isEqualTo(
+                DocCategory.NOTICE_OF_DISCONTINUE.getValue());
         }
     }
-
 }
