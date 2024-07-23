@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @lombok.AllArgsConstructor
 @lombok.NoArgsConstructor
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class HearingSupport {
 
     // CIV-5557 to be removed

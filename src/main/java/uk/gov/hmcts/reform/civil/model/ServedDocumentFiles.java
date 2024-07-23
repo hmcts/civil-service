@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
@@ -15,6 +17,8 @@ import static java.util.Optional.ofNullable;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ServedDocumentFiles {
 
     private List<Element<DocumentWithRegex>> other;
