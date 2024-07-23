@@ -89,6 +89,9 @@ public class BundleRequestMapper {
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
+
+        this.filterDocumentsUnbundledFolder(caseData);
+
         BundlingCaseData bundlingCaseData =
             BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
                     bundleConfigFileName)
@@ -866,6 +869,112 @@ public class BundleRequestMapper {
                               .documentBinaryUrl(document.getDocumentBinaryUrl())
                               .documentFilename(document.getDocumentFileName()).build())
             .build();
+    }
+
+    private void filterDocumentsUnbundledFolder(CaseData caseData) {
+
+        //Disclosure
+        filterGenericDisclosure(caseData.getDocumentForDisclosure());
+        filterGenericDisclosure(caseData.getDocumentForDisclosureApp2());
+        filterGenericDisclosure(caseData.getDocumentForDisclosureRes());
+        filterGenericDisclosure(caseData.getDocumentForDisclosureRes2());
+        filterGenericDisclosure(caseData.getDocumentDisclosureList());
+        filterGenericDisclosure(caseData.getDocumentDisclosureListApp2());
+        filterGenericDisclosure(caseData.getDocumentDisclosureListRes());
+        filterGenericDisclosure(caseData.getDocumentDisclosureListRes2());
+
+        filterGenericDisclosure(caseData.getDocumentReferredInStatement());
+        filterGenericDisclosure(caseData.getDocumentReferredInStatementApp2());
+        filterGenericDisclosure(caseData.getDocumentReferredInStatementRes());
+        filterGenericDisclosure(caseData.getDocumentForDisclosureRes2());
+
+        filterGenericDisclosure(caseData.getDocumentEvidenceForTrial());
+        filterGenericDisclosure(caseData.getDocumentEvidenceForTrialApp2());
+        filterGenericDisclosure(caseData.getDocumentEvidenceForTrialRes());
+        filterGenericDisclosure(caseData.getDocumentEvidenceForTrialRes2());
+
+        filterGenericDisclosure(caseData.getDocumentCaseSummary());
+        filterGenericDisclosure(caseData.getDocumentCaseSummaryApp2());
+        filterGenericDisclosure(caseData.getDocumentCaseSummaryRes());
+        filterGenericDisclosure(caseData.getDocumentCaseSummaryRes2());
+
+        filterGenericDisclosure(caseData.getDocumentCosts());
+        filterGenericDisclosure(caseData.getDocumentCostsApp2());
+        filterGenericDisclosure(caseData.getDocumentCostsRes());
+        filterGenericDisclosure(caseData.getDocumentCostsRes2());
+
+        filterGenericDisclosure(caseData.getDocumentSkeletonArgument());
+        filterGenericDisclosure(caseData.getDocumentSkeletonArgumentApp2());
+        filterGenericDisclosure(caseData.getDocumentSkeletonArgumentRes());
+        filterGenericDisclosure(caseData.getDocumentSkeletonArgumentRes2());
+
+        //CaseData
+        filterGenericCaseData(caseData.getDefendantResponseDocuments());
+        filterGenericCaseData(caseData.getClaimantResponseDocuments());
+        filterGenericCaseData(caseData.getSystemGeneratedCaseDocuments());
+
+        //Witness
+        filterGenericWitness(caseData.getDocumentWitnessStatement());
+        filterGenericWitness(caseData.getDocumentWitnessStatementApp2());
+        filterGenericWitness(caseData.getDocumentWitnessStatementRes());
+        filterGenericWitness(caseData.getDocumentWitnessStatementRes2());
+        filterGenericWitness(caseData.getDocumentWitnessSummary());
+        filterGenericWitness(caseData.getDocumentWitnessSummaryApp2());
+        filterGenericWitness(caseData.getDocumentWitnessSummaryRes());
+        filterGenericWitness(caseData.getDocumentWitnessSummaryRes2());
+        filterGenericWitness(caseData.getDocumentHearsayNotice());
+        filterGenericWitness(caseData.getDocumentHearsayNoticeApp2());
+        filterGenericWitness(caseData.getDocumentHearsayNoticeRes());
+        filterGenericWitness(caseData.getDocumentHearsayNoticeRes2());
+
+        //Expert
+        filterGenericExpert(caseData.getDocumentExpertReport());
+        filterGenericExpert(caseData.getDocumentExpertReportApp2());
+        filterGenericExpert(caseData.getDocumentExpertReportRes());
+        filterGenericExpert(caseData.getDocumentExpertReportRes2());
+        filterGenericExpert(caseData.getDocumentQuestions());
+        filterGenericExpert(caseData.getDocumentQuestionsApp2());
+        filterGenericExpert(caseData.getDocumentQuestionsRes());
+        filterGenericExpert(caseData.getDocumentQuestionsRes2());
+        filterGenericExpert(caseData.getDocumentAnswers());
+        filterGenericExpert(caseData.getDocumentAnswersApp2());
+        filterGenericExpert(caseData.getDocumentAnswersRes());
+        filterGenericExpert(caseData.getDocumentAnswersRes2());
+        filterGenericExpert(caseData.getDocumentJointStatement());
+        filterGenericExpert(caseData.getDocumentJointStatementApp2());
+        filterGenericExpert(caseData.getDocumentJointStatementRes());
+        filterGenericExpert(caseData.getDocumentJointStatementRes2());
+
+    }
+
+    private void filterGenericExpert(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
+
+        uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
+            && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals("UnbundledFolder")));
+
+    }
+
+    private void filterGenericWitness(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness) {
+
+        uploadEvidenceWitness.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID())
+            && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals("UnbundledFolder")));
+
+    }
+
+    private void filterGenericCaseData(List<Element<CaseDocument>> caseDocument) {
+
+        caseDocument.stream()
+            .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
+                && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("UnbundledFolder")));
+
+    }
+
+    private void filterGenericDisclosure(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType) {
+
+        uploadEvidenceDocumentType.stream()
+            .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentUpload().getCategoryID())
+                && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals("UnbundledFolder")));
+
     }
 
     protected enum PartyType {
