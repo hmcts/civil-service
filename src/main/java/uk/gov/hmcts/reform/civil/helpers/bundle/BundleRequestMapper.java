@@ -950,8 +950,8 @@ public class BundleRequestMapper {
     private void filterGenericExpert(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
 
         if (nonNull(uploadEvidenceExpert)) {
-        uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
-            && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals("UnbundledFolder")));
+            uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
+                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals("UnbundledFolder")));
         }
     }
 
