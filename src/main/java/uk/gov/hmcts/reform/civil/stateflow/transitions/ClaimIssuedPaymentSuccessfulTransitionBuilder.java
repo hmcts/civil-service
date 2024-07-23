@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -24,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransitionBuilder {
 
     @Autowired
