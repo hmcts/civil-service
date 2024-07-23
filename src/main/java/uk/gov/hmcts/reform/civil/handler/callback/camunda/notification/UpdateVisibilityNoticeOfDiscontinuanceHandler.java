@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,8 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
     public static final String TASK_ID = "UpdateVisibilityNoticeOfDiscontinuance";
 
     private final RuntimeService runTimeService;
+    private final AssignCategoryId assignCategoryId;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,8 +52,17 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
 
     private CallbackResponse updateVisibilityNoticeDiscontinuance(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        //TODO add update visibility implementation here
         updateCamundaVars(caseData);
+        if (ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            caseDataBuilder.noticeOfDiscontinueAllParitiesDoc(caseData.getNoticeOfDiscontinueCWDoc());
+            caseDataBuilder.noticeOfDiscontinueCWDoc(null);
+            CaseData updatedData = caseDataBuilder.build();
+            assignCategoryId.assignCategoryIdToCaseDocument(updatedData.getNoticeOfDiscontinueAllParitiesDoc(), DocCategory.NOTICE_OF_DISCONTINUE.getValue());
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(updatedData.toMap(objectMapper))
+                    .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
