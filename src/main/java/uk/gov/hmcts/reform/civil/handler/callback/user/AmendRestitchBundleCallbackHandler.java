@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -42,7 +43,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::startBundleCreation,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -73,6 +74,15 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
+            .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader("Placeholder")
+            .confirmationBody("Placeholder")
             .build();
     }
 }
