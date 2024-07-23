@@ -91,11 +91,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             }
         } else if (isClaimantRejectRepaymentPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
-        } else if (
-            !featureToggleService.isJudgmentOnlineLive()
-                && !caseData.isApplicantLiP()
-                && caseData.hasApplicantAcceptedRepaymentPlan()
-                && caseData.isCcjRequestJudgmentByAdmission()) {
+        } else if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
         }
         return null;
@@ -191,5 +187,12 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     private boolean isCarmApplicableForMediation(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData);
+    }
+
+    private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
+        return !featureToggleService.isJudgmentOnlineLive()
+            && !caseData.isApplicantLiP()
+            && caseData.hasApplicantAcceptedRepaymentPlan()
+            && caseData.isCcjRequestJudgmentByAdmission();
     }
 }
