@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
+import uk.gov.hmcts.reform.civil.enums.DocumentFileType;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
@@ -24,18 +25,26 @@ public class DocumentGeneratorService {
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;
 
+    public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template, DocumentFileType documentFileType) {
+        return generateDocmosisDocument(templateData.toMap(mapper), template, documentFileType);
+    }
+
     public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template) {
-        return generateDocmosisDocument(templateData.toMap(mapper), template);
+        return generateDocmosisDocument(templateData.toMap(mapper), template, DocumentFileType.PDF);
     }
 
     public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template) {
+        return generateDocmosisDocument(templateData, template, DocumentFileType.PDF);
+    }
+
+    public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template, DocumentFileType fileType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         DocmosisRequest requestBody = DocmosisRequest.builder()
             .templateName(template.getTemplate())
             .data(templateData)
-            .outputFormat("pdf")
+            .outputFormat(fileType.getValue())
             .outputName("IGNORED")
             .accessKey(configuration.getAccessKey())
             .build();
