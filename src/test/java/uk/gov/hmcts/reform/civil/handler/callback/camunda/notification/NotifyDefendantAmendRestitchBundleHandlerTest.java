@@ -76,8 +76,7 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
     void shouldSendEmailWhenAllDataIsCorrectAndBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").
-                                     build())
+            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .applicant1Represented(YesOrNo.NO)
@@ -111,8 +110,7 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build()).respondent1Represented(YesOrNo.YES).build();
@@ -133,8 +131,7 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).partyEmail(null).build()).respondent1Represented(YesOrNo.NO).build();
