@@ -34,6 +34,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
+            .responseClaimTrack("SMALL_CLAIM")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)

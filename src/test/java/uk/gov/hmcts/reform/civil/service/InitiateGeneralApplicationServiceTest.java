@@ -55,7 +55,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -1084,6 +1086,103 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
             .isNull();
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmptyForGaLips() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(
+            any(),
+            any()
+        )).thenReturn(getEmptyCourLocationsRefObject());
+        when(locationRefDataService.getCnbcLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("2").epimmsId("11111").build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isNull();
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForFAForLipsEnabled() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(
+            any(),
+            any()
+        )).thenReturn(getSampleCourLocationsRefObject());
+        when(locationRefDataService.getCnbcLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("locationOfRegion2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isNotNull();
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForFAForLipsFalse() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(
+            any(),
+            any()
+        )).thenReturn(getSampleCourLocationsRefObject());
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForCaseManagementLocation(UNSPEC_CLAIM, AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("574546");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("locationOfRegion2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isNotNull();
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
     }
 
     @Test

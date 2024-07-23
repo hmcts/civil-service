@@ -3,11 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -31,73 +29,60 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LIP_MANUAL_DETERMINATION;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateClaimantLipManualDeterminationCallBackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCallbackHandlerTest {
+
+    @InjectMocks
+    private GenerateClaimantLipManualDeterminationCallBackHandler handler;
+
+    @Mock
+    private ClaimantLipManualDeterminationFormGenerator formGenerator;
+
+    @Mock
+    private SystemGeneratedDocumentService documentService;
+
+    @Mock
+    private ObjectMapper mapper;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final CaseDocument FORM = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(LIP_MANUAL_DETERMINATION)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                    .documentUrl("fake-url")
-                    .documentFileName("file-name")
-                    .documentBinaryUrl("binary-url")
-                    .build())
-            .build();
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
-    private GenerateClaimantLipManualDeterminationCallBackHandler handler;
-    @MockBean
-    private ClaimantLipManualDeterminationFormGenerator lipManualDeterminationHandlerFormGenerator;
-    @MockBean
-    private SystemGeneratedDocumentService systemGeneratedDocumentService;
+        .createdBy("John")
+        .documentName("document name")
+        .documentSize(0L)
+        .documentType(LIP_MANUAL_DETERMINATION)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
-        given(lipManualDeterminationHandlerFormGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
 
-        CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.COMPANY)
-                        .build())
-                .build();
-
+        CaseData caseData = createCaseData(Party.Type.COMPANY);
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        verify(lipManualDeterminationHandlerFormGenerator).generate(caseData, BEARER_TOKEN);
+
+        verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
-    void shouldNotGenerateForm_whenPartyTypeIsNotCompanyORNotOrganisation() {
-        given(lipManualDeterminationHandlerFormGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-
-        CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.SOLE_TRADER)
-                        .build())
-                .build();
-
+    void shouldNotGenerateForm_whenPartyTypeIsNotCompanyOrOrganisation() {
+        CaseData caseData = createCaseData(Party.Type.SOLE_TRADER);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION.name());
 
         handler.handle(params);
-        verify(lipManualDeterminationHandlerFormGenerator, never()).generate(any(CaseData.class), anyString());
-        verify(systemGeneratedDocumentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+
+        verify(formGenerator, never()).generate(any(CaseData.class), anyString());
+        verify(documentService, never()).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
     }
 
     @Test
     void shouldReturnCorrectActivityId_whenRequestedMDForm() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         assertThat(handler.camundaActivityId(params)).isEqualTo("Generate_LIP_Claimant_MD");
@@ -106,5 +91,14 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     @Test
     void testHandledEvents() {
         assertThat(handler.handledEvents()).contains(GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION);
+    }
+
+    private CaseData createCaseData(Party.Type type) {
+        return CaseDataBuilder.builder()
+            .respondent1(PartyBuilder.builder()
+                             .soleTrader().build().toBuilder()
+                             .type(type)
+                             .build())
+            .build();
     }
 }
