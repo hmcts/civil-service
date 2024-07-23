@@ -92,7 +92,8 @@ public enum DocmosisTemplates {
     JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
-    JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf");
+    JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
+    NOTICE_OF_DISCONTINUANCE_PDF("CV-CMC-GNO-ENG-SD0001.docx", "notice_of_discontinuance_%s.pdf");
 
     private final String template;
     private final String documentTitle;
