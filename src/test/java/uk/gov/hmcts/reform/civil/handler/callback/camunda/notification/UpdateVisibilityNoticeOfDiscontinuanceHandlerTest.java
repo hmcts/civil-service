@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -47,6 +49,10 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
     private AssignCategoryId assignCategoryId;
 
     private static final String processId = "process-id";
+    private static final CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName("document name")
+            .documentType(DocumentType.NOTICE_OF_DISCONTINUANCE)
+            .build();
 
     @Nested
     class AboutToSubmitCallback {
@@ -59,6 +65,7 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
                 .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setConfirmOrderGivesPermission(
                 toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
+            caseData.setNoticeOfDiscontinueCWDoc(caseDocument);
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
