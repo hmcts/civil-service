@@ -7,11 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -39,25 +36,28 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    TransferOnlineCaseCallbackHandler.class,
-    JacksonAutoConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
 
-    @Autowired
     private TransferOnlineCaseCallbackHandler handler;
-    @Autowired
+
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Mock
     protected LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @Mock
     protected CourtLocationUtils courtLocationUtils;
-    @MockBean
+    @Mock
     protected FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new TransferOnlineCaseCallbackHandler(objectMapper, locationRefDataService, courtLocationUtils,
+                                                        featureToggleService);
+    }
 
     @Nested
     class AboutToStartCallback extends LocationRefSampleDataBuilder {
@@ -259,12 +259,16 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @CsvSource({"true", "false"})
         void shouldPopulateWhiteListing_whenNationalRolloutEnabled(Boolean isNationalRolloutEnabled) {
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(isNationalRolloutEnabled);
-            when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(isNationalRolloutEnabled);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
+
+            if (isNationalRolloutEnabled) {
+                when(featureToggleService.isPartOfNationalRollout("222")).thenReturn(true);
+            }
+
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .caseManagementLocation(CaseLocationCivil.builder()
                                             .region("2")
@@ -276,7 +280,11 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isNationalRolloutEnabled ? YES : null);
+            if (isNationalRolloutEnabled) {
+                assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(YES);
+            } else {
+                assertThat(responseCaseData.getEaCourtLocation()).isNull();
+            }
         }
     }
 
