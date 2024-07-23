@@ -62,7 +62,7 @@ public class BundleRequestMapper {
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    private static final String UNBUNDLED_Folder="UnbundledFolder";
+    private static final String UNBUNDLED_Folder = "UnbundledFolder";
 
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
