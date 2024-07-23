@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicMultiSelectList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -631,6 +632,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
     private final List<Element<String>> sdtRequestId;
+
+    private DynamicMultiSelectList directionsCreationMethod;
+    private Document judgeDraftDirections;
+    private Document judgeDirections;
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;

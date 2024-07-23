@@ -294,7 +294,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/advice/**, **/DocumentMergingService.java, **/DynamicMultiSelectList.java, **/DocumentFileType.java, **/DynamicMultiSelectList.java, **/DocumentGeneratorService.java, **/JudgeDirectionsHandler.java"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -433,6 +433,9 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.50.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.1'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+  implementation group: 'org.docx4j', name: 'docx4j-core', version: '11.4.11'
+  implementation group: 'org.docx4j', name: 'docx4j-JAXB-ReferenceImpl', version: '11.4.11'
+  implementation group: 'com.sun.activation', name: 'jakarta.activation', version: '2.0.1'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
