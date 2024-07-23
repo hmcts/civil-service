@@ -62,7 +62,7 @@ public class BundleRequestMapper {
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    private static final String UNBUNDLED_Folder = "UnbundledFolder";
+    private static final String UNBUNDLED_FOLDER = "UnbundledFolder";
 
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
@@ -949,38 +949,42 @@ public class BundleRequestMapper {
 
     }
 
-    private void filterGenericExpert(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
+    private List<Element<UploadEvidenceExpert>> filterGenericExpert(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
 
         if (nonNull(uploadEvidenceExpert)) {
-            uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
-                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_Folder)));
+            uploadEvidenceExpert = uploadEvidenceExpert.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
+                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
         }
+        return uploadEvidenceExpert;
     }
 
-    private void filterGenericWitness(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness) {
+    private List<Element<UploadEvidenceWitness>>  filterGenericWitness(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness) {
 
         if (nonNull(uploadEvidenceWitness)) {
-            uploadEvidenceWitness.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID())
-                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(UNBUNDLED_Folder)));
+            uploadEvidenceWitness = uploadEvidenceWitness.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
+                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
         }
+        return uploadEvidenceWitness;
     }
 
-    private void filterGenericCaseData(List<Element<CaseDocument>> caseDocument) {
+    private List<Element<CaseDocument>>  filterGenericCaseData(List<Element<CaseDocument>> caseDocument) {
 
         if (nonNull(caseDocument)) {
-            caseDocument.stream()
-                .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
-                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(UNBUNDLED_Folder)));
+            caseDocument = caseDocument.stream()
+                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentLink().getCategoryID() != null
+                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
         }
+        return caseDocument;
     }
 
-    private void filterGenericDisclosure(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType) {
+    private List<Element<UploadEvidenceDocumentType>> filterGenericDisclosure(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType) {
 
         if (nonNull(uploadEvidenceDocumentType)) {
-            uploadEvidenceDocumentType.stream()
-                .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentUpload().getCategoryID())
-                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_Folder)));
+            uploadEvidenceDocumentType = uploadEvidenceDocumentType.stream()
+                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentUpload().getCategoryID() != null
+                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
         }
+        return uploadEvidenceDocumentType;
     }
 
     protected enum PartyType {
