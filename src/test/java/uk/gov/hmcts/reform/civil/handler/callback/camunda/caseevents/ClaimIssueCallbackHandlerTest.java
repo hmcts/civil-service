@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -29,29 +27,25 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ClaimIssueCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    DeadlinesCalculator.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
-
-    @Autowired
+    @InjectMocks
     private ClaimIssueCallbackHandler handler;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
+
+    @Mock
+    private ObjectMapper mapper;
 
     private final LocalDateTime deadline = now().atTime(MIDNIGHT);
 
     @BeforeEach
     void setup() {
-        when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
-            .thenReturn(deadline);
+        mapper = new ObjectMapper();
+        handler = new ClaimIssueCallbackHandler(mapper, deadlinesCalculator);
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
     @Test
@@ -62,6 +56,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
+            .thenReturn(deadline);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -75,6 +71,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
+            .thenReturn(deadline);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -95,6 +93,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
+            .thenReturn(deadline);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -109,6 +109,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
+            .thenReturn(deadline);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
