@@ -62,6 +62,8 @@ public class BundleRequestMapper {
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
+    private static final String UNBUNDLED_Folder="UnbundledFolder";
+
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
                                                                 String caseTypeId) {
@@ -951,7 +953,7 @@ public class BundleRequestMapper {
 
         if (nonNull(uploadEvidenceExpert)) {
             uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
-                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals("UnbundledFolder")));
+                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_Folder)));
         }
     }
 
@@ -959,7 +961,7 @@ public class BundleRequestMapper {
 
         if (nonNull(uploadEvidenceWitness)) {
             uploadEvidenceWitness.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID())
-                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals("UnbundledFolder")));
+                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(UNBUNDLED_Folder)));
         }
     }
 
@@ -968,7 +970,7 @@ public class BundleRequestMapper {
         if (nonNull(caseDocument)) {
             caseDocument.stream()
                 .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
-                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("UnbundledFolder")));
+                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(UNBUNDLED_Folder)));
         }
     }
 
@@ -977,7 +979,7 @@ public class BundleRequestMapper {
         if (nonNull(uploadEvidenceDocumentType)) {
             uploadEvidenceDocumentType.stream()
                 .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentUpload().getCategoryID())
-                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals("UnbundledFolder")));
+                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_Folder)));
         }
     }
 

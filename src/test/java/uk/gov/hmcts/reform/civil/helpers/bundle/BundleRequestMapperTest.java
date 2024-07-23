@@ -190,9 +190,43 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
     }
 
+    @Test
+    void testBundleRequestMapperWhenDirectionsHaveUnbundledFolderCategoryId() {
+        // Given
+        CaseData caseData = getCaseDataWithUnbundledFolderId();
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+            ".yaml", "test", "test"
+        );
+        // Then
+        assertNotNull(bundleCreateRequest);
+        assertEquals("Directions Questionnaire 10/06/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+    }
+
+
     private CaseData getCaseDataWithNoId() {
         return CaseData.builder().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
+            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
+                "applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
+                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .addApplicant2(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
+                "applicant2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
+                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
+                                            2, 2))
+            .build();
+    }
+
+    private CaseData getCaseDataWithUnbundledFolderId() {
+        return CaseData.builder().ccdCaseReference(1L)
+            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsUnbundledFolderId())
             .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
                 "applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
@@ -305,7 +339,7 @@ class BundleRequestMapperTest {
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                         .expertOptionExpertise("Test")
                                                         .expertOptionOtherParty(otherParty)
                                                         .expertOptionExpertises("Test1 Test2")
@@ -314,7 +348,7 @@ class BundleRequestMapperTest {
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                         .expertOptionExpertise("Test")
                                                         .expertOptionOtherParty("wrong party name")
                                                         .expertOptionExpertises("Test1 Test2")
@@ -330,7 +364,7 @@ class BundleRequestMapperTest {
             CaseDocument.builder()
                 .documentType(DocumentType.CLAIMANT_DEFENCE)
                 .createdBy("Claimant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
@@ -343,7 +377,7 @@ class BundleRequestMapperTest {
             CaseDocument.builder()
                 .documentType(DocumentType.DEFENDANT_DEFENCE)
                 .createdBy("Defendant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
@@ -355,7 +389,7 @@ class BundleRequestMapperTest {
         CaseDocument caseDocumentDC =
             CaseDocument.builder()
                 .documentType(docType)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
@@ -368,7 +402,7 @@ class BundleRequestMapperTest {
             otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                            .builder()
                                                            .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                               .documentFileName(TEST_FILE_NAME).build())
+                                                                               .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                            .typeOfDocument(type.getDisplayNames().get(0))
                                                            .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                            .build()));
@@ -376,7 +410,7 @@ class BundleRequestMapperTest {
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).build())
+                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                        .typeOfDocument("Other")
                                                        .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
@@ -390,7 +424,7 @@ class BundleRequestMapperTest {
                                                        .witnessOptionName(witnessOptionName)
                                                        .typeOfDocument(TEST_FILE_TYPE)
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).build())
+                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                        .documentIssuedDate(LocalDate.of(2022, 12, 12))
                                                        .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
         return otherEvidenceDocs;
@@ -401,7 +435,7 @@ class BundleRequestMapperTest {
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
                                                         .expertOptionExpertise("Test")
                                                         .expertOptionExpertises("Test1 Test2")
                                                         .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
@@ -455,6 +489,51 @@ class BundleRequestMapperTest {
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
                 .documentLink(Document.builder().documentUrl(TEST_URL)
                                   .documentFileName("FOUR").build())
+                .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef23 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName("FIVE").build())
+                .createdDatetime(LocalDateTime.of(2023, 6, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
+        return systemGeneratedCaseDocuments;
+    }
+
+    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocsUnbundledFolderId() {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentDQDef1 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName("ONE").categoryID("UnbundledFolder").build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQApp1 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName("TWO").categoryID("UnbundledFolder").build())
+                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef22 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName("THREE").categoryID("UnbundledFolder").build())
+                .createdDatetime(LocalDateTime.of(2023, 4, 11, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef21 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName("FOUR").categoryID("UnbundledFolder").build())
                 .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
                                                   2, 2)).build();
         CaseDocument caseDocumentDQDef23 =
