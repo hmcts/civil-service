@@ -949,32 +949,36 @@ public class BundleRequestMapper {
 
     private void filterGenericExpert(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
 
+        if (nonNull(uploadEvidenceExpert)) {
         uploadEvidenceExpert.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getExpertDocument().getCategoryID())
             && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals("UnbundledFolder")));
-
+        }
     }
 
     private void filterGenericWitness(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness) {
 
-        uploadEvidenceWitness.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID())
-            && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals("UnbundledFolder")));
-
+        if (nonNull(uploadEvidenceWitness)) {
+            uploadEvidenceWitness.stream().filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID())
+                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals("UnbundledFolder")));
+        }
     }
 
     private void filterGenericCaseData(List<Element<CaseDocument>> caseDocument) {
 
-        caseDocument.stream()
-            .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
-                && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("UnbundledFolder")));
-
+        if (nonNull(caseDocument)) {
+            caseDocument.stream()
+                .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
+                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("UnbundledFolder")));
+        }
     }
 
     private void filterGenericDisclosure(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType) {
 
-        uploadEvidenceDocumentType.stream()
-            .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentUpload().getCategoryID())
-                && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals("UnbundledFolder")));
-
+        if (nonNull(uploadEvidenceDocumentType)) {
+            uploadEvidenceDocumentType.stream()
+                .filter(caseDocumentElement -> (nonNull(caseDocumentElement.getValue().getDocumentUpload().getCategoryID())
+                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals("UnbundledFolder")));
+        }
     }
 
     protected enum PartyType {
