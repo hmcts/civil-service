@@ -45,6 +45,8 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler i
         return EVENTS;
     }
 
+    // Todo Remove this class from sonar exclusions once LR notification is implemented
+
     public CallbackResponse sendNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
