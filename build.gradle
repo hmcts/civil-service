@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.0.0.4638'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1321'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1328'
   id "org.flywaydb.flyway" version "10.15.2"
 }
 
@@ -24,7 +24,7 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.34',
-  springSecurity    : '5.8.12',
+  springSecurity    : '5.8.13',
   camunda           : '7.20.0',
   jackson           : '2.17.2',
   testcontainers    : '1.19.8'
@@ -95,14 +95,14 @@ allprojects {
       }
 
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.24'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.24'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.24'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.24'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.24'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
 
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.12'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.13'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
@@ -121,7 +121,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.761'
+        version: '1.12.763'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -369,7 +369,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.2.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.5'
@@ -412,7 +412,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.91'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.22'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.4.0'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -430,7 +430,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.49.1'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.50.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.1'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
@@ -466,7 +466,7 @@ dependencies {
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.230'
   // dashboard specific changes ends
 
 
