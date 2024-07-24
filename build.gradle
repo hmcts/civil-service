@@ -27,7 +27,7 @@ def versions = [
   springSecurity    : '5.8.13',
   camunda           : '7.20.0',
   jackson           : '2.17.2',
-  testcontainers    : '1.19.8'
+  testcontainers    : '1.20.0'
 ]
 
 allprojects {
