@@ -1,34 +1,33 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 
 public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DefendantResponseClaimantNotificationHandler handler;
 
-    @Test
-    void shouldCreateFullDefenceFastTrackResponseScenario() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = {"SMALL_CLAIM"})
+    void shouldCreateFullDefenceFastTrackResponseScenario(AllocatedTrack track) throws Exception {
 
         String caseId = "1234987";
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -38,7 +37,7 @@ public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends D
             .applicant1ResponseDeadline(LocalDateTime.of(2024, 8, 6, 12, 0))
             .respondent1(Party.builder().individualFirstName("James")
                     .individualLastName("John").type(Party.Type.INDIVIDUAL).build())
-            .responseClaimTrack(FAST_CLAIM.name())
+            .responseClaimTrack(track.name())
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .build();
 
