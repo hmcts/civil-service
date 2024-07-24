@@ -5,11 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -25,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -54,31 +52,32 @@ import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFE
 import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFENDANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFENDANT_TWO_ID;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    UploadMediationDocumentsCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private UploadMediationDocumentsCallbackHandler handler;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private UploadMediationService uploadMediationService;
 
-    @MockBean
+    @Mock
+    private UserService userService;
+
+    @Mock
     private Time time;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        AssignCategoryId assignCategoryId = new AssignCategoryId();
+        handler = new UploadMediationDocumentsCallbackHandler(coreCaseUserService, userService, objectMapper, time,
+                                                              assignCategoryId, uploadMediationService);
+    }
 
     private static final String PARTY_OPTIONS_PAGE = "populate-party-options";
     private static final String VALIDATE_DATES = "validate-dates";
