@@ -16,11 +16,13 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -37,13 +39,22 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     private final BundleCreationService bundleCreationService;
     private final BundleCreationTriggerEventHandler bundleCreationEventHandler;
 
+    private final FeatureToggleService featureToggleService;
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
+        return featureToggleService.isCaseEventsEnabled()
+            ? Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::startBundleCreation,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::buildConfirmation
+            )
+            : Map.of(
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "create-bundle"), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
     }
 
@@ -58,17 +69,16 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
 
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        List<IdValue<Bundle>> filteredCaseBundles = caseBundles.stream()
-            .filter(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
-                && !bundle.getValue().getBundleHearingDate().equals(caseData.getHearingDate()))
-            .toList();
+        caseBundles.removeIf(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
+                                 && bundle.getValue().getBundleHearingDate().get().equals(
+                                 caseData.getHearingDate()));
 
-        filteredCaseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
                                .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
             ).toList());
-        caseDataBuilder.caseBundles(filteredCaseBundles);
+        caseDataBuilder.caseBundles(caseBundles);
 
-        if(!bundleCreateResponse.getErrors().isEmpty()) {
+        if (nonNull(bundleCreateResponse.getErrors()) && !bundleCreateResponse.getErrors().isEmpty()) {
             caseDataBuilder.bundleError(YesOrNo.YES);
         }
 
