@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
@@ -47,7 +48,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
             ? Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "create-bundle"), this::startBundleCreation,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
             callbackKey(SUBMITTED), this::buildConfirmation
             )
             : Map.of(
@@ -93,6 +94,20 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("Placeholder")
             .confirmationBody("Placeholder")
+            .build();
+    }
+
+    private CallbackResponse amendRestitchBundle(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+
+        if (caseData.getBundleError() == null || caseData.getBundleError().equals(YesOrNo.NO)) {
+            dataBuilder.businessProcess(BusinessProcess.ready(AMEND_RESTITCH_BUNDLE));
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(mapper))
             .build();
     }
 }

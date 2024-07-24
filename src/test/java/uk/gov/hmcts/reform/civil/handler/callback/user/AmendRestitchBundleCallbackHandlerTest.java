@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,9 +41,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
 
 @ExtendWith(MockitoExtension.class)
 class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -167,6 +168,11 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(AMEND_RESTITCH_BUNDLE);
         }
     }
 
