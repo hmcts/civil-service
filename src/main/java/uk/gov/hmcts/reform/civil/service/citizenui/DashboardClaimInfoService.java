@@ -156,6 +156,8 @@ public class DashboardClaimInfoService {
 
         if (caseData.getActiveJudgment() != null) {
             item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
+        } else if (caseData.isCcjRequestJudgmentByAdmission()) {
+            item.setCcjRequestedDate(caseData.getApplicant1ResponseDate());
         }
 
         return item;
