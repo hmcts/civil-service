@@ -107,7 +107,7 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     DynamicListElement buildListOption(Document document) {
         return DynamicListElement.builder()
                 .label(document.getDocumentFileName())
-                .code(document.getDocumentFileName().toString())
+                .code(document.getDocumentFileName())
                 .build();
     }
 
@@ -156,10 +156,11 @@ public class JudgeDirectionsHandler extends CallbackHandler {
             testDocuments
                     .stream().filter(document -> selectedDocumentIds.contains(document.getDocumentFileName()))
                     .forEach(document -> {
-                        MergeDoc.builder()
+                        selectedDocuments.add(MergeDoc.builder()
                                 .sectionHeader(document.getDocumentFileName())
                                 .file(downloadDcoument(document, auth))
-                                .build();
+                                .build()
+                        );
                     });
             //===================================================
 
