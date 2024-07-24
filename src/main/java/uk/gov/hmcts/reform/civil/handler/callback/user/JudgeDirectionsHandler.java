@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocumentFileType;
@@ -71,10 +72,24 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        var partyDirectionDocumentOptions = buildDirectionDocumentsList(caseData);
+
+        //If test documents exist add them to options
+        if (nonNull(caseData.getTestDocuments())) {
+            caseData.getTestDocuments().stream()
+                    .forEach(document ->
+                            partyDirectionDocumentOptions.add(
+                                    DynamicListElement.builder()
+                                            .label(document.getValue().getDocumentFileName())
+                                            .code(document.getId().toString())
+                                            .build()));
+        }
+
+        //ToDo Remove. For test documents page only.
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toBuilder()
                         .directionsCreationMethod(DynamicMultiSelectList.builder()
-                                .listItems(buildDirectionDocumentsList(caseData))
+                                .listItems(partyDirectionDocumentOptions)
                                 .build())
                         .build().toMap(objectMapper))
                 .build();
@@ -111,7 +126,8 @@ public class JudgeDirectionsHandler extends CallbackHandler {
 
         if (nonNull(caseData.getDirectionsCreationMethod().getValue())) {
             List<String> selectedDocumentIds = caseData.getDirectionsCreationMethod().getValue().stream().map(item -> item.getCode()).toList();
-            List<MergeDoc> selectedDocumentLinks =
+
+            List<MergeDoc> selectedDocuments =
                     getAllPartyDirectionDocuments(caseData).stream()
                             .filter(item -> selectedDocumentIds.contains(item.getId().toString()))
                             .map(item -> MergeDoc.builder().sectionHeader(getListItemLabel(item.getValue()))
@@ -119,9 +135,21 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                                     .build()
                             ).toList();
 
+            //ToDo: Remove. Add selected test docs
+            if (nonNull(caseData.getTestDocuments())) {
+                caseData.getTestDocuments()
+                        .stream().filter(document -> selectedDocumentIds.contains(document.getId()))
+                        .forEach(document -> {
+                            MergeDoc.builder()
+                                    .sectionHeader(document.getId().toString())
+                                    .file(getDocument(document.getValue(), auth))
+                                    .build();
+                        });
+            }
+
             List<MergeDoc> filesToMerge = Stream.concat(
                     List.of(MergeDoc.builder().file(directionsTemplate).build()).stream(),
-                    selectedDocumentLinks.stream()).toList();
+                    selectedDocuments.stream()).toList();
             directionsTemplate = documentMergingservice.merge(filesToMerge);
         }
 
@@ -177,5 +205,13 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                         .judgeDraftDirections(null)
                         .judgeDirections(null)
                         .build().toMap(objectMapper)).build();
+    }
+
+    private byte[] getDocument(Document document, String authToken) {
+        String documentId = document.getDocumentUrl().substring(document.getDocumentUrl().lastIndexOf("/") + 1);
+        return documentManagementService.downloadDocument(
+                authToken,
+                String.format("documents/%s", documentId)
+        );
     }
 }
