@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_AMEND
 
 @Service
 @RequiredArgsConstructor
-public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler implements NotificationData{
+public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler implements NotificationData {
 
     private static final String TASK_ID = "NotifyClaimantAmendRestitchBundle";
     private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-claimant-notification-%s";
