@@ -13,7 +13,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSection;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DocumentsToBeConsidered;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import java.util.Optional;
 
@@ -62,6 +69,60 @@ class DQLipDefendantFormMapperTest {
         DirectionsQuestionnaireForm resultForm = dqLipDefendantFormMapper.addLipDQs(form, caseDataLiPOptional);
         //Then
         assertThat(resultForm.getLipExtraDQ()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulateLipDQ_whenDQIsNotNullMinti() {
+        //Given
+        given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
+                                                         .respondent1DQFixedRecoverableCostsIntermediate(
+                                                             FixedRecoverableCosts.builder()
+                                                                 .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
+                                                                 .reasons("reasons")
+                                                                 .build())
+                                                         .specRespondent1DQDisclosureOfElectronicDocuments(
+                                                             DisclosureOfElectronicDocuments.builder()
+                                                                 .reachedAgreement(YesOrNo.NO)
+                                                                 .agreementLikely(YesOrNo.NO)
+                                                                 .reasonForNoAgreement("no")
+                                                                 .build())
+                                                         .specRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                             DisclosureOfNonElectronicDocuments.builder()
+                                                                 .bespokeDirections("directions")
+                                                                 .build())
+                                                         .respondent1DQClaimantDocumentsToBeConsidered(
+                                                             DocumentsToBeConsidered.builder()
+                                                                 .hasDocumentsToBeConsidered(YesOrNo.NO)
+                                                                 .details("details")
+                                                                 .build())
+                                                         .build());
+        //When
+        FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
+        //Then
+        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
+                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
+                                              .reasons("reasons")
+                                              .build());
+
+        assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YesOrNo.NO)
+                                                              .agreementLikely(YesOrNo.NO)
+                                                              .reasonForNoAgreement("no")
+                                                              .build());
+
+        assertThat(expectedNonEletronicDisclosure).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .bespokeDirections("directions")
+                                                                 .build());
+
+        assertThat(expectedDocsToBeConsidered).isEqualTo(DocumentsToBeConsideredSection.builder()
+                                                             .hasDocumentsToBeConsidered(YesOrNo.NO)
+                                                             .details("details")
+                                                             .sectionHeading("Claimants documents to be considered")
+                                                             .question("Are there any documents the claimants have that you want the court to consider?")
+                                                             .build());
     }
 
     @Test
