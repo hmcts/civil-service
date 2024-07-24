@@ -59,7 +59,8 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-                callbackKey(ABOUT_TO_START), this::aboutToStart,
+                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+                callbackKey(MID, "populate-document-selection"), this::aboutToStart,
                 callbackKey(MID, "create-directions-template"), this::createDirectionsTemplate,
                 callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit
         );
