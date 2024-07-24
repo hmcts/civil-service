@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AMEN
 
 @Service
 @RequiredArgsConstructor
-public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler {
+public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler implements NotificationData {
 
     private static final String TASK_ID = "NotifyDefendantAmendRestitchBundle";
     private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-defendant-notification-%s";
@@ -52,11 +52,7 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 getNotificationTemplate(caseData),
-                Map.of(
-                    "CLAIM_REFERENCE_NUMBER", caseData.getLegacyCaseReference(),
-                    "PARTY_NAME", caseData.getRespondent1().getPartyName(),
-                    "CLAIMANT_V_DEFENDANT", PartyUtils.getAllPartyNames(caseData)
-                ),
+                addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
@@ -67,5 +63,14 @@ public class NotifyDefendantAmendRestitchBundleHandler extends CallbackHandler {
         return caseData.isRespondentResponseBilingual()
             ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
             : notificationsProperties.getNotifyLipUpdateTemplate();
+    }
+
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+        );
     }
 }
