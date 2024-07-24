@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -34,36 +33,32 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    ClaimantDefendantAgreedMediationApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+
+    @InjectMocks
     private ClaimantDefendantAgreedMediationApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyApplicantLRMediationTemplate()).thenReturn("mediation-template");
-
-        }
-
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
+            when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn("template-id");
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -88,7 +83,9 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
 
         @Test
         void shouldSendMediationNotifyApplicantParty_whenCarmIsON() {
+            when(notificationsProperties.getNotifyApplicantLRMediationTemplate()).thenReturn("mediation-template");
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
