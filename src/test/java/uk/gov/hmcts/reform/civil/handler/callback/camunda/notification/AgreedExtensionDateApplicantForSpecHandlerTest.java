@@ -5,22 +5,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,23 +45,19 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    AgreedExtensionDateApplicantForSpecNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private AgreedExtensionDateApplicantForSpecNotificationHandler handler;
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
     @Nested
@@ -78,16 +72,6 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
         Map<String, String> expectedNotificationDataRespondent;
         CaseData caseData;
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec())
-                .thenReturn("template-id");
-            when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
-                .thenReturn("template-id-respondent");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-        }
-
         @Nested
         class WhenRespondent1SubmitsTimeExtension {
 
@@ -98,10 +82,16 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
                 expectedNotificationDataRespondent = getNotificationDataMapRespondent(
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             }
 
             @Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id");
+
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
                 verify(notificationService).sendMail(
@@ -114,6 +104,9 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
                 verify(notificationService).sendMail(
@@ -124,8 +117,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 );
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
                 verify(notificationService).sendMail(
@@ -151,6 +147,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyRespondentSolicitor2() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
                 verify(notificationService).sendMail(
@@ -163,6 +164,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor1TimeExtensionExists() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -184,6 +190,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor1ExtendsFirst() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -204,8 +215,13 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 );
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyWithCorrectExtensionDate_when1v2DSRespondentSolicitor1ExtendsFirst() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .respondent1(PartyBuilder.builder().individual().build())
@@ -225,8 +241,13 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 );
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor2ExtendsFirst() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -247,8 +268,13 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 );
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyWithCorrectExtensionDate_when1v2SameSolicitorExtends() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .addRespondent2(YES)
@@ -272,6 +298,10 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyRespondentSolicitor2ClaimStatementOfTruth_whenNoOrgFound() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -311,6 +341,10 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void testNullRespondentSolicitor1AgreedDeadlineExtension() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
@@ -331,6 +365,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void testRespondent2AgreedDeadlineExtensionIsAfterRespondent1() {
+                when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
+                    .thenReturn("template-id-respondent");
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
