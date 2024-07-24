@@ -91,15 +91,15 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     }
 
     private List<Document> getTestDocuments(CaseData caseData) {
-        List list = new ArrayList();
+        List<Document> list = new ArrayList<Document>();
         if (nonNull(caseData.getTestDocument1())) {
-            list.add(buildListOption(caseData.getTestDocument1()));
+            list.add(caseData.getTestDocument1());
         }
         if (nonNull(caseData.getTestDocument2())) {
-            list.add(buildListOption(caseData.getTestDocument2()));
+            list.add(caseData.getTestDocument2());
         }
         if (nonNull(caseData.getTestDocument3())) {
-            list.add(buildListOption(caseData.getTestDocument3()));
+            list.add(caseData.getTestDocument3());
         }
         return  list;
     }
