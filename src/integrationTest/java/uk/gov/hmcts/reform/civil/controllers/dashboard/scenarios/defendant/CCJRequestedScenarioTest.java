@@ -36,15 +36,8 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Mr. John Rambo has requested a County Court Judgment (CCJ)"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Mr. John Rambo has requested a CCJ against you because you have not responded to the claim and the response deadline" +
-                        " has passed.</p><p class=\"govuk-body\">Your online account will not be updated with the progress of the claim, and any further updates will be by post." +
-                        "</p><p class=\"govuk-body\">If your deadline has passed, but the CCJ has not been issued, you can " +
-                        "still respond. Get in touch with HMCTS on {civilMoneyClaimsTelephone} " +
-                        "if you are in England and Wales. You can call from Monday to Friday, between 8.30am to 5pm. " +
-                        "<a href=\"https://www.gov.uk/call-charges\" target=\"_blank\" " +
-                        "rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about call charges (opens in new tab)</a>.</p>" +
-                        "<p class=\"govuk-body\">If you do not get in touch, " +
-                        "we will post a CCJ to yourself and Mr. John Rambo and explain what to do next.</p>"),
+                    "<p class=\"govuk-body\">Mr. John Rambo has requested a CCJ against you, because you have not responded to the claim and the response deadline" +
+                               "<p class=\"govuk-body\">We will post a CCJ to you and Mr. John Rambo and explain what to do next.</p>"),
                 jsonPath("$[0].titleCy").value("Mae Mr. John Rambo wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ)"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Mr. John Rambo wedi gwneud cais am CCJ yn " +
