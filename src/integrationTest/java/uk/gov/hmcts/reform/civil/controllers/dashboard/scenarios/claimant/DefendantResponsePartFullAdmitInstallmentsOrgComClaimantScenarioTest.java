@@ -39,6 +39,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
+            .responseClaimTrack("SMALL_CLAIM")
             .respondent1(Party.builder().companyName("Company One").type(Party.Type.COMPANY).build())
             .respondent1RepaymentPlan(RepaymentPlanLRspec
                                           .builder()
