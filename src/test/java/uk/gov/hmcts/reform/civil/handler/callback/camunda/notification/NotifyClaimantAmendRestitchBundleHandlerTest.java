@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,81 +44,48 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
     @Autowired
     NotifyClaimantAmendRestitchBundleHandler handler;
 
-    @Test
-    void shouldSendEmailWhenAllDataIsCorrectAndNotBilingual() {
+    private CaseData caseData;
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+    @BeforeEach
+    void setUp() {
+        caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
-            .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).build()).build();
-
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
-            TEMPLATE_ID);
-
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-        handler.handle(params);
-
-        verify(notificationService).sendMail(
-            "claimant@hmcts.net",
-            TEMPLATE_ID,
-            getNotificationDataMap(caseData),
-            "amend-restitch-bundle-claimant-notification-000DC001"
-        );
-
     }
 
-    @Test
-    void shouldSendEmailWhenAllDataIsCorrectAndBilingual() {
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
-
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(
-            BILINGUAL_TEMPLATE_ID);
-
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-        handler.handle(params);
-
-        verify(notificationService).sendMail(
-            "claimant@hmcts.net",
-            BILINGUAL_TEMPLATE_ID,
-            getNotificationDataMap(caseData),
-            "amend-restitch-bundle-claimant-notification-000DC001"
-        );
-
-    }
-
-    @Test
-    void shouldNotSendEmailWhenAllDataIsCorrectAndNotLIP() {
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build()).respondent1Represented(YesOrNo.YES).build();
-
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
-            TEMPLATE_ID);
+    @ParameterizedTest
+    @CsvSource({
+        "NO, NO, template-id",
+        "YES, NO, bilingual-template-id",
+        "NO, YES, ''",
+        "YES, YES, ''"
+    })
+    void shouldSendEmailBasedOnConditions(YesOrNo bilingual, YesOrNo represented, String expectedTemplateId) {
+        if (bilingual == YesOrNo.YES) {
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
+        } else {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        }
+        caseData = caseData.toBuilder().applicant1Represented(represented).build();
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
         handler.handle(params);
 
-        verify(notificationService, never()).sendMail(any(), any(), any(), any());
-
+        if (!expectedTemplateId.isEmpty()) {
+            verify(notificationService).sendMail(
+                "claimant@hmcts.net",
+                expectedTemplateId,
+                getNotificationDataMap(caseData),
+                "amend-restitch-bundle-claimant-notification-000DC001"
+            );
+        } else {
+            verify(notificationService, never()).sendMail(any(), any(), any(), any());
+        }
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
@@ -126,5 +95,4 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
             CLAIMANT_V_DEFENDANT, "John Doe V Jack Jackson"
         );
     }
-
 }
