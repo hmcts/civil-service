@@ -151,4 +151,8 @@ public class FeatureToggleService {
     public boolean isGenAppsAllowedPreSdo() {
         return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
     }
+
+    public boolean isCaseEventsEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
+    }
 }

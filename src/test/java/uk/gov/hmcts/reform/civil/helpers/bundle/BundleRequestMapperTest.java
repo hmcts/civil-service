@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.civil.helpers.bundle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
@@ -18,9 +21,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -31,12 +32,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
 class BundleRequestMapperTest {
 
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_TYPE = "Email";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
@@ -46,6 +50,7 @@ class BundleRequestMapperTest {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData();
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
@@ -172,6 +177,7 @@ class BundleRequestMapperTest {
         // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles using CL1, DF1, DF2 prefix
         // Given
         CaseData caseData = getCaseDataWithNoId();
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
             ".yaml", "test", "test"
@@ -194,6 +200,7 @@ class BundleRequestMapperTest {
     void testBundleRequestMapperWhenDirectionsHaveUnbundledFolderCategoryId() {
         // Given
         CaseData caseData = getCaseDataWithUnbundledFolderId();
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
             ".yaml", "test", "test"
