@@ -50,7 +50,7 @@ class BundleRequestMapperTest {
         // Given
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData();
-        given(featureToggleService.isCaseEventsEnabled()).willReturn(false);
+        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +

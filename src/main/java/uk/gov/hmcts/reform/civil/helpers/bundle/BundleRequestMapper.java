@@ -955,7 +955,7 @@ public class BundleRequestMapper {
 
         if (nonNull(uploadEvidenceExpert)) {
             uploadEvidenceExpert = uploadEvidenceExpert.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
-                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
+                && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
         }
         return uploadEvidenceExpert;
     }
@@ -964,7 +964,7 @@ public class BundleRequestMapper {
 
         if (nonNull(uploadEvidenceWitness)) {
             uploadEvidenceWitness = uploadEvidenceWitness.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
-                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
+                && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
         }
         return uploadEvidenceWitness;
     }
@@ -974,7 +974,7 @@ public class BundleRequestMapper {
         if (nonNull(caseDocument)) {
             caseDocument = caseDocument.stream()
                 .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentLink().getCategoryID() != null
-                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
+                    && !caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
         }
         return caseDocument;
     }
@@ -984,7 +984,7 @@ public class BundleRequestMapper {
         if (nonNull(uploadEvidenceDocumentType)) {
             uploadEvidenceDocumentType = uploadEvidenceDocumentType.stream()
                 .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentUpload().getCategoryID() != null
-                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).collect(Collectors.toList());
+                    && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
         }
         return uploadEvidenceDocumentType;
     }
