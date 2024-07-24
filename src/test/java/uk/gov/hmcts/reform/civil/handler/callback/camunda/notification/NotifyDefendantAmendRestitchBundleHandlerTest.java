@@ -88,7 +88,7 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
                 "respondentLip@example.com",
                 expectedTemplateId,
                 getNotificationDataMap(caseData),
-                "amend-restitch-bundle-defendant-notification-000DC001"
+                "amend-restitch-bundle-defendant-notification-1594901956117591"
             );
         } else {
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
@@ -97,7 +97,7 @@ class NotifyDefendantAmendRestitchBundleHandlerTest {
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, "Jack Jackson",
             CLAIMANT_V_DEFENDANT, "John Doe V Jack Jackson"
         );

@@ -54,7 +54,7 @@ public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler im
                 caseData.getClaimantUserDetails().getEmail(),
                 getNotificationTemplate(caseData),
                 addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -69,7 +69,7 @@ public class NotifyClaimantAmendRestitchBundleHandler extends CallbackHandler im
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
