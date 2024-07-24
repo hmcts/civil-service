@@ -179,6 +179,10 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("1 Ebrill 2024");
         assertThat(result).extracting("hearingFee")
             .isEqualTo("£100");
+        assertThat(result).extracting("trialArrangementDeadlineEn")
+            .isEqualTo("4 March 2024");
+        assertThat(result).extracting("trialArrangementDeadlineCy")
+            .isEqualTo("4 Mawrth 2024");
     }
 
     @ParameterizedTest
