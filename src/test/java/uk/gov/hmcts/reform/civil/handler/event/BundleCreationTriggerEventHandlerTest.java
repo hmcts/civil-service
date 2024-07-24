@@ -228,21 +228,12 @@ class BundleCreationTriggerEventHandlerTest {
         // Given: a collection of case bundles and a valid startEventResponse
         StartEventResponse startEventResponse =
             StartEventResponse.builder().token("123").eventId("event1").caseDetails(caseDetails).build();
-        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1",
-                                      uk.gov.hmcts.reform.civil.model.Bundle.builder()
-                                          .title("Trial Bundle").fileName("TrialBundle.pdf")
-                                          .stitchStatus(Optional.of("NEW")).build()));
         // When: I call the prepareCaseContent method
-        CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
-                                                                                               startEventResponse);
+        CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(startEventResponse);
         // Then: all fields are populated correctly
         Assertions.assertEquals("event1", caseDataContent.getEvent().getId());
         Assertions.assertEquals("123", caseDataContent.getEventToken());
-        Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
-        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
-        Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
-                                );
+
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {

@@ -46,17 +46,10 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
-
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-            ).toList());
-        CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
+        CaseDataContent caseContent = prepareCaseContent(startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
@@ -75,11 +68,10 @@ public class BundleCreationTriggerEventHandler {
         return new IdValue<>(result.getId(), result);
     }
 
-    CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
+    CaseDataContent prepareCaseContent(StartEventResponse startEventResponse) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
         List<Element<UploadEvidenceDocumentType>> evidenceUploadedAfterBundle = new ArrayList<>();
         evidenceUploadedAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder().build()));
-        data.put("caseBundles", caseBundles);
         data.put("applicantDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
         data.put("respondentDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
         return CaseDataContent.builder()
