@@ -633,10 +633,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String sdtRequestIdFromSdt;
     private final List<Element<String>> sdtRequestId;
 
-    private List<Element<Document>> testDocuments;
     private DynamicMultiSelectList directionsCreationMethod;
     private Document judgeDraftDirections;
     private Document judgeDirections;
+
+    //Testing purposes
+    private Document testDocument1;
+    private Document testDocument2;
+    private Document testDocument3;
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;

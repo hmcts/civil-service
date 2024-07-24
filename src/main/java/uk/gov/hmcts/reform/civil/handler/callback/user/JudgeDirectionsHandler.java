@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.documentmerge.MergeDoc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,24 +75,39 @@ public class JudgeDirectionsHandler extends CallbackHandler {
 
         var partyDirectionDocumentOptions = buildDirectionDocumentsList(caseData);
 
-        //If test documents exist add them to options
-        if (nonNull(caseData.getTestDocuments())) {
-            caseData.getTestDocuments().stream()
-                    .forEach(document ->
-                            partyDirectionDocumentOptions.add(
-                                    DynamicListElement.builder()
-                                            .label(document.getValue().getDocumentFileName())
-                                            .code(document.getId().toString())
-                                            .build()));
-        }
-
         //ToDo Remove. For test documents page only.
+
+        //If test documents exist add them to options
+        getTestDocuments(caseData).forEach(document -> partyDirectionDocumentOptions.add(buildListOption(document)));
+        //==============================================
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toBuilder()
                         .directionsCreationMethod(DynamicMultiSelectList.builder()
                                 .listItems(partyDirectionDocumentOptions)
                                 .build())
                         .build().toMap(objectMapper))
+                .build();
+    }
+
+    private List<Document> getTestDocuments(CaseData caseData) {
+        List list = new ArrayList();
+        if (nonNull(caseData.getTestDocument1())) {
+            list.add(buildListOption(caseData.getTestDocument1()));
+        }
+        if (nonNull(caseData.getTestDocument2())) {
+            list.add(buildListOption(caseData.getTestDocument2()));
+        }
+        if (nonNull(caseData.getTestDocument3())) {
+            list.add(buildListOption(caseData.getTestDocument3()));
+        }
+        return  list;
+    }
+
+    DynamicListElement buildListOption(Document document) {
+        return DynamicListElement.builder()
+                .label(document.getDocumentFileName())
+                .code(document.getDocumentFileName().toString())
                 .build();
     }
 
@@ -136,16 +152,16 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                             ).toList();
 
             //ToDo: Remove. Add selected test docs
-            if (nonNull(caseData.getTestDocuments())) {
-                caseData.getTestDocuments()
-                        .stream().filter(document -> selectedDocumentIds.contains(document.getId()))
-                        .forEach(document -> {
-                            MergeDoc.builder()
-                                    .sectionHeader(document.getId().toString())
-                                    .file(getDocument(document.getValue(), auth))
-                                    .build();
-                        });
-            }
+            var testDocuments = getTestDocuments(caseData);
+            testDocuments
+                    .stream().filter(document -> selectedDocumentIds.contains(document.getDocumentFileName()))
+                    .forEach(document -> {
+                        MergeDoc.builder()
+                                .sectionHeader(document.getDocumentFileName())
+                                .file(downloadDcoument(document, auth))
+                                .build();
+                    });
+            //===================================================
 
             List<MergeDoc> filesToMerge = Stream.concat(
                     List.of(MergeDoc.builder().file(directionsTemplate).build()).stream(),
@@ -207,7 +223,7 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                         .build().toMap(objectMapper)).build();
     }
 
-    private byte[] getDocument(Document document, String authToken) {
+    private byte[] downloadDcoument(Document document, String authToken) {
         String documentId = document.getDocumentUrl().substring(document.getDocumentUrl().lastIndexOf("/") + 1);
         return documentManagementService.downloadDocument(
                 authToken,
