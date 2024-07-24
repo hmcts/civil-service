@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -12,8 +10,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 @lombok.AllArgsConstructor
 @lombok.NoArgsConstructor
 @Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 public class RequestedCourt {
 
     /**
