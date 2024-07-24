@@ -1,19 +1,17 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.exceptions.StitchingFailedException;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,20 +34,20 @@ import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    CivilDocumentStitchingService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class CivilDocumentStitchingServiceTest {
 
-    @Autowired
+    @InjectMocks
     private CivilDocumentStitchingService civilDocumentStitchingService;
-    @MockBean
+
+    @Mock
     private BundleRequestExecutor bundleRequestExecutor;
-    @MockBean
+
+    @Mock
     private StitchingConfiguration stitchingConfiguration;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     CaseData caseData;
 
