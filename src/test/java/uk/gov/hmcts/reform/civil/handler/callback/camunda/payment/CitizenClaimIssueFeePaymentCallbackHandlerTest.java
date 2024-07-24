@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -16,15 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 
-@SpringBootTest(classes = {
-    CitizenClaimIssueFeePaymentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-})
-
+@ExtendWith(MockitoExtension.class)
 class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private CitizenClaimIssueFeePaymentCallbackHandler handler;
+
+    @Mock
+    private ObjectMapper mapper;
 
     @Test
     void citizenClaimIssuePayment() {
@@ -37,16 +38,16 @@ class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandler
         assertThat(response.getErrors()).isNull();
     }
 
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CITIZEN_CLAIM_ISSUE_PAYMENT);
+    }
+
     private PaymentDetails buildPaymentDetails() {
         return PaymentDetails.builder()
             .status(PaymentStatus.SUCCESS)
             .reference("R1234-1234-1234-1234")
             .build();
 
-    }
-
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CITIZEN_CLAIM_ISSUE_PAYMENT);
     }
 }
