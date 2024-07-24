@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -445,7 +446,6 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
-            when(workingDayIndicator.isPublicHoliday(LocalDate.now().plusDays(1))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
@@ -455,7 +455,7 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
             ).build();
-            var response = (AboutToStartOrSubmitCallbackResponse)  handler.handle(params);
+            handler.handle(params);
             ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
             verify(dashboardApiClient).recordScenario(
                 eq(caseData.getCcdCaseReference().toString()),
