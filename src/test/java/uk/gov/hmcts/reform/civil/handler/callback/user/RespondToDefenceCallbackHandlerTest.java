@@ -791,6 +791,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedOneOnly() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
 
@@ -836,6 +837,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedTwoOnly() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
 
