@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
