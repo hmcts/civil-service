@@ -152,63 +152,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldThrowError_when_GaForLip_NotEnabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent2Represented(NO)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("45678")
-                                        .region("4").build()).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors()).isNotNull();
-        assertThat(response.getErrors().get(0))
-            .isEqualTo("Sorry this service is not available, please raise an application manually.");
-    }
-
-    @Test
-    void shouldThrowError_whenDefendantIsNotAssigned_LIP() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent2Represented(NO)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("45678")
-                                        .region("4").build()).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors()).isNotNull();
-        assertThat(response.getErrors().get(0)).isEqualTo(RESP_NOT_ASSIGNED_ERROR_LIP);
-    }
-
-    @Test
-    void shouldNotThrowError_whenDefendantIsAssigned_LIP() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent2Represented(NO)
-            .defendantUserDetails(IdamUserDetails.builder().email("test@gmail.com").id("ID").build())
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("45678")
-                                        .region("4").build()).build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
     void shouldNotThrowError_whenEpimsIdIsValidRegionPreSdoNationalRollout() {
         // National rollout applies to all courts pre sdo
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
