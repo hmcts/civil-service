@@ -5,15 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
@@ -43,25 +46,31 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    GenerateResponseSealedSpec.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
+})
 class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
+    @Autowired
     private GenerateResponseSealedSpec handler;
 
-    @Mock
+    @MockBean
     private SealedClaimResponseFormGeneratorForSpec sealedClaimResponseFormGeneratorForSpec;
 
-    @InjectMocks
+    @Autowired
     private ObjectMapper mapper;
 
-    @InjectMocks
+    @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @Mock
+    @MockBean
     private CivilDocumentStitchingService civilDocumentStitchingService;
 
-    @Mock
+    @MockBean
     private FeatureToggleService toggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
