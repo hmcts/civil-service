@@ -830,6 +830,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .build())
                 .build().toBuilder()
                 .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(9999_00))
                                 .build())
@@ -1213,7 +1214,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("caseManagementLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("10", "214320");
+                    .containsExactly("4", "00000");
 
             }
 
