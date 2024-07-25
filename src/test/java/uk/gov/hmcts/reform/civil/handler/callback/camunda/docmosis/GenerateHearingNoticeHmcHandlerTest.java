@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +65,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator, mapper, locationRefDataService);
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.registerModule(new JavaTimeModule());
 
     }
 

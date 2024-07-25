@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,7 +78,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void setup() {
         mapper = new ObjectMapper();
         handler = new GenerateDirectionsQuestionnaireCallbackHandler(directionsQuestionnaireGenerator, mapper, assignCategoryId);
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.registerModule(new JavaTimeModule());
     }
 
     @Test

@@ -1,11 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.NestedTestConfiguration;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -20,9 +25,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFo
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -201,7 +203,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
                                                            sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(true);
-            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            mapper.registerModule(new JavaTimeModule());
             when(time.now()).thenReturn(issueDate.atStartOfDay());
         }
 
@@ -273,7 +275,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
         }
 
-        //fail
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPerson() {
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -335,7 +336,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
                                                            sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(false);
-            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            mapper.registerModule(new JavaTimeModule());
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
         }

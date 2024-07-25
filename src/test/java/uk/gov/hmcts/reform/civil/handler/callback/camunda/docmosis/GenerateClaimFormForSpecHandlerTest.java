@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         mapper = new ObjectMapper();
         handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator,
                                                               civilDocumentStitchingService, toggleService, assignCategoryId, toggleService);
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.registerModule(new JavaTimeModule());
     }
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
@@ -573,7 +574,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    //pass
     @Test
     void shouldReturnCorrectActivityId_whenRequestedSpecClaim() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
@@ -583,7 +583,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimFormForSpec");
     }
 
-    //pass
     @Test
     void testHandledEvents() {
         assertThat(handler.handledEvents()).contains(GENERATE_CLAIM_FORM_SPEC);
