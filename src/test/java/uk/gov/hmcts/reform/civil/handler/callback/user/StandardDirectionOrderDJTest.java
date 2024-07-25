@@ -921,6 +921,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .trialHearingMethodInPersonDJ(options)
                 .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
