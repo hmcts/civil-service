@@ -412,7 +412,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
-        return false;
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+            && caseData.isClaimantBilingual();
     }
 
     @Override
