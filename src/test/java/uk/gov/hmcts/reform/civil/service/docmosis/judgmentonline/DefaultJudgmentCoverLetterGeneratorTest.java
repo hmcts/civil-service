@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -54,10 +54,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAU
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrganisationByPolicy;
 
-@SpringBootTest(classes = {
-    DefaultJudgmentCoverLetterGenerator.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DefaultJudgmentCoverLetterGeneratorTest {
 
     private static final CaseDocument COVER_LETTER = CaseDocumentBuilder.builder()
@@ -70,20 +67,23 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         .documentType(DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)
         .build();
 
-    @MockBean
+    @Mock
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+
+    @Mock
+    private DownloadedDocumentResponse downloadedDocumentResponse;
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @Mock
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @Mock
     private BulkPrintService bulkPrintService;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+    @Mock
     private CivilDocumentStitchingService civilDocumentStitchingService;
 
-    @Autowired
+    @InjectMocks
     private DefaultJudgmentCoverLetterGenerator defaultJudgmentCoverLetterGenerator;
     private static final String DEFAULT_JUDGMENT_COVER_LETTER = "default-judgment-cover-letter";
     public static final String TASK_ID = "SendCoverLetterToDefendantLR";
@@ -125,10 +125,10 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
     @BeforeEach
     void setup() {
-        given(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(
+        lenient().when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(
             DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG
                 .getDocumentTitle(), LETTER_CONTENT, DocumentType.DEFAULT_JUDGMENT_COVER_LETTER)))
-            .willReturn(COVER_LETTER);
+            .thenReturn(COVER_LETTER);
 
         lenient().when(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
@@ -139,19 +139,19 @@ class DefaultJudgmentCoverLetterGeneratorTest {
                 LETTER_CONTENT
             ));
 
-        given(documentDownloadService.downloadDocument(
+        lenient().when(documentDownloadService.downloadDocument(
             any(),
             any()
-        )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
+        )).thenReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
 
-        given(civilDocumentStitchingService.bundle(any(), any(), any(), any(), any()))
-            .willReturn(STITCHED_DOC);
+        lenient().when(civilDocumentStitchingService.bundle(any(), any(), any(), any(), any()))
+            .thenReturn(STITCHED_DOC);
 
         uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg1 = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();
         uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg2 = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();
 
-        given(organisationService.findOrganisationById("1234"))
-            .willReturn(Optional.of(testOrg1));
+        lenient().when(organisationService.findOrganisationById("1234"))
+            .thenReturn(Optional.of(testOrg1));
 
         given(organisationService.findOrganisationById("3456"))
             .willReturn(Optional.of(testOrg2));
@@ -162,13 +162,13 @@ class DefaultJudgmentCoverLetterGeneratorTest {
         OrganisationPolicy organisation2Policy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("3456").build()).build();
 
-        given(getOrganisationByPolicy(organisation1Policy, organisationService))
-            .willReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
+        lenient().when(getOrganisationByPolicy(organisation1Policy, organisationService))
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .organisationIdentifier("1234").name("Org1Name")
                                         .contactInformation(List.of(CONTACT_INFORMATION_ORG_1)).build()));
 
-        given(getOrganisationByPolicy(organisation2Policy, organisationService))
-            .willReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
+        lenient().when(getOrganisationByPolicy(organisation2Policy, organisationService))
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .organisationIdentifier("3456").name("Org2Name")
                                         .contactInformation(List.of(CONTACT_INFORMATION_ORG_2)).build()));
     }
@@ -189,7 +189,7 @@ class DefaultJudgmentCoverLetterGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean toSecondDefendantLegalOrg) {
+    void shouldDownloadDocumentAndPrintLetterSuccessfully(boolean toSecondDefendantLegalOrg) throws java.io.IOException {
         // given
         ReflectionTestUtils.setField(defaultJudgmentCoverLetterGenerator, "stitchEnabled", true);
 

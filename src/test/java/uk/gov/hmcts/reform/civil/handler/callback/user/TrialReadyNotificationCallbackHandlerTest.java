@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -19,23 +17,23 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    TrialReadyNotificationCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class TrialReadyNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
     private TrialReadyNotificationCallbackHandler handler;
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new TrialReadyNotificationCallbackHandler(objectMapper, time);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -58,7 +56,6 @@ class TrialReadyNotificationCallbackHandlerTest extends BaseCallbackHandlerTest 
         @BeforeEach
         void setup() {
             now = LocalDateTime.now();
-            when(time.now()).thenReturn(now);
         }
 
         @Test

@@ -195,7 +195,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty();
+        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
     }
 
     @Override
@@ -412,7 +412,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
-        return false;
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+            && caseData.isClaimantBilingual();
     }
 
     @Override

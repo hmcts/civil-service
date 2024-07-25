@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.civil.helpers.discontinue;
+package uk.gov.hmcts.reform.civil.helpers.settlediscontinue;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;

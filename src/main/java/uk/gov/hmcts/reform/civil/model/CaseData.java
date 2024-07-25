@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
@@ -677,9 +679,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private SettleDiscontinueYesOrNoList courtPermissionNeeded;
     private SettleDiscontinueYesOrNoList isPermissionGranted;
     private PermissionGranted permissionGrantedComplex;
+    private String permissionGrantedJudgeCopy;
+    private LocalDate permissionGrantedDateCopy;
+    private DiscontinuanceTypeList typeOfDiscontinuance;
+    private String partDiscontinuanceDetails;
+    private ConfirmOrderGivesPermission confirmOrderGivesPermission;
+    private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
     private SettlementReason settleReason;
     private final MarkPaidConsentList markPaidConsent;
-
+    private YesOrNo claimantsConsentToDiscontinuance;
+    private CaseDocument noticeOfDiscontinueCWDoc;
+    private CaseDocument noticeOfDiscontinueAllParitiesDoc;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
@@ -1525,5 +1535,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean nocApplyForLiPDefendant() {
         return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+    }
+
+    @JsonIgnore
+    public boolean isJudgeOrderVerificationRequired() {
+        return (this.getCourtPermissionNeeded() != null && SettleDiscontinueYesOrNoList.YES.equals(this.getCourtPermissionNeeded()));
     }
 }
