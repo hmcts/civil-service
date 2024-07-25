@@ -759,7 +759,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .ccdCaseReference(10000006L)
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
