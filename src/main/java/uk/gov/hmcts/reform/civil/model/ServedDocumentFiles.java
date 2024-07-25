@@ -14,9 +14,9 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ServedDocumentFiles {
 
     private List<Element<DocumentWithRegex>> other;
