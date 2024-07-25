@@ -39,6 +39,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
     private CoreCaseUserService coreCaseUserService;
 
     private static final String NEW_ORG_ID = "1234";
+
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();

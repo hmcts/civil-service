@@ -80,7 +80,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator, civilDocumentStitchingService, toggleService, assignCategoryId, toggleService);
+        handler = new GenerateClaimFormForSpecCallbackHandler(sealedClaimFormGeneratorForSpec, mapper, time, deadlinesCalculator,
+                                                              civilDocumentStitchingService, toggleService, assignCategoryId, toggleService);
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
@@ -119,7 +120,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class GenerateClaimFormOnlySpec {
 
-        //pass
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
             // Given
@@ -156,7 +156,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //pass
         @Test
         void shouldGenerateClaimForm_whenOneVsTwo_andBothPartiesRepresentedSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -190,7 +189,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //fail
         @Test
         void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondent() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -234,7 +232,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    //pass
     @Test
     void shouldAssignCategoryId_whenInvoked() {
         // Given
@@ -265,7 +262,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("detailsOfClaim");
     }
 
-    //fail
     @Test
     void shouldAssignCategoryIdParticulars_whenInvoked() {
         // Given
@@ -302,7 +298,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
     }
 
-    //fail
     @Test
     void shouldAssignCategoryIdTimeline_whenInvoked() {
         // Given
@@ -339,7 +334,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getServedDocumentFiles().getTimelineEventUpload().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
     }
 
-    //fail
     @Test
     void shouldAssignCategoryIdBothTimelineAndParticulars_whenInvoked() {
         // Given
@@ -379,7 +373,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     }
 
-    //fail
     @Test
     void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
         // Given
@@ -422,7 +415,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class GenerateAndStitchLitigantInPersonFormSpec {
 
-        //pass
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -454,7 +446,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //pass
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef1LitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -487,7 +478,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //pass
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef2LitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -520,7 +510,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //pass
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
@@ -553,7 +542,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(civilDocumentStitchingService);
         }
 
-        //pass
         @Test
         void shouldNotGenerateClaimForm_whenLipvLipFlagIsOnAndApplicantIsLip() {
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),

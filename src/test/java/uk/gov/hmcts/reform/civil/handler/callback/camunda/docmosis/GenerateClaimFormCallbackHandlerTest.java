@@ -130,7 +130,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator, sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(true);
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             when(time.now()).thenReturn(issueDate.atStartOfDay());
@@ -197,7 +198,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator, sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(true);
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             when(time.now()).thenReturn(issueDate.atStartOfDay());
@@ -330,7 +332,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             mapper = new ObjectMapper();
-            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator, sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
+            handler = new GenerateClaimFormCallbackHandler(civilDocumentStitchingService, litigantInPersonFormGenerator,
+                                                           sealedClaimFormGenerator, mapper, time, assignCategoryId, featureToggleService);
             handler.setStitchEnabled(false);
             mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);

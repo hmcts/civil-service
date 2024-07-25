@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-
 @ExtendWith(MockitoExtension.class)
 class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
