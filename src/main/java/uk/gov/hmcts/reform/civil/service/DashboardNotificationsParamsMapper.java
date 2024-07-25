@@ -208,7 +208,7 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getHearingDate())) {
-            LocalDate date = caseData.getHearingDate().minusWeeks(3);
+            LocalDate date = caseData.getHearingDate().minusWeeks(4);
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
             params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
         }
