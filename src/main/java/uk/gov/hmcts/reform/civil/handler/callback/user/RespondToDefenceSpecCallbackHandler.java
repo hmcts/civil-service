@@ -699,6 +699,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
                 format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
+        } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
