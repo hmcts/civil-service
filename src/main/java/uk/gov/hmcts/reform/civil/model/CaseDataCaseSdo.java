@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -109,7 +108,6 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class CaseDataCaseSdo implements MappableObject {
 
     //default judgement SDO fields for trial/fast track
