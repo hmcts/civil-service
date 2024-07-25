@@ -793,17 +793,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
-    private String getEpimmsId(CaseData caseData) {
-        if (caseData.getTrialHearingMethodInPersonDJ() != null) {
-            return Optional.ofNullable(caseData.getTrialHearingMethodInPersonDJ().getValue())
-                .map(DynamicListElement::getCode).orElse(null);
-        } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
-            return Optional.ofNullable(caseData.getDisposalHearingMethodInPersonDJ().getValue())
-                .map(DynamicListElement::getCode).orElse(null);
-        }
-        throw new IllegalArgumentException("Epimms Id is not provided");
-    }
-
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
