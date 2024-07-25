@@ -1809,7 +1809,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -1828,7 +1827,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateLocation_WhenCmlIsNotCnbcAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1847,7 +1845,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOnFlightDelayOtherSmall() {
             // Given
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             given(featureToggleService.isSdoR2Enabled()).willReturn(true);
             LocationRefData locationA = LocationRefData.builder()
                 .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")

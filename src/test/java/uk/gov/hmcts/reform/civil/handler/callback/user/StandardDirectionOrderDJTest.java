@@ -1010,7 +1010,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(
                 isLocationWhiteListed);
 
@@ -1069,7 +1068,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(eq(options.getValue().getCode()))).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(

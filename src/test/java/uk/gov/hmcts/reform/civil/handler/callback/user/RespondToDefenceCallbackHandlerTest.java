@@ -1519,7 +1519,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1537,7 +1536,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateLocation_WhenCmlIsNotCcmccAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1551,24 +1549,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("3", "12345");
-        }
-
-        @Test
-        void shouldUpdateLocation_preferredLocationBehaviourWhenToggleOff() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-            // Given
-            var caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
-                .build();
-            //When
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsExactly("10", "214320");
         }
     }
 

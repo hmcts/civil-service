@@ -775,32 +775,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YES);
+        if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            caseDataBuilder.eaCourtLocation(YES);
 
-                if (featureToggleService.isHmcEnabled()) {
-                    caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                        caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-                }
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(NO);
+            if (featureToggleService.isHmcEnabled()) {
+                caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
         } else {
-            if (featureToggleService.isEarlyAdoptersEnabled()) {
-                // check epimm from judge selected court in SDO journey
-                if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                    // check epimm from case management location
-                    && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-                } else {
-                    log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YesOrNo.NO);
-                }
-            }
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            caseDataBuilder.eaCourtLocation(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

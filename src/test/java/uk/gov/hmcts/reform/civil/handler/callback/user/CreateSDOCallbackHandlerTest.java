@@ -259,7 +259,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourt() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             String preSelectedCourt = "214320";
@@ -305,7 +304,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDynamicListsCorrectly() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
@@ -345,7 +343,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
             List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
@@ -418,7 +415,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             String preSelectedCourt = "214320";
@@ -471,7 +467,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
@@ -682,7 +677,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
@@ -731,7 +725,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldPopulateWelshSectionForSDOR2(boolean valid) {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build()
@@ -766,7 +759,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region("ccmcRegion").build())
@@ -810,7 +802,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateCaseManagementLocation_whenNotUnder1000SpecCcmcc() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
@@ -1443,7 +1434,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
@@ -1487,7 +1477,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
             isLocationWhiteListed);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);

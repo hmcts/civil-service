@@ -1543,32 +1543,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-            if (!sdoSubmittedPreCPForLiPCase(caseData)
-                && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
+        // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
+        if (!sdoSubmittedPreCPForLiPCase(caseData)
+            && featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(YES);
 
-                if (featureToggleService.isHmcEnabled()) {
-                    dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                        caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-                }
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(NO);
+            if (featureToggleService.isHmcEnabled()) {
+                dataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
-        } else if (featureToggleService.isEarlyAdoptersEnabled()) {
-            // LiP check ensures any LiP cases will always create takeCaseOffline WA task until CP goes live
-            if (!sdoSubmittedPreCPForLiPCase(caseData)
-                && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(NO);
-            }
+        } else {
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(NO);
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
@@ -1830,8 +1817,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public Predicate<CaseData> isSpecClaim1000OrLessAndCcmcc(BigDecimal ccmccAmount,
                                                                               FeatureToggleService featureToggleService) {
         return caseData ->
-            featureToggleService.isNationalRolloutEnabled()
-                && caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
                 && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
                 && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
     }
