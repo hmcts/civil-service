@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -46,44 +44,35 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    ClaimDJNonDivergentDefendantNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
-@Ignore
+@ExtendWith(MockitoExtension.class)
 class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
+    private ClaimDJNonDivergentDefendantNotificationHandler handler;
 
     private static final String TEMPLATE_ID = "template-id";
     private static final String TASK_ID_RESPONDENT1 = "NotifyDJNonDivergentDefendant1";
     private static final String TASK_ID_RESPONDENT2 = "NotifyDJNonDivergentDefendant2";
     private static final String TASK_ID_RESPONDENT1_LIP = "NotifyDJNonDivergentDefendant1LiP";
 
-    @MockBean
-    private NotificationService notificationService;
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-
-    @Autowired
-    private ClaimDJNonDivergentDefendantNotificationHandler handler;
-
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-        }
-
         @Test
         void shouldNotifyDefendantSolicitor1_whenInvoked() {
+            when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
             CallbackParams params = CallbackParams.builder()
@@ -106,6 +95,10 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyDefendantSolicitor2_whenInvoked() {
+            when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
             CallbackParams params = CallbackParams.builder()
@@ -129,6 +122,8 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyDefendantLipSolicitor_whenInvoked() {
+            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().toBuilder()
                 .applicant1(Party.builder()
                                 .individualFirstName("Applicant1")
