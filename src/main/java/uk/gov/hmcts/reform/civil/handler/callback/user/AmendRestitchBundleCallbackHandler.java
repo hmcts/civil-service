@@ -102,9 +102,7 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        if (caseData.getBundleError() == null || caseData.getBundleError().equals(YesOrNo.NO)) {
-            dataBuilder.businessProcess(BusinessProcess.ready(AMEND_RESTITCH_BUNDLE));
-        }
+        dataBuilder.businessProcess(BusinessProcess.ready(AMEND_RESTITCH_BUNDLE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(mapper))
