@@ -683,6 +683,7 @@ public class CaseDataBuilder {
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
     private SdoR2FastTrackCreditHireDetails sdoR2FastTrackCreditHireDetails;
     private String claimantBilingualLanguagePreference;
+    private JudgmentPaidInFull judgmentPaidInFull;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -7743,6 +7744,7 @@ public class CaseDataBuilder {
             .paymentSetDate(paymentSetDate)
             .repaymentFrequency(repaymentFrequency)
             .repaymentDate(repaymentDate)
+            .joJudgmentPaidInFull(judgmentPaidInFull)
             .build();
     }
 
@@ -7752,4 +7754,8 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder judgmentPaidInFull(JudgmentPaidInFull judgmentPaidInFull) {
+        this.judgmentPaidInFull = judgmentPaidInFull;
+        return this;
+    }
 }
