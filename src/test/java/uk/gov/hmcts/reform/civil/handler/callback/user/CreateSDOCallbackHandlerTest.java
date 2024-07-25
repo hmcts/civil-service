@@ -1749,6 +1749,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.fastTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1760,6 +1761,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1769,6 +1771,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .responseClaimTrack("SMALL_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .orderType(OrderType.DECIDE_DAMAGES)
                     .build(),
                 "FAST_CLAIM"
@@ -1781,6 +1784,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1791,6 +1795,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "FAST_CLAIM"
             ),
@@ -1801,6 +1806,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(NO)
                     .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1812,6 +1818,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1822,6 +1829,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build(),
                 "SMALL_CLAIM"
             ),
@@ -1832,6 +1840,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .orderType(OrderType.DISPOSAL)
                     .build(),
                 "SMALL_CLAIM"
