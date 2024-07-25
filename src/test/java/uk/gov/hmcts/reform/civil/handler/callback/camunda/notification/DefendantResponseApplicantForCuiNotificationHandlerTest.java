@@ -1,30 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -34,21 +30,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    DefendantResponseApplicantForCuiNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private DefendantResponseApplicantForCuiNotificationHandler handler;
-    @MockBean
+
+    @Mock
     private FeatureToggleService toggleService;
 
     @Nested
@@ -63,21 +60,11 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
         private static final String TEMPLATE_ID_LiP_CLAIMANT = "template-id-lip-claimant";
         private static final String CLAIM_LEGAL_ORG_NAME = "Signer Name";
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentLipFullAdmitOrPartAdmitTemplate())
-                .thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate())
-                .thenReturn(TEMPLATE_ID_MEDIATION);
-            when(notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate())
-                .thenReturn(TEMPLATE_ID_NO_MEDIATION);
-            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(TEMPLATE_ID_LiP_CLAIMANT);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(CLAIM_LEGAL_ORG_NAME).build()));
-        }
-
         @Test
         void shouldNotifyApplicantSolicitorForPartAdmit_whenInvoked() {
+            when(notificationsProperties.getRespondentLipFullAdmitOrPartAdmitTemplate())
+                .thenReturn(TEMPLATE_ID);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -96,6 +83,9 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
 
         @Test
         void shouldNotifyApplicantSolicitorForFullDefenceWithMediation_whenInvoked() {
+            when(notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate())
+                .thenReturn(TEMPLATE_ID_MEDIATION);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -115,6 +105,9 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
 
         @Test
         void shouldNotifyApplicantSolicitorForFullDefenceNoMediation_whenInvoked() {
+            when(notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate())
+                .thenReturn(TEMPLATE_ID_NO_MEDIATION);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -134,6 +127,8 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
 
         @Test
         void shouldNotifyLiPClaimant_whenInvoked() {
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(TEMPLATE_ID_LiP_CLAIMANT);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
