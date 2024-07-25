@@ -38,23 +38,17 @@ public class DocumentMergingService {
 
         byte[] baseDoc = docs.get(0).getFile();
 
-        try (InputStream baseDocStream = new ByteArrayInputStream(baseDoc);
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
+        try (InputStream baseDocStream = new ByteArrayInputStream(baseDoc)) {
+            //ToDo: Handle this output stream better. Reassigning it and not closing is not great.
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write(baseDocStream.readAllBytes());
 
             for (int i = 1; i < docs.size(); i++) {
-                try (InputStream contentStream = new ByteArrayInputStream(docs.get(i).getFile());
-                     ByteArrayOutputStream tempOut = new ByteArrayOutputStream()) {
-                    tempOut.write(out.toByteArray());
-                    out.reset();
-
-                    mergeContentStream(tempOut, contentStream,
-                            String.format(SECTION_START_FORMAT, docs.get(i).getSectionHeader()));
-
-                    out.write(tempOut.toByteArray()); // Write merged content back to out
-                } catch (IOException | Docx4JException | JAXBException e) {
-                    log.error("Error merging document at index {}: {}. Skipping document.", i, e.getMessage(), e);
+                try (InputStream contentStream = new ByteArrayInputStream(docs.get(i).getFile())) {
+                    //ToDo: Utilise output stream better.
+                    out = mergeContentStream(out, contentStream, String.format(SECTION_START_FORMAT, docs.get(i).getSectionHeader()));
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
             }
             return out.toByteArray();

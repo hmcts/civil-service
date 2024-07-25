@@ -59,8 +59,7 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-                callbackKey(MID, "populate-document-selection"), this::aboutToStart,
+                callbackKey(ABOUT_TO_START), this::aboutToStart,
                 callbackKey(MID, "create-directions-template"), this::createDirectionsTemplate,
                 callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit
         );
@@ -74,13 +73,12 @@ public class JudgeDirectionsHandler extends CallbackHandler {
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        var partyDirectionDocumentOptions = buildDirectionDocumentsList(caseData);
+        // Build list from case data directions files
+        // var partyDirectionDocumentOptions = buildDirectionDocumentsList(caseData);
 
-        //ToDo Remove. For test documents page only.
-
-        //If test documents exist add them to options
-        getTestDocuments(caseData).forEach(document -> partyDirectionDocumentOptions.add(buildListOption(document)));
-        //==============================================
+        //Build list from test documents
+        var partyDirectionDocumentOptions =
+                getTestDocuments(caseData).stream().map(document -> buildListOption(document)).toList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toBuilder()
@@ -102,37 +100,7 @@ public class JudgeDirectionsHandler extends CallbackHandler {
         if (nonNull(caseData.getTestDocument3())) {
             list.add(caseData.getTestDocument3());
         }
-        return  list;
-    }
-
-    DynamicListElement buildListOption(Document document) {
-        return DynamicListElement.builder()
-                .label(document.getDocumentFileName())
-                .code(document.getDocumentFileName())
-                .build();
-    }
-
-    List<Element<CaseDocument>> getAllPartyDirectionDocuments(CaseData caseData) {
-        return Stream.concat(caseData.getClaimantResponseDocuments().stream(), caseData.getDefendantResponseDocuments().stream())
-                .filter(item -> isDirectionsType(item.getValue().getDocumentType())).toList();
-    }
-
-    List<DynamicListElement> buildDirectionDocumentsList(CaseData caseData) {
-        return getAllPartyDirectionDocuments(caseData).stream()
-                .map(item -> DynamicListElement.builder()
-                        .code(item.getId().toString())
-                        .label(getListItemLabel(item.getValue())).build())
-                .collect(Collectors.toList());
-    }
-
-    private String getListItemLabel(CaseDocument caseDocument) {
-        boolean createdByParty = nonNull(caseDocument.getCreatedBy()) && List.of("Defendant", "Claimant").contains(caseDocument.getCreatedBy());
-        return createdByParty ? caseDocument.getCreatedBy() + " Directions" : caseDocument.getDocumentName();
-    }
-
-    private boolean isDirectionsType(DocumentType type) {
-        //For some reason the defendants directions document is uploaded as type DEFENDANT_DEFENCE???
-        return type.equals(CLAIMANT_DRAFT_DIRECTIONS) || type.equals(DEFENDANT_DEFENCE);
+        return list;
     }
 
     private CallbackResponse createDirectionsTemplate(CallbackParams callbackParams) {
@@ -144,35 +112,35 @@ public class JudgeDirectionsHandler extends CallbackHandler {
         if (nonNull(caseData.getDirectionsCreationMethod().getValue())) {
             List<String> selectedDocumentIds = caseData.getDirectionsCreationMethod().getValue().stream().map(item -> item.getCode()).toList();
 
-            List<MergeDoc> selectedDocuments =
-                    getAllPartyDirectionDocuments(caseData).stream()
-                            .filter(item -> selectedDocumentIds.contains(item.getId().toString()))
-                            .map(item -> MergeDoc.builder().sectionHeader(getListItemLabel(item.getValue()))
-                                    .file(documentManagementService.downloadDocument(auth, getDocumentLink(item.getValue())))
-                                    .build()
-                            ).toList();
+            //Download selected directions documents
+            // var selectedDocuments =
+            //        getAllPartyDirectionDocuments(caseData).stream()
+            //                .filter(item -> selectedDocumentIds.contains(item.getId().toString()))
+            //                .map(item -> MergeDoc.builder().sectionHeader(getListItemLabel(item.getValue()))
+            //                        .file(documentManagementService.downloadDocument(auth, getDocumentLink(item.getValue())))
+            //                        .build()
+            //                );
 
-            //ToDo: Remove. Add selected test docs
+            //Download selected test documents
             var testDocuments = getTestDocuments(caseData);
-            testDocuments
+            var selectedDocuments = testDocuments
                     .stream().filter(document -> selectedDocumentIds.contains(document.getDocumentFileName()))
-                    .forEach(document -> {
-                        selectedDocuments.add(MergeDoc.builder()
-                                .sectionHeader(document.getDocumentFileName())
-                                .file(downloadDcoument(document, auth))
-                                .build()
-                        );
-                    });
-            //===================================================
+                    .map(document ->
+                            MergeDoc.builder()
+                                    .sectionHeader(document.getDocumentFileName())
+                                    .file(downloadDocument(document, auth))
+                                    .build()
+                    );
 
             List<MergeDoc> filesToMerge = Stream.concat(
-                    List.of(MergeDoc.builder().file(directionsTemplate).build()).stream(),
-                    selectedDocuments.stream()).toList();
+                            List.of(MergeDoc.builder().file(directionsTemplate).build()).stream(),
+                            selectedDocuments)
+                    .toList();
+
             directionsTemplate = documentMergingservice.merge(filesToMerge);
         }
 
-        CaseDocument document = documentManagementService.uploadDocument(
-                auth,
+        CaseDocument document = documentManagementService.uploadDocument(auth,
                 new PDF(
                         "directions-template.docx",
                         directionsTemplate,
@@ -180,12 +148,10 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                 )
         );
 
-        CaseData updated = caseData.toBuilder()
-                .judgeDraftDirections(document.getDocumentLink())
-                .build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updated.toMap(objectMapper))
+                .data(caseData.toBuilder()
+                        .judgeDraftDirections(document.getDocumentLink())
+                        .build().toMap(objectMapper))
                 .build();
     }
 
@@ -225,11 +191,41 @@ public class JudgeDirectionsHandler extends CallbackHandler {
                         .build().toMap(objectMapper)).build();
     }
 
-    private byte[] downloadDcoument(Document document, String authToken) {
+    private byte[] downloadDocument(Document document, String authToken) {
         String documentId = document.getDocumentUrl().substring(document.getDocumentUrl().lastIndexOf("/") + 1);
         return documentManagementService.downloadDocument(
                 authToken,
                 String.format("documents/%s", documentId)
         );
+    }
+
+    DynamicListElement buildListOption(Document document) {
+        return DynamicListElement.builder()
+                .label(document.getDocumentFileName())
+                .code(document.getDocumentFileName())
+                .build();
+    }
+
+    List<Element<CaseDocument>> getAllPartyDirectionDocuments(CaseData caseData) {
+        return Stream.concat(caseData.getClaimantResponseDocuments().stream(), caseData.getDefendantResponseDocuments().stream())
+                .filter(item -> isDirectionsType(item.getValue().getDocumentType())).toList();
+    }
+
+    List<DynamicListElement> buildDirectionDocumentsList(CaseData caseData) {
+        return getAllPartyDirectionDocuments(caseData).stream()
+                .map(item -> DynamicListElement.builder()
+                        .code(item.getId().toString())
+                        .label(getListItemLabel(item.getValue())).build())
+                .collect(Collectors.toList());
+    }
+
+    private String getListItemLabel(CaseDocument caseDocument) {
+        boolean createdByParty = nonNull(caseDocument.getCreatedBy()) && List.of("Defendant", "Claimant").contains(caseDocument.getCreatedBy());
+        return createdByParty ? caseDocument.getCreatedBy() + " Directions" : caseDocument.getDocumentName();
+    }
+
+    private boolean isDirectionsType(DocumentType type) {
+        // For some reason the defendants directions document is uploaded as type DEFENDANT_DEFENCE???
+        return type.equals(CLAIMANT_DRAFT_DIRECTIONS) || type.equals(DEFENDANT_DEFENCE);
     }
 }
