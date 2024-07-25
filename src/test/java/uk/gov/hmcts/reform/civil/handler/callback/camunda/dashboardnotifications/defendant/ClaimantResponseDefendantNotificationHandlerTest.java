@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -776,5 +777,55 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void shouldReturnNullWhenNothingIsMatched_ClaimantProceedWithClaim() {
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(10000006L)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+        assertThat(response.getErrors()).isNull();
+    }
+
+    @Test
+    void shouldReturnNullWhenNothingIsMatched_DisputeClaimIsSelected() {
+        HashMap<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(10000006L)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .defenceRouteRequired(DISPUTES_THE_CLAIM)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+        assertThat(response.getErrors()).isNull();
     }
 }
