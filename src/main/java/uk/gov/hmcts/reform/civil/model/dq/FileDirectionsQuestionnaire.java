@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class FileDirectionsQuestionnaire {
 
     private List<String> explainedToClient;

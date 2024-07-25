@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -17,41 +16,30 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 
-@SpringBootTest(classes = {
-    ClaimReconsiderationUpheldDefendantNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
     @Captor
@@ -66,21 +54,16 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
     @Captor
     private ArgumentCaptor<String> reference;
 
-    @Autowired
+    @InjectMocks
     private ClaimReconsiderationUpheldDefendantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-        }
-
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
+            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             CallbackParams params = CallbackParams.builder()
@@ -103,6 +86,8 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendantBothSolicitors_whenInvoked() {
+            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
             CallbackParams params = CallbackParams.builder()
@@ -136,6 +121,8 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyDefendant_whenInvoked() {
+            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                 .respondent1Represented(NO)
                 .build();
@@ -176,19 +163,6 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent2().getPartyName()
         );
-    }
-
-    @NotNull
-    private String getLegalOrganizationDef2Name(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant2OrganisationPolicy() != null
-                                      ? caseData.getApplicant2OrganisationPolicy()
-                .getOrganisation().getOrganisationID() : caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
-        }
-        return caseData.getApplicant2().getPartyName();
     }
 
 }

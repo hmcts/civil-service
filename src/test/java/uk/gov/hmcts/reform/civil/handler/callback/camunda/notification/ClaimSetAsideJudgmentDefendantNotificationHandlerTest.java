@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -46,42 +45,34 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON_FROM_CASEWORKER;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    ClaimSetAsideJudgmentDefendantNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
+    private ClaimSetAsideJudgmentDefendantNotificationHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
     public static final String TASK_ID_RESPONDENT1 = "NotifyDefendantSetAsideJudgment1";
     public static final String TASK_ID_RESPONDENT2 = "NotifyDefendantSetAsideJudgment2";
 
-    @MockBean
-    private NotificationService notificationService;
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-
-    @Autowired
-    private ClaimSetAsideJudgmentDefendantNotificationHandler handler;
-
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-        }
-
         @Test
         void shouldNotifyDefendantSolicitor1_whenInvoked() {
+            when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
@@ -105,6 +96,10 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
 
         @Test
         void shouldNotifyDefendantSolicitor2_whenInvoked() {
+            when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
@@ -129,6 +124,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
 
         @Test
         void shouldNotifyDefendantLipSolicitor_whenInvoked() {
+            when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().toBuilder()
                 .applicant1(Party.builder()
                                 .individualFirstName("Applicant1")
@@ -199,4 +196,3 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             .isEqualTo(TASK_ID_RESPONDENT1_LIP);
     }
 }
-
