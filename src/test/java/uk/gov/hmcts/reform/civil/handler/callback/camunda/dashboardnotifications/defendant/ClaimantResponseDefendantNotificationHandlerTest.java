@@ -613,6 +613,52 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
     }
 
     @Test
+    void shouldCreateNotificationForDefendantWhenClaimantRejectRepaymentPlanForLRClaim() {
+        // Given
+        HashMap<String, Object> params = new HashMap<>();
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .legacyCaseReference("reference")
+            .ccdCaseReference(78034251L)
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1(Party.builder()
+                            .companyName("COMPANY")
+                            .type(Party.Type.COMPANY).build())
+            .respondent1(Party.builder()
+                             .partyName("Respondent")
+                             .type(Party.Type.INDIVIDUAL).build())
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .respondent1RepaymentPlan(RepaymentPlanLRspec
+                                          .builder()
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .paymentAmount(new BigDecimal(1000))
+                                          .firstRepaymentDate(LocalDate.now())
+                                          .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+        // When
+        handler.handle(callbackParams);
+
+        // Then
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
     void shouldCreateNotificationForDefendantWhenClaimantProceedsCarm() {
         HashMap<String, Object> params = new HashMap<>();
 
