@@ -4,19 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -26,6 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,26 +44,26 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateDJFormHandlerSpecNonDivergent.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+    @InjectMocks
     private GenerateDJFormHandlerSpecNonDivergent handler;
-    @Autowired
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @Mock
     private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateDJFormHandlerSpecNonDivergent(assignCategoryId, defaultJudgmentFormGenerator, mapper);
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Nested
     class AboutToSubmitCallback {
