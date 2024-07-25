@@ -201,10 +201,9 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     }
 
     private boolean isLrvLipFullDefenceNotProceed(CaseData caseData) {
-        return (!NO.equals(caseData.getApplicant1Represented())
+        return !caseData.isApplicantLiP()
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && NO.equals(caseData.getApplicant1ProceedWithClaim())
-            && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-        );
+            && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
     }
 }
