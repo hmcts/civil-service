@@ -40,13 +40,12 @@ public class TrialArrangementsNotifyOtherPartyDefendantScenarioTest extends Case
         verifyTaskStatus(caseId, "CLAIMANT", TaskStatus.DONE);
     }
 
-    private CaseData createCaseData(String caseId, YesOrNo respondent1NotRepresented) {
+    private CaseData createCaseData(String caseId, YesOrNo respondent1Represented) {
         return CaseDataBuilder.builder().atStateAwaitingResponseNotFullDefenceReceived().build()
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1Represented(respondent1NotRepresented)
-            .respondent1Represented(YesOrNo.NO)
+            .respondent1Represented(respondent1Represented)
             .build();
     }
 
