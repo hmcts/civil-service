@@ -733,7 +733,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
                 claimNumber
             );
-        }else {
+        } else {
             return format(
                 "# You have decided not to proceed with the claim%n## Claim number: %s",
                 claimNumber
