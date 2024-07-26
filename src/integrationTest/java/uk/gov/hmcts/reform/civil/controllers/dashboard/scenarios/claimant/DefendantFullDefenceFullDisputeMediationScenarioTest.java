@@ -39,6 +39,7 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
                     .individualFirstName("James")
                     .individualLastName("John")
                     .build())
+            .responseClaimTrack("SMALL_CLAIM")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .responseClaimMediationSpecRequired(YesOrNo.YES)

@@ -1,18 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -32,22 +30,24 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
-@SpringBootTest(classes = {
-    TranslatedDocumentUploadedClaimantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
-public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+@ExtendWith(MockitoExtension.class)
+public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
 
-    @MockBean
-    private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @Autowired
+    @InjectMocks
     private TranslatedDocumentUploadedClaimantNotificationHandler handler;
-    @MockBean
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
+
     private static final String CLAIMANT_LR_EMAIL_TEMPLATE = "template-id";
     private static final String CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL = "template-id-Bilingual";
     private static final String CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH = "template-id-English";
@@ -58,15 +58,9 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(CLAIMANT_LR_EMAIL_TEMPLATE);
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
-        }
-
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(CLAIMANT_LR_EMAIL_TEMPLATE);
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -88,6 +82,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
         @Test
         void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInBilingual() {
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStatePendingClaimIssued()
@@ -115,6 +110,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
         @Test
         void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInEnglish() {
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
