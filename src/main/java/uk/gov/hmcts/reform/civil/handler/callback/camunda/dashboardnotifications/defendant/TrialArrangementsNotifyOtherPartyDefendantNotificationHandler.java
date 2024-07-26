@@ -13,7 +13,6 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_DEFENDANT;
 
 @Service
 public class TrialArrangementsNotifyOtherPartyDefendantNotificationHandler extends CaseProgressionDashboardCallbackHandler {
@@ -40,8 +39,11 @@ public class TrialArrangementsNotifyOtherPartyDefendantNotificationHandler exten
 
     @Override
     public String getScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented()
-            ? SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario()
-            : SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_DEFENDANT.getScenario();
+        return SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario();
+    }
+
+    @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isRespondent1NotRepresented();
     }
 }
