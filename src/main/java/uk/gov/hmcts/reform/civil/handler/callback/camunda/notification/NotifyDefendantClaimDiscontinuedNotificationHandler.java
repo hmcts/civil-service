@@ -80,7 +80,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
     }
 
     private String getLIPTemplate() {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+        return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -99,9 +99,8 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
 
     public Map<String, String> addPropertiesLip(CaseData caseData) {
         return Map.of(
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, caseData.getRespondent1().getPartyName()
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 }
