@@ -110,8 +110,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
-
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
@@ -154,6 +152,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 }
             }
         }
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails

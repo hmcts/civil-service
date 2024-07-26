@@ -249,8 +249,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
-
-
             assertThat(service.respondentAssigned(caseData)).isTrue();
         }
 
