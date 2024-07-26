@@ -699,8 +699,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertEquals(format("# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
                                 caseData.getLegacyCaseReference()), response.getConfirmationHeader());
             assertThat(response.getConfirmationBody()).contains("Download county court judgment");
-
-
         }
     }
 
