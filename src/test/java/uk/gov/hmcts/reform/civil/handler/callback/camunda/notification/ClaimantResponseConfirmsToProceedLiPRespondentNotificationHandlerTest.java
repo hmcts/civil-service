@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -38,21 +37,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
-@SpringBootTest(classes = {
-    ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler handler;
 
     @Nested
@@ -64,17 +64,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         private static final String REFERENCE_NUMBER = "claimant-confirms-to-proceed-respondent-notification-000DC001";
         private static final String DEFENDANT = "Mr. Sole Trader";
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(
-                RESPONDENT_EMAIL_TEMPLATE);
-            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(
-                RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        }
-
         @Test
         void shouldNotifyLipRespondent_whenInvoked() {
+            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
@@ -92,6 +85,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
         @Test
         void shouldNotifyLipRespondent_whenTranslatedDocUploaded() {
+            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -137,9 +132,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         @Test
         void shouldNotNotifyLRRespondent_whenApplicantProceeds() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn(RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
                                  .applicant1SettleClaim(NO)
