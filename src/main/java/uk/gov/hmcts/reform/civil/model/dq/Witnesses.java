@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class Witnesses {
 
     private YesOrNo witnessesToAppear;
