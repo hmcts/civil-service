@@ -56,8 +56,8 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                 jsonPath("$[0].titleEn").value("The court will review the details and issue a judgment"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Company one has rejected your payment plan, the court will issue a County Court Judgment (CCJ)."
-                          +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. "
-                          +  "Your online account will not be updated - any further updates will be by post.</p><p class=\"govuk-body\">Email the details and your claim number"
+                          +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. </p>"
+                          + "<p class=\"govuk-body\">Email the details and your claim number"
                           +  " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
                 jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                 jsonPath("$[0].descriptionCy").value(
@@ -107,9 +107,8 @@ public class ClaimantRejectRepaymentPlanDefendantOrgLtdCoDefendantScenarioTest e
                         jsonPath("$[0].titleEn").value("The court will review the details and issue a judgment"),
                         jsonPath("$[0].descriptionEn").value(
                                 "<p class=\"govuk-body\">Applicant Org has rejected your payment plan, the court will issue a County Court Judgment (CCJ)."
-                                        +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. "
-                                        +  "Your online account will not be updated - any further updates will be by post.</p>" +
-                                    "<p class=\"govuk-body\">Email the details and your claim number"
+                                        +  " If you do not agree with the judgment, you can send in your financial details and ask for this to be redetermined. </p>"
+                                        +  "<p class=\"govuk-body\">Email the details and your claim number"
                                         +  " reference to {cmcCourtEmailId} or send by post to: </p><br>{cmcCourtAddress}"),
                         jsonPath("$[0].titleCy").value("Bydd y llys yn adolygu’r manylion ac yn cyhoeddi dyfarniad"),
                         jsonPath("$[0].descriptionCy").value(
