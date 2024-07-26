@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -30,6 +31,7 @@ public class TrialArrangementsNotifyOtherPartyDefendantScenarioTest extends Case
     }
 
     @Test
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
     void should_update_task_list_for_claimant_when_claimant_finalises_trial_arrangements() throws Exception {
         String caseId = "10002348";
         CaseData caseData = createCaseData(caseId, YesOrNo.NO);
