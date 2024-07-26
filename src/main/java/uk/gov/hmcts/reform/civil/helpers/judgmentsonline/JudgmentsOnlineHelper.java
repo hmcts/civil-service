@@ -70,12 +70,18 @@ public class JudgmentsOnlineHelper {
     }
 
     public static boolean isNonDivergentForDJ(CaseData caseData) {
-        return  caseData.isLRvLipOneVOne()
+        // LIP cases cannot be divergent
+        return !caseData.isApplicant1NotRepresented()
+            && (MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
-            || (ofNullable(caseData.getRespondent2()).isPresent()
+            || isDefendantDetailsSpecNonDivergent(caseData));
+    }
+
+    private static boolean isDefendantDetailsSpecNonDivergent(CaseData caseData) {
+        return ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec().getValue()).isPresent()
-            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both"));
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both");
     }
 
     public static boolean isNonDivergentForJBA(CaseData caseData) {
