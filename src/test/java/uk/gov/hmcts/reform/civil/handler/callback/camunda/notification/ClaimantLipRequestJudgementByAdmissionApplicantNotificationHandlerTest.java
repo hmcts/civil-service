@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -32,34 +31,29 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
-@SpringBootTest(classes = {
-    ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
-
+@ExtendWith(MockitoExtension.class)
 class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private PinInPostConfiguration pinInPostConfiguration;
-    @Autowired
+
+    @InjectMocks
     private ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyApplicantLipRequestJudgementByAdmissionNotificationTemplate()).thenReturn("template-id");
-            when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
-            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
-        }
-
         @Test
         void shouldNotifyLipApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyApplicantLipRequestJudgementByAdmissionNotificationTemplate()).thenReturn("template-id");
+            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .build();
@@ -72,7 +66,7 @@ class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest ext
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "request-judgement-by-admission-applicant-notification-000DC001"
             );
         }
@@ -84,7 +78,7 @@ class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest ext
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIMANT_NAME, "Mr. John Rambo",
