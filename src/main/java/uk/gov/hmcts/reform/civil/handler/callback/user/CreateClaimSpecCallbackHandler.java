@@ -626,7 +626,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getSpecHeader(caseData))
+                .confirmationHeader(getSpecHeader())
                 .confirmationBody(getSpecBody(caseData))
                 .build();
         } else {
@@ -834,7 +834,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private String getSpecHeader(CaseData caseData) {
+    private String getSpecHeader() {
         return format(PAY_FEE_MESSAGE);
     }
 
