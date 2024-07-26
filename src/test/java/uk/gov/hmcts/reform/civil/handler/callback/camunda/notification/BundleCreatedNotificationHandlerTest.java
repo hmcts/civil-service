@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -255,7 +254,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void addPropertiesLipForApplicant() {
-        CaseData caseData =CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
@@ -271,7 +270,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void addPropertiesLipForRespondent() {
-        CaseData caseData =CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
