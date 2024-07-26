@@ -70,7 +70,7 @@ public class JudgmentsOnlineHelper {
     }
 
     public static boolean isNonDivergentForDJ(CaseData caseData) {
-        return  MultiPartyScenario.isOneVOne(caseData)
+        return  caseData.isLRvLipOneVOne()
             || MultiPartyScenario.isTwoVOne(caseData)
             || (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
