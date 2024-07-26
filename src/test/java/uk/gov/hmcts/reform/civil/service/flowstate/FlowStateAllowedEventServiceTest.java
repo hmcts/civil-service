@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_UNAVAILABLE_DATES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
@@ -976,7 +977,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         INVALID_HWF_REFERENCE,
-                        COURT_OFFICER_ORDER
+                        COURT_OFFICER_ORDER,
+                        AMEND_RESTITCH_BUNDLE
                     }
                 )
             );
@@ -1131,6 +1133,12 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
                         TAKEN_OFFLINE_AFTER_SDO.fullName(),
+                        IN_HEARING_READINESS.fullName()
+                    }
+                ),
+                of(
+                    AMEND_RESTITCH_BUNDLE,
+                    new String[] {
                         IN_HEARING_READINESS.fullName()
                     }
                 )

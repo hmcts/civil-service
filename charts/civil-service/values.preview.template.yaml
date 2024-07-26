@@ -23,6 +23,8 @@ java:
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     SIMPLE_STATE_FLOW_ENGINE_ENABLED: true
   keyVaults:
