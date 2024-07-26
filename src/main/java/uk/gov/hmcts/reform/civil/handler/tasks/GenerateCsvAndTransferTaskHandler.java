@@ -77,9 +77,9 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
-
+        log.info("email address {} - remove this after testing", mediationCSVEmailConfiguration.getRecipient());
         return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getRecipient())
+                               .to("testboxmmt@justice.gov.uk")
                                .subject(SUBJECT)
                                .attachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME)))
                                .build());
