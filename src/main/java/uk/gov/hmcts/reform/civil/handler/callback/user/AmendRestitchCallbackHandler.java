@@ -24,7 +24,8 @@ public class AmendRestitchCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-//            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            // TODO waiting for others' work and preventing conflicts in ccd
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
