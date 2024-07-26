@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,7 +23,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,10 +32,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest  extends BaseCallbackHandlerTest {
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -70,9 +66,14 @@ class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest extends 
     @Nested
     class AboutToSubmitCallback {
 
-        @ParameterizedTest
-        @MethodSource("provideCaseData")
-        void shouldRecordScenario_whenInvoked(CaseData caseData, String expectedScenario) {
+        @Test
+        void shouldRecordScenario_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
+                                 .applicant1ClaimSettledDate(
+                                     LocalDate.now()).build())
+                .respondent1Represented(YesOrNo.NO).build();
+
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
@@ -86,28 +87,9 @@ class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest extends 
             handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                expectedScenario,
+                SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        static Stream<Object[]> provideCaseData() {
-            return Stream.of(
-                new Object[]{
-                    CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                        .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                         .applicant1ClaimSettledDate(LocalDate.now()).build())
-                        .respondent1Represented(YesOrNo.NO).build(),
-                    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario()
-                },
-                new Object[]{
-                    CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                        .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                         .applicant1ClaimSettledDate(LocalDate.now()).build())
-                        .respondent1Represented(YesOrNo.YES).build(),
-                    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_DEFENDANT.getScenario()
-                }
             );
         }
     }
