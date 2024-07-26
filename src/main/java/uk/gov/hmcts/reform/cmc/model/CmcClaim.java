@@ -558,7 +558,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isCaseStruckOut() { 
-        return false; 
+    public boolean isCaseStruckOut() {
+        return false;
+    }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return false;
     }
 }

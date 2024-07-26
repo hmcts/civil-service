@@ -1,20 +1,18 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -45,13 +43,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateDirectionsQuestionnaireCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final CaseDocument DOCUMENT = CaseDocument.builder()
@@ -67,27 +59,26 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                           .build())
         .build();
 
-    @MockBean
+    @Mock
     private DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
 
-    @Autowired
+    @InjectMocks
     private GenerateDirectionsQuestionnaireCallbackHandler handler;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private ObjectMapper mapper;
 
-    @Autowired
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
-        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
-        when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
-                                                                                    anyString(), anyString()
-        )).thenReturn(DOCUMENT);
+        mapper = new ObjectMapper();
+        handler = new GenerateDirectionsQuestionnaireCallbackHandler(directionsQuestionnaireGenerator, mapper, assignCategoryId);
+        mapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -97,6 +88,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -120,6 +113,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
+                                                                                    anyString(), anyString()
+        )).thenReturn(DOCUMENT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -147,6 +144,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
+                                                                                    anyString(), anyString()
+        )).thenReturn(DOCUMENT);
+
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(directionsQuestionnaireGenerator).generateDQFor1v2SingleSolDiffResponse(
@@ -170,6 +171,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
+
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(directionsQuestionnaireGenerator).generate(caseData, "BEARER_TOKEN");
@@ -192,6 +195,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -217,11 +222,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "ONE"
-            )).thenReturn(Optional.of(generatedDocument));
+            when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -233,11 +234,13 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolRespondent1Spec() {
-        for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
-                                                                  RespondentResponseTypeSpec.PART_ADMISSION)) {
+        for (RespondentResponseTypeSpec responseType : EnumSet.of(
+            RespondentResponseTypeSpec.FULL_DEFENCE,
+            RespondentResponseTypeSpec.PART_ADMISSION
+        )) {
 
             when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class),
-                                                                                        anyString(), anyString()
+                                                                          anyString(), anyString()
             )).thenReturn(Optional.of(DOCUMENT));
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
@@ -272,11 +275,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "TWO"
-            )).thenReturn(Optional.of(generatedDocument));
+            when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -404,6 +403,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .respondent2DocumentGeneration("userRespondent2")
             .build();
         // When
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -511,6 +511,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .respondentResponseIsSame(YesOrNo.NO)
             .build();
         // When
+        when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class),
+                                                                                    anyString(), anyString()
+        )).thenReturn(DOCUMENT);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
