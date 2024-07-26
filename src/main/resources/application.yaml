@@ -627,7 +627,7 @@ notification:
 mediation:
   emails:
     sender: hmcts.civil@gmail.com
-    recipient: civilmoneyclaimsdemo@gmail.com
+    recipient: testboxmmt@justice.gov.uk
     jsonRecipient: civilmoneyclaimsdemo@gmail.com
 
 
