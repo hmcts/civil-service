@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -8,26 +9,21 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,14 +45,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 
-@SpringBootTest(classes = {
-    UpdateFromGACaseEventTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CaseDataContentConverter.class,
-    CoreCaseDataService.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class UpdateFromGACaseEventTaskHandlerTest {
 
     private static final String CIVIL_CASE_ID = "1594901956117591";
@@ -68,20 +57,23 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @Autowired
     private UpdateFromGACaseEventTaskHandler handler;
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new UpdateFromGACaseEventTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper);
+    }
+
+    @Test
+    void testShouldAddGeneralOrderDocument() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
-        when(mockExternalTask.getWorkerId()).thenReturn("worker");
-        when(mockExternalTask.getActivityId()).thenReturn("activityId");
 
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
@@ -89,10 +81,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 "caseEvent", ADD_PDF_TO_MAIN_CASE,
                 "generalAppParentCaseLink", CIVIL_CASE_ID
             ));
-    }
 
-    @Test
-    void testShouldAddGeneralOrderDocument() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -123,6 +112,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddDismissalOrderDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -154,6 +152,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddDirectionOrderDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -185,6 +192,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddHearingNoticeDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
@@ -311,7 +327,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
-        String uid = "f000aa01-0451-4000-b000-000000000000";
         gaCaseData = gaCaseData.toBuilder().build();
         Map<String, Object> output = new HashMap<>();
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
@@ -332,7 +347,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
-        String uid = "f000aa01-0451-4000-b000-000000000000";
         gaCaseData = gaCaseData.toBuilder().build();
         Map<String, Object> output = new HashMap<>();
         String noExistingField = "notExist";
@@ -406,6 +420,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddConsentOrderDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -437,6 +460,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddGaDraftApplicationDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -468,6 +500,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddGaAdditionalDocument() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
@@ -539,6 +580,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
             .thenReturn(updatedCaseData1);
 
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
         handler.execute(mockExternalTask, externalTaskService);
 
         assertThat(updatedCaseData1.getDirectionOrderDocument().size())
@@ -582,6 +632,15 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
             .thenReturn(updatedCaseData1);
+
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
 
         handler.execute(mockExternalTask, externalTaskService);
 
