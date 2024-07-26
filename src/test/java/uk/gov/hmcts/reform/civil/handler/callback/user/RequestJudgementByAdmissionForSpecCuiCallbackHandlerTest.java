@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -686,6 +687,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                           .build())
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .ccdState(All_FINAL_ORDERS_ISSUED)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -696,12 +698,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .handle(params);
             assertEquals(format("# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
                                 caseData.getLegacyCaseReference()), response.getConfirmationHeader());
+            assertThat(response.getConfirmationBody()).contains("Download county court judgment");
 
-            assertEquals(
-                "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2><br>This case will now "
-                    + "proceed offline. Any updates will be sent by post.<br><br>",
-                response.getConfirmationBody()
-            );
 
         }
     }
