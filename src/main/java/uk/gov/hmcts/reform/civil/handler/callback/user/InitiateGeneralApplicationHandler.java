@@ -137,7 +137,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             }
         }
 
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

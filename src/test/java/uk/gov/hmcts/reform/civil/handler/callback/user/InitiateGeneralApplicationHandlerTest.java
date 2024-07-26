@@ -162,7 +162,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -182,7 +182,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -202,7 +202,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isEmpty();
@@ -220,7 +220,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
         when(featureToggleService.isGenAppsAllowedPreSdo()).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
@@ -253,7 +253,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
@@ -1138,7 +1138,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -1164,7 +1164,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(false);
+            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
             when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
