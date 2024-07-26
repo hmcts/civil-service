@@ -32,7 +32,7 @@ public class TrialArrangementsNotifyOtherPartyDefendantScenarioTest extends Case
     @Test
     void should_update_task_list_for_claimant_when_claimant_finalises_trial_arrangements() throws Exception {
         String caseId = "10002348";
-        CaseData caseData = createCaseData(caseId, YesOrNo.NO);
+        CaseData caseData = createCaseData(caseId, YesOrNo.YES);
 
         handler.handle(callbackParams(caseData));
 
