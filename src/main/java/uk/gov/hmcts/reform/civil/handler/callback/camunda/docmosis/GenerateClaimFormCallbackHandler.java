@@ -53,6 +53,10 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
 
+    public void setStitchEnabled(boolean stitchEnabled) {
+        this.stitchEnabled = stitchEnabled;
+    }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;

@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.noticeofchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -24,22 +26,26 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@SpringBootTest(classes = {
-    UpdateCaseDetailsAfterNoCHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private UpdateCaseDetailsAfterNoCHandler handler;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private ObjectMapper mapper;
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
     private static final String NEW_ORG_ID = "1234";
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new UpdateCaseDetailsAfterNoCHandler(mapper, coreCaseUserService);
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Nested
     class AboutToSubmit {
