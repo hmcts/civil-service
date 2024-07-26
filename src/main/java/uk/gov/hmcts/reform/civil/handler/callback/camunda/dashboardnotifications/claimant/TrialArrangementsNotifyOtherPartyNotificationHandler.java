@@ -13,6 +13,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_CLAIMANT;
 
 @Service
 public class TrialArrangementsNotifyOtherPartyNotificationHandler extends CaseProgressionDashboardCallbackHandler {
@@ -39,11 +40,8 @@ public class TrialArrangementsNotifyOtherPartyNotificationHandler extends CasePr
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario();
-    }
-
-    @Override
-    public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isApplicantNotRepresented();
+        return caseData.isApplicantNotRepresented()
+            ? SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario()
+            : SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_CLAIMANT.getScenario();
     }
 }
