@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -24,9 +25,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSolicitorNotifier {
 
     //NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE
-    private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationService notificationService;
     private final OrganisationService organisationService;
+
 
     @Override
     protected String getRecipient(CaseData caseData) {
@@ -94,5 +96,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
+
+
 
 }

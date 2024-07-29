@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
@@ -11,7 +14,29 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-public abstract class FullDefenceSolicitorUnspecNotifier extends FullDefenceSolicitorNotifier {
+@RequiredArgsConstructor
+public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSolicitorNotifier {
+
+    //NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
+    private final NotificationService notificationService;
+    private final NotificationsProperties notificationsProperties;
+
+    @Override
+    public void notifySolicitorForDefendantResponse(CaseData caseData) {
+        String recipient;
+        recipient = getRecipient(caseData);
+        sendNotificationToSolicitor(caseData, recipient);
+    }
+
+    @Override
+    protected void sendNotificationToSolicitor(CaseData caseData, String recipient) {
+        notificationService.sendMail(
+            recipient,
+            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {

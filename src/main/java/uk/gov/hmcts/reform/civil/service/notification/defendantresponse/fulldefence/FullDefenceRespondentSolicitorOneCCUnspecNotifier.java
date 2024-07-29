@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -9,12 +9,13 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 public class FullDefenceRespondentSolicitorOneCCUnspecNotifier extends FullDefenceSolicitorUnspecNotifier {
 
-    //NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
-    private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
+    @Autowired
+    public FullDefenceRespondentSolicitorOneCCUnspecNotifier(NotificationService notificationService,
+                                                             NotificationsProperties notificationsProperties) {
+        super(notificationService, notificationsProperties);
+    }
 
     @Override
     protected String getRecipient(CaseData caseData) {
@@ -27,14 +28,5 @@ public class FullDefenceRespondentSolicitorOneCCUnspecNotifier extends FullDefen
             var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress());
             return emailAddress.orElse(null);
         }
-    }
-
-    protected void sendNotificationToSolicitor(CaseData caseData, String recipient) {
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
     }
 }
