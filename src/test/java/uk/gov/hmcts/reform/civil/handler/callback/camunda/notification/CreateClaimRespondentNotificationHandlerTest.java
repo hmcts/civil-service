@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -37,33 +36,29 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
-@SpringBootTest(classes = {
-    CreateClaimRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
-    @Autowired
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @InjectMocks
     private CreateClaimRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
-                .thenReturn("multiparty-template-id");
-        }
-
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE").build()).build();
@@ -80,6 +75,9 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC").build()).build();
@@ -148,6 +146,9 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvolked_InOneVsTwoCaseSameSolicitor() {
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();
@@ -170,6 +171,9 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvolked_InOneVsTwoCaseDifferentSolicitor() {
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();
@@ -192,6 +196,9 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
+            when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+                .thenReturn("multiparty-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();

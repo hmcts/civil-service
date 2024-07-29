@@ -139,10 +139,6 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isNationalRolloutEnabled() {
-        return featureToggleApi.isFeatureEnabled("enable-national-rollout");
-    }
-
     public boolean isPartOfNationalRollout(String locationEpimms) {
         return locationEpimms != null && featureToggleApi
             .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);

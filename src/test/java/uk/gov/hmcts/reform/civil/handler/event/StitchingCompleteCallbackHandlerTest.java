@@ -1,17 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.event.StitchingCompleteCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
@@ -24,18 +22,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    StitchingCompleteCallbackHandler.class, JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    StitchingCompleteCallbackHandler handler;
-    @Autowired
+    private StitchingCompleteCallbackHandler handler;
+
     private ObjectMapper mapper;
-    private List<IdValue<Bundle>> caseBundles;
-    private CaseData caseData;
+
+    @BeforeEach
+    void setup() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
+        handler = new StitchingCompleteCallbackHandler(mapper);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -44,7 +43,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldSetCategoryId() {
-        caseBundles = new ArrayList<>();
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
                 .title("Trial Bundle")
                 .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
@@ -53,7 +52,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
                                 .documentFileName("name")
                         .build()))
                 .build()));
-        caseData = CaseData.builder().caseBundles(caseBundles).build();
+        CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();

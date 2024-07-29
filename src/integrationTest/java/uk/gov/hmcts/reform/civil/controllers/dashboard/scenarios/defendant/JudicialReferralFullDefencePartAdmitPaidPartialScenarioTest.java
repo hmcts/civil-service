@@ -53,14 +53,14 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
                                + " The case will be referred to a judge who will decide what should happen next.</p>"
                                + "<p class=\"govuk-body\">You can <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">view your response</a> or "
                                + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\"  rel=\"noopener noreferrer\" "
-                               + "class=\"govuk-link\">view the claimant's hearing requirements</a>.</p>"),
+                               + "class=\"govuk-link\">view the claimant's hearing requirements (opens in a new tab)</a>.</p>"),
                 jsonPath("$[0].descriptionCy")
                     .value("<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad."
                                + " Maent wedi gwrthod eich addefiad o £3000 ond yn derbyn eich bod wedi’i dalu’n barod."
                                + " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>"
                                + "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">weld eich ymateb</a> neu "
                                + "<a target=\"_blank\" href=\"{VIEW_CLAIMANT_HEARING_REQS}\"  rel=\"noopener noreferrer\" "
-                               + "class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd</a>.</p>")
+                               + "class=\"govuk-link\">weld gofynion ar gyfer y gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
             );
     }
 }

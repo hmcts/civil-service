@@ -1,27 +1,25 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -35,46 +33,38 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @Autowired
+
+    @InjectMocks
     private ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
         public static final String LEGACY_CASE_REFERENCE = "000DC001";
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()).thenReturn("spec-template-id");
-            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn("spec-template-id");
-            when(notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec()).thenReturn("spec-template-part-admit-id");
-        }
-
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED")
@@ -92,6 +82,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec() {
+            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn("spec-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -113,6 +105,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked_spec() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()).thenReturn("spec-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -136,6 +130,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED")
@@ -153,6 +149,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
+            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn("spec-template-id");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -174,6 +172,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder()
@@ -199,8 +199,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec_partadmit() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+            when(notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec()).thenReturn("spec-template-part-admit-id");
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -267,7 +267,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED").build())
+                "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED").build())
                                                  .build())).isEqualTo(Task_ID_RESPONDENT_SOL2);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
