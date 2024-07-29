@@ -30,7 +30,6 @@ import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "payments-api")
 @TestPropertySource(properties = "payments.api.url=http://localhost:8765")
-@MockServerConfig(hostInterface = "localhost", port = "6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
     public static final String PAYMENT_REQUEST_ENDPOINT_PREFIX = "/service-request/";
@@ -81,7 +80,10 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         public static DslPart buildPaymentStatusResponseDsl() {
             return newJsonBody(response ->
                                    response
+                                       .stringValue("externalReference", "DUMMY-EXT-REF")
+                                       .stringValue("paymentReference", "DUMMY-PAYMENT-REF")
                                        .stringValue("status", "Success")
+                                       .stringValue("dateCreated","2020-02-20T20:20:20.222+0000")
             ).build();
         }
 
@@ -95,6 +97,8 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         @PactTestFor(pactMethod = "doCardPaymentRequest")
         public void verifyPostOfPaymentRequest() {
             CardPaymentServiceRequestResponse response = paymentsApi.createGovPayCardPaymentRequest(REFERENCE, AUTHORIZATION_TOKEN, SERVICE_AUTH_TOKEN, buildPaymentRequest());
+            assertThat(response.getExternalReference(), is("DUMMY-EXT-REF"));
+            assertThat(response.getStatus(), is("Initiated"));
             assertThat(response.getNextUrl(), is("cui-page.hmcts.platform.net"));
         }
 
@@ -128,13 +132,11 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         public static DslPart buildDoPaymentResponseDsl() {
             return newJsonBody(response ->
                                    response
-                                       .stringValue("externalReference", "123")
-                                       .stringValue("paymentReference", "456")
+                                       .stringValue("externalReference", "DUMMY-EXT-REF")
+                                       .stringValue("paymentReference", "DUMMY-PAYMENT-REF")
                                        .stringValue("status", "Initiated")
                                        .stringValue("nextUrl", "cui-page.hmcts.platform.net")
-                                       .stringMatcher("dateCreated",
-                                                      "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
-                                                      "2020-02-20T20:20:20.222")
+                                       .stringValue("dateCreated","2020-02-20T20:20:20.222+0000")
             ).build();
         }
     }
