@@ -208,7 +208,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @CsvSource({"true", "false"})
         void shouldPopulateHmcEaCourtLocation_whenLocationIsWhiteListed(Boolean isLocationWhiteListed) {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
             when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isLocationWhiteListed);
