@@ -22,5 +22,4 @@ public class FullDefenceApplicantSolicitorOneCCUnspecNotifier extends FullDefenc
         return caseData.getRespondentSolicitor1EmailAddress();
     }
 
-
 }

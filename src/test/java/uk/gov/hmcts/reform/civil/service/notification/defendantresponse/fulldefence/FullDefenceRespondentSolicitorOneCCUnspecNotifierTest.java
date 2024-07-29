@@ -33,7 +33,6 @@ public class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-
     @InjectMocks
     private FullDefenceRespondentSolicitorOneCCUnspecNotifier notifier;
 
@@ -75,7 +74,6 @@ public class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
             "defendant-response-applicant-notification-000DC001"
         );
     }
-
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)

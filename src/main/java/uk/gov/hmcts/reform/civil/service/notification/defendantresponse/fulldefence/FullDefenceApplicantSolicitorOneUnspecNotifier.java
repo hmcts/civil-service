@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 @Component
 public class FullDefenceApplicantSolicitorOneUnspecNotifier extends FullDefenceSolicitorUnspecNotifier {
 
-
     @Autowired
     public FullDefenceApplicantSolicitorOneUnspecNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties) {
         super(notificationService, notificationsProperties);
@@ -24,6 +23,5 @@ public class FullDefenceApplicantSolicitorOneUnspecNotifier extends FullDefenceS
         return NO.equals(applicant1Represented) ? caseData.getApplicant1().getPartyEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
-
 
 }

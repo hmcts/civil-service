@@ -23,7 +23,6 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
 
-
     @Autowired
     public FullDefenceRespondentSolicitorTwoCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService,
                                                            OrganisationService organisationService) {
@@ -51,8 +50,6 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
-
-
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {

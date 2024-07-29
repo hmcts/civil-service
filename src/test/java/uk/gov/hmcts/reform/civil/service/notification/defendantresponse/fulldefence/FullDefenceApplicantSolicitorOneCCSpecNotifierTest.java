@@ -37,7 +37,6 @@ public class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
     @InjectMocks
     private FullDefenceApplicantSolicitorOneCCSpecNotifier notifier;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -51,7 +50,6 @@ public class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
-
 
         when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
             .thenReturn("spec-respondent-template-id");

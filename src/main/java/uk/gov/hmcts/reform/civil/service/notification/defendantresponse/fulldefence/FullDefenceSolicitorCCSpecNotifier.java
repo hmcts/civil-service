@@ -36,7 +36,6 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
         return emailTemplate;
     }
 
-
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null
@@ -55,7 +54,6 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
         }
     }
 
-
     private String getLegalOrganisationName(CaseData caseData) {
         String organisationID;
         if (caseData.getRespondent1DQ() != null
@@ -69,6 +67,5 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
-
 
 }

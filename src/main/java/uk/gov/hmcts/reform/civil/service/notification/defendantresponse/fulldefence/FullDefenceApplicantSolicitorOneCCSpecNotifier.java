@@ -9,11 +9,9 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class FullDefenceApplicantSolicitorOneCCSpecNotifier extends FullDefenceSolicitorCCSpecNotifier {
@@ -24,7 +22,8 @@ public class FullDefenceApplicantSolicitorOneCCSpecNotifier extends FullDefenceS
     private final OrganisationService organisationService;
 
     @Autowired
-    public FullDefenceApplicantSolicitorOneCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService, OrganisationService organisationService) {
+    public FullDefenceApplicantSolicitorOneCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService,
+                                                          OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
         this.notificationsProperties = notificationsProperties;
         this.notificationService = notificationService;

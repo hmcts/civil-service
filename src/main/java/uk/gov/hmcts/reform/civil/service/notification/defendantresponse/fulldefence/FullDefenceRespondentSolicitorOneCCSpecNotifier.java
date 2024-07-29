@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefenceSolicitorCCSpecNotifier {
@@ -18,14 +17,12 @@ public class FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefence
     //NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     public FullDefenceRespondentSolicitorOneCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService,
                                                            OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
         this.notificationsProperties = notificationsProperties;
         this.notificationService = notificationService;
-        this.organisationService = organisationService;
     }
 
     @Override
@@ -55,6 +52,5 @@ public class FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefence
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
-
 
 }

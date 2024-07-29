@@ -52,7 +52,6 @@ public class FullDefenceRespondentSolicitorTwoCCUnspecNotifierTest {
             .thenReturn("spec-respondent-template-id");
     }
 
-
     @Test
     void shouldNotifyRespondentSolicitor2In1v2Scenario_whenV1CallbackInvoked() {
         CaseData caseData = CaseDataBuilder.builder()

@@ -43,7 +43,6 @@ public class FullDefenceApplicantSolicitorOneUnspecNotifierTest {
     @InjectMocks
     private FullDefenceApplicantSolicitorOneUnspecNotifier notifier;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -69,7 +68,6 @@ public class FullDefenceApplicantSolicitorOneUnspecNotifierTest {
             "defendant-response-applicant-notification-000DC001"
         );
     }
-
 
     @Test
     void shouldNotifyApplicantSolicitorIn1v2Scenario_whenV1CallbackInvoked() {

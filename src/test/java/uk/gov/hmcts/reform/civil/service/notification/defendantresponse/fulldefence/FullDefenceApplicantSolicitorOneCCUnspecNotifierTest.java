@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
@@ -33,7 +32,6 @@ public class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
 
     @InjectMocks
     private FullDefenceApplicantSolicitorOneCCUnspecNotifier notifier;
@@ -76,7 +74,6 @@ public class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
             "defendant-response-applicant-notification-000DC001"
         );
     }
-
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
