@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.6"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1330'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1332'
   id "org.flywaydb.flyway" version "10.16.0"
 }
 
@@ -121,7 +121,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.764'
+        version: '1.12.765'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -340,7 +340,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.1.1'
+  implementation 'com.github.hmcts:civil-commons:1.1.2'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -412,7 +412,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.91'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.23'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.22'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.0'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.1'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -431,7 +431,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.50.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.2'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
