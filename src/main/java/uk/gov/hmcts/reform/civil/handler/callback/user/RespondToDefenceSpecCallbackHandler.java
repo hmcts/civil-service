@@ -700,6 +700,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
                 format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
+        }  else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format(DOWNLOAD_URL_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
+            );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
@@ -721,6 +727,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return format(
                 "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
+            );
+        } else if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                claimNumber
             );
         } else {
             return format(
