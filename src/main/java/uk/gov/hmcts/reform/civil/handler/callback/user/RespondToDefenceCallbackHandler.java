@@ -258,11 +258,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         );
 
         // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (notTransferredOnline(caseData)) {
-                updateCaseManagementLocation(callbackParams, builder);
-            }
-        } else {
+        if (notTransferredOnline(caseData)) {
             updateCaseManagementLocation(callbackParams, builder);
         }
 
