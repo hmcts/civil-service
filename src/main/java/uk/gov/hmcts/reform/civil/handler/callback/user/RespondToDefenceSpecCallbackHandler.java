@@ -346,11 +346,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         builder.respondent1ClaimResponseDocumentSpec(null);
 
         // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (notTransferredOnline(caseData)) {
-                updateCaseManagementLocation(callbackParams, builder);
-            }
-        } else {
+        if (notTransferredOnline(caseData)) {
             updateCaseManagementLocation(callbackParams, builder);
         }
 
@@ -365,18 +361,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
             // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
-            if (featureToggleService.isNationalRolloutEnabled()) {
-                if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
-                    || isFlightDelaySmallClaimAndOther(caseData))) {
-                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
-                }
-            } else {
-                //Update Case Management location with DQ location only if either of following is true
-                // 1. It is a Fast_Claim 2. Small claim and not Flight Delay 3.Small Claim & Flight delay & Airline is Other
-                if (!isFlightDelayAndSmallClaim(caseData)
-                    || isFlightDelaySmallClaimAndOther(caseData)) {
-                    updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
-                }
+            if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
+                || isFlightDelaySmallClaimAndOther(caseData))) {
+                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();

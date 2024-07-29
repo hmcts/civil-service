@@ -115,26 +115,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            // If Pre SDO allow GA in all locations.
-            // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
-            if (inStateAfterJudicialReferral(caseData.getCcdState())
-                && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-            if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
-                log.info("Gen apps for case {} not allowed pre sdo", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-        } else {
-            if (featureToggleService.isEarlyAdoptersEnabled()
-                && (Objects.isNull(caseData.getCaseManagementLocation())
-                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                      .getBaseLocation())))) {
-                log.info("Gen apps for case {} not whitelisted in case progression", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
+        // If Pre SDO allow GA in all locations.
+        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+        if (inStateAfterJudicialReferral(caseData.getCcdState())
+            && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
+            errors.add(NOT_IN_EA_REGION);
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
