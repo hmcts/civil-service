@@ -4,7 +4,7 @@ import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
@@ -23,16 +23,14 @@ import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "paymentsAPI")
+@PactTestFor(providerName = "payments-api")
+@TestPropertySource(properties = "payments.api.url=http://localhost:8765")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
-@TestPropertySource(properties = "payments.api.url=http://localhost:6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
     public static final String PAYMENT_REQUEST_ENDPOINT_PREFIX = "/service-request/";
@@ -63,7 +61,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
             assertThat(response.getStatus(), is("Success"));
         }
 
-        private V4Pact buildStatusOfPaymentPact(PactDslWithProvider builder) throws IOException {
+        public V4Pact buildStatusOfPaymentPact(PactDslWithProvider builder) throws IOException {
             return builder
                 .given("The status of a payment request needs to be checked")
                 .uponReceiving("a request for status for a payment reference")
@@ -80,7 +78,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
                 .toPact(V4Pact.class);
         }
 
-        static DslPart buildPaymentStatusResponseDsl() {
+        public static DslPart buildPaymentStatusResponseDsl() {
             return newJsonBody(response ->
                                    response
                                        .stringValue("status", "Success")
@@ -97,7 +95,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         @PactTestFor(pactMethod = "doCardPaymentRequest")
         public void verifyPostOfPaymentRequest() {
             CardPaymentServiceRequestResponse response = paymentsApi.createGovPayCardPaymentRequest(REFERENCE, AUTHORIZATION_TOKEN, SERVICE_AUTH_TOKEN, buildPaymentRequest());
-            assertThat(response.getNextUrl(), is("do-payment.hmcts.platform.net"));
+            assertThat(response.getNextUrl(), is("cui-page.hmcts.platform.net"));
         }
 
         private V4Pact buildCardPaymentRequestPact(PactDslWithProvider builder) throws IOException {
@@ -117,7 +115,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
                 .toPact(V4Pact.class);
         }
 
-        private CardPaymentServiceRequestDTO buildPaymentRequest() {
+        public CardPaymentServiceRequestDTO buildPaymentRequest() {
             return CardPaymentServiceRequestDTO.builder()
                 .language("En")
                 .currency("GBP")
@@ -127,14 +125,16 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
         }
 
-        static DslPart buildDoPaymentResponseDsl() {
+        public static DslPart buildDoPaymentResponseDsl() {
             return newJsonBody(response ->
                                    response
                                        .stringValue("externalReference", "123")
                                        .stringValue("paymentReference", "456")
                                        .stringValue("status", "Initiated")
-                                       .stringValue("nextUrl", "do-payment.hmcts.platform.net")
-                                       .datetime("dateCreated", "dd-MMM-yyyy HH:mm:ss", LocalDateTime.of(2024, 5, 6, 3, 2).now().toInstant(ZoneOffset.UTC))
+                                       .stringValue("nextUrl", "cui-page.hmcts.platform.net")
+                                       .stringMatcher("dateCreated",
+                                                      "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{1,6})$",
+                                                      "2020-02-20T20:20:20.222")
             ).build();
         }
     }
