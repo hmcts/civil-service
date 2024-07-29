@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -15,8 +14,7 @@ public class JudgmentSubmittedConfText implements RespondToResponseConfirmationT
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (caseData.isDefendantPaymentPlanNo()
-            || caseData.hasClaimantAgreedToFreeMediation()
-            || CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            || caseData.hasClaimantAgreedToFreeMediation()) {
             return Optional.empty();
         }
         return Optional.of(format(
