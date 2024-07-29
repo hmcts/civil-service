@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
@@ -22,11 +22,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.client.FeesApiClient;
-import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -46,46 +43,39 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PAYMENT_TYPE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT;
 
-@SpringBootTest(classes = {
-    DJCaseworkerReceivedNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-    InterestCalculator.class,
-    FeesService.class,
-    FeesClientService.class
-})
+@ExtendWith(MockitoExtension.class)
 class DJCaseworkerReceivedNotificationHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
-    @MockBean
-    NotificationsProperties notificationsProperties;
-    @Autowired
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
     private DJCaseworkerReceivedNotificationHandler handler;
-    @MockBean
+
+    @Mock
     private InterestCalculator interestCalculator;
-    @MockBean
+
+    @Mock
     private FeesService feesService;
-    @MockBean
+
+    @Mock
     private DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
-    @MockBean
-    private FeesApiClient feesApiClient;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
                 .thenReturn("test-template-received-id");
             when(defaultJudgmentSpecEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
-
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
@@ -95,6 +85,7 @@ class DJCaseworkerReceivedNotificationHandlerTest {
                                 .version("1")
                                 .code("CODE")
                                 .build());
+
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build().toBuilder()
@@ -121,6 +112,10 @@ class DJCaseworkerReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedPartialPaymentAnd1v1() {
+            when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
+                .thenReturn("test-template-received-id");
+            when(defaultJudgmentSpecEmailConfiguration.getReceiver())
+                .thenReturn("caseworker@hmcts.net");
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );

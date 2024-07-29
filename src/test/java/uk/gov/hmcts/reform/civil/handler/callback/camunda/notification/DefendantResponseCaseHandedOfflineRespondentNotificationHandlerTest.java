@@ -1,27 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -48,21 +47,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    DefendantResponseCaseHandedOfflineRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private DefendantResponseCaseHandedOfflineRespondentNotificationHandler handler;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Nested
@@ -101,22 +101,17 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         @Nested
         class OneVsTwoScenario {
 
-            @BeforeEach
-            void setup() {
-                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
-                    .thenReturn("template-id-multiparty");
-            }
-
             @Test
             void shouldNotifyDefendantSolicitor1_when1v2Case() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("template-id-multiparty");
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -165,6 +160,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor2_when1v2Case() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -178,9 +176,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                                  .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
                                  .build())
                     .build();
-
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("template-id-multiparty");
 
                 handler.handle(params);
 
@@ -223,6 +218,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor1_when1v2SameSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimOneDefendantSolicitor()
@@ -247,6 +245,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor2_when1v2SameSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimOneDefendantSolicitor()
@@ -273,6 +274,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor2_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimOneDefendantSolicitor()
@@ -280,8 +284,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .respondentSolicitor2EmailAddress(null)
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
-                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-                    .thenReturn("template-id-multiparty");
+
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -301,6 +304,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor1_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimOneDefendantSolicitor()
@@ -328,6 +334,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor1FirstScenerio_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -354,6 +363,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitorOneFirstScenerio_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -380,6 +392,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor2FirstScenerio_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -441,6 +456,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitorOne2FirstScenerio_when1v2DifferentSolicitorCase() {
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)

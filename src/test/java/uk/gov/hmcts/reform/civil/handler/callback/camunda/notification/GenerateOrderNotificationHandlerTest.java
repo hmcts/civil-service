@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -32,44 +31,37 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    GenerateOrderNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @Autowired
+
+    @InjectMocks
     private GenerateOrderNotificationHandler handler;
 
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
-            when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh())
-                .thenReturn("template-id-lip-translate");
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
@@ -87,6 +79,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
@@ -104,6 +98,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
@@ -121,6 +117,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent1Lip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO).build();
@@ -140,6 +138,9 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent1Lip_whenInvokedBilingual() {
+            when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh())
+                .thenReturn("template-id-lip-translate");
+
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .caseDataLiP(CaseDataLiP.builder()
@@ -164,6 +165,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+
             //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -192,6 +195,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent2Lip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+
             //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
@@ -221,6 +226,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+
             //given: case where applicant Lip has email and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO).build();
@@ -240,6 +247,9 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedBilingual() {
+            when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh())
+                .thenReturn("template-id-lip-translate");
+
             //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)

@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -21,18 +20,14 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,37 +52,20 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    DefendantResponseApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @Autowired
-    private DefendantResponseApplicantNotificationHandler handler;
-    @MockBean
-    private OrganisationService organisationService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
-    @BeforeEach
-    void setup() {
-        when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-        when(notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec())
-            .thenReturn("spec-claimant-1v2DS-template-id");
-        when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
-            .thenReturn("spec-claimant-template-id");
-        when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
-            .thenReturn("spec-respondent-template-id");
-        when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
-        when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
-    }
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
+    private DefendantResponseApplicantNotificationHandler handler;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -97,6 +75,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorIn1v1Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -120,6 +100,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v1Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -143,6 +125,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v1ScenarioSecondSol_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -166,6 +150,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-claimant-template-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -200,6 +186,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyCitizenApplicantSpec_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-claimant-template-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -234,6 +222,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -268,6 +257,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio2_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusDays(5);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -302,6 +292,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio3_whenInvoked() {
+                when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
 
                 LocalDate whenWillPay = LocalDate.now().plusDays(5);
                 CaseData caseData = CaseDataBuilder.builder()
@@ -336,6 +327,9 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-respondent-template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -359,6 +353,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpecDef1_whenInvokedWithCcEvent() {
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-respondent-template-id");
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -382,6 +378,9 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-respondent-template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -405,6 +404,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void sendNotificationToSolicitorSpecPart_shouldNotifyRespondentSolicitorSpecDef1v1() {
+                when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -429,6 +430,9 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitorSpecDef1SecondScenerio_whenInvokedWithCcEvent() {
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("spec-respondent-template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -461,6 +465,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorIn1v2Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -485,6 +491,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In1v2Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -509,6 +517,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor2In1v2Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -536,6 +546,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         class TwoVsOneScenario {
             @Test
             void shouldNotifyApplicantSolicitorIn2v1Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefence()
@@ -560,6 +572,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyRespondentSolicitor1In2v1Scenario_whenV1CallbackInvoked() {
+                when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefence()
@@ -868,7 +882,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());;
+            .containsEntry("payImmediately", formattedDate.toUpperCase());
 
     }
 }
