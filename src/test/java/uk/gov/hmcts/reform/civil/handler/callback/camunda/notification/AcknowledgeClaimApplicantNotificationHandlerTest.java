@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -49,29 +48,22 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
-@SpringBootTest(classes = {
-    AcknowledgeClaimApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @Autowired
+    @InjectMocks
     private AcknowledgeClaimApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
@@ -88,7 +80,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotNotifyApplicantSolicitor_whenRecipeintIsNull() {
+        void shouldNotNotifyApplicantSolicitor_whenRecipientIsNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
@@ -103,7 +95,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotNotifyRespondentSolicitor_whenRecipeint1IsNull() {
+        void shouldNotNotifyRespondentSolicitor_whenRecipient1IsNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor1EmailAddress(null)
@@ -118,7 +110,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldNotNotifyRespondentSolicitor_whenRecipeint2IsNull() {
+        void shouldNotNotifyRespondentSolicitor_whenRecipient2IsNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondentSolicitor2EmailAddress(null)
@@ -134,6 +126,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
@@ -152,6 +145,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotifyRespondentSolicitor2WhenSolicitor2RespondsFirst_whenInvokedWithCcEvent() {
             //solicitor 2  acknowledges claim, solicitor 1 does not
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -179,6 +173,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotifyRespondentSolicitor2WhenSolicitor2RespondsLast_whenInvokedWithCcEvent() {
             //solicitor 2 acknowledges claim,solicitor 1 already acknowledged
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -206,6 +201,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotifyRespondentSolicitor1WhenSolicitor1RespondsLast_whenInvokedWithCcEvent() {
             //solicitor 1 acknowledges claim,solicitor 2 already acknowledged
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -231,6 +227,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyRespondentSolicitor1v2SameSolicitor_whenInvokedWithCcEvent() {
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -259,6 +256,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyRespondentSolicitor2v1SameSolicitor_whenInvokedWithCcEvent() {
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addApplicant2(YesOrNo.YES)
                 .applicant2(PartyBuilder.builder().individual().build())
@@ -285,6 +283,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvokedWithCcEvent() {
             //solicitor 1 acknowledges claim,solicitor 2 not
+            when(notificationsProperties.getRespondentSolicitorAcknowledgeClaim()).thenReturn("template-id");
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)

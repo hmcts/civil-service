@@ -1,19 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -46,27 +44,30 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateHearingNoticeHmcHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+
+    @InjectMocks
     private GenerateHearingNoticeHmcHandler handler;
-    @MockBean
+    @Mock
     private HearingsService hearingsService;
-    @MockBean
+    @Mock
     private HearingNoticeCamundaService camundaService;
-    @MockBean
+    @Mock
     private HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
-    @MockBean
+    @Mock
     private LocationReferenceDataService locationRefDataService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator, mapper, locationRefDataService);
+        mapper.registerModule(new JavaTimeModule());
+
+    }
 
     private static Long CASE_ID = 1L;
     private static String HEARING_ID = "1234";

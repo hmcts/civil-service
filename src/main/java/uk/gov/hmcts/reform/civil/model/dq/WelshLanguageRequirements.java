@@ -8,8 +8,8 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 
 @Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class WelshLanguageRequirements {
 
     private Language evidence;

@@ -5,13 +5,15 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 @Data
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Builder(toBuilder = true)
 public class PartyFlagStructure {
 
-    private final String partyID;
-    private final String firstName;
-    private final String lastName;
-    private final String email;
-    private final String phone;
-    private final Flags flags;
+    private String partyID;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private Flags flags;
 }
