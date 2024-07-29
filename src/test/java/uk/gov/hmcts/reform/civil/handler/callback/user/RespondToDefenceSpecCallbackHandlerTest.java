@@ -830,6 +830,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .build())
                 .build().toBuilder()
                 .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(9999_00))
                                 .build())
@@ -1213,7 +1214,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("caseManagementLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("10", "214320");
+                    .containsExactly("4", "00000");
 
             }
 
@@ -1809,7 +1810,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -1828,7 +1828,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateLocation_WhenCmlIsNotCnbcAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1847,7 +1846,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOnFlightDelayOtherSmall() {
             // Given
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             given(featureToggleService.isSdoR2Enabled()).willReturn(true);
             LocationRefData locationA = LocationRefData.builder()
                 .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1880,24 +1878,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             caseData.setIsFlightDelayClaim(YES);
-            //When
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsExactly("10", "214320");
-        }
-
-        @Test
-        void shouldUpdateLocation_preferredLocationBehaviourWhenToggleOff() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-            // Given
-            var caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
-                .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
