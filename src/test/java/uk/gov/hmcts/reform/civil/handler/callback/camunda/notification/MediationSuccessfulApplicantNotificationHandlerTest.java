@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -34,8 +33,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_TWO;
@@ -43,22 +42,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    MediationSuccessfulApplicantNotificationHandler.class,
-    OrganisationDetailsService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationDetailsService organisationDetailsService;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+
+    @InjectMocks
     private MediationSuccessfulApplicantNotificationHandler handler;
 
     private static final String REFERENCE_NUMBER = "8372942374";
@@ -75,20 +74,11 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
     class AboutToSubmitCallback {
         private static final String ORGANISATION_NAME = "Org Name";
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate()).thenReturn(TEMPLATE_LIP_ID);
-            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
-            when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate()).thenReturn(TEMPLATE_LIP_ID);
-            when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
-        }
-
         @Test
         void shouldNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -109,6 +99,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
+            when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate()).thenReturn(TEMPLATE_LIP_ID);
+
             //Given
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
@@ -137,6 +129,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedClaimIssueInBilingual() {
+            when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate()).thenReturn(TEMPLATE_LIP_ID);
+
             //Given
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
@@ -166,6 +160,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyApplicantLipFeatureToggleDisabled_whenInvoked() {
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
             Party applicant1 = PartyBuilder.builder().soleTrader()
@@ -194,6 +190,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLRvLRNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
@@ -216,6 +215,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLRvLRSameSolicitorNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
@@ -238,6 +240,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLRvLRdifferentSolicitorNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
@@ -260,6 +265,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmTwoVOneNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -283,6 +291,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLRVLipNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
@@ -305,6 +316,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLipVLipNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -329,6 +342,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyClaimantCarmLipVLipNotifyApplicantWithBilingualNotification_whenInvoked() {
+            when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
+
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
