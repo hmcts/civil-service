@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -63,7 +64,6 @@ import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -175,7 +175,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final FeatureToggleService featureToggleService;
     private final OrganisationService organisationService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -378,7 +378,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
             .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
@@ -598,7 +598,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();

@@ -28,8 +28,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -60,8 +58,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     private LocationHelper helper;
     @MockBean
     private Time time;
-    @MockBean
-    private IdamClient idamClient;
     @Autowired
     private CreateReferToJudgeCallbackHandler handler;
     @MockBean
@@ -99,9 +95,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
             given(helper.leadDefendantIs1(any()))
                     .willReturn(true);
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
         }

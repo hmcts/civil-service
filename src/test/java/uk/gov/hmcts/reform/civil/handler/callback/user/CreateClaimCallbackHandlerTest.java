@@ -63,7 +63,6 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -141,9 +140,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private OrganisationService organisationService;
-
-    @MockBean
-    private IdamClient idamClient;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -527,7 +523,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String userId = UUID.randomUUID().toString();
             String email = "example@email.com";
 
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(email).id(userId).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
@@ -545,7 +541,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String userId = UUID.randomUUID().toString();
             String email = "example@email.com";
 
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(email).id(userId).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
@@ -1056,7 +1052,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
-            given(idamClient.getUserDetails(any()))
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
@@ -1405,7 +1401,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
                 userId = UUID.randomUUID().toString();
 
-                given(idamClient.getUserDetails(any()))
+                given(userService.getUserDetails(any()))
                     .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
             }
 
@@ -1437,7 +1433,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldAddDifferentEmailToIdamDetails_whenIdamEmailIsNotCorrect() {
                 userId = UUID.randomUUID().toString();
-                given(idamClient.getUserDetails(any()))
+                given(userService.getUserDetails(any()))
                     .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
                 CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()

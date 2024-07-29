@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
@@ -103,9 +102,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private DocumentHearingLocationHelper locationHelper;
 
     @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
     private WorkingDayIndicator workingDayIndicator;
 
     @Autowired
@@ -140,7 +136,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @BeforeEach
     void setUp() {
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+        when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judge")
                                                                     .surname("Judy")
                                                                     .roles(Collections.emptyList()).build());

@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -103,9 +102,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private OrganisationService organisationService;
-
-    @MockBean
-    protected IdamClient idamClient;
 
     @MockBean
     protected GeneralAppFeesService feesService;
@@ -884,7 +880,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseData(CaseData.builder().build());
 
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -908,7 +904,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -975,7 +971,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -1003,7 +999,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .generalAppHearingDetails(GAHearingDetails.builder().build())
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .build();
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
