@@ -127,8 +127,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
-    private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
-        + "is assigned to the case.";
 
     @Test
     void shouldThrowError_whenLRVsLiP() {
