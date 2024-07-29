@@ -187,6 +187,7 @@ public enum DashboardClaimStatus {
     RESPONSE_BY_POST(
         Claim::isPaperResponse
     ),
+    DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
     NO_STATUS(c -> false);
 
     @Getter
