@@ -42,7 +42,6 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifierTest {
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
     }
 
-
     @Test
     void shouldNotifyRespondentSolicitor2In1v2ScenarioSecondSol_whenV1CallbackInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
