@@ -10,17 +10,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartyValidator {
 
-    public static int ADDRESS_MAX_LENGTH_ALLOWED = 35;
+    public static final int ADDRESS_MAX_LENGTH_ALLOWED = 35;
 
-    public static int NAME_MAX_LENGTH_ALLOWED = 70;
+    public static final int NAME_MAX_LENGTH_ALLOWED = 70;
 
-    public static String ADDRESS_LENGTH_ERROR = "exceeds maximum length 35";
+    public static final String ADDRESS_LENGTH_ERROR = "exceeds maximum length 35";
 
-    public static String NAME_LENGTH_ERROR = "Name exceeds maximum length 70";
+    public static final String NAME_LENGTH_ERROR = "Name exceeds maximum length 70";
 
-    public static String WELSH_CHARS = ".*[ˆ`´¨].*";
+    public static final String WELSH_CHARS = ".*[ˆ`´¨].*";
 
-    public static String WELSH_CHAR_ERROR = "Special characters are not allowed";
+    public static final String WELSH_CHAR_ERROR = "Special characters are not allowed";
 
     public List<String> validateAddress(Address primaryAddress, List<String> errors) {
 
