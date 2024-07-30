@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DisclosureOfNonElectronicDocuments {
 
     private YesOrNo directionsForDisclosureProposed;

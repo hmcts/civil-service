@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 @Data
-@Builder(toBuilder = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class RequestedCourt {
 
     /**
