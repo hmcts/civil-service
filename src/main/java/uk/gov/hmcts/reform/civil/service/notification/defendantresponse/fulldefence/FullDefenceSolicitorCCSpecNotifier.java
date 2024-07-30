@@ -54,7 +54,7 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
         }
     }
 
-    private String getLegalOrganisationName(CaseData caseData) {
+    protected String getLegalOrganisationName(CaseData caseData) {
         String organisationID;
         if (caseData.getRespondent1DQ() != null
             && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {

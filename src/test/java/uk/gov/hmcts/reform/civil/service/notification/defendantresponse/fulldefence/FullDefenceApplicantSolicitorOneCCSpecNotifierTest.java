@@ -1,21 +1,30 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -62,6 +71,75 @@ public class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             getNotificationDataMapSpec(),
             "defendant-response-applicant-notification-000DC001"
         );
+    }
+
+    @Test
+    void shouldGetRecipientEmail() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .respondentSolicitor1EmailAddress("solicitor1@example.com")
+            .build();
+
+        // When
+        String recipient = notifier.getRecipient(caseData);
+
+        // Then
+        assertEquals("solicitor1@example.com", recipient);
+    }
+
+    @Test
+    void shouldSendNotificationToSolicitor() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("12345")
+            .respondent1ResponseDate(null)
+            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
+                .name("statementOfTruthName").build())
+            .respondent2(Party.builder()
+                .type(Party.Type.ORGANISATION)
+                .organisationName("org-name")
+                .build())
+            .respondent2OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
+                    .build())
+            .build();
+
+        when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+            .thenReturn("template-id");
+
+        // When
+        notifier.sendNotificationToSolicitor(caseData, "solicitor1@example.com");
+
+        // Then
+        verify(notificationService).sendMail(
+            eq("solicitor1@example.com"),
+            eq("template-id"),
+            anyMap(),
+            eq("defendant-response-applicant-notification-12345")
+        );
+    }
+
+    @Test
+    void shouldGetLegalOrganisationName() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .respondent1DQ(null)
+            .respondent2OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
+                    .build())
+            .build();
+
+        when(organisationService.findOrganisationById("org-id"))
+            .thenReturn(Optional.of(Organisation.builder().name("Org Name").build()));
+
+        // When
+        String organisationName = notifier.getLegalOrganisationName(caseData);
+
+        // Then
+        AssertionsForClassTypes.assertThat("Org Name").isEqualTo(organisationName);
+
     }
 
     @Test
