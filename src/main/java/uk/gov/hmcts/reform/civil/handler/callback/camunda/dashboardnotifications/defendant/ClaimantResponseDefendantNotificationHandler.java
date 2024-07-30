@@ -185,7 +185,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
-                && caseData.getRespondent1().isCompanyOROrganisation()
+                && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
                 && caseData.hasApplicantRejectedRepaymentPlan());
     }
 
