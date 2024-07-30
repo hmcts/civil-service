@@ -791,6 +791,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedOneOnly() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
 
@@ -836,6 +837,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedTwoOnly() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
 
@@ -881,6 +883,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateBothApplicantFRCResponse2v1IntermediateProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
 
@@ -1519,7 +1522,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1537,7 +1539,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateLocation_WhenCmlIsNotCcmccAndToggleOn() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1551,24 +1552,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("3", "12345");
-        }
-
-        @Test
-        void shouldUpdateLocation_preferredLocationBehaviourWhenToggleOff() {
-            when(featureToggleService.isNationalRolloutEnabled()).thenReturn(false);
-            // Given
-            var caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
-                .build();
-            //When
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsExactly("10", "214320");
         }
     }
 
