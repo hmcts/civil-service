@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -930,7 +929,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     );
 
             assertThat(result).isNotNull();
-            assertThat(result.getGeneralAppUrgencyRequirement()).isNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
         }
 
     }
