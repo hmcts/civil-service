@@ -49,7 +49,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec_lip() {
-            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip()).thenReturn("spec-lip-template-id");
+            when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("spec-lip-template-id");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
