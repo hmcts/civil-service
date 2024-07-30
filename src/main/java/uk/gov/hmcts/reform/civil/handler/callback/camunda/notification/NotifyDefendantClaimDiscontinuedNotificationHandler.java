@@ -19,6 +19,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +63,13 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
             );
+        } else {
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                getLIPTemplate(),
+                addPropertiesLip(caseData),
+                getReferenceTemplate(caseData)
+            );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -69,6 +77,10 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
 
     private String getLRTemplate() {
         return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
+    }
+
+    private String getLIPTemplate() {
+        return notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -82,6 +94,14 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
             caseData.getLegacyCaseReference(),
             LEGAL_ORG_NAME,
             getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+        );
+    }
+
+    public Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 }

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -22,15 +22,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_BY_ADMISSION_DEFENDANT1_PIN_IN_LETTER;
 
-@SpringBootTest(classes = {
-    JudgmentByAdmissionPinInPostLiPDefendant1LetterHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class JudgmentByAdmissionPinInPostLiPDefendant1LetterHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private JudgmentByAdmissionPinInPostLiPDefendant1LetterHandler handler;
-    @MockBean
+    @Mock
     private JudgmentByAdmissionPiPLetterGenerator letterGenerator;
 
     public static final String TASK_ID = "SendJudgmentByAdmissionLiPLetterDef1";
