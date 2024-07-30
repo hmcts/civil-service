@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -854,6 +855,47 @@ public class InitiateGeneralApplicationServiceHelperTest {
                     .isEqualTo(YES);
             assertThat(result.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate())
                     .isEqualTo(caseData.getHearingDate());
+        }
+
+        @Test
+        void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
+            CaseData.CaseDataBuilder caseDataBuilder =
+                getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
+            caseDataBuilder.addRespondent2(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
+                                                                                  .getFormattedName())
+                                                   .build())
+                .ccdCaseReference(12L)
+                .respondent1(Party.builder()
+                                 .partyID("party")
+                                 .partyEmail("party@gmail.com")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("defF").build())
+                .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
+                .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com")
+                                          .build())
+                .applicant1Represented(NO);
+            when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                                .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
+
+            CaseData caseData = caseDataBuilder.build();
+            GeneralApplication result = helper
+                .setRespondentDetailsIfPresent(
+                    GeneralApplication.builder().build(),
+                    caseData,
+                    getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT)
+                );
+
+            assertThat(result).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement()).isNotNull();
+            assertThat(result.getGeneralAppUrgencyRequirement().getGeneralAppUrgency())
+                .isEqualTo(NO);
         }
 
         @Test
