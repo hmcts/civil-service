@@ -314,7 +314,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldShowSummaryForAllFinalOrdersIssued() {
-            String expected = "The Judgement request will be processed and a Country"
+            String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
 
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
