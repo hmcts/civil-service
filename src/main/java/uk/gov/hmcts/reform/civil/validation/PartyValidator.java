@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PartyValidator {
