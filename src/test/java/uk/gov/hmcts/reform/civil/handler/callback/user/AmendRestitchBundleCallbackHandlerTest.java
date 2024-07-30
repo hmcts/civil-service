@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -15,15 +14,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -37,8 +31,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,12 +49,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
     @Mock
     private FeatureToggleService featureToggleService;
-
     private final ObjectMapper mapper = new ObjectMapper();
-
-    private static final String TEST_URL = "url";
-    private static final String TEST_FILE_NAME = "testFileName.pdf";
-
     private static final String MID_PAGE_ID = "create-bundle";
 
     @BeforeEach
@@ -127,31 +114,13 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
             when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-            Bundle bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle - New").id("2")
-                                                       .stitchStatus("new")
-                                                       .fileName("Trial Bundle.pdf")
-                                                       .description("Trial Bundle - New")
-                                                       .bundleHearingDate(LocalDate.of(2023, 12, 12))
-                                                       .stitchedDocument(Document.builder()
-                                                                             .documentUrl(TEST_URL)
-                                                                             .documentFileName(TEST_FILE_NAME)
-                                                                             .build())
-                                                       .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
-                                                       .build()).build();
-            IdValue<Bundle> packedBundle = new IdValue<>("2", bundle);
-            BundleCreateResponse bundleCreateResponse =
-                BundleCreateResponse.builder().data(BundleData.builder().caseBundles(List.of(bundle)).build()).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome()
-                .caseBundles(prepareCaseBundles())
-                .build();
-
-            when(bundleCreationService.createBundle(anyLong())).thenReturn(bundleCreateResponse);
-            when(bundleCreationTriggerEventHandler.prepareNewBundle(any(), any())).thenAnswer(x -> packedBundle);
-
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = callbackParamsOf(caseData, MID, MID_PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            List<IdValue<Bundle>> actualData = mapper.convertValue(response.getData().get("caseBundles"), new TypeReference<List<IdValue<Bundle>>>() {});
-            assertThat(actualData.get(1).getValue()).isEqualTo(packedBundle.getValue());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
         }
 
     }

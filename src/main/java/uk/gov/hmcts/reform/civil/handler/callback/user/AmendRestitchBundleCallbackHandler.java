@@ -10,20 +10,15 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
-import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -67,21 +62,6 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     private CallbackResponse startBundleCreation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
-
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        caseBundles.removeIf(bundle -> bundle.getValue().getBundleHearingDate().isPresent()
-                                 && bundle.getValue().getBundleHearingDate().get().equals(
-                                 caseData.getHearingDate()));
-
-        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                               .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
-            ).toList());
-        caseDataBuilder.caseBundles(caseBundles);
-
-        if (nonNull(bundleCreateResponse.getErrors()) && !bundleCreateResponse.getErrors().isEmpty()) {
-            caseDataBuilder.bundleError(YesOrNo.YES);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
