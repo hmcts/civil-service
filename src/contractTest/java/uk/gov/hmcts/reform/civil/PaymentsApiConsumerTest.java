@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil;
 
+import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;
@@ -30,6 +31,7 @@ import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "payments-api")
 @TestPropertySource(properties = "payments.api.url=http://localhost:8765")
+@MockServerConfig(hostInterface = "localhost", port = "6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
     public static final String PAYMENT_REQUEST_ENDPOINT_PREFIX = "/service-request/";
