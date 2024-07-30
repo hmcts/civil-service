@@ -146,7 +146,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     }
 
     private String setUpBody(CaseData caseData) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED  == caseData.getCcdState()) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
             return format(
                 "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
                     + "<br><br>The defendant will be served the county court judgment<br><br>",
