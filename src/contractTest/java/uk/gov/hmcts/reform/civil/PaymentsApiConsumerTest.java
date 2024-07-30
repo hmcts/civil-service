@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil;
 
-import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
@@ -85,7 +83,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
                                        .stringValue("externalReference", "DUMMY-EXT-REF")
                                        .stringValue("paymentReference", "DUMMY-PAYMENT-REF")
                                        .stringValue("status", "Success")
-                                       .stringValue("dateCreated","2020-02-20T20:20:20.222+0000")
+                                       .stringValue("dateCreated", "2020-02-20T20:20:20.222+0000")
             ).build();
         }
 
@@ -138,7 +136,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
                                        .stringValue("paymentReference", "DUMMY-PAYMENT-REF")
                                        .stringValue("status", "Initiated")
                                        .stringValue("nextUrl", "cui-page.hmcts.platform.net")
-                                       .stringValue("dateCreated","2020-02-20T20:20:20.222+0000")
+                                       .stringValue("dateCreated", "2020-02-20T20:20:20.222+0000")
             ).build();
         }
     }
