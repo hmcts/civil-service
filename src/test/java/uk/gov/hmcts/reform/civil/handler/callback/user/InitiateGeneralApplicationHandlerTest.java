@@ -152,7 +152,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
@@ -183,7 +183,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         when(featureToggleService.isPartOfNationalRollout(any())).thenReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
