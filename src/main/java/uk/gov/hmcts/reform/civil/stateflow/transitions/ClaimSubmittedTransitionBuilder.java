@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
@@ -11,15 +13,21 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
     @Autowired
@@ -52,7 +60,14 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                     FlowFlag.LIP_CASE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
                 )))
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(isLiPvLRCase)
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyWhen(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant))
+                .and(not(nocSubmittedForLiPDefendantBeforeOffline)))
+            .set(flags -> flags.putAll(
+                Map.of(
+                    FlowFlag.LIP_CASE.name(), true,
+                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                )))
+            .moveTo(SPEC_DEFENDANT_NOC).onlyWhen(nocSubmittedForLiPDefendantBeforeOffline)
             .set(flags -> flags.putAll(
                 Map.of(
                     FlowFlag.LIP_CASE.name(), true,
