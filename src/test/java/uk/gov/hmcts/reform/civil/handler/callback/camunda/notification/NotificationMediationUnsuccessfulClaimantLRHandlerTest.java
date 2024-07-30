@@ -335,8 +335,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
-                given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
-                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                given(notificationsProperties.getMediationUnsuccessfulLIPTemplate()).willReturn(CARM_LIP_MAIL_TEMPLATE);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
