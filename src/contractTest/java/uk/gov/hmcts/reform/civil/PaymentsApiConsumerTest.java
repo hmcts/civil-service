@@ -28,7 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "payments-api")
-@TestPropertySource(properties = "payments.api.url=http://localhost:8765")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
