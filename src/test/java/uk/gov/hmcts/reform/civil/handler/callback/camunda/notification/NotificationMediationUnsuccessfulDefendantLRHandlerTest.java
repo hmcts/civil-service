@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -112,14 +111,16 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
         //When
         given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -146,14 +147,14 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
-
-        //When
         given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
+        //When
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -180,14 +181,14 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
-
-        //When
         given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+        //When
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -213,14 +214,16 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
         //When
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -246,14 +249,16 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
 
         //When
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -277,14 +282,16 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
         //When
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -309,14 +316,16 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS, NOT_CONTACTABLE_DEFENDANT_ONE, NOT_CONTACTABLE_DEFENDANT_TWO)).build())
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
 
         //When
         given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(EMAIL_NO_ATTENDANCE_TEMPLATE);
         given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
         notificationHandler.handle(params);
         //Then
         verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -341,12 +350,13 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
         //When
         given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
         given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr()).willReturn(EMAIL_TEMPLATE_LIP_V_LR);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
         notificationHandler.handle(params);
         //Then

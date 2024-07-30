@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -74,13 +73,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_NO_HWF);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
@@ -105,13 +105,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_NO_HWF);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
@@ -137,13 +138,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_HWF);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
@@ -168,13 +170,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_NO_HWF);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
@@ -200,13 +203,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate()).thenReturn(
                 EMAIL_TEMPLATE_NO_HWF_BILINGUAL);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
@@ -235,13 +239,14 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             // When
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate()).thenReturn(
                 EMAIL_TEMPLATE_HWF_BILINGUAL);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
             handler.handle(params);
 
             // Then
