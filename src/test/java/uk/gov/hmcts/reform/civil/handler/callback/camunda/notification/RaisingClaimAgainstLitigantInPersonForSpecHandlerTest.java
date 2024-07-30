@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -27,27 +26,19 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler.class
-})
+@ExtendWith(MockitoExtension.class)
 class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     private static final String TEMPLATE_ID = "template-id";
 
-    @Autowired
+    @InjectMocks
     private RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler handler;
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-
-    @BeforeEach
-    void setup() {
-        when(notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline()).thenReturn(TEMPLATE_ID);
-    }
 
     @Test
     void shouldNotifyApplicantSolicitor_whenInvoked() {
@@ -56,6 +47,7 @@ class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
         // When
+        when(notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline()).thenReturn(TEMPLATE_ID);
         handler.handle(params);
 
         // Then

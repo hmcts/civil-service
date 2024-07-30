@@ -4,9 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -23,9 +24,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,36 +35,25 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandler.class,
-    NotificationsProperties.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TEMPLATE_ID = "template-id";
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
-    @Autowired
+    @InjectMocks
     private NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
-        }
 
         @Test
         void shouldNotifyRespondentLip_whenInvoked() {
@@ -85,6 +73,7 @@ class NotifyDefendantLipJudgmentVariedDeterminationOfMeansNotificationHandlerTes
                 CallbackRequest.builder().eventId(NOTIFY_DEFENDANT1_LIP_JUDGMENT_VARIED_DETERMINATION_OF_MEANS.name()).build()
             ).build();
 
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(

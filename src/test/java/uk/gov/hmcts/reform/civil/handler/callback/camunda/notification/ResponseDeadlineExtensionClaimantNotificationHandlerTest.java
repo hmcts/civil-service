@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -46,23 +46,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Re
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
-@SpringBootTest(classes = {
-    ResponseDeadlineExtensionClaimantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
-    @MockBean
+    @Mock
     private PinInPostConfiguration pipInPostConfiguration;
-    @Autowired
+    @InjectMocks
     private ResponseDeadlineExtensionClaimantNotificationHandler handler;
 
     @Nested
@@ -74,17 +71,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         private final String emailLipTemplate = "emailTemplateLip";
         private final String legacyReference = "000DC001";
 
-        @BeforeEach
-        void setUp() {
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
-            when(toggleService.isLipVLipEnabled()).thenReturn(false);
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
-
-        }
-
         @Test
         void shouldSendEmailToClaimantLR() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -94,6 +80,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -133,6 +122,8 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
             handler.handle(params);
 
             verify(notificationService).sendMail(

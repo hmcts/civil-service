@@ -7,10 +7,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -48,18 +48,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationMediationUnsuccessfulClaimantLRHandler.TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
 
-@SpringBootTest(classes = {
-    NotificationMediationUnsuccessfulClaimantLRHandler.class,
-    OrganisationDetailsService.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     OrganisationDetailsService organisationDetailsService;
     @Captor
     private ArgumentCaptor<String> targetEmail;
@@ -69,10 +65,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
     private ArgumentCaptor<Map<String, String>> notificationDataMap;
     @Captor
     private ArgumentCaptor<String> reference;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @Autowired
+    @InjectMocks
     private NotificationMediationUnsuccessfulClaimantLRHandler notificationHandler;
 
     @Nested
@@ -110,18 +106,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         private static final Map<String, String> CARM_NO_ATTENDANCE_CLAIMANT_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                                                                        CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
-        @BeforeEach
-        void setUp() {
-            given(notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate()).willReturn(EMAIL_TEMPLATE);
-            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
-            given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
-            given(notificationsProperties.getMediationUnsuccessfulLIPTemplate()).willReturn(CARM_LIP_MAIL_TEMPLATE);
-            given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
-            given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
-            given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
-            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
-        }
-
         @Test
         void shouldSendNotificationToClaimantLr_whenEventIsCalled() {
             //Given
@@ -136,6 +120,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
+            given(notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -165,6 +151,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
+            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -195,6 +182,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
+            given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -240,6 +228,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -274,6 +264,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -308,6 +300,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -341,6 +335,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -375,6 +371,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -405,6 +402,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -434,6 +433,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -464,6 +465,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -493,6 +496,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                     .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
                 //When
+                given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
+                given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),

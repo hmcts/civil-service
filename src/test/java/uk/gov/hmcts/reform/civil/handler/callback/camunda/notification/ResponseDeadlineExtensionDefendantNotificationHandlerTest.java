@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -42,20 +42,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
-@SpringBootTest(classes = {
-    ResponseDeadlineExtensionDefendantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
-    @Autowired
+    @InjectMocks
     private ResponseDeadlineExtensionDefendantNotificationHandler handler;
 
     @Nested
@@ -65,14 +62,6 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
         private final String emailTemplateWelsh = "emailTemplateWelsh";
         private final String defendantEmail = "sherlock@scotlandyard.co.uk";
         private final String legacyReference = "000MC001";
-
-        @BeforeEach
-        void setUp() {
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            given(notificationsProperties.getRespondentDeadlineExtensionWelsh()).willReturn(emailTemplateWelsh);
-            given(notificationsProperties.getRespondentDeadlineExtension()).willReturn(emailTemplate);
-        }
 
         @Test
         void shouldSendEmailToLipDefendantNotBilingual() {
@@ -95,6 +84,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            given(notificationsProperties.getRespondentDeadlineExtension()).willReturn(emailTemplate);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -128,6 +118,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            given(notificationsProperties.getRespondentDeadlineExtensionWelsh()).willReturn(emailTemplateWelsh);
             handler.handle(params);
 
             verify(notificationService).sendMail(
