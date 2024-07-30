@@ -1,0 +1,81 @@
+package uk.gov.hmcts.reform.civil.validation;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.model.Address;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PartyValidator {
+
+    public static int ADDRESS_MAX_LENGTH_ALLOWED = 35;
+
+    public static int NAME_MAX_LENGTH_ALLOWED = 70;
+
+    public static String ADDRESS_LENGTH_ERROR = "exceeds maximum length 35";
+
+    public static String NAME_LENGTH_ERROR = "Name exceeds maximum length 70";
+
+    public static String WELSH_CHARS = ".*[ˆ`´¨].*";
+
+    public static String WELSH_CHAR_ERROR = "Special characters are not allowed";
+
+
+    public List<String> validateAddress(Address primaryAddress, List<String> errors) {
+
+        if (primaryAddress != null) {
+            if (exceedsLength(primaryAddress.getAddressLine1(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("Building and Street " + ADDRESS_LENGTH_ERROR);
+            }
+            if (exceedsLength(primaryAddress.getAddressLine2(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("Address Line 2 " + ADDRESS_LENGTH_ERROR);
+            }
+            if (exceedsLength(primaryAddress.getAddressLine3(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("Address Line 3 " + ADDRESS_LENGTH_ERROR);
+            }
+            if (exceedsLength(primaryAddress.getPostTown(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("Post town  " + ADDRESS_LENGTH_ERROR);
+            }
+            if (exceedsLength(primaryAddress.getCounty(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("County " + ADDRESS_LENGTH_ERROR);
+            }
+            if (exceedsLength(primaryAddress.getPostCode(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+                errors.add("Postcode " + ADDRESS_LENGTH_ERROR);
+            }
+
+            if (hasWelshChars(primaryAddress.getAddressLine1()) || hasWelshChars(primaryAddress.getAddressLine2())
+                || hasWelshChars(primaryAddress.getAddressLine3()) || hasWelshChars(primaryAddress.getPostTown())
+                || hasWelshChars(primaryAddress.getCounty()) || hasWelshChars(primaryAddress.getPostCode())) {
+                errors.add(WELSH_CHAR_ERROR);
+            }
+        }
+        return errors;
+    }
+
+    public List<String> validateName(String partyName, List<String> errors) {
+
+        if (exceedsLength(partyName, NAME_MAX_LENGTH_ALLOWED)) {
+            errors.add(NAME_LENGTH_ERROR);
+        }
+        return errors;
+    }
+
+    private boolean hasWelshChars(String strToMatch) {
+
+        if (strToMatch != null && strToMatch.matches(WELSH_CHARS)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean exceedsLength(String strToCheck, int length) {
+
+        if (strToCheck != null && strToCheck.length() > length) {
+            return true;
+        }
+        return false;
+    }
+
+}

@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
@@ -190,6 +191,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private final AirlineEpimsService airlineEpimsService;
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -275,6 +277,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        partyValidator.validateAddress(applicant.getPrimaryAddress(), errors);
+        partyValidator.validateName(applicant.getPartyName(), errors);
+
         if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
