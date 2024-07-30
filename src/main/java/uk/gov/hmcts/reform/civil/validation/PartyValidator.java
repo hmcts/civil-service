@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.Address;
 
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PartyValidator {
@@ -21,7 +20,6 @@ public class PartyValidator {
     public static String WELSH_CHARS = ".*[ˆ`´¨].*";
 
     public static String WELSH_CHAR_ERROR = "Special characters are not allowed";
-
 
     public List<String> validateAddress(Address primaryAddress, List<String> errors) {
 
@@ -77,5 +75,4 @@ public class PartyValidator {
         }
         return false;
     }
-
 }

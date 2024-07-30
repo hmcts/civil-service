@@ -274,12 +274,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams,
                                                      Function<CaseData, Party> getApplicant) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         partyValidator.validateAddress(applicant.getPrimaryAddress(), errors);
         partyValidator.validateName(applicant.getPartyName(), errors);
 
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (errors.isEmpty() && callbackParams.getRequest().getEventId() != null) {
             errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
