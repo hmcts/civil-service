@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
@@ -26,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -60,11 +58,26 @@ import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuil
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    InitiateGeneralApplicationServiceHelper.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class InitiateGeneralApplicationServiceHelperTest {
+
+    @InjectMocks
+    private InitiateGeneralApplicationServiceHelper helper;
+
+    @Mock
+    private CaseAssignmentApi caseAssignmentApi;
+
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private CrossAccessUserConfiguration crossAccessUserConfiguration;
+
+    @Mock
+    protected IdamClient idamClient;
 
     private static final String TEST_USER_EMAILID = "test@gmail.com";
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
@@ -72,44 +85,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
     public static final String CL_LIP_USER_ID = "456";
     public static final String DEF_LIP_USER_ID = "123";
 
-    @Autowired
-    private InitiateGeneralApplicationServiceHelper helper;
-
-    @MockBean
-    private CaseAssignmentApi caseAssignmentApi;
-
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private UserService userService;
-
-    @MockBean
-    private CrossAccessUserConfiguration crossAccessUserConfiguration;
-
-    @MockBean
-    protected IdamClient idamClient;
-
-    @MockBean
-    protected UserRoleCaching userRoleCaching;
-
     public UserDetails getUserDetails(String id, String email) {
         return UserDetails.builder().id(id)
                 .email(email)
                 .build();
-    }
-
-    @BeforeEach
-    void setup() {
-        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
-                .thenReturn(CaseAssignmentUserRolesResource.builder()
-                        .caseAssignmentUserRoles(getCaseAssignmentApplicantUserRoles()).build());
-
-        when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
-                .thenReturn(CaseAssignmentUserRolesResource.builder()
-                        .caseAssignmentUserRoles(List.of(
-                                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
-                                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build())).build());
     }
 
     public List<CaseAssignmentUserRole> getCaseAssignmentApplicantUserRoles() {
@@ -212,6 +191,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Test
     void shouldReturnsFourRespondents() {
+        when(caseAssignmentApi.getUserRoles(any(), any(), any()))
+                .thenReturn(CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(getCaseAssignmentApplicantUserRoles()).build());
 
         GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
@@ -442,7 +424,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsers()).build());
-        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
                 CaseData.builder().ccdCaseReference(1234L)
@@ -491,7 +472,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
-        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
                 CaseData.builder().ccdCaseReference(1234L)
@@ -543,7 +523,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
-        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
                 GeneralApplication.builder().build(),
                 CaseData.builder().ccdCaseReference(1234L)
@@ -612,7 +591,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lr_Vs_Lip_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -658,7 +637,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsApp_Lr_Vs_Lip_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -696,7 +675,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -735,7 +714,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -776,7 +755,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldWork_Lip_Vs_Lip() {
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -816,7 +795,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldUrgency_Lip_Vs_Lip_at_10thDay() {
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 10).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 10).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -858,7 +837,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldNotUrgency_Lip_Vs_Lip_at_11thDay() {
-            CaseData.CaseDataBuilder caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
