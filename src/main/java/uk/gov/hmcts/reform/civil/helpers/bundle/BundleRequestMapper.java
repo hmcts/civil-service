@@ -446,20 +446,20 @@ public class BundleRequestMapper {
                                             witnessEvidence.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
                                                 && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
                                                 UNBUNDLED_FOLDER)).toList().forEach(uploadEvidenceWitnessElement -> {
-                                                String docName = generateDocName(
+                                                    String docName = generateDocName(
                                                     displayName,
                                                     uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                     String.valueOf(witnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1),
                                                     uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
                                                 );
-                                                bundlingRequestDocuments.add(buildBundlingRequestDoc(
+                                                    bundlingRequestDocuments.add(buildBundlingRequestDoc(
                                                     docName,
                                                     uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(),
                                                     documentType
                                                 ));
-                                            })
+                                                })
             );
-        }else{
+        } else {
             witnessStatmentsMap.forEach((witnessName, witnessEvidence) ->
                                             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
                                                 String docName = generateDocName(
@@ -748,7 +748,8 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
             if (featureToggleService.isCaseEventsEnabled()) {
-                witnessEvidence = new ArrayList<>(witnessEvidence.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
+                witnessEvidence = new ArrayList<>(witnessEvidence.stream()
+                                                      .filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
                     && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
                     UNBUNDLED_FOLDER)).toList());
             }
