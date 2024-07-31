@@ -1,23 +1,22 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
+import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
@@ -40,32 +39,25 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    TrialReadyNotifyOthersHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @Autowired
+    @InjectMocks
     private TrialReadyNotifyOthersHandler handler;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
-            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
-                .thenReturn("cui-template-id-bilingual");
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
@@ -83,6 +75,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyApplicant_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
@@ -100,6 +94,9 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyApplicant_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("cui-template-id-bilingual");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -118,6 +115,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyApplicantWithNoEmail_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false)
                 .claimantUserDetails(new IdamUserDetails().toBuilder().email("email@email.com").build()).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -136,6 +135,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
+            when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
@@ -153,6 +154,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyRespondent1_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
@@ -187,6 +190,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
+            when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY.name()).build()
@@ -204,6 +209,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyRespondent2_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY.name()).build()

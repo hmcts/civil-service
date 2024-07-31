@@ -208,7 +208,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty();
+        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
     }
 
     @Override
@@ -453,5 +453,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return isPaperResponse()
             && (caseData.getBusinessProcess() != null
             && CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name().equals(caseData.getBusinessProcess().getCamundaEvent()));
+    }
+
+    public boolean isDefaultJudgementIssued() {
+        return false;
     }
 }

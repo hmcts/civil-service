@@ -110,39 +110,23 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
-
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            // If Pre SDO allow GA in all locations.
-            // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
-            if (inStateAfterJudicialReferral(caseData.getCcdState())
-                && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-            if (!inStateAfterJudicialReferral(caseData.getCcdState()) && !featureToggleService.isGenAppsAllowedPreSdo()) {
-                log.info("Gen apps for case {} not allowed pre sdo", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
-        } else {
-            if (featureToggleService.isEarlyAdoptersEnabled()
-                && (Objects.isNull(caseData.getCaseManagementLocation())
-                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                      .getBaseLocation())))) {
-                log.info("Gen apps for case {} not whitelisted in case progression", caseData.getCcdCaseReference());
-                errors.add(NOT_IN_EA_REGION);
-            }
+        // If Pre SDO allow GA in all locations.
+        // If Post SDO including JUDICIAL REFERRAL, allow GA in all locations, except Birmingham
+        if (inStateAfterJudicialReferral(caseData.getCcdState())
+            && !featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Gen apps for case {} not part of national rollout, post SDO", caseData.getCcdCaseReference());
+            errors.add(NOT_IN_EA_REGION);
         }
 
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseContainsLiP(caseData)) {
+        if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()) {
                 errors.add(LR_VS_LIP);
             } else {
@@ -154,6 +138,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 }
             }
         }
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -362,10 +347,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
-    }
-
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private boolean inStateAfterJudicialReferral(CaseState state) {

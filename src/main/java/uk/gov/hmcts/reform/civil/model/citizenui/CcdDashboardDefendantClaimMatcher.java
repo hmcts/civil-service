@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
@@ -89,7 +91,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isEligibleForCCJ() {
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() == null;
+            && caseData.getPaymentTypeSelection() == null && null == caseData.getActiveJudgment();
     }
 
     @Override
@@ -195,7 +197,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHearingFormGenerated() {
-        return !caseData.getHearingDocuments().isEmpty();
+        return !caseData.getHearingDocuments().isEmpty() && !isPaperResponse();
     }
 
     @Override
@@ -412,7 +414,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     public boolean isWaitingForClaimantIntentDocUpload() {
-        return false;
+        return caseData.isRespondentResponseFullDefence()
+            && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
+            && caseData.isClaimantBilingual();
     }
 
     @Override
@@ -429,4 +434,12 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isNocForDefendant() {
         return false;
     }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return nonNull(caseData.getActiveJudgment())
+            && DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
+            && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState());
+    }
+
 }

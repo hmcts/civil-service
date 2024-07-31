@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
@@ -149,10 +150,22 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
             item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
         }
-        if (caseData.getActiveJudgment() != null) {
-            item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
+
+        if (caseData.hasApplicant1AcceptedCcj()) {
+            item.setCcjRequestedDate(caseData.getApplicant1ResponseDate());
         }
 
+        if (caseData.getActiveJudgment() != null) {
+            item.setCcjRequestedDate(caseData.getActiveJudgment().getCreatedTimestamp());
+        } else if (caseData.isCcjRequestJudgmentByAdmission()) {
+            item.setCcjRequestedDate(caseData.getApplicant1ResponseDate());
+        }
+
+        if (caseData.getActiveJudgment() != null
+            && caseData.getActiveJudgment().getType().equals(JudgmentType.DEFAULT_JUDGMENT)
+            && caseData.getActiveJudgment().getIssueDate() != null) {
+            item.setDefaultJudgementIssuedDate(caseData.getActiveJudgment().getIssueDate());
+        }
         return item;
     }
 
