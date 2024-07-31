@@ -23,7 +23,7 @@ class UncaughtExceptionHandlerTest {
     private UncaughtExceptionHandler uncaughtExceptionHandler;
 
     @Test
-    void shouldReturnNotFound_whenCallbackExceptionThrown() {
+    void shouldReturnInternalServerError_whenUncaughtExceptionThrown() {
         Exception e = new NullPointerException(NULL_POINTER_EXCEPTION);
         ResponseEntity<?> result = uncaughtExceptionHandler.runtimeException(e);
 
