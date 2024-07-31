@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.CP.Bundle.Updated.Claimant',
-        '{Notice.AAA6.CP.Bundle.Ready.Claimant"}',
+        '{"Notice.AAA6.CP.Bundle.Ready.Claimant"}',
         '{"Notice.AAA6.CP.Bundle.Updated.Claimant": ["bundleRestitchedDateEn", "bundleRestitchedDateCy"]}'),
        ('Scenario.AAA6.CP.Bundle.Updated.Defendant',
         '{"Notice.AAA6.CP.Bundle.Ready.Defendant"}',
