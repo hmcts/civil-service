@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -249,5 +250,37 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
                 PARTY_NAME, "John Doe"
             );
         }
+    }
+
+    @Test
+    void addPropertiesLipForApplicant() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                             .type(Party.Type.INDIVIDUAL).build()).build();
+
+        Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_APPLICANT);
+
+        assertThat(properties).containsEntry("claimReferenceNumber", "000DC001");
+        assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
+        assertThat(properties).containsEntry("name", "John Doe");
+    }
+
+    @Test
+    void addPropertiesLipForRespondent() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                             .type(Party.Type.INDIVIDUAL).build()).build();
+
+        Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_DEFENDANT1);
+
+        assertThat(properties).containsEntry("claimReferenceNumber", "000DC001");
+        assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
+        assertThat(properties).containsEntry("name", "Jack Jackson");
     }
 }
