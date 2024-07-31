@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.CP.HearingFee.HWF.InvalidRef', '{"Notice.AAA6.CP.HearingFee.HWF.Requested"}',
+VALUES ('Scenario.AAA6.CP.HearingFee.HWF.InvalidRef', '{"Notice.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant"}',
         '{"Notice.AAA6.CP.HearingFee.HWF.InvalidRef" : ["hearingDueDateEn", "hearingDueDateCy"]}');
 
 /**

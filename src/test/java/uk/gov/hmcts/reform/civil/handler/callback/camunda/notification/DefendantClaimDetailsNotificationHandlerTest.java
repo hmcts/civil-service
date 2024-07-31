@@ -1,23 +1,24 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -42,29 +43,29 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
-@SpringBootTest(classes = {
-    DeadlinesCalculator.class,
-    DefendantClaimDetailsNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
+    private DefendantClaimDetailsNotificationHandler handler;
+
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
+
+    @Mock
+    private ToggleConfiguration toggleConfiguration;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     public static final String REFERENCE = "claim-details-respondent-notification-000DC001";
     public static final String templateId = "17151a5a-00b1-48b7-8e45-38a5f20b6ec0";
-    @MockBean
-    private NotificationService notificationService;
-
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-
-    @Autowired
-    private DefendantClaimDetailsNotificationHandler handler;
-
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
-
-    @MockBean
-    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToSubmitCallback {
@@ -75,12 +76,13 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
-            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
         }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                                     .request(CallbackRequest.builder()
@@ -98,6 +100,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC.name())
@@ -126,6 +130,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_InOneVsTwoCaseSameSolicitor() {
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();
@@ -148,6 +154,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_InOneVsTwoCaseDifferentSolicitor() {
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();
@@ -170,6 +178,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .build();

@@ -132,6 +132,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private UserService userService;
+
     @MockBean
     private UserRoleCaching userRoleCaching;
 
@@ -200,16 +201,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .caseReference(1L)
                 .respondent1OrganisationPolicy(respondent1Organization)
                 .build();
-            List<String> userRoles = new ArrayList<>(Arrays.asList(
-                "[APPLICANTSOLICITORONE]",
-                "[RESPONDENTSOLICITORONE]"
-            ));
-            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
+            assertThat(service.respondentAssigned(caseData)).isTrue();
         }
 
         @Test
@@ -222,7 +218,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
         /* 1V2 Same defendant org scenarios */
@@ -234,16 +230,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .respondent1OrganisationPolicy(respondent1Organization)
                 .respondent2OrganisationPolicy(respondent2Organization)
                 .build();
-            List<String> userRoles = new ArrayList<>(Arrays.asList(
-                "[APPLICANTSOLICITORONE]",
-                "[RESPONDENTSOLICITORONE]"
-            ));
-            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
+            assertThat(service.respondentAssigned(caseData)).isTrue();
         }
 
         @Test
@@ -254,17 +245,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .respondent1OrganisationPolicy(respondent1Organization)
                 .respondent2OrganisationPolicy(respondent2Organization)
                 .build();
-            List<String> userRoles = new ArrayList<>(Arrays.asList(
-                "[APPLICANTSOLICITORONE]",
-                "[RESPONDENTSOLICITORONE]",
-                "[RESPONDENTSOLICITORTWO]"
-            ));
-            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
+            assertThat(service.respondentAssigned(caseData)).isTrue();
         }
 
         @Test
@@ -279,7 +264,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
         @Test
@@ -294,7 +279,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
         /* 1V2 Different defendant org scenarios */
@@ -307,17 +292,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .respondent1OrganisationPolicy(respondent1Organization)
                 .respondent2OrganisationPolicy(respondent2Organization)
                 .build();
-            List<String> userRoles = new ArrayList<>(Arrays.asList(
-                "[APPLICANTSOLICITORONE]",
-                "[RESPONDENTSOLICITORONE]",
-                "[RESPONDENTSOLICITORTWO]"
-            ));
-            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isTrue();
+            assertThat(service.respondentAssigned(caseData)).isTrue();
         }
 
         @Test
@@ -332,7 +311,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
         @Test
@@ -347,7 +326,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent1SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
 
         @Test
@@ -362,7 +341,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                                 .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
-            assertThat(service.respondentAssigned(caseData, authToken)).isFalse();
+            assertThat(service.respondentAssigned(caseData)).isFalse();
         }
     }
 

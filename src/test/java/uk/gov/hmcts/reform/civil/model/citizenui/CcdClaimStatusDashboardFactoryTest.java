@@ -30,6 +30,9 @@ import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -693,5 +696,17 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_APPLY_NOC);
+    }
+
+    @Test
+    void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus() {
+        CaseData claim =
+            CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+                JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT).issueDate(LocalDate.now())
+                    .state(JudgmentState.ISSUED).build()).build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(claim,
+                                                                                                         featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_ISSUED);
     }
 }
