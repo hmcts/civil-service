@@ -748,9 +748,9 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
             if (featureToggleService.isCaseEventsEnabled()) {
-                witnessEvidence = witnessEvidence.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
+                witnessEvidence = new ArrayList<>(witnessEvidence.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID() != null
                     && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
-                    UNBUNDLED_FOLDER)).toList();
+                    UNBUNDLED_FOLDER)).toList());
             }
             sortWitnessListByDate(witnessEvidence,
                                   !documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
@@ -784,10 +784,11 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
             if (featureToggleService.isCaseEventsEnabled()) {
-                evidenceUploadDocList = evidenceUploadDocList.stream()
+                evidenceUploadDocList = new ArrayList<>(evidenceUploadDocList.stream()
                     .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentUpload().getCategoryID() != null
-                        && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
+                        && !caseDocumentElement.getValue().getDocumentUpload().getCategoryID().equals(UNBUNDLED_FOLDER)).toList());
             }
+
             sortEvidenceUploadByDate(evidenceUploadDocList,
                                      documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
                                          || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())
@@ -847,8 +848,8 @@ public class BundleRequestMapper {
 
         if (evidenceUploadExpert != null) {
             if (featureToggleService.isCaseEventsEnabled()) {
-                evidenceUploadExpert = evidenceUploadExpert.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
-                    && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList();
+                evidenceUploadExpert = new ArrayList<>(evidenceUploadExpert.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
+                    && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList());
             }
             sortExpertListByDate(evidenceUploadExpert);
             evidenceUploadExpert.forEach(expertElement -> {
