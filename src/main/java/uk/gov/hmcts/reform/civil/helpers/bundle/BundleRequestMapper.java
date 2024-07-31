@@ -447,16 +447,16 @@ public class BundleRequestMapper {
                                                 && !caseDocumentElement.getValue().getWitnessOptionDocument().getCategoryID().equals(
                                                 UNBUNDLED_FOLDER)).toList().forEach(uploadEvidenceWitnessElement -> {
                                                     String docName = generateDocName(
-                                                    displayName,
-                                                    uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
-                                                    String.valueOf(witnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1),
-                                                    uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
-                                                );
+                                                        displayName,
+                                                        uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                                                        String.valueOf(witnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1),
+                                                        uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                                                    );
                                                     bundlingRequestDocuments.add(buildBundlingRequestDoc(
-                                                    docName,
-                                                    uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(),
-                                                    documentType
-                                                ));
+                                                        docName,
+                                                        uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(),
+                                                        documentType
+                                                    ));
                                                 })
             );
         } else {
@@ -849,7 +849,8 @@ public class BundleRequestMapper {
 
         if (evidenceUploadExpert != null) {
             if (featureToggleService.isCaseEventsEnabled()) {
-                evidenceUploadExpert = new ArrayList<>(evidenceUploadExpert.stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
+                evidenceUploadExpert = new ArrayList<>(evidenceUploadExpert.stream()
+                                                           .filter(caseDocumentElement -> caseDocumentElement.getValue().getExpertDocument().getCategoryID() != null
                     && !caseDocumentElement.getValue().getExpertDocument().getCategoryID().equals(UNBUNDLED_FOLDER)).toList());
             }
             sortExpertListByDate(evidenceUploadExpert);

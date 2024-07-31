@@ -196,21 +196,6 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
     }
 
-//    @Test
-//    void testBundleRequestMapperWhenDirectionsHaveUnbundledFolderCategoryId() {
-//        // Given
-//        CaseData caseData = getCaseDataWithUnbundledFolderId();
-//        given(featureToggleService.isCaseEventsEnabled()).willReturn(true);
-//        // When
-//        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
-//            ".yaml", "test", "test"
-//        );
-//        // Then
-//        assertNotNull(bundleCreateRequest);
-//        assertEquals("Directions Questionnaire 10/06/2023",
-//                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
-//    }
-
     private CaseData getCaseDataWithNoId() {
         return CaseData.builder().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
