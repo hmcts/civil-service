@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -47,28 +45,31 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RequestForReconsiderationCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private RequestForReconsiderationCallbackHandler handler;
 
-    @Autowired
+    @Mock
     private ObjectMapper objectMapper;
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
-    @MockBean
+    @Mock
     private LiPRequestReconsiderationGeneratorService documentService;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @Autowired
+    @Mock
     private UserService userService;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        handler = new RequestForReconsiderationCallbackHandler(objectMapper, userService, coreCaseUserService, documentService, featureToggleService);
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
         " your notifications/dashboard for an update.";
@@ -147,8 +148,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -169,8 +168,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                                                        .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -237,8 +234,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .totalClaimAmount(new BigDecimal(1200))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -559,7 +554,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -589,7 +583,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
