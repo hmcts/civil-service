@@ -43,7 +43,7 @@ public class ClaimSubmittedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions() {
-        assertThat(result).hasSize(6);
+        assertThat(result).hasSize(7);
 
         assertTransition(result.get(0), "MAIN.CLAIM_SUBMITTED", "MAIN.CLAIM_ISSUED_PAYMENT_SUCCESSFUL");
         assertTransition(result.get(1), "MAIN.CLAIM_SUBMITTED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
@@ -51,6 +51,7 @@ public class ClaimSubmittedTransitionBuilderTest {
         assertTransition(result.get(3), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(4), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
         assertTransition(result.get(5), "MAIN.CLAIM_SUBMITTED", "MAIN.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC");
+        assertTransition(result.get(6), "MAIN.CLAIM_SUBMITTED", "MAIN.SPEC_DEFENDANT_NOC");
     }
 
     @Test
