@@ -70,6 +70,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         handler = new RequestForReconsiderationCallbackHandler(objectMapper, userService, coreCaseUserService, documentService, featureToggleService);
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
+
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
         " your notifications/dashboard for an update.";
