@@ -183,6 +183,11 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("4 March 2024");
         assertThat(result).extracting("trialArrangementDeadlineCy")
             .isEqualTo("4 Mawrth 2024");
+        assertThat(result).extracting("bundleRestitchedDateEn").
+            isEqualTo(DateUtils.formatDate(LocalDate.now()));
+        assertThat(result).extracting("bundleRestitchedDateCy").
+            isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
+
     }
 
     @ParameterizedTest

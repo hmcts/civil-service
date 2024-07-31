@@ -240,6 +240,9 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
         }
 
+        params.put("bundleRestitchedDateEn", DateUtils.formatDate(LocalDate.now()));
+        params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+
         return params;
     }
 
