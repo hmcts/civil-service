@@ -24,30 +24,30 @@ public class PartyValidator {
 
     public List<String> validateAddress(Address primaryAddress, List<String> errors) {
 
-            if (exceedsLength(primaryAddress.getAddressLine1(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("Building and Street " + ADDRESS_LENGTH_ERROR);
-            }
-            if (exceedsLength(primaryAddress.getAddressLine2(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("Address Line 2 " + ADDRESS_LENGTH_ERROR);
-            }
-            if (exceedsLength(primaryAddress.getAddressLine3(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("Address Line 3 " + ADDRESS_LENGTH_ERROR);
-            }
-            if (exceedsLength(primaryAddress.getPostTown(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("Post town  " + ADDRESS_LENGTH_ERROR);
-            }
-            if (exceedsLength(primaryAddress.getCounty(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("County " + ADDRESS_LENGTH_ERROR);
-            }
-            if (exceedsLength(primaryAddress.getPostCode(), ADDRESS_MAX_LENGTH_ALLOWED)) {
-                errors.add("Postcode " + ADDRESS_LENGTH_ERROR);
-            }
+        if (exceedsLength(primaryAddress.getAddressLine1(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("Building and Street " + ADDRESS_LENGTH_ERROR);
+        }
+        if (exceedsLength(primaryAddress.getAddressLine2(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("Address Line 2 " + ADDRESS_LENGTH_ERROR);
+        }
+        if (exceedsLength(primaryAddress.getAddressLine3(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("Address Line 3 " + ADDRESS_LENGTH_ERROR);
+        }
+        if (exceedsLength(primaryAddress.getPostTown(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("Post town  " + ADDRESS_LENGTH_ERROR);
+        }
+        if (exceedsLength(primaryAddress.getCounty(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("County " + ADDRESS_LENGTH_ERROR);
+        }
+        if (exceedsLength(primaryAddress.getPostCode(), ADDRESS_MAX_LENGTH_ALLOWED)) {
+            errors.add("Postcode " + ADDRESS_LENGTH_ERROR);
+        }
 
-            if (hasWelshChars(primaryAddress.getAddressLine1()) || hasWelshChars(primaryAddress.getAddressLine2())
-                || hasWelshChars(primaryAddress.getAddressLine3()) || hasWelshChars(primaryAddress.getPostTown())
-                || hasWelshChars(primaryAddress.getCounty()) || hasWelshChars(primaryAddress.getPostCode())) {
-                errors.add(WELSH_CHAR_ERROR);
-            }
+        if (hasWelshChars(primaryAddress.getAddressLine1()) || hasWelshChars(primaryAddress.getAddressLine2())
+            || hasWelshChars(primaryAddress.getAddressLine3()) || hasWelshChars(primaryAddress.getPostTown())
+            || hasWelshChars(primaryAddress.getCounty()) || hasWelshChars(primaryAddress.getPostCode())) {
+            errors.add(WELSH_CHAR_ERROR);
+        }
         return errors;
     }
 
