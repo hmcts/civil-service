@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -106,7 +106,7 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
                         .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                          .applicant1ClaimSettledDate(LocalDate.now()).build())
                         .applicant1Represented(YesOrNo.YES).build(),
-                    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_LR_CLAIMANT.getScenario()
+                    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario()
                 }
             );
         }
