@@ -21,9 +21,11 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
@@ -93,6 +95,8 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
         } else if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
+        } else if (isLrvLipFullDefenceNotProceed(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
         }
         return null;
     }
@@ -181,7 +185,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
-                && caseData.getRespondent1().isCompanyOROrganisation()
+                && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
                 && caseData.hasApplicantRejectedRepaymentPlan());
     }
 
@@ -194,5 +198,12 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && !caseData.isApplicantLiP()
             && caseData.hasApplicantAcceptedRepaymentPlan()
             && caseData.isCcjRequestJudgmentByAdmission();
+    }
+
+    private boolean isLrvLipFullDefenceNotProceed(CaseData caseData) {
+        return !caseData.isApplicantLiP()
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            && NO.equals(caseData.getApplicant1ProceedWithClaim())
+            && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
     }
 }
