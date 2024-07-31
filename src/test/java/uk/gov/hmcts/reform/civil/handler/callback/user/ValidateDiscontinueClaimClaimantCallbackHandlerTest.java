@@ -199,6 +199,24 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
         }
+
+        @Test
+        void shouldDiscontinueCase_When2v1FullDiscontinuanceAgainstBothClaimantAndAboutToSubmitIsInvoked() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setSelectedClaimantForDiscontinuance("Both");
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+        }
     }
 
     @Nested

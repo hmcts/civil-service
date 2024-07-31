@@ -20,11 +20,11 @@ VALUES ('Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant',
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order, hint_text_en, hint_text_cy)
-values ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>',
-        'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant','{3, 3}', 'CLAIMANT', 11, null, null),
-        ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>',
-        'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant','{3, 3}', 'CLAIMANT', 11, null, null),
-       ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>',
-        'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.NotUploaded.Defendant','{3, 3}', 'DEFENDANT', 11, null, null),
-        ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>',
-        'Hearing', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant','{3, 3}', 'DEFENDANT', 11, null, null);
+values ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">Gweld y dogfennau</a>',
+        'Gwrandawiad', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant','{3, 3}', 'CLAIMANT', 11, null, null),
+        ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">Gweld y dogfennau</a>',
+        'Gwrandawiad', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant','{3, 3}', 'CLAIMANT', 11, null, null),
+       ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">Gweld y dogfennau</a>',
+        'Gwrandawiad', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.NotUploaded.Defendant','{3, 3}', 'DEFENDANT', 11, null, null),
+        ('<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">View documents</a>', 'Hearing' ,'<a href="{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}" class="govuk-link">Gweld y dogfennau</a>',
+        'Gwrandawiad', 'Hearing.Document.View', 'Scenario.AAA6.CP.HearingDocuments.Uploaded.Defendant','{3, 3}', 'DEFENDANT', 11, null, null);
