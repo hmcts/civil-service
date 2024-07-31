@@ -29,22 +29,18 @@ class PartyValidatorTest {
         @Test
         void shouldReturn_error_when_length_exceeds() {
             String name = "Mr Testing for maxlength 70 error First name and last name this name should throw error";
-            LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
             List<String> errors = new ArrayList<>();
 
             validator.validateName(name, errors);
-
             assertThat(errors).isNotEmpty();
         }
 
         @Test
         void shouldNotReturn_error_when_length_exceeds() {
             String name = "Mr ABC TEST";
-            LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
             List<String> errors = new ArrayList<>();
 
             validator.validateName(name, errors);
-
             assertThat(errors).isEmpty();
         }
 
@@ -64,7 +60,7 @@ class PartyValidatorTest {
     @Nested
     class ValidateAddress {
         @Test
-        public void should_return_max_length_error() {
+        void should_return_max_length_error() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Line 1 test again for more than 35 characters")
                 .addressLine2("Line 1 test again for more than 35 characters")
@@ -78,11 +74,11 @@ class PartyValidatorTest {
             validator.validateAddress(primaryAddress, errors);
 
             assertThat(errors).isNotEmpty();
-            assertThat(errors.size()).isEqualTo(6);
+            assertThat(errors).hasSize(6);
         }
 
         @Test
-        public void should_not_return_max_length_error() {
+        void should_not_return_max_length_error() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .addressLine2("Proper address")
@@ -99,7 +95,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_line1() {
+        void should_not_return_Special_character_error_address_line1() {
             Address primaryAddress = Address.builder()
                 .addressLine1("ˆProper address")
                 .build();
@@ -110,7 +106,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_line2() {
+        void should_not_return_Special_character_error_address_line2() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .addressLine2("`Proper address")
@@ -122,7 +118,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_line3() {
+        void should_not_return_Special_character_error_address_line3() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .addressLine3("´Proper address")
@@ -134,7 +130,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_posttown() {
+        void should_not_return_Special_character_error_address_posttown() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .postTown(" ¨Proper address")
@@ -146,7 +142,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_postcode() {
+        void should_not_return_Special_character_error_address_postcode() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .postCode(" ¨Proper address")
@@ -158,7 +154,7 @@ class PartyValidatorTest {
         }
 
         @Test
-        public void should_not_return_Special_character_error_address_county() {
+        void should_not_return_Special_character_error_address_county() {
             Address primaryAddress = Address.builder()
                 .addressLine1("Proper address")
                 .county(" ¨Proper address")

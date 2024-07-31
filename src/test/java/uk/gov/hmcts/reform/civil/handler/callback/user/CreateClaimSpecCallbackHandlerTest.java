@@ -296,8 +296,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().plusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -313,8 +313,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().plusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -330,8 +330,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().minusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -347,8 +347,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().minusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -365,12 +365,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder().type(Party.Type.ORGANISATION)
                                 .primaryAddress(Address.builder()
-                                .addressLine1("Line 1 test again for more than 35 characters")
-                                .addressLine2("Line 1 test again for more than 35 characters")
-                                .addressLine3("Line 1 test again for more than 35 characters")
-                                .county("Line 1 test again for more than 35 characters")
-                                .postCode("Line 1 test again for more than 35 characters")
-                                .postTown("Line 1 test again for more than 35 characters").build())
+                                                    .addressLine1("Line 1 test again for more than 35 characters")
+                                                    .addressLine2("Line 1 test again for more than 35 characters")
+                                                    .addressLine3("Line 1 test again for more than 35 characters")
+                                                    .county("Line 1 test again for more than 35 characters")
+                                                    .postCode("Line 1 test again for more than 35 characters")
+                                                    .postTown("Line 1 test again for more than 35 characters").build())
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -380,7 +380,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors().size()).isEqualTo(6);
+            assertThat(response.getErrors()).hasSize(6);
 
         }
 
@@ -392,7 +392,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .type(Party.Type.COMPANY)
                                 .primaryAddress(Address.builder().addressLine1("TEST").build())
                                 .companyName("MR This is very long nam exceeds 70 characters to throw"
-                                                            + " error for max length allowed").build())
+                                                 + " error for max length allowed").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -412,7 +412,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualFirstName("This is very long name")
                                 .individualTitle("MR")
                                 .individualLastName("exceeds 70 characters to throw error for max length allowed")
-                .build())
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -450,7 +450,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder()
                                 .type(Party.Type.ORGANISATION)
                                 .organisationName("This is very long name exceeds 70 characters "
-                                                                 + " to throw error for max length allowed")
+                                                      + " to throw error for max length allowed")
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -473,8 +473,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().plusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -490,8 +490,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().plusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -507,8 +507,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().minusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -524,8 +524,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().minusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -574,8 +574,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
             // Given
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                .particularsOfClaimText("Some string")
-                .build()).build();
+                                                                        .particularsOfClaimText("Some string")
+                                                                        .build()).build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             // When
@@ -729,8 +729,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                    .email("email@example.com")
-                    .build())
+                                                    .email("email@example.com")
+                                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1017,12 +1017,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
             claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(1000)).claimReason("Test reason1").build()).build());
+                                       .value(ClaimAmountBreakupDetails.builder()
+                                                  .claimAmount(new BigDecimal(1000)).claimReason("Test reason1").build()).build());
 
             claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(2000)).claimReason("Test reason2").build()).build());
+                                       .value(ClaimAmountBreakupDetails.builder()
+                                                  .claimAmount(new BigDecimal(2000)).claimReason("Test reason2").build()).build());
 
             CaseData caseData = CaseData.builder().claimAmountBreakup(claimAmountBreakup).build();
 
@@ -1046,10 +1046,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
             claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(10000000))
-                    .claimReason("Test reason1").build())
-                .build());
+                                       .value(ClaimAmountBreakupDetails.builder()
+                                                  .claimAmount(new BigDecimal(10000000))
+                                                  .claimReason("Test reason1").build())
+                                       .build());
             CaseData caseData = CaseData.builder().claimAmountBreakup(claimAmountBreakup).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "amount-breakup");
             // When
@@ -1068,7 +1068,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().claimInterest(YES)
                 .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
                 .sameRateInterestSelection(SameRateInterestSelection.builder()
-                    .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+                                               .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000)).build();
 
@@ -1131,7 +1131,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
+                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(
+                    1)).build()).build());
             CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
                 .build();
 
@@ -1148,7 +1149,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().plusDays(1)).build()).build());
+                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().plusDays(
+                    1)).build()).build());
             CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
                 .build();
 
@@ -1169,7 +1171,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
+                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(
+                    1)).build()).build());
             CaseData caseData = CaseData.builder().totalClaimAmount(new BigDecimal(1000))
                 .build();
 
@@ -1194,11 +1197,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
+                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(
+                    1)).build()).build());
             CaseData caseData = CaseData.builder().claimInterest(YES)
                 .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
                 .sameRateInterestSelection(SameRateInterestSelection.builder()
-                    .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+                                               .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
@@ -1288,7 +1292,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
         }
 
@@ -1329,7 +1333,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
             @Test
@@ -1366,7 +1370,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
             @Test
@@ -1403,7 +1407,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
         }
@@ -1877,13 +1881,13 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
             given(defendantPinToPostLRspecService.buildDefendantPinToPost())
                 .willReturn(DefendantPinToPostLRspec.builder()
-                    .accessCode(
-                        AccessCodeGenerator.generateAccessCode())
-                    .respondentCaseRole(
-                        CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                    .expiryDate(LocalDate.now().plusDays(
-                        180))
-                    .build());
+                                .accessCode(
+                                    AccessCodeGenerator.generateAccessCode())
+                                .respondentCaseRole(
+                                    CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                .expiryDate(LocalDate.now().plusDays(
+                                    180))
+                                .build());
         }
 
         @Test
@@ -1951,7 +1955,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             System.out.println(response.getData().get("applicantSolicitor1PbaAccounts"));
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
-            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain(
+                "98765");
         }
 
         @Test
@@ -2324,7 +2329,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region")
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting(
+                        "region")
                     .isEqualTo("Site Name");
             }
 
@@ -2346,7 +2352,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString("flightCourtLocation");
+                assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString(
+                    "flightCourtLocation");
             }
         }
     }
@@ -2621,14 +2628,14 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
                     .confirmationBody(
                         format(
-                        SPEC_LIP_CONFIRMATION_BODY_PBAV3,
-                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
-                        format("/cases/case-details/%s#CaseDocuments", CASE_ID),
-                        responsePackLink,
-                        n9aLink,
-                        n9bLink,
-                        n215Link
-                    ) + exitSurveyContentService.applicantSurvey())
+                            SPEC_LIP_CONFIRMATION_BODY_PBAV3,
+                            format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink,
+                            n9aLink,
+                            n9bLink,
+                            n215Link
+                        ) + exitSurveyContentService.applicantSurvey())
                     .build());
         }
     }

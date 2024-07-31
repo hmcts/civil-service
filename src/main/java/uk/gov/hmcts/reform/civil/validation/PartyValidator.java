@@ -18,7 +18,7 @@ public class PartyValidator {
 
     public static final String NAME_LENGTH_ERROR = "Name exceeds maximum length 70";
 
-    public static final String WELSH_CHARS = ".*[ˆ`´¨].*";
+    public static final String[] WELSH_CHARS = {"ˆ", "`", "´", "¨"};
 
     public static final String WELSH_CHAR_ERROR = "Special characters are not allowed";
 
@@ -60,18 +60,15 @@ public class PartyValidator {
     }
 
     private boolean hasWelshChars(String strToMatch) {
-
-        if (strToMatch != null && strToMatch.matches(WELSH_CHARS)) {
-            return true;
+        for (String s : WELSH_CHARS) {
+            if (strToMatch != null && strToMatch.indexOf(s) != -1) {
+                return true;
+            }
         }
         return false;
     }
 
     private boolean exceedsLength(String strToCheck, int length) {
-
-        if (strToCheck != null && strToCheck.length() > length) {
-            return true;
-        }
-        return false;
+        return strToCheck != null && strToCheck.length() > length ? true : false;
     }
 }
