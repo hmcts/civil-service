@@ -58,7 +58,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
         var recipient = caseData.getRespondent1().getPartyEmail();
         String template = caseData.isPartAdmitPayImmediatelyAccepted()
             ? notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec()
-            : notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip();
+            : notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
         Map<String, String> properties = addProperties(caseData);
         if (StringUtils.isNotBlank(recipient)) {
             notificationService.sendMail(
