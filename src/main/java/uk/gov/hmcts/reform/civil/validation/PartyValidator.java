@@ -24,7 +24,6 @@ public class PartyValidator {
 
     public List<String> validateAddress(Address primaryAddress, List<String> errors) {
 
-        if (primaryAddress != null) {
             if (exceedsLength(primaryAddress.getAddressLine1(), ADDRESS_MAX_LENGTH_ALLOWED)) {
                 errors.add("Building and Street " + ADDRESS_LENGTH_ERROR);
             }
@@ -49,7 +48,6 @@ public class PartyValidator {
                 || hasWelshChars(primaryAddress.getCounty()) || hasWelshChars(primaryAddress.getPostCode())) {
                 errors.add(WELSH_CHAR_ERROR);
             }
-        }
         return errors;
     }
 
