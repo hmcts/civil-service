@@ -30,8 +30,8 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -183,10 +183,10 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("4 March 2024");
         assertThat(result).extracting("trialArrangementDeadlineCy")
             .isEqualTo("4 Mawrth 2024");
-        assertThat(result).extracting("bundleRestitchedDateEn").
-            isEqualTo(DateUtils.formatDate(LocalDate.now()));
-        assertThat(result).extracting("bundleRestitchedDateCy").
-            isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
+        assertThat(result).extracting("bundleRestitchedDateEn")
+            .isEqualTo(DateUtils.formatDate(LocalDate.now()));
+        assertThat(result).extracting("bundleRestitchedDateCy")
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
 
     }
 
