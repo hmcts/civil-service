@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
@@ -775,49 +774,23 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isNationalRolloutEnabled()) {
-            if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YES);
+        if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            caseDataBuilder.eaCourtLocation(YES);
 
-                if (featureToggleService.isHmcEnabled()) {
-                    caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                        caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-                }
-            } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(NO);
+            if (featureToggleService.isHmcEnabled()) {
+                caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
+                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
             }
         } else {
-            if (featureToggleService.isEarlyAdoptersEnabled()) {
-                // check epimm from judge selected court in SDO journey
-                if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
-                    // check epimm from case management location
-                    && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
-                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-                } else {
-                    log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YesOrNo.NO);
-                }
-            }
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            caseDataBuilder.eaCourtLocation(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
-    }
-
-    private String getEpimmsId(CaseData caseData) {
-        if (caseData.getTrialHearingMethodInPersonDJ() != null) {
-            return Optional.ofNullable(caseData.getTrialHearingMethodInPersonDJ().getValue())
-                .map(DynamicListElement::getCode).orElse(null);
-        } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
-            return Optional.ofNullable(caseData.getDisposalHearingMethodInPersonDJ().getValue())
-                .map(DynamicListElement::getCode).orElse(null);
-        }
-        throw new IllegalArgumentException("Epimms Id is not provided");
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
