@@ -4,18 +4,17 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
@@ -32,20 +31,17 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CLAIM_ISSUED_
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildClaimantReference;
 
-@SpringBootTest(classes = {
-    ClaimContinuingOnlineApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @Autowired
+
+    @InjectMocks
     private ClaimContinuingOnlineApplicantNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {

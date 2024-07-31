@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -29,19 +30,20 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
-@SpringBootTest(classes = {
-    TakeCaseOfflineEventHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CoreCaseDataService.class
-})
+@ExtendWith(MockitoExtension.class)
 class TakeCaseOfflineEventHandlerTest {
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @Autowired
     private TakeCaseOfflineEventHandler takeCaseOfflineEventHandler;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+        takeCaseOfflineEventHandler = new TakeCaseOfflineEventHandler(coreCaseDataService, caseDetailsConverter);
+    }
 
     @Test
     void shouldTakeCaseOfflineOnTakeCaseOfflineEvent() {
