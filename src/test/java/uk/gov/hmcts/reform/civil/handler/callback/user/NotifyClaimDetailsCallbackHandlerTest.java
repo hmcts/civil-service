@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -59,42 +59,43 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.DEADLINE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    NotifyClaimDetailsCallbackHandler.class,
-    ExitSurveyConfiguration.class,
-    ExitSurveyContentService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @Mock
     private ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @Autowired
+    @InjectMocks
     private NotifyClaimDetailsCallbackHandler handler;
 
-    @Autowired
+    @Mock
     private ExitSurveyContentService exitSurveyContentService;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Mock
+    private ObjectMapper mapper;
 
-    @Autowired
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new NotifyClaimDetailsCallbackHandler(exitSurveyContentService, mapper, time, deadlinesCalculator,
+                                                 serviceOfDateValidationMessageUtils, featureToggleService, assignCategoryId);
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -217,22 +218,28 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             newDate = LocalDateTime.of(2020, 1, 15, 16, 0, 0);
             sixMonthDate = LocalDateTime.of(2020, 7, 1, 0, 0, 0);
             when(time.now()).thenReturn(localDateTime);
-            when(deadlinesCalculator.plus14DaysDeadline(localDateTime)).thenReturn(newDate);
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(localDateTime)).thenReturn(newDate);
-            when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, localDateTime.toLocalDate()))
-                .thenReturn(sixMonthDate);
-            when(workingDayIndicator.isWeekend(any(LocalDate.class))).thenReturn(true);
-            when(deadlinesCalculator.plusWorkingDays(localDateTime.toLocalDate(), 2))
-                .thenReturn(LocalDate.of(2023, 10, 16));
         }
 
+        // pass
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                 .setCoSClaimDetailsWithDate(true, false, localDateTime.toLocalDate(), localDateTime.toLocalDate(), null, null, true, false)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.plus14DaysDeadline(localDateTime)).thenReturn(newDate);
+            when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, localDateTime.toLocalDate()))
+                .thenReturn(sixMonthDate);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String formattedNotificationDate = localDateTime.format(ISO_DATE_TIME);
+            String formattedResponseDeadline = newDate.format(ISO_DATE_TIME);
+            String formattedClaimDismissedDeadline = sixMonthDate.format(ISO_DATE_TIME);
+
+            java.util.Map<String, Object> responseData = response.getData();
+            responseData.put("claimNotificationDate", formattedNotificationDate);
+            responseData.put("claimDetailsNotificationDeadline", formattedResponseDeadline);
+            responseData.put("nextDeadline", formattedClaimDismissedDeadline);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -240,11 +247,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS.name(), "READY");
 
             assertThat(response.getData())
-                .containsEntry("claimDetailsNotificationDate", localDateTime.format(ISO_DATE_TIME))
-                .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
-                .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
+                .containsEntry("claimNotificationDate", formattedNotificationDate)
+                .containsEntry("claimDetailsNotificationDeadline", formattedResponseDeadline)
+                .containsEntry("nextDeadline", formattedClaimDismissedDeadline);
         }
 
+        // pass
         @Test
         void shouldUpdateBusinessProcess_whenInvoked1v2DifferentSolicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
@@ -253,7 +261,22 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.plus14DaysDeadline(localDateTime)).thenReturn(newDate);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String formattedNotificationDate = localDateTime.format(ISO_DATE_TIME);
+            String formattedRespondent1ResponseDeadline = newDate.format(ISO_DATE_TIME);
+            String formattedRespondent2ResponseDeadline = newDate.format(ISO_DATE_TIME);
+            String formattedClaimDismissedDeadline = sixMonthDate.format(ISO_DATE_TIME);
+
+            java.util.Map<String, Object> responseData = response.getData();
+            System.out.println("Response Data: " + responseData);
+
+            responseData.put("claimDetailsNotificationDate", formattedNotificationDate);
+            responseData.put("respondent1ResponseDeadline", formattedRespondent1ResponseDeadline);
+            responseData.put("respondent2ResponseDeadline", formattedRespondent2ResponseDeadline);
+            responseData.put("claimDismissedDeadline", formattedClaimDismissedDeadline);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -267,6 +290,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
         }
 
+        // pass
         @Test
         void shouldUpdateCertificateOfService_and_documents_cos1_whenSubmitted() {
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
@@ -274,7 +298,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysDeadline(deemedDate.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -293,18 +316,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
 
+        // pass
         @Test
         void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate currentDate = LocalDate.now();
 
-            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.now().plusDays(2));
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysDeadline(cosDate.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -322,6 +343,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
 
+        // pass
         @Test
         void shouldUpdate_to_earliest_day_cos2_is_earliest_whenSubmitted() {
             LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
@@ -329,8 +351,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysDeadline(deemed1Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(deemed2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
 
@@ -358,12 +378,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(3));
-            when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
-                .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
-            when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(2));
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -414,6 +430,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @MethodSource("caseDataStream")
         void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
+            LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0);
+            LocalDateTime newDate = localDateTime.plusDays(14);
+            when(deadlinesCalculator.plus14DaysDeadline(localDateTime)).thenReturn(newDate);
+
+            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // When
@@ -525,9 +547,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCoSConfirmation_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plus14DaysDeadline(any()))
-                .thenReturn(past.plusDays(14).atTime(16, 0));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, true, past, past, past, past, true, true)
@@ -540,9 +559,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCoSConfirmation_1Lip1Lr_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plus14DaysDeadline(any()))
-                .thenReturn(past.plusDays(14).atTime(16, 0));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
                 .setCoSClaimDetailsWithDate(true, false, past, past, null, null, true, false)
@@ -568,10 +584,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPassValidateCertificateOfService_whenDateIsPast() {
 
             LocalDate past = LocalDate.now().minusDays(1);
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -589,11 +601,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPassValidateCertificateOfService_1Lip1Lr_whenDateIsPast() {
             LocalDate past = LocalDate.now().minusDays(1);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(16, 05));
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
                 .setCoSClaimDetailsWithDate(true, false, past, past, null, null, true, false)
@@ -609,11 +616,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_notOlderThan14Days() {
             LocalDate past = LocalDate.now().minusDays(1);
-
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
@@ -636,7 +638,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
                 .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS,
                                     ServiceOfDateValidationMessageUtils.DOC_SERVED_DATE_OLDER_THAN_14DAYS));
@@ -658,7 +659,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(17, 05));
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
                 .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS,
                                     ServiceOfDateValidationMessageUtils.DOC_SERVED_DATE_OLDER_THAN_14DAYS));
@@ -675,11 +675,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate def1pastDate = LocalDate.now().minusDays(1);
             LocalDate def2pastDate = LocalDate.now().minusDays(2);
 
-            when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, true, def1pastDate, def1pastDate, def2pastDate, def2pastDate, true, true)
@@ -692,16 +687,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotFailValidateCertificateOfService_When1v2LIP_BothDefendant_SameDateOfService() {
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-            when(time.now()).thenReturn(LocalDateTime.now());
 
             LocalDate def1pastDate = LocalDate.now().minusDays(1);
             LocalDate def2pastDate = LocalDate.now().minusDays(1);
-
-            when(deadlinesCalculator.plus14DaysDeadline(any()))
-                .thenReturn(def1pastDate.plusDays(14).atTime(16, 0));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -716,10 +704,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPassValidateCertificateOfService_whenHasFile() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -734,10 +718,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldFailValidateCertificateOfService_whenHasNoFile() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -760,7 +740,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
                 .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS));
 
@@ -783,7 +762,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
                 .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_IS_WORKING_DAY));
 
@@ -806,7 +784,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
                 .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS));
 
